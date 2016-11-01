@@ -1,11 +1,11 @@
 
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FavoriteMovies", "favoriteMovies\favoriteMovies.csproj", "{7F66213F-A1B5-4473-A26D-F19555F0BA51}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "favoriteMovies", "favoriteMovies\favoriteMovies.csproj", "{7F66213F-A1B5-4473-A26D-F19555F0BA51}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FavoriteMovies.UITests", "favoriteMovies.UITests\favoriteMovies.UITests.csproj", "{56BC9F61-DA92-4E35-9F12-F249F3D08B67}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "favoriteMovies.UITests", "favoriteMovies.UITests\favoriteMovies.UITests.csproj", "{56BC9F61-DA92-4E35-9F12-F249F3D08B67}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FavoriteMoviesPCL", "favoriteMoviesPCL\favoriteMoviesPCL.csproj", "{5E21058F-6E9D-49C9-B81F-9B975C2A44BD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "favoriteMoviesPCL", "favoriteMoviesPCL\favoriteMoviesPCL.csproj", "{5E21058F-6E9D-49C9-B81F-9B975C2A44BD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

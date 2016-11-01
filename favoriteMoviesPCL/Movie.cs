@@ -10,8 +10,8 @@ namespace FavoriteMoviesPCL
 		}
 
 		public string Title { get; set; }
-		public Uri HighResPosterPath { get; set; }
-		public Uri PosterPath { get; set; }
+		public string HighResPosterPath { get; set; }
+		public string PosterPath { get; set; }
 		public int Id { get; set; }
 		public string Overview { get; set; }
 		public double VoteCount { get; set; }

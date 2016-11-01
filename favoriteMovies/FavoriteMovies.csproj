@@ -117,13 +117,13 @@
   <ItemGroup>
     <Compile Include="Main.cs" />
     <Compile Include="AppDelegate.cs" />
-    <Compile Include="SecondViewController.cs" />
-    <Compile Include="MovieCell.cs" />
-    <Compile Include="LineLayout.cs" />
+    <Compile Include="TopRatedCollectionViewController.cs" />
     <Compile Include="Extensions.cs" />
-    <Compile Include="MovieCollectionSource.cs" />
-    <Compile Include="GridLayout.cs" />
-    <Compile Include="CircleLayout.cs" />
+    <Compile Include="NowPlayingCollectionViewController.cs" />
+    <Compile Include="MovieDetailViewController.cs" />
+    <Compile Include="MovieDetailViewController.designer.cs">
+      <DependentUpon>MovieDetailViewController.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <BundleResource Include="Resources\placeholder.png" />
@@ -133,6 +133,9 @@
       <Project>{5E21058F-6E9D-49C9-B81F-9B975C2A44BD}</Project>
       <Name>favoriteMoviesPCL</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <InterfaceDefinition Include="MovieDetailViewController.xib" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 </Project>

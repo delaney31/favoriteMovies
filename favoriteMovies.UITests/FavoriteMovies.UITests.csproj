@@ -36,7 +36,7 @@
   <ItemGroup>
     <ProjectReference Include="..\favoriteMovies\favoriteMovies.csproj">
       <Project>{7F66213F-A1B5-4473-A26D-F19555F0BA51}</Project>
-      <Name>FavoriteMovies</Name>
+      <Name>favoriteMovies</Name>
       <ReferenceOutputAssembly>False</ReferenceOutputAssembly>
       <Private>False</Private>
     </ProjectReference>

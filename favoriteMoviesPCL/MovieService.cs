@@ -63,7 +63,7 @@ namespace FavoriteMoviesPCL
 				} catch (Exception ex) {
 					//Model Error
 					Debug.WriteLine (ex);
-					return null;
+
 				}
 			}
 			//Server Error or no internet connection.
@@ -77,20 +77,29 @@ namespace FavoriteMoviesPCL
 			JObject jresponse = JObject.Parse (content);
 			var jarray = jresponse ["results"];
 			ObservableCollection<Movie> movieList = new ObservableCollection<Movie> ();
+			try {
+				foreach (var jObj in jarray) {
+					Movie newMovie = new Movie ();
+					newMovie.Title = (string)jObj ["title"];
+					newMovie.PosterPath = (string)jObj ["poster_path"];
+					newMovie.HighResPosterPath = (string)jObj ["poster_path"];
+					newMovie.Id = (int)jObj ["id"];
+					newMovie.Overview = (string)jObj ["overview"];
+					newMovie.VoteCount = (double)jObj ["vote_count"];
+					newMovie.ReleaseDate = (DateTime)jObj ["release_date"];
+					newMovie.VoteAverage = (float)jObj ["vote_average"];
+					movieList.Add (newMovie);
+				}
+			} catch (Exception e) {
 
-			foreach (var jObj in jarray) {
-				Movie newMovie = new Movie ();
-				newMovie.Title = (string)jObj ["title"];
-				newMovie.PosterPath = new Uri(_baseImgUrl + (string)jObj ["poster_path"]);
-				newMovie.HighResPosterPath = new Uri(_baseImgUrl + (string)jObj ["poster_path"]);
-				newMovie.Id = (int)jObj ["id"];
-				newMovie.Overview = (string)jObj ["overview"];
-				newMovie.VoteCount = (double)jObj ["vote_count"];
-				newMovie.ReleaseDate = (DateTime)jObj ["release_date"];
-				newMovie.VoteAverage = (float)jObj ["vote_average"];
-				movieList.Add (newMovie);
+				Debug.WriteLine (e.Message);
+				//if one of the json items is malformed delete it and send what we have.
+				movieList.RemoveAt (movieList.Count - 1);
+				 //log message and send what we have.
 			}
-			return movieList;
+				return movieList;
+
+
 		}
 
 		//POST Example:

@@ -32,7 +32,6 @@ namespace FavoriteMovies
 			{ 
 				NowPlaying = MovieService.GetMoviesAsync(MovieService.MovieType.NowPaying).Result;
 				TopRated = MovieService.GetMoviesAsync (MovieService.MovieType.TopRated).Result;
-				Similar = MovieService.GetMoviesAsync (MovieService.MovieType.Similar).Result;
 				Popular = MovieService.GetMoviesAsync (MovieService.MovieType.Popular).Result;
 			});
 			task.Wait ();
@@ -49,26 +48,9 @@ namespace FavoriteMovies
 
 
 
-			var tab1 = new SimpleCollectionViewController (flowLayout, TopRated, NowPlaying, Similar, Popular);
-			var tab2 = new SecondViewController (flowLayout);
-
-
-			tab1.Title = "Movies";
-			tab1.TabBarItem = new UITabBarItem (UITabBarSystemItem.TopRated, 0);
-			//tab1.CollectionView.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
-
-			tab2.Title = "Favorites";
-			tab2.TabBarItem = new UITabBarItem (UITabBarSystemItem.Favorites, 0);
-			//tab2.CollectionView.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
-
-
-			var tab = new UITabBarController();
-			tab.AddChildViewController (tab1);
-			tab.AddChildViewController (tab2);
-
 			var nav = new UINavigationController ();
 
-			nav.AddChildViewController (tab);
+			nav.AddChildViewController (new TopRatedCollectionViewController (flowLayout, TopRated, NowPlaying,Popular));
 			nav.NavigationBar.BarTintColor = UIColor.Clear.FromHexString (UIColorExtensions.NAV_BAR_COLOR, 1.0f);
 			nav.NavigationBar.TintColor = UIColor.White;
 			nav.NavigationBar.Translucent = false;

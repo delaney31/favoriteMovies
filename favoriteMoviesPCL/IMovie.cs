@@ -6,8 +6,8 @@ namespace FavoriteMoviesPCL
 	public interface IMovie
 	{
 		string Title { get; set; }
-		Uri HighResPosterPath { get; set; }
-		Uri PosterPath { get; set; }
+		string HighResPosterPath { get; set; }
+		string PosterPath { get; set; }
 		int Id { get; set; }
 		string Overview { get; set; }
 		double VoteCount { get; set; }
