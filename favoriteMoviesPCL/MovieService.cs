@@ -30,7 +30,7 @@ namespace FavoriteMoviesPCL
 		}
 
 		//GET Example
-		public static async Task<ObservableCollection<Movie>> GetMoviesAsync (MovieType type,int page = 1)
+		public static async Task<ObservableCollection<Movie>> GetMoviesAsync (MovieType type,int page = 1, int movieId=0)
 		{
 			HttpClient client = new HttpClient ();
 			string Url = "";
@@ -42,12 +42,12 @@ namespace FavoriteMoviesPCL
 					break;
 				case MovieType.NowPaying:
 					Url = _baseUrl + "movie/now_playing?api_key=" + _apiKey + _pageString + page;
-					break;
+				break;
 				case MovieType.Popular:
 					Url = _baseUrl + "movie/popular?api_key=" + _apiKey + _pageString + page;
 					break;
 				case MovieType.Similar:
-					Url = _baseUrl + "movie/simular?api_key=" + _apiKey + _pageString + page;
+					Url = _baseUrl + "movie/" + movieId+"/simular?api_key=" + _apiKey + _pageString + page;
 				break;
 			}
 

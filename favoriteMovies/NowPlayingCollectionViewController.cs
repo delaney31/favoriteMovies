@@ -25,7 +25,7 @@ namespace FavoriteMovies
 			_items = movies;
 			rootNav =(UINavigationController)rootnav.RootViewController;
 			window = rootnav;
-			//this.Layout = layout;
+
 		}
 
 		public NowPlayingCollectionViewController (UICollectionViewLayout layout,UIWindow rootnav): base (layout)
@@ -54,7 +54,7 @@ namespace FavoriteMovies
 					if(view is UICollectionView)
 					   view.RemoveFromSuperview ();
 				}
-				rootNav.PushViewController (new MovieDetailViewController (row), true);
+				rootNav.PushViewController (new MovieDetailsViewController (row), true);
 			} catch (Exception e) 
 			{
 				Debug.WriteLine (e.Message);

@@ -7,21 +7,21 @@
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="MovieDetailViewController">
             <connections>
                 <outlet property="view" destination="2" id="RRd-Eg-VrN"/>
-                <outlet property="posterImage" destination="2" id="name-outlet-2"/>
-                <outlet property="Title" destination="10" id="name-outlet-10"/>
+                <outlet property="movieDetails" destination="2" id="name-outlet-2"/>
+                <outlet property="MovieTitle" destination="10" id="name-outlet-10"/>
                 <outlet property="releaseDate" destination="11" id="name-outlet-11"/>
                 <outlet property="rating" destination="12" id="name-outlet-12"/>
                 <outlet property="numberofVotes" destination="14" id="name-outlet-14"/>
                 <outlet property="PlayVideo" destination="15" id="name-outlet-15"/>
                 <outlet property="SaveToFavorites" destination="16" id="name-outlet-16"/>
-                <outlet property="Description" destination="18" id="name-outlet-18"/>
-                <outlet property="SimilarMovies" destination="22" id="name-outlet-22"/>
+                <outlet property="MovieDescription" destination="18" id="name-outlet-18"/>
                 <outlet property="similiarMoviesCollection" destination="19" id="name-outlet-19"/>
                 <outlet property="similarMovies" destination="28" id="name-outlet-28"/>
+                <outlet property="posterImage" destination="7" id="name-outlet-7"/>
             </connections>
         </placeholder>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
-        <view contentMode="scaleToFill" id="2">
+        <view contentMode="scaleToFill" id="2" customClass="MovieDetailViewController">
             <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
             <subviews>
@@ -122,12 +122,6 @@
                         <rect key="frame" x="20" y="503" width="319" height="84"/>
                     </variation>
                 </collectionView>
-                <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" id="22" translatesAutoresizingMaskIntoConstraints="NO" fixedFrame="YES" text="Similar Movies">
-                    <rect key="frame" x="28" y="995" width="184" height="27"/>
-                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                    <fontDescription key="fontDescription" style="UICTFontTextStyleCaption1"/>
-                    <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
-                </textView>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Similar Movies" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="28" translatesAutoresizingMaskIntoConstraints="NO" fixedFrame="YES">
                     <rect key="frame" x="20" y="334" width="87" height="21"/>
                     <fontDescription key="fontDescription" style="UICTFontTextStyleCaption1"/>
@@ -135,7 +129,7 @@
                     <nil key="highlightedColor"/>
                 </label>
                 <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" id="32" translatesAutoresizingMaskIntoConstraints="NO" fixedFrame="YES">
-                    <rect key="frame" x="20" y="363" width="355" height="128"/>
+                    <rect key="frame" x="20" y="363" width="324" height="128"/>
                     <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="34">
                         <size key="itemSize" width="50" height="50"/>
                         <size key="headerReferenceSize" width="0.0" height="0.0"/>
@@ -158,6 +152,9 @@
             <constraints>
                 <constraint id="25" firstItem="10" firstAttribute="height" secondItem="2" secondAttribute="height"/>
             </constraints>
+            <connections>
+                <outlet property="scrollView" destination="6" id="name-outlet-6"/>
+            </connections>
         </view>
     </objects>
     <resources>

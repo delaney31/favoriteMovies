@@ -16,7 +16,15 @@ namespace FavoriteMovies
     {
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        UIKit.UITextView Description { get; set; }
+        UIKit.UITextView MovieDescription { get; set; }
+
+        [Outlet]
+        [GeneratedCode ("iOS Designer", "1.0")]
+        FavoriteMovies.MovieDetailViewController movieDetails { get; set; }
+
+        [Outlet]
+        [GeneratedCode ("iOS Designer", "1.0")]
+        UIKit.UITextView MovieTitle { get; set; }
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
@@ -26,10 +34,7 @@ namespace FavoriteMovies
         [GeneratedCode ("iOS Designer", "1.0")]
         UIKit.UIButton PlayVideo { get; set; }
 
-        [Outlet]
-        [GeneratedCode ("iOS Designer", "1.0")]
-        UIKit.UIView posterImage { get; set; }
-
+        
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
         UIKit.UIImageView rating { get; set; }
@@ -44,25 +49,31 @@ namespace FavoriteMovies
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        UIKit.UILabel similarMovies { get; set; }
+        UIKit.UIScrollView scrollView { get; set; }
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
-        UIKit.UITextView SimilarMovies { get; set; }
+        UIKit.UILabel similarMovies { get; set; }
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
         UIKit.UICollectionView similiarMoviesCollection { get; set; }
 
-        [Outlet]
-        [GeneratedCode ("iOS Designer", "1.0")]
-        UIKit.UITextView Title { get; set; }
-
         void ReleaseDesignerOutlets ()
         {
-            if (Description != null) {
-                Description.Dispose ();
-                Description = null;
+            if (MovieDescription != null) {
+                MovieDescription.Dispose ();
+                MovieDescription = null;
+            }
+
+            if (movieDetails != null) {
+                movieDetails.Dispose ();
+                movieDetails = null;
+            }
+
+            if (MovieTitle != null) {
+                MovieTitle.Dispose ();
+                MovieTitle = null;
             }
 
             if (numberofVotes != null) {
@@ -75,10 +86,6 @@ namespace FavoriteMovies
                 PlayVideo = null;
             }
 
-            if (posterImage != null) {
-                posterImage.Dispose ();
-                posterImage = null;
-            }
 
             if (rating != null) {
                 rating.Dispose ();
@@ -95,24 +102,19 @@ namespace FavoriteMovies
                 SaveToFavorites = null;
             }
 
+            if (scrollView != null) {
+                scrollView.Dispose ();
+                scrollView = null;
+            }
+
             if (similarMovies != null) {
                 similarMovies.Dispose ();
                 similarMovies = null;
             }
 
-            if (SimilarMovies != null) {
-                SimilarMovies.Dispose ();
-                SimilarMovies = null;
-            }
-
             if (similiarMoviesCollection != null) {
                 similiarMoviesCollection.Dispose ();
                 similiarMoviesCollection = null;
-            }
-
-            if (Title != null) {
-                Title.Dispose ();
-                Title = null;
             }
         }
     }

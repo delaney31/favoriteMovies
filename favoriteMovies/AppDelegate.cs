@@ -28,9 +28,8 @@ namespace FavoriteMovies
 			window = new UIWindow (UIScreen.MainScreen.Bounds);
 
 
-			var task = Task.Run (async () => 
-			{ 
-				NowPlaying = MovieService.GetMoviesAsync(MovieService.MovieType.NowPaying).Result;
+			var task = Task.Run (async () => {
+				NowPlaying = MovieService.GetMoviesAsync (MovieService.MovieType.NowPaying).Result;
 				TopRated = MovieService.GetMoviesAsync (MovieService.MovieType.TopRated).Result;
 				Popular = MovieService.GetMoviesAsync (MovieService.MovieType.Popular).Result;
 			});
@@ -43,23 +42,22 @@ namespace FavoriteMovies
 				ScrollDirection = UICollectionViewScrollDirection.Horizontal,
 				MinimumInteritemSpacing = 10, // minimum spacing between cells
 				MinimumLineSpacing = -5, // minimum spacing between rows if ScrollDirection is Vertical or between columns if Horizontal
-				ItemSize = new CGSize(110,150)
+				ItemSize = new CGSize (110, 150)
 			};
 
 
 
 			var nav = new UINavigationController ();
 
-			nav.AddChildViewController (new TopRatedCollectionViewController (flowLayout, TopRated, NowPlaying,Popular));
+			nav.AddChildViewController (new TopRatedCollectionViewController (flowLayout, TopRated, NowPlaying, Popular));
 			nav.NavigationBar.BarTintColor = UIColor.Clear.FromHexString (UIColorExtensions.NAV_BAR_COLOR, 1.0f);
 			nav.NavigationBar.TintColor = UIColor.White;
 			nav.NavigationBar.Translucent = false;
 			nav.NavigationBar.TopItem.Title = UIColorExtensions.TITLE;
-			UINavigationBar.Appearance.SetTitleTextAttributes (new UITextAttributes () {
+			nav.NavigationBar.TitleTextAttributes = new UIStringAttributes () {
 				Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, 18),
-				TextColor = UIColor.Clear.FromHexString (UIColorExtensions.TITLE_COLOR, 1.0f)
-			});
-
+				ForegroundColor =UIColor.White//= UIColor.Clear.FromHexString (UIColorExtensions.TITLE_COLOR, 1.0f)
+			};
 
 
 			window.RootViewController = nav;
@@ -68,7 +66,7 @@ namespace FavoriteMovies
 
 			// Code to start the Xamarin Test Cloud Agent
 #if ENABLE_TEST_CLOUD
-			Xamarin.Calabash.Start();
+			Xamarin.Calabash.Start ();
 #endif
 
 			return true;
@@ -107,6 +105,6 @@ namespace FavoriteMovies
 	}
 
 
-	
+
 }
 

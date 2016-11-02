@@ -120,9 +120,10 @@
     <Compile Include="TopRatedCollectionViewController.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="NowPlayingCollectionViewController.cs" />
-    <Compile Include="MovieDetailViewController.cs" />
-    <Compile Include="MovieDetailViewController.designer.cs">
-      <DependentUpon>MovieDetailViewController.cs</DependentUpon>
+    <Compile Include="EmptyClass.cs" />
+    <Compile Include="MovieDetailsViewController.cs" />
+    <Compile Include="MovieDetailsViewController.designer.cs">
+      <DependentUpon>MovieDetailsViewController.cs</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -135,7 +136,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <InterfaceDefinition Include="MovieDetailViewController.xib" />
+    <InterfaceDefinition Include="MovieDetailsViewController.xib" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
 </Project>

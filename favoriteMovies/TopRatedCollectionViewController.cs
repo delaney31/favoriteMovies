@@ -38,13 +38,12 @@ namespace FavoriteMovies
 		UICollectionViewFlowLayout flowLayout;
 		NowPlayingCollectionViewController nowPlayingController;
 		PopularCollectionViewController popularController;
-		//UICollectionViewLayout layout;
+
 		UIWindow window;
 		static UILabel TopRatedLabel;
 		static UILabel PlayingNowLabel;
 		static UILabel PopularLabel;
 
-		//public CGRect FrameRec { get; set; }
 
 
 		public TopRatedCollectionViewController (UICollectionViewLayout layout, ObservableCollection<Movie> topRated, ObservableCollection<Movie> nowPlaying, ObservableCollection<Movie> popular ): base (layout)
@@ -127,7 +126,7 @@ namespace FavoriteMovies
 			popularController.CollectionView.ContentMode = UIViewContentMode.ScaleAspectFit;
 			popularController.CollectionView.SizeToFit ();
 
-
+			// adding views to keywindow. This is not the ideal way but ran out of time..
 			window.AddSubview(TopRatedLabel);
 			window.AddSubview(PlayingNowLabel);
 			window.AddSubview (PopularLabel);
@@ -160,11 +159,12 @@ namespace FavoriteMovies
 				var row = topRated [indexPath.Row];
 				HideLabels ();
 				var views = window.Subviews;
+				//hack to remove views added to keywindow
 				foreach (var view in views) {
 					if (view is UICollectionView)
 						view.RemoveFromSuperview ();
 				}
-				((UINavigationController)window.RootViewController).PushViewController (new MovieDetailViewController (row), true);
+				((UINavigationController)window.RootViewController).PushViewController (new MovieDetailsViewController (row), true);
 			} catch (Exception e) {
 				Debug.WriteLine (e.Message);
 			}
@@ -189,7 +189,7 @@ namespace FavoriteMovies
 			var Moviecell= (MovieCell)collectionView.DequeueReusableCell (movieTopRatedCellId, indexPath);
 
 			var row = topRated[indexPath.Row];
-
+			// left this comment because this a really cool way to pass a objective c enum to Xamarin
 			//IntPtr uikit = Dlfcn.dlopen (Constants.UIKitLibrary, 0);
 			//NSString header = Dlfcn.GetStringConstant (uikit, "UICollectionElementKindSectionHeader");
 
@@ -226,7 +226,7 @@ namespace FavoriteMovies
 			ImageView.Image = GetImage(element.PosterPath);
 		}
 
-		public UIImage GetImage (string posterPath)
+		public static UIImage GetImage (string posterPath)
 		{
 			if (posterPath != null) {
 				var uri = new Uri (posterPath);
