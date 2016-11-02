@@ -11,6 +11,7 @@ namespace FavoriteMovies
 {
 	public partial class MovieDetailsViewController : UIViewController
 	{
+		
 
 		Movie movieDetail;
 		ObservableCollection<Movie> similarMovies;
@@ -61,8 +62,15 @@ namespace FavoriteMovies
 
 
 			posterImage.ContentMode = UIViewContentMode.ScaleToFill;
-			posterImage.Layer.BorderWidth = 1.0f;
-			posterImage.Layer.BorderColor = UIColor.White.CGColor;
+			if (UIColorExtensions.MovieIsFavorite (movieDetail.Id.ToString()))
+			{
+				posterImage.Layer.BorderWidth = 2.0f;
+				posterImage.Layer.BorderColor = UIColor.Orange.CGColor;
+			} else 
+			{
+				posterImage.Layer.BorderWidth = 1.0f;
+				posterImage.Layer.BorderColor = UIColor.White.CGColor;
+			}
 			posterImage.ClipsToBounds = true;
 			posterImage.Image = MovieCell.GetImage (movieDetail.HighResPosterPath);
 
@@ -87,15 +95,60 @@ namespace FavoriteMovies
 
 			descriptView.Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, 13);
 			descriptView.TextColor = UIColor.White;
-			descriptView.ResignFirstResponder ();
 
-			//this..RegisterClassForCell (typeof (UserCell), UserCell.CellID);
-			//collectionViewUser.ShowsHorizontalScrollIndicator = false;
-			//collectionViewUser.Source = userSource;
+			saveFavoriteButt.TouchDown += SaveFavoriteButt_TouchDown;
+			saveFavoriteButt.BackgroundColor = UIColor.Orange;
+			playVideoButt.SetTitle ( "Clear Favorites",UIControlState.Normal);
+			playVideoButt.TouchDown += PlayVideoButt_TouchDown;
+			playVideoButt.BackgroundColor = UIColor.Green;
+
+
+
 
 
 		}
+		void PlayVideoButt_TouchDown (object sender, EventArgs e)
+		{
+			posterImage.Layer.BorderWidth = 1.0f;
+			posterImage.Layer.BorderColor = UIColor.White.CGColor;
+			try {
+				using (var db = new SQLite.SQLiteConnection (MovieService.Database)) {
+					db.DropTable<Movie> ();
+				}
+			} catch (SQLite.SQLiteException) 
+			{
+				//first time in no favorites yet.
+			}
+		}
+		void SaveFavoriteButt_TouchDown (object sender, EventArgs e)
+		{
+			posterImage.Layer.BorderWidth = 2.0f;
+			posterImage.Layer.BorderColor = UIColor.Orange.CGColor;
+			movieDetail.Favorite = true;
+			// Create the database and a table to hold Favorite information.
+			try {
+				using (var db = new SQLite.SQLiteConnection (MovieService.Database)) {
+					db.Insert (movieDetail);
+				}
+			} catch (SQLite.SQLiteException ) {
 
+				//create db if not created.
+
+				}using (var conn = new SQLite.SQLiteConnection (MovieService.Database)) {
+					conn.CreateTable<Movie> ();
+					using (var db = new SQLite.SQLiteConnection (MovieService.Database)) {
+					db.Insert (movieDetail);
+					}
+				}
+
+		}
+
+		//dismiss keyboard
+		public override void TouchesBegan (NSSet touches, UIEvent evt)
+		{
+			descriptView.ResignFirstResponder ();
+			movieTitle.ResignFirstResponder ();
+		}
 		public override void DidReceiveMemoryWarning ()
 		{
 			base.DidReceiveMemoryWarning ();

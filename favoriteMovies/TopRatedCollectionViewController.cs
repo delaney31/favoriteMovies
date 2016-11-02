@@ -69,6 +69,10 @@ namespace FavoriteMovies
 			ShowLabels ();
 			window.AddSubview (nowPlayingController.CollectionView);
 			window.AddSubview (popularController.CollectionView);
+			nowPlayingController.CollectionView.ReloadData ();
+			popularController.CollectionView.ReloadData ();
+			CollectionView.ReloadData ();
+		
 		}
 		public override void ViewDidLoad ()
 		{
@@ -107,14 +111,18 @@ namespace FavoriteMovies
 		
 			CollectionView.BackgroundColor =UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha);
 			CollectionView.RegisterClassForCell (typeof (MovieCell), movieTopRatedCellId);
+
 			CollectionView.SetCollectionViewLayout (flowLayout, true);
+			CollectionView.CollectionViewLayout.InvalidateLayout ();
+			//CollectionView.ContentMode = UIViewContentMode.ScaleAspectFit;
+
 
 			nowPlayingController = new NowPlayingCollectionViewController (flowLayout,nowPlaying,window);
 			nowPlayingController.CollectionView.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha);
 			nowPlayingController.CollectionView.RegisterClassForCell (typeof (NowPlayingMovieCell), NowPlayingCollectionViewController.movieNowPlayingCellId);
-
+			//nowPlayingController.CollectionView.ContentMode = UIViewContentMode.ScaleToFill;
 			nowPlayingController.CollectionView.Frame = NowPlayingControllerFrame;
-	
+
 
 
 			popularController = new PopularCollectionViewController (flowLayout, popular,window);
@@ -123,8 +131,8 @@ namespace FavoriteMovies
 
 			popularController.CollectionView.Frame = PopularControllerFrame;
 			popularController.CollectionView.ScrollEnabled = true;
-			popularController.CollectionView.ContentMode = UIViewContentMode.ScaleAspectFit;
-			popularController.CollectionView.SizeToFit ();
+			//popularController.CollectionView.ContentMode = UIViewContentMode.ScaleAspectFit;
+
 
 			// adding views to keywindow. This is not the ideal way but ran out of time..
 			window.AddSubview(TopRatedLabel);
@@ -159,7 +167,6 @@ namespace FavoriteMovies
 				var row = topRated [indexPath.Row];
 				HideLabels ();
 				var views = window.Subviews;
-				//hack to remove views added to keywindow
 				foreach (var view in views) {
 					if (view is UICollectionView)
 						view.RemoveFromSuperview ();
@@ -223,8 +230,25 @@ namespace FavoriteMovies
 		//public UILabel LabelView { get; private set; }
 		public void UpdateRow (Movie element, Single fontSize)
 		{
-			ImageView.Image = GetImage(element.PosterPath);
+			ImageView.Image = GetImage (element.PosterPath);
+			try {
+				if (UIColorExtensions.MovieIsFavorite (element.Id.ToString ())) {
+
+					ImageView.Layer.BorderWidth = 2.0f;
+					ImageView.Layer.BorderColor = UIColor.Orange.CGColor;
+
+				} else 
+				{
+					ImageView.Layer.BorderWidth = 1.0f;
+					ImageView.Layer.BorderColor = UIColor.White.CGColor;
+				}
+			} catch (SQLite.SQLiteException) 
+			{
+				//so favorites yet
+			}
 		}
+
+
 
 		public static UIImage GetImage (string posterPath)
 		{

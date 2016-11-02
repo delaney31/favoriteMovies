@@ -18,7 +18,7 @@ namespace FavoriteMovies
 		public SizeF ImageViewSize { get; set; }
 		UINavigationController rootNav;
 		UIWindow window;
-		//UICollectionViewLayout Layout;
+
 
 		public NowPlayingCollectionViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies, UIWindow rootnav):base(layout)
 		{
@@ -30,7 +30,6 @@ namespace FavoriteMovies
 
 		public NowPlayingCollectionViewController (UICollectionViewLayout layout,UIWindow rootnav): base (layout)
 		{
-			//this.Layout = layout;
 			rootNav = (UINavigationController)rootnav.RootViewController;
 			window = rootnav;
 		}
@@ -60,13 +59,7 @@ namespace FavoriteMovies
 				Debug.WriteLine (e.Message);
 			}
 		}
-		//public override void ItemHighlighted (UICollectionView collectionView, NSIndexPath indexPath)
-		//{
-		//	//var cell = collectionView.CellForItem (indexPath);
-		//	var row = _items [indexPath.Row];
-		//	TopRatedCollectionViewController.HideLabels ();
-		//	rootNav.PushViewController (new MovieDetailViewController (row),true);
-		//}
+
 
 		public override nint GetItemsCount (UICollectionView collectionView, nint section)
 		{

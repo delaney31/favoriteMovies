@@ -17,7 +17,7 @@ namespace FavoriteMoviesPCL
 		public double VoteCount { get; set; }
 		public DateTime ReleaseDate { get; set;}
 		public float VoteAverage { get; set; }
-		public bool Favorite { get; internal set; }
+		public bool Favorite { get; set; }
 
 	}
 }

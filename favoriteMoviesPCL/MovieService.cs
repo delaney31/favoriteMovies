@@ -28,8 +28,14 @@ namespace FavoriteMoviesPCL
 			Popular =2,
 			Similar =3
 		}
-
-		//GET Example
+		public static string Database { get; set; }
+		static FavoriteMovieStore store;
+		public static FavoriteMovieStore Store {
+			get {
+				return store != null ? store : store = new FavoriteMovieStore (Database, "MovieEntries.db3");
+			}
+		}
+		//GET movies from service
 		public static async Task<ObservableCollection<Movie>> GetMoviesAsync (MovieType type,int page = 1, int movieId=0)
 		{
 			HttpClient client = new HttpClient ();

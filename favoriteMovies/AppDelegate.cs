@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Threading.Tasks;
 using CoreGraphics;
 using FavoriteMoviesPCL;
 using Foundation;
+using Mono.Data.Sqlite;
+using SQLite;
 using UIKit;
 
 namespace FavoriteMovies
@@ -58,6 +61,8 @@ namespace FavoriteMovies
 				Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, 18),
 				ForegroundColor =UIColor.White//= UIColor.Clear.FromHexString (UIColorExtensions.TITLE_COLOR, 1.0f)
 			};
+
+			MovieService.Database = Path.Combine (FileHelper.GetLocalStoragePath (), "MovieEntries.db3");
 
 
 			window.RootViewController = nav;

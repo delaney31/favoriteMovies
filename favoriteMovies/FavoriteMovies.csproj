@@ -95,6 +95,8 @@
     <Reference Include="Calabash">
       <HintPath>..\packages\Xamarin.TestCloud.Agent.0.19.0\lib\Xamarin.iOS10\Calabash.dll</HintPath>
     </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="Mono.Data.Sqlite" />
   </ItemGroup>
   <ItemGroup>
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Contents.json" />
@@ -125,6 +127,9 @@
     <Compile Include="MovieDetailsViewController.designer.cs">
       <DependentUpon>MovieDetailsViewController.cs</DependentUpon>
     </Compile>
+    <Compile Include="FileHelper.cs" />
+    <Compile Include="SQLiteAsync.cs" />
+    <Compile Include="SQLite.cs" />
   </ItemGroup>
   <ItemGroup>
     <BundleResource Include="Resources\placeholder.png" />

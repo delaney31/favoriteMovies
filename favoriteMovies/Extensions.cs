@@ -1,4 +1,5 @@
 ﻿using System;
+using FavoriteMoviesPCL;
 using UIKit;
 
 namespace FavoriteMovies
@@ -11,6 +12,19 @@ namespace FavoriteMovies
 		public const string TITLE_FONT = "Arial-BoldMT";
 		public const string TAB_BACKGROUND_COLOR = "#555555";
 		public const Single HEADER_FONT_SIZE = 13f;
+		public const string SQL_TABLE = "MovieEntries.db3";
+
+
+		public static bool MovieIsFavorite (string id)
+		{
+			try {
+				using (var db = new SQLite.SQLiteConnection (MovieService.Database)) {
+					var favorite = db.Query<Movie> ("SELECT * FROM MOVIE WHERE ID = ?", id);
+					return favorite.Count > 0;
+				}
+			} catch (SQLite.SQLiteException) { //db not created yet}
+				return false;} 
+		}
 
 		public static UIColor FromHexString (this UIColor color, string hexValue, float alpha = 1.0f)
 		{
