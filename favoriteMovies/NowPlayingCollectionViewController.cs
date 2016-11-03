@@ -9,7 +9,10 @@ using Foundation;
 using UIKit;
 
 namespace FavoriteMovies
-{
+{/// <summary>
+/// This is the View Controller for the scrollable movies under the Now Playing header. It also serves as a base class for the 
+	/// Popular movies header
+/// </summary>
 	public class NowPlayingCollectionViewController : UICollectionViewController
 	{
 		public static NSString movieNowPlayingCellId = new NSString ("NowPlayingMovieCell");
@@ -75,7 +78,9 @@ namespace FavoriteMovies
 		}
 
 	}
-
+	/// <summary>
+	/// This is the view controller for the Popular Movies scrollable list of movies
+	/// </summary>
 	public class PopularCollectionViewController : NowPlayingCollectionViewController
 	{
 		

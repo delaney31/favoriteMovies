@@ -12,19 +12,21 @@ using System.Threading.Tasks;
 using System.Diagnostics;
 
 namespace FavoriteMovies
-{
+{/// <summary>
+/// This is the Main View controller for the application. It serves as the Top Rated collection of movies and creates the Now Playing 
+	/// Poplular scrollable collections.
+/// </summary>
 	public class TopRatedCollectionViewController : UICollectionViewController
 	{
 		static NSString movieTopRatedCellId = new NSString ("TopRatedMovieCell");
 		static CGSize HeaderReferenceSize = new CGSize (50, 50);
-		static int MinimumInteritemSpacing = 10;
+		static int MinimumInteritemSpacing = 30;
 		static int MinimumLineSpacing = -5;
 		static CGSize ItemSize = new CGSize (110, 150);
-		static CGRect TopRatedLabelFrame = new CGRect (7, 69, 90, 20);
-		//static CGRect TopRatedControllerFrame = new CGRect (7, 170, 400, 150);
-		static CGRect NowPlayingLabelFrame = new CGRect (7, 229, 90, 20);
-		static CGRect NowPlayingControllerFrame = new CGRect (7, 245, 400, 150);
-		static CGRect PopularLabelFrame = new CGRect (7, 390, 90, 20);
+		static CGRect TopRatedLabelFrame = new CGRect (7, 74, 90, 20);
+		static CGRect NowPlayingLabelFrame = new CGRect (7, 231, 90, 20);
+		static CGRect NowPlayingControllerFrame = new CGRect (7, 235, 400, 150);
+		static CGRect PopularLabelFrame = new CGRect (8, 400, 90, 20);
 		static CGRect PopularControllerFrame = new CGRect (7, 409, 400, 150);
 		const float BackGroundColorAlpha = 1.0f;
 		static string TopRated = "Top Rated";
@@ -56,24 +58,24 @@ namespace FavoriteMovies
 				ScrollDirection = UICollectionViewScrollDirection.Horizontal,
 				MinimumInteritemSpacing = MinimumInteritemSpacing, // minimum spacing between cells
 				MinimumLineSpacing = MinimumLineSpacing, // minimum spacing between rows if ScrollDirection is Vertical or between columns if Horizontal
-				ItemSize = ItemSize
+				ItemSize = ItemSize,
+				SectionInset = new UIEdgeInsets (80, -40, 97, 127)
 			};
 
 
 		}
 
-
-		public override void ViewDidAppear (bool animated)
+		public override void ViewWillAppear (bool animated)
 		{
-			base.ViewDidAppear (animated);
+			base.ViewWillAppear (animated);
 			ShowLabels ();
 			window.AddSubview (nowPlayingController.CollectionView);
 			window.AddSubview (popularController.CollectionView);
 			nowPlayingController.CollectionView.ReloadData ();
 			popularController.CollectionView.ReloadData ();
 			CollectionView.ReloadData ();
-		
 		}
+
 		public override void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
@@ -108,19 +110,18 @@ namespace FavoriteMovies
 
 			#region   //Setup my movie collection controllers
 
-		
+
 			CollectionView.BackgroundColor =UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha);
 			CollectionView.RegisterClassForCell (typeof (MovieCell), movieTopRatedCellId);
 
 			CollectionView.SetCollectionViewLayout (flowLayout, true);
 			CollectionView.CollectionViewLayout.InvalidateLayout ();
-			//CollectionView.ContentMode = UIViewContentMode.ScaleAspectFit;
+			CollectionView.ContentMode = UIViewContentMode.ScaleAspectFit;
 
 
 			nowPlayingController = new NowPlayingCollectionViewController (flowLayout,nowPlaying,window);
 			nowPlayingController.CollectionView.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha);
 			nowPlayingController.CollectionView.RegisterClassForCell (typeof (NowPlayingMovieCell), NowPlayingCollectionViewController.movieNowPlayingCellId);
-			//nowPlayingController.CollectionView.ContentMode = UIViewContentMode.ScaleToFill;
 			nowPlayingController.CollectionView.Frame = NowPlayingControllerFrame;
 
 
@@ -128,21 +129,16 @@ namespace FavoriteMovies
 			popularController = new PopularCollectionViewController (flowLayout, popular,window);
 			popularController.CollectionView.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha);
 			popularController.CollectionView.RegisterClassForCell (typeof (PopularMovieCell), PopularCollectionViewController.popularCellId);
-
 			popularController.CollectionView.Frame = PopularControllerFrame;
 			popularController.CollectionView.ScrollEnabled = true;
-			//popularController.CollectionView.ContentMode = UIViewContentMode.ScaleAspectFit;
+		
 
 
-			// adding views to keywindow. This is not the ideal way but ran out of time..
+			// adding views to keywindow. 
 			window.AddSubview(TopRatedLabel);
 			window.AddSubview(PlayingNowLabel);
 			window.AddSubview (PopularLabel);
-			//((UINavigationController)window.RootViewController).AddChildViewController (nowPlayingController);
 			window.AddSubview (nowPlayingController.CollectionView);
-			//((UINavigationController)window.RootViewController).AddChildViewController (popularController);
-			//CollectionView.AddSubview (nowPlayingController.CollectionView);
-			//CollectionView.AddSubview (popularController.CollectionView);
 			window.AddSubview (popularController.CollectionView);
 
 
@@ -206,26 +202,26 @@ namespace FavoriteMovies
 		}
 
 	}
-
+	
 	public class MovieCell : UICollectionViewCell
 	{
 		public UIImageView ImageView { get; set; }
-		CGRect topRatedRect = new CGRect (-42, 25, 97, 127);
+		CGRect topRatedRect = new CGRect (-2, 40, 97, 127);
 		protected const string baseUrl = "https://image.tmdb.org/t/p/w300/";
 		[Export ("initWithFrame:")]
 		public MovieCell (CGRect frame) : base (frame)
 		{
-
+			
 			ImageView = new UIImageView ();
 			ImageView.Center = ContentView.Center;
 			ImageView.Frame = topRatedRect;
 			ImageView.ContentMode = UIViewContentMode.ScaleToFill;
 			ImageView.Layer.BorderWidth = 1.0f;
 			ImageView.Layer.BorderColor = UIColor.White.CGColor;
-			ImageView.ClipsToBounds = true;
 			ContentView.AddSubview (ImageView);
 
 		}
+
 
 		//public UILabel LabelView { get; private set; }
 		public void UpdateRow (Movie element, Single fontSize)
@@ -269,7 +265,7 @@ namespace FavoriteMovies
 
 	public class NowPlayingMovieCell : MovieCell
 	{
-		CGRect nowPlayingRect = new CGRect (-50, 5, 97, 133);
+		CGRect nowPlayingRect = new CGRect (-9, 26, 97, 133);
 		[Export ("initWithFrame:")]
 		public NowPlayingMovieCell (CGRect frame) : base (frame)
 		{
@@ -281,7 +277,7 @@ namespace FavoriteMovies
 	public class PopularMovieCell : MovieCell
 	{
 
-		static CGRect popularRect = new CGRect (-50, 3, 97, 133);
+		static CGRect popularRect = new CGRect (-9, 22, 97, 133);
 		[Export ("initWithFrame:")]
 		public PopularMovieCell (CGRect frame) : base (frame)
 		{

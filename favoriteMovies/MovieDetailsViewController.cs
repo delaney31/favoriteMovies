@@ -12,7 +12,9 @@ namespace FavoriteMovies
 	public partial class MovieDetailsViewController : UIViewController
 	{
 		
-
+		/// <summary>
+		/// This is the view controller for the movie details page. In addition it allows you to save and clear favorite movies
+		/// </summary>
 		Movie movieDetail;
 		ObservableCollection<Movie> similarMovies;
 
@@ -44,11 +46,12 @@ namespace FavoriteMovies
 
 
 		}
-
+		/// <summary>
+		/// /Setup the UI Elements based on the passed in movieDetails
+		/// </summary>
 		public override void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
-			// Perform any additional setup after loading the view, typically from a nib.
 
 			var nav = NavigationController;
 
@@ -106,7 +109,11 @@ namespace FavoriteMovies
 
 
 
-		}
+		}/// <summary>
+		/// This is the button press delegate for clear favorites button. It was a last minute change and needs to be renamed
+		/// </summary>
+		/// <param name="sender">Sender.</param>
+		/// <param name="e">E.</param>
 		void PlayVideoButt_TouchDown (object sender, EventArgs e)
 		{
 			posterImage.Layer.BorderWidth = 1.0f;
@@ -120,6 +127,11 @@ namespace FavoriteMovies
 				//first time in no favorites yet.
 			}
 		}
+		/// <summary>
+		/// This is the delegate for the save favorite button. It also has visual indicator for the current poster image
+		/// </summary>
+		/// <param name="sender">Sender.</param>
+		/// <param name="e">E.</param>
 		void SaveFavoriteButt_TouchDown (object sender, EventArgs e)
 		{
 			posterImage.Layer.BorderWidth = 2.0f;
@@ -155,6 +167,9 @@ namespace FavoriteMovies
 			// Release any cached data, images, etc that aren't in use.
 		}
 	}
+	/// <summary>
+	/// This class ( and subsequent classes) is not currently being used. It was going to be the datassource for the similar movies collection
+	/// </summary>
 	public class SimilarMoviesDataSource : UICollectionViewSource
 	{
 		public SimilarMoviesDataSource ()
