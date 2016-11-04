@@ -11,24 +11,24 @@ namespace FavoriteMovies
 {
 	public partial class MovieDetailsViewController : UIViewController
 	{
-		
+
 		/// <summary>
 		/// This is the view controller for the movie details page. In addition it allows you to save and clear favorite movies
 		/// </summary>
 		Movie movieDetail;
 		ObservableCollection<Movie> similarMovies;
 
-		public MovieDetailsViewController (IntPtr handle) : base(handle)
+		public MovieDetailsViewController (IntPtr handle) : base (handle)
 		{
 			Initialize ();
 		}
 
 		[Export ("initWithCoder:")]
-		public MovieDetailsViewController (NSCoder coder) : base(coder)
+		public MovieDetailsViewController (NSCoder coder) : base (coder)
 		{
 			Initialize ();
 		}
-		public MovieDetailsViewController (Movie movie) : base("MovieDetailsViewController", null)
+		public MovieDetailsViewController (Movie movie) : base ("MovieDetailsViewController", null)
 		{
 			Initialize ();
 
@@ -65,12 +65,10 @@ namespace FavoriteMovies
 
 
 			posterImage.ContentMode = UIViewContentMode.ScaleToFill;
-			if (UIColorExtensions.MovieIsFavorite (movieDetail.Id.ToString()))
-			{
+			if (UIColorExtensions.MovieIsFavorite (movieDetail.Id.ToString ())) {
 				posterImage.Layer.BorderWidth = 2.0f;
 				posterImage.Layer.BorderColor = UIColor.Orange.CGColor;
-			} else 
-			{
+			} else {
 				posterImage.Layer.BorderWidth = 1.0f;
 				posterImage.Layer.BorderColor = UIColor.White.CGColor;
 			}
@@ -88,7 +86,7 @@ namespace FavoriteMovies
 			dateOpenView.TextColor = UIColor.White;
 			dateOpenView.Text = "Release Date: " + movieDetail.ReleaseDate.ToString ("MMMM dd, yyyy");
 
-			voteResultText.Text = Convert.ToInt32(movieDetail.VoteAverage).ToString () + " of 10 Stars";
+			voteResultText.Text = Convert.ToInt32 (movieDetail.VoteAverage).ToString () + " of 10 Stars";
 			voteResultText.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 			voteResultText.Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, 10);
 			voteResultText.TextColor = UIColor.White;
@@ -101,7 +99,7 @@ namespace FavoriteMovies
 
 			saveFavoriteButt.TouchDown += SaveFavoriteButt_TouchDown;
 			saveFavoriteButt.BackgroundColor = UIColor.Orange;
-			playVideoButt.SetTitle ( "Delete Favorite",UIControlState.Normal);
+			playVideoButt.SetTitle ("Delete Favorite", UIControlState.Normal);
 			playVideoButt.TouchDown += PlayVideoButt_TouchDown;
 			playVideoButt.BackgroundColor = UIColor.Green;
 
@@ -110,10 +108,10 @@ namespace FavoriteMovies
 
 
 		}/// <summary>
-		/// This is the button press delegate for clear favorites button. It was a last minute change and needs to be renamed
-		/// </summary>
-		/// <param name="sender">Sender.</param>
-		/// <param name="e">E.</param>
+		 /// This is the button press delegate for clear favorites button. It was a last minute change and needs to be renamed
+		 /// </summary>
+		 /// <param name="sender">Sender.</param>
+		 /// <param name="e">E.</param>
 		void PlayVideoButt_TouchDown (object sender, EventArgs e)
 		{
 			posterImage.Layer.BorderWidth = 1.0f;
@@ -123,8 +121,7 @@ namespace FavoriteMovies
 					// there is a sqllite bug here https://forums.xamarin.com/discussion/52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
 					db.Query<Movie> ("DELETE FROM [Movie] WHERE [id] = " + movieDetail.Id);
 				}
-			} catch (SQLite.SQLiteException) 
-			{
+			} catch (SQLite.SQLiteException) {
 				//first time in no favorites yet.
 			}
 		}
@@ -143,16 +140,17 @@ namespace FavoriteMovies
 				using (var db = new SQLite.SQLiteConnection (MovieService.Database)) {
 					db.Insert (movieDetail);
 				}
-			} catch (SQLite.SQLiteException ) {
+			} catch (SQLite.SQLiteException) {
 
 				//create db if not created.
 
-				}using (var conn = new SQLite.SQLiteConnection (MovieService.Database)) {
-					conn.CreateTable<Movie> ();
-					using (var db = new SQLite.SQLiteConnection (MovieService.Database)) {
+			}
+			using (var conn = new SQLite.SQLiteConnection (MovieService.Database)) {
+				conn.CreateTable<Movie> ();
+				using (var db = new SQLite.SQLiteConnection (MovieService.Database)) {
 					db.Insert (movieDetail);
-					}
 				}
+			}
 
 		}
 
@@ -168,8 +166,9 @@ namespace FavoriteMovies
 			// Release any cached data, images, etc that aren't in use.
 		}
 	}
+	#region Simlar Movies setup not used yet 
 	/// <summary>
-	/// This class ( and subsequent classes) is not currently being used. It is going to be the datassource for the similar movies collection
+	  /// This class ( and subsequent classes) is not currently being used. It is going to be the datassource for the similar movies collection
 	/// </summary>
 	public class SimilarMoviesDataSource : UICollectionViewSource
 	{
@@ -230,7 +229,7 @@ namespace FavoriteMovies
 	{
 		public SimilarMovie (UIImage image, Action tapped)
 		{
-			
+
 			Image = image;
 			Tapped = tapped;
 		}
@@ -267,7 +266,7 @@ namespace FavoriteMovies
 
 		public void UpdateRow (SimilarMovie element, Single fontSize, SizeF imageViewSize)
 		{
-			
+
 			ImageView.Image = element.Image;
 
 			LabelView.Font = UIFont.FromName ("HelveticaNeue-Bold", fontSize);
@@ -276,6 +275,6 @@ namespace FavoriteMovies
 
 		}
 	}
-
+	#endregion
 }
 

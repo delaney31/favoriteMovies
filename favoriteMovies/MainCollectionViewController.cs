@@ -178,9 +178,10 @@ namespace FavoriteMovies
 				{
 					ContentView.Layer.BorderColor = UIColor.White.CGColor;
 				}
-			} catch (SQLite.SQLiteException) 
+			} catch (SQLite.SQLiteException ex) 
 			{
-				//so favorites yet
+				//no favorites yet
+				Debug.Write (ex.Message);
 			}
 		}
 
