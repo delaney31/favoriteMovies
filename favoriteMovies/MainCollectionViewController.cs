@@ -143,8 +143,6 @@ namespace FavoriteMovies
 
 		}
 
-
-
 	}
 	
 	public class MovieCell : UICollectionViewCell

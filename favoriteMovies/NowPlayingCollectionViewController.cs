@@ -54,9 +54,8 @@ namespace FavoriteMovies
 
 			CGPoint pointPressed = gestureRecognizer.LocationInView (CollectionView);
 			NSIndexPath indexPath = CollectionView.IndexPathForItemAtPoint (pointPressed);
-			var row = _items [indexPath.Row];
-
 			if (indexPath != null) {
+				var row = _items [indexPath.Row];
 				UICollectionViewCell cell = CollectionView.CellForItem (indexPath);
 				if (row.Favorite == false) {
 					//cell.ContentView.Subviews [0].Layer.BorderWidth = 3.0f;
@@ -67,6 +66,7 @@ namespace FavoriteMovies
 						using (var db = new SQLite.SQLiteConnection (MovieService.Database)) {
 							db.Insert (row);
 						}
+
 					} catch (SQLite.SQLiteException) {
 
 						//create db if not created.
@@ -76,6 +76,10 @@ namespace FavoriteMovies
 								db.Insert (row);
 							}
 						}
+
+					} finally 
+					{ 
+						CollectionView.ReloadData ();
 					}
 
 
@@ -89,12 +93,15 @@ namespace FavoriteMovies
 							// there is a sqllite bug here https://forums.xamarin.com/discussion/52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
 							db.Query<Movie> ("DELETE FROM [Movie] WHERE [id] = " + row.Id);
 						}
+						CollectionView.ReloadData ();
 					} catch (SQLite.SQLiteException) {
 						//first time in no favorites yet.
+					} finally {
+						CollectionView.ReloadData ();
 					}
 				}
 
-				CollectionView.ReloadData ();
+
 			}
 
 		}
