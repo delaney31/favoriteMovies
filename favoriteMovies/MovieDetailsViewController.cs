@@ -101,7 +101,7 @@ namespace FavoriteMovies
 
 			saveFavoriteButt.TouchDown += SaveFavoriteButt_TouchDown;
 			saveFavoriteButt.BackgroundColor = UIColor.Orange;
-			playVideoButt.SetTitle ( "Clear Favorites",UIControlState.Normal);
+			playVideoButt.SetTitle ( "Delete Favorite",UIControlState.Normal);
 			playVideoButt.TouchDown += PlayVideoButt_TouchDown;
 			playVideoButt.BackgroundColor = UIColor.Green;
 
@@ -120,7 +120,8 @@ namespace FavoriteMovies
 			posterImage.Layer.BorderColor = UIColor.White.CGColor;
 			try {
 				using (var db = new SQLite.SQLiteConnection (MovieService.Database)) {
-					db.DropTable<Movie> ();
+					// there is a sqllite bug here https://forums.xamarin.com/discussion/52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
+					db.Query<Movie> ("DELETE FROM [Movie] WHERE [id] = " + movieDetail.Id);
 				}
 			} catch (SQLite.SQLiteException) 
 			{
@@ -168,7 +169,7 @@ namespace FavoriteMovies
 		}
 	}
 	/// <summary>
-	/// This class ( and subsequent classes) is not currently being used. It was going to be the datassource for the similar movies collection
+	/// This class ( and subsequent classes) is not currently being used. It is going to be the datassource for the similar movies collection
 	/// </summary>
 	public class SimilarMoviesDataSource : UICollectionViewSource
 	{

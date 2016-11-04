@@ -39,20 +39,22 @@ namespace FavoriteMovies
 			task.Wait ();
 
 			flowLayout = new UICollectionViewFlowLayout () {
-				HeaderReferenceSize = new CGSize (50, 50),
-				SectionInset = new UIEdgeInsets (140, 23, 150, 100),
-				//SectionInset = new UIEdgeInsets (400, 0, 400, 0),
-				ScrollDirection = UICollectionViewScrollDirection.Horizontal,
-				MinimumInteritemSpacing = 10, // minimum spacing between cells
-				MinimumLineSpacing = -5, // minimum spacing between rows if ScrollDirection is Vertical or between columns if Horizontal
-				ItemSize = new CGSize (110, 150)
+				//HeaderReferenceSize = new CGSize (50, 50),
+				//SectionInset = new UIEdgeInsets (140, 23, 150, 100),
+				SectionInset = new UIEdgeInsets (0, 0, 800, 0),
+				ScrollDirection = UICollectionViewScrollDirection.Vertical,
+				                                              
+				//MinimumInteritemSpacing = 10, // minimum spacing between cells
+				//MinimumLineSpacing = -5, // minimum spacing between rows if ScrollDirection is Vertical or between columns if Horizontal
+				//ItemSize = new CGSize (110, 150)
 			};
 
 
 
 			var nav = new UINavigationController ();
-
-			nav.AddChildViewController (new TopRatedCollectionViewController (flowLayout, TopRated, NowPlaying, Popular));
+			//var scrollView = new UIScrollView ();
+		//	scrollView.AddSubview (new TopRatedCollectionViewController (flowLayout, TopRated, NowPlaying, Popular).View);
+			nav.AddChildViewController (new MainCollectionViewController (flowLayout, TopRated, NowPlaying, Popular));
 			nav.NavigationBar.BarTintColor = UIColor.Clear.FromHexString (UIColorExtensions.NAV_BAR_COLOR, 1.0f);
 			nav.NavigationBar.TintColor = UIColor.White;
 			nav.NavigationBar.Translucent = false;

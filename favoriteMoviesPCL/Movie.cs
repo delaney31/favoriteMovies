@@ -1,10 +1,13 @@
 using System;
-
+using SQLite;
 
 namespace FavoriteMoviesPCL
 {
+	
+	[Table ("DiaryEntry")]
 	public class Movie : IMovie
 	{
+		
 		public Movie ()
 		{
 		}
@@ -12,6 +15,7 @@ namespace FavoriteMoviesPCL
 		public string Title { get; set; }
 		public string HighResPosterPath { get; set; }
 		public string PosterPath { get; set; }
+		[SQLite.PrimaryKey]
 		public int Id { get; set; }
 		public string Overview { get; set; }
 		public double VoteCount { get; set; }

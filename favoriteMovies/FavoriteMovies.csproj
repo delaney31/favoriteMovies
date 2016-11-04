@@ -102,7 +102,6 @@
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Contents.json" />
     <ImageAsset Include="Assets.xcassets\Contents.json" />
     <ImageAsset Include="Assets.xcassets\LaunchImage.launchimage\Contents.json" />
-    <ImageAsset Include="Assets.xcassets\LaunchImage.launchimage\images 2.png" />
     <ImageAsset Include="Assets.xcassets\LaunchImage.launchimage\Default%402x.png" />
     <ImageAsset Include="Assets.xcassets\LaunchImage.launchimage\Default-568h%402x.png" />
   </ItemGroup>
@@ -117,7 +116,7 @@
   <ItemGroup>
     <Compile Include="Main.cs" />
     <Compile Include="AppDelegate.cs" />
-    <Compile Include="TopRatedCollectionViewController.cs" />
+    <Compile Include="MainCollectionViewController.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="NowPlayingCollectionViewController.cs" />
     <Compile Include="MovieDetailsViewController.cs" />
