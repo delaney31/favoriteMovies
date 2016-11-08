@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
+using System.Globalization;
 using System.Threading.Tasks;
 using FavoriteMoviesPCL;
 using Foundation;
@@ -32,7 +33,7 @@ namespace FavoriteMovies
 		{
 			Initialize ();
 
-			this.movieDetail = movie;
+			movieDetail = movie;
 		}
 
 		void Initialize ()
@@ -62,14 +63,14 @@ namespace FavoriteMovies
 			nav.NavigationBar.TopItem.Title = UIColorExtensions.TITLE;
 
 			this.View.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
-
+			posterImage.Layer.BorderWidth = 1.0f;
 
 			posterImage.ContentMode = UIViewContentMode.ScaleToFill;
 			if (UIColorExtensions.MovieIsFavorite (movieDetail.Id.ToString ())) {
-				posterImage.Layer.BorderWidth = 2.0f;
+
 				posterImage.Layer.BorderColor = UIColor.Orange.CGColor;
 			} else {
-				posterImage.Layer.BorderWidth = 1.0f;
+
 				posterImage.Layer.BorderColor = UIColor.White.CGColor;
 			}
 			posterImage.ClipsToBounds = true;
@@ -79,23 +80,34 @@ namespace FavoriteMovies
 			movieTitle.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 			movieTitle.TextColor = UIColor.White;
 			movieTitle.Text = movieDetail.Title;
-			movieTitle.ResignFirstResponder ();
+			movieTitle.Lines = 0;
 
 			dateOpenView.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 			dateOpenView.Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, 10);
 			dateOpenView.TextColor = UIColor.White;
-			dateOpenView.Text = "Release Date: " + movieDetail.ReleaseDate.ToString ("MMMM dd, yyyy");
-
-			voteResultText.Text = Convert.ToInt32 (movieDetail.VoteAverage).ToString () + " of 10 Stars";
+			dateOpenView.Text = "Release Date: " + movieDetail.ReleaseDate.ToString ("MM/dd/yyyy",
+				  CultureInfo.InvariantCulture);
+			dateOpenView.Frame = new RectangleF (180, 70, 300, 10);
+			voteResultText.Text = Convert.ToInt32 (movieDetail.VoteAverage) + " of 10 Stars";
 			voteResultText.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
-			voteResultText.Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, 10);
+			voteResultText.Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, 13);
 			voteResultText.TextColor = UIColor.White;
+
 
 			descriptView.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 			descriptView.Text = movieDetail.Overview;
-
+			//descriptView.ScrollEnabled = true;
+			descriptView.Lines = 0;
 			descriptView.Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, 13);
 			descriptView.TextColor = UIColor.White;
+
+			descriptView.Frame = new RectangleF (10, 250, 300, ((movieDetail.Overview.Length / 40) * 20));
+
+			descriptView.LineBreakMode = UILineBreakMode.WordWrap;
+			//descriptView.TextAlignment = UITextAlignment.Left;
+
+
+
 
 			saveFavoriteButt.TouchDown += SaveFavoriteButt_TouchDown;
 			saveFavoriteButt.BackgroundColor = UIColor.Orange;
@@ -132,7 +144,7 @@ namespace FavoriteMovies
 		/// <param name="e">E.</param>
 		void SaveFavoriteButt_TouchDown (object sender, EventArgs e)
 		{
-			posterImage.Layer.BorderWidth = 2.0f;
+			posterImage.Layer.BorderWidth = 1.0f;
 			posterImage.Layer.BorderColor = UIColor.Orange.CGColor;
 			movieDetail.Favorite = true;
 			// Create the database and a table to hold Favorite information.
@@ -142,15 +154,15 @@ namespace FavoriteMovies
 				}
 			} catch (SQLite.SQLiteException) {
 
-				//create db if not created.
+				using (var conn = new SQLite.SQLiteConnection (MovieService.Database)) {
+					conn.CreateTable<Movie> ();
+					using (var db = new SQLite.SQLiteConnection (MovieService.Database)) {
+						db.Insert (movieDetail);
+					}
+				}
 
 			}
-			using (var conn = new SQLite.SQLiteConnection (MovieService.Database)) {
-				conn.CreateTable<Movie> ();
-				using (var db = new SQLite.SQLiteConnection (MovieService.Database)) {
-					db.Insert (movieDetail);
-				}
-			}
+
 
 		}
 
@@ -168,7 +180,7 @@ namespace FavoriteMovies
 	}
 	#region Simlar Movies setup not used yet 
 	/// <summary>
-	  /// This class ( and subsequent classes) is not currently being used. It is going to be the datassource for the similar movies collection
+	/// This class ( and subsequent classes) is not currently being used. It is going to be the datassource for the similar movies collection
 	/// </summary>
 	public class SimilarMoviesDataSource : UICollectionViewSource
 	{

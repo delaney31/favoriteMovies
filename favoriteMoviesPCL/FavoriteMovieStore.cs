@@ -1,16 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using SQLite;
-using System.Linq;
 using SQLitePCL;
 
 namespace FavoriteMoviesPCL
 {
 	public class FavoriteMovieStore
 	{
-		
+
 		string path;
-		SQLiteAsyncConnection connection;
+		readonly SQLiteAsyncConnection connection;
 
 		public FavoriteMovieStore (string folder, string filename)
 		{

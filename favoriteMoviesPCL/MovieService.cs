@@ -16,7 +16,6 @@ namespace FavoriteMoviesPCL
 		
 		const string _baseUrl = "https://api.themoviedb.org/3/";
 		const string _pageString = "&page=";
-		static string _baseImgUrl;
 		static string _apiKey = "ab41356b33d100ec61e6c098ecc92140";
 		static string _sessionId = "";
 		public static ObservableCollection<Movie> MovieList;
@@ -38,7 +37,7 @@ namespace FavoriteMoviesPCL
 		//GET movies from service
 		public static async Task<ObservableCollection<Movie>> GetMoviesAsync (MovieType type,int page = 1, int movieId=0)
 		{
-			HttpClient client = new HttpClient ();
+			var client = new HttpClient ();
 			string Url = "";
 
 			switch (type) {
@@ -82,10 +81,10 @@ namespace FavoriteMoviesPCL
 
 			JObject jresponse = JObject.Parse (content);
 			var jarray = jresponse ["results"];
-			ObservableCollection<Movie> movieList = new ObservableCollection<Movie> ();
+			var movieList = new ObservableCollection<Movie> ();
 			try {
 				foreach (var jObj in jarray) {
-					Movie newMovie = new Movie ();
+					var newMovie = new Movie ();
 					newMovie.Title = (string)jObj ["title"];
 					newMovie.PosterPath = (string)jObj ["poster_path"];
 					newMovie.HighResPosterPath = (string)jObj ["poster_path"];
@@ -112,12 +111,12 @@ namespace FavoriteMoviesPCL
 		public static async Task<bool> PostFavoriteMovieAsync (Movie movie)
 		{
 			try {
-				HttpClient client = new HttpClient ();
+				var client = new HttpClient ();
 				//_sessionId = string with the movie database session.
 				string tokenUrl = _baseUrl + "account/id/favorite?" + _apiKey + _sessionId;
 				string postBody = JsonConvert.SerializeObject (new Favorite {
 					favorite = !movie.Favorite,
-					media_id = movie.Id,
+					media_id = movie.Id
 				});
 
 				client.DefaultRequestHeaders.Accept.Add (new MediaTypeWithQualityHeaderValue ("application/json"));

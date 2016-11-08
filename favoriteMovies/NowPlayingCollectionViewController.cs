@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Drawing;
@@ -15,26 +14,42 @@ namespace FavoriteMovies
 /// </summary>
 	public class NowPlayingCollectionViewController : UICollectionViewController
 	{
-		public static NSString movieNowPlayingCellId = new NSString ("MovieCell");
+		public static NSString movieCellId = new NSString ("MovieCell");
 		public ObservableCollection<Movie> _items { get; internal set; }
 		public float FontSize { get; set; }
 		public SizeF ImageViewSize { get; set; }
-		UINavigationController rootNav;
+		protected UINavigationController rootNav;
 		//UIWindow window;
 
 
-		public NowPlayingCollectionViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies, UIWindow rootnav):base(layout)
+		public NowPlayingCollectionViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies, UIViewController rootnav):base(layout)
 		{
 			_items = movies;
-			rootNav =(UINavigationController)rootnav.RootViewController;
+			rootNav =rootnav.NavigationController;
 
 
 		}
-
-		public NowPlayingCollectionViewController (UICollectionViewLayout layout,UIWindow rootnav): base (layout)
+		public override nint GetItemsCount (UICollectionView collectionView, nint section)
 		{
-			rootNav = (UINavigationController)rootnav.RootViewController;
+			return _items.Count;
+		}
+		public override UICollectionViewCell GetCell (UICollectionView collectionView, NSIndexPath indexPath)
+		{
 
+			var cell = (MovieCell)collectionView.DequeueReusableCell (movieCellId, indexPath);
+			var row = _items [indexPath.Row];
+			cell.UpdateRow (row);
+			return cell;
+		}
+		public override void ItemSelected (UICollectionView collectionView, NSIndexPath indexPath)
+		{
+			try {
+				var row = _items [indexPath.Row];
+
+				rootNav.PushViewController (new MovieDetailsViewController (row), true);
+			} catch (Exception e) {
+				Debug.WriteLine (e.Message);
+			}
 		}
 		public override void ViewDidAppear (bool animated)
 		{
@@ -77,9 +92,6 @@ namespace FavoriteMovies
 							}
 						}
 
-					} finally 
-					{ 
-						CollectionView.ReloadData ();
 					}
 
 
@@ -93,43 +105,18 @@ namespace FavoriteMovies
 							// there is a sqllite bug here https://forums.xamarin.com/discussion/52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
 							db.Query<Movie> ("DELETE FROM [Movie] WHERE [id] = " + row.Id);
 						}
+
 						CollectionView.ReloadData ();
 					} catch (SQLite.SQLiteException) {
 						//first time in no favorites yet.
-					} finally {
-						CollectionView.ReloadData ();
-					}
+					} 
 				}
 
 
 			}
 
 		}
-		public override void ItemSelected (UICollectionView collectionView, NSIndexPath indexPath)
-		{
-			try {
-				var row = _items [indexPath.Row];
 
-				rootNav.PushViewController (new MovieDetailsViewController (row), true);
-			} catch (Exception e) 
-			{
-				Debug.WriteLine (e.Message);
-			}
-		}
-
-
-		public override nint GetItemsCount (UICollectionView collectionView, nint section)
-		{
-			return _items.Count;
-		}
-
-		public override UICollectionViewCell GetCell (UICollectionView collectionView, NSIndexPath indexPath)
-		{
-			var cell = (MovieCell)collectionView.DequeueReusableCell (movieNowPlayingCellId, indexPath);
-			var row = _items [indexPath.Row];
-			cell.UpdateRow (row, UIColorExtensions.HEADER_FONT_SIZE);
-			return cell;
-		}
 
 	}
 	/// <summary>
@@ -137,9 +124,8 @@ namespace FavoriteMovies
 	/// </summary>
 	public class PopularCollectionViewController : NowPlayingCollectionViewController
 	{
-		
-		public static NSString popularCellId = new NSString ("MovieCell");
-		public PopularCollectionViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies, UIWindow rootnav) : base (layout,rootnav)
+		public new ObservableCollection<Movie>_items { get; set; }
+		public PopularCollectionViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies, UIViewController rootnav) : base (layout,movies,rootnav)
 		{
 			_items = movies;
 		}
@@ -147,13 +133,22 @@ namespace FavoriteMovies
 		public override UICollectionViewCell GetCell (UICollectionView collectionView, NSIndexPath indexPath)
 		{
 			
-			var cell = (MovieCell)collectionView.DequeueReusableCell (popularCellId, indexPath);
+			var cell = (MovieCell)collectionView.DequeueReusableCell (movieCellId, indexPath);
 			var row = _items [indexPath.Row];
-			cell.UpdateRow (row, UIColorExtensions.HEADER_FONT_SIZE);
+			cell.UpdateRow (row);
 			return cell;
 		}
+		public override void ItemSelected (UICollectionView collectionView, NSIndexPath indexPath)
+		{
+			try {
+				var row = _items [indexPath.Row];
 
-
+				rootNav.PushViewController (new MovieDetailsViewController (row), true);
+			} catch (Exception e) {
+				Debug.WriteLine (e.Message);
+			}
+		}
+	
 
 	}
 
@@ -162,9 +157,9 @@ namespace FavoriteMovies
 	/// </summary>
 	public class TopRatedCollectionViewController : NowPlayingCollectionViewController
 	{
+		public new ObservableCollection<Movie> _items { get; set; }
 
-		public static NSString topRatedCellId = new NSString ("MovieCell");
-		public TopRatedCollectionViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies, UIWindow rootnav) : base (layout, rootnav)
+		public TopRatedCollectionViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies, UIViewController rootnav) : base (layout,movies, rootnav)
 		{
 			_items = movies;
 		}
@@ -172,15 +167,58 @@ namespace FavoriteMovies
 		public override UICollectionViewCell GetCell (UICollectionView collectionView, NSIndexPath indexPath)
 		{
 
-			var cell = (MovieCell)collectionView.DequeueReusableCell (topRatedCellId, indexPath);
+			var cell = (MovieCell)collectionView.DequeueReusableCell (movieCellId, indexPath);
 			var row = _items [indexPath.Row];
-			cell.UpdateRow (row, UIColorExtensions.HEADER_FONT_SIZE);
+			cell.UpdateRow (row);
 			return cell;
 		}
+		public override void ItemSelected (UICollectionView collectionView, NSIndexPath indexPath)
+		{
+			try {
+				var row = _items [indexPath.Row];
 
+				rootNav.PushViewController (new MovieDetailsViewController (row), true);
+			} catch (Exception e) {
+				Debug.WriteLine (e.Message);
+			}
+		}
 
 
 	}
 
+	/// <summary>
+	/// This is the view controller for the Favorite Movies scrollable list
+	/// </summary>
+	public class FavoritesViewController : NowPlayingCollectionViewController
+	{
+		public new ObservableCollection<Movie> _items { get; set; }
+		public FavoritesViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies, UIViewController rootnav) : base (layout, movies,rootnav)
+		{
+			_items = movies;
+		}
+		public override nint GetItemsCount (UICollectionView collectionView, nint section)
+		{
+			return _items.Count;
+		}
+		public override UICollectionViewCell GetCell (UICollectionView collectionView, NSIndexPath indexPath)
+		{
+
+			var cell = (MovieCell)collectionView.DequeueReusableCell (movieCellId, indexPath);
+			var row = _items [indexPath.Row];
+			cell.UpdateRow (row);
+			return cell;
+		}
+
+		public override void ItemSelected (UICollectionView collectionView, NSIndexPath indexPath)
+		{
+			try {
+				var row = _items [indexPath.Row];
+
+				rootNav.PushViewController (new MovieDetailsViewController (row), true);
+			} catch (Exception e) {
+				Debug.WriteLine (e.Message);
+			}
+		}
+	}
 
 }
