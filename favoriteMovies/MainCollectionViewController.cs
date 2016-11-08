@@ -24,6 +24,7 @@ namespace FavoriteMovies
 		static int DefaultYPositionNowPlayingLabel = 185;
 		static int DefaultYPositionPopularController = 380;
 		static int DefaultYPositionPopularLabel = 360;
+		static int DefaultHeaderHeight = 80;
 		static CGSize ItemSize = new CGSize (100, 150);
 		static CGRect FavoriteLabelFrame = new CGRect (7, 10, 90, 20);
 		static CGRect TopRatedLabelFrame = new CGRect (7, 185, 90, 20);
@@ -55,7 +56,6 @@ namespace FavoriteMovies
 		static UILabel PlayingNowLabel;
 		static UILabel PopularLabel;
 		static UILabel FavoriteLabel;
-		int heightFav = 10;
 		UIScrollView scrollView = new UIScrollView ();
 
 
@@ -126,6 +126,9 @@ namespace FavoriteMovies
 				popularController.CollectionView.Frame = new CGRect (popularController.CollectionView.Frame.X, DefaultYPositionPopularController, popularController.CollectionView.Frame.Width, popularController.CollectionView.Frame.Height);
 				PopularLabel.Frame = new CGRect (PopularLabel.Frame.X, DefaultYPositionPopularLabel, PopularLabel.Frame.Width, PopularLabel.Frame.Height);
 
+				//For scrolling to work the scrollview Content size has to be bigger than the View.Frame.Height
+				scrollView.ContentSize = new CGSize (View.Frame.Width, View.Frame.Height + DefaultHeaderHeight + MinimumInteritemSpacing );
+				scrollView.ContentOffset = new CGPoint (0, -scrollView.ContentInset.Top);
 
 			} else {
 				TopRatedLabel.Frame = TopRatedLabelFrame;
@@ -136,7 +139,13 @@ namespace FavoriteMovies
 
 				popularController.CollectionView.Frame = PopularControllerFrame;
 				PopularLabel.Frame = PopularLabelFrame;
+
+				//For scrolling to work the scrollview Content size has to be bigger than the View.Frame.Height
+				scrollView.ContentSize = new CGSize (View.Frame.Width, View.Frame.Height + ItemSize.Height + DefaultHeaderHeight + MinimumInteritemSpacing + DefaultYPositionTopRatedLabel);
+				scrollView.ContentOffset = new CGPoint (0, -scrollView.ContentInset.Top);
+
 			}
+
 
 			topRatedController.CollectionView.SetNeedsLayout ();
 		}
@@ -146,12 +155,9 @@ namespace FavoriteMovies
 			base.ViewDidLoad ();
 			scrollView.Frame = View.Frame;
 			favorites = GetFavorites ();
-			if (favorites.Count > 0)
-				heightFav = 200;
 
-			scrollView.ContentSize = new CGSize (View.Frame.Width, View.Frame.Height + heightFav);
-			scrollView.ContentOffset = new CGPoint (0, -scrollView.ContentInset.Top);
-			//favorites = topRated;
+
+
 			//Create Labels for Movie Collections
 			FavoriteLabel = new UILabel () {
 				TextColor = UIColor.White, Frame = FavoriteLabelFrame,

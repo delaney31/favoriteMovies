@@ -98,10 +98,10 @@ namespace FavoriteMovies
 			descriptView.Text = movieDetail.Overview;
 			//descriptView.ScrollEnabled = true;
 			descriptView.Lines = 0;
-			descriptView.Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, 13);
+			descriptView.Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, 12);
 			descriptView.TextColor = UIColor.White;
 
-			descriptView.Frame = new RectangleF (10, 250, 300, ((movieDetail.Overview.Length / 40) * 20));
+			descriptView.Frame = new RectangleF (10, 250, 300, ((movieDetail.Overview.Length / 50) * 20));
 
 			descriptView.LineBreakMode = UILineBreakMode.WordWrap;
 			//descriptView.TextAlignment = UITextAlignment.Left;
