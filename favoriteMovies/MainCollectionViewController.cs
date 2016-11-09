@@ -269,7 +269,6 @@ namespace FavoriteMovies
 		[Export ("initWithFrame:")]
 		public MovieCell (CGRect frame) : base (frame)
 		{
-
 			ImageView = new UIImageView ();
 			ImageView.Center = ContentView.Center;
 			ImageView.Frame = ContentView.Frame;
@@ -307,7 +306,6 @@ namespace FavoriteMovies
 				using (var imgUrl = new NSUrl (baseUrl + uri.AbsoluteUri.Substring (8))) {
 					using (var data = NSData.FromUrl (imgUrl)) {
 						return (UIImage.LoadFromData (data));
-
 					}
 				}
 			} else {

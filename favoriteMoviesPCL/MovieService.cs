@@ -17,8 +17,10 @@ namespace FavoriteMoviesPCL
 		const string _baseUrl = "https://api.themoviedb.org/3/";
 		const string _pageString = "&page=";
 		static string _apiKey = "ab41356b33d100ec61e6c098ecc92140";
+
 		static string _sessionId = "";
 		public static ObservableCollection<Movie> MovieList;
+
 
 		public enum MovieType
 		{
@@ -34,6 +36,49 @@ namespace FavoriteMoviesPCL
 				return store != null ? store : store = new FavoriteMovieStore (Database, "MovieEntries.db3");
 			}
 		}
+
+		public static async Task<string> GetYouTubeMovieId (string url)
+		{
+			var client = new HttpClient ();
+			HttpResponseMessage result = await client.GetAsync (url, CancellationToken.None);
+			if (result.IsSuccessStatusCode) {
+				try {
+					string content = await result.Content.ReadAsStringAsync ();
+					string videoId = ParceVideoId (content).Id.ToString();
+					//return a ObservableCollection to fill a list of movies
+					return videoId;
+
+				} catch (Exception ex) {
+					//Model Error
+					Debug.WriteLine (ex);
+
+				}
+			}
+			return "";
+		}
+
+	
+		static MoviePOCO ParceVideoId (string content)
+		{
+			JObject jresponse = JObject.Parse (content);
+			var jarray = jresponse ["results"];
+			var newMovie = new MoviePOCO ();
+			try {
+				foreach (var jObj in jarray) {
+					
+					newMovie.Id = jObj ["key"].ToString();
+					break;
+				
+				}
+			} catch (Exception e) {
+
+				Debug.WriteLine (e.Message);
+
+			}
+			return newMovie;
+
+		}
+
 		//GET movies from service
 		public static async Task<ObservableCollection<Movie>> GetMoviesAsync (MovieType type,int page = 1, int movieId=0)
 		{
@@ -108,12 +153,12 @@ namespace FavoriteMoviesPCL
 		}
 
 		//POST Example:
-		public static async Task<bool> PostFavoriteMovieAsync (Movie movie)
+		public static async Task<bool> PostFavoriteMovieAsync (Movie movie, string sessionId)
 		{
 			try {
 				var client = new HttpClient ();
 				//_sessionId = string with the movie database session.
-				string tokenUrl = _baseUrl + "account/id/favorite?" + _apiKey + _sessionId;
+				string tokenUrl = _baseUrl + "account/id/favorite?" + _apiKey + sessionId;
 				string postBody = JsonConvert.SerializeObject (new Favorite {
 					favorite = !movie.Favorite,
 					media_id = movie.Id

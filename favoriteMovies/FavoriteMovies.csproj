@@ -129,6 +129,7 @@
   </ItemGroup>
   <ItemGroup>
     <BundleResource Include="Resources\placeholder.png" />
+    <BundleResource Include="Resources\download.png" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\favoriteMoviesPCL\favoriteMoviesPCL.csproj">

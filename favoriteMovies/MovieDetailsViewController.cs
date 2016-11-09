@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Drawing;
 using System.Globalization;
 using System.Threading.Tasks;
+using CoreGraphics;
 using FavoriteMoviesPCL;
 using Foundation;
 using UIKit;
@@ -12,11 +13,17 @@ namespace FavoriteMovies
 {
 	public partial class MovieDetailsViewController : UIViewController
 	{
-
+		
 		/// <summary>
 		/// This is the view controller for the movie details page. In addition it allows you to save and clear favorite movies
 		/// </summary>
+
+
+		static string _googleApiKey = "AIzaSyCu634TJuZR_0iUhJQ6D8E9xr2a3VbU3_M";
+		static string _movieImdbApiKey= "ab41356b33d100ec61e6c098ecc92140";
+		string _embededMoveId;
 		Movie movieDetail;
+		UIImageView moviePlay;
 		ObservableCollection<Movie> similarMovies;
 
 		public MovieDetailsViewController (IntPtr handle) : base (handle)
@@ -31,18 +38,34 @@ namespace FavoriteMovies
 		}
 		public MovieDetailsViewController (Movie movie) : base ("MovieDetailsViewController", null)
 		{
-			Initialize ();
-
 			movieDetail = movie;
+			Initialize ();
+			moviePlay = new UIImageView ();
+			moviePlay.Image = UIImage.FromBundle ("download.png");
+
 		}
 
 		void Initialize ()
 		{
-			var task = Task.Run (async () => {
-				similarMovies = MovieService.GetMoviesAsync (MovieService.MovieType.Similar).Result;
+			var imDbUrl = "http://api.themoviedb.org/3/movie/" + movieDetail.Id + "/videos?api_key=" + _movieImdbApiKey;
+			var youtubeMovieId = "";
+
+			//var task = Task.Run (async () => {
+			//	similarMovies = MovieService.GetMoviesAsync (MovieService.MovieType.Similar).Result;
+
+			//});
+			//task.Wait ();
+
+			var UTubeMovidId = Task.Run (async () => {
+				youtubeMovieId = await MovieService.GetYouTubeMovieId(imDbUrl);
 
 			});
-			task.Wait ();
+			UTubeMovidId.Wait ();
+
+
+
+			_embededMoveId = youtubeMovieId;
+
 
 
 
@@ -73,9 +96,15 @@ namespace FavoriteMovies
 
 				posterImage.Layer.BorderColor = UIColor.White.CGColor;
 			}
+
+			moviePlay.Frame = new CGRect (posterImage.Frame.X+115, posterImage.Frame.Y+ 185, 30, 30);
+			//moviePlay.Frame = posterImage.Frame;
+			moviePlay.Alpha = .9f;
+		//moviePlay.Image.Size = new CoreGraphics.CGSize () { Width = 10, Height = 10 };
 			posterImage.ClipsToBounds = true;
 			posterImage.Image = MovieCell.GetImage (movieDetail.HighResPosterPath);
 
+			posterImage.AddSubview (moviePlay);
 			movieTitle.Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, 15);
 			movieTitle.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 			movieTitle.TextColor = UIColor.White;
@@ -107,19 +136,37 @@ namespace FavoriteMovies
 			//descriptView.TextAlignment = UITextAlignment.Left;
 
 
-
+			var playClip  = new UITapGestureRecognizer(HandleAction);
 
 			saveFavoriteButt.TouchDown += SaveFavoriteButt_TouchDown;
 			saveFavoriteButt.BackgroundColor = UIColor.Orange;
 			playVideoButt.SetTitle ("Delete Favorite", UIControlState.Normal);
 			playVideoButt.TouchDown += PlayVideoButt_TouchDown;
 			playVideoButt.BackgroundColor = UIColor.Green;
+			posterImage.UserInteractionEnabled = true;
+			posterImage.AddGestureRecognizer (playClip);
 
 
 
+		}
+
+		void HandleAction ()
+		{
+			var webView = new UIWebView (View.Bounds);
+			if (_embededMoveId != "")
+			   View.AddSubview (webView);
+
+			//var url = "https://www.youtube.com/embed/watch?v=5794f3fdc3a3681ee9002e9f"; // NOTE: https secure request
+			//var url = "https://gdata.youtube.com/feeds/api/videos/5794f3fdc3a3681ee9002e9f?v=2";
+
+		//	var url = "https://www.googleapis.com/youtube/v3/videos?id=5794f3fdc3a3681ee9002e9f&key=AIzaSyCu634TJuZR_0iUhJQ6D8E9xr2a3VbU3_M&part=snippet,contentDetails,statistics,status";
+			//var url = "https://www.youtube.com/embed/7lCDEYXw3mM";
+			var url = "https://www.youtube.com/embed/" + _embededMoveId;
+			webView.LoadRequest (new NSUrlRequest (new NSUrl (url)));
+		}
 
 
-		}/// <summary>
+			                                        /// <summary>
 		 /// This is the button press delegate for clear favorites button. It was a last minute change and needs to be renamed
 		 /// </summary>
 		 /// <param name="sender">Sender.</param>
@@ -191,7 +238,7 @@ namespace FavoriteMovies
 
 		public List<SimilarMovie> Rows { get; private set; }
 
-		public Single FontSize { get; set; }
+		public float FontSize { get; set; }
 
 		public SizeF ImageViewSize { get; set; }
 
@@ -205,7 +252,7 @@ namespace FavoriteMovies
 			return Rows.Count;
 		}
 
-		public override Boolean ShouldHighlightItem (UICollectionView collectionView, NSIndexPath indexPath)
+		public override bool ShouldHighlightItem (UICollectionView collectionView, NSIndexPath indexPath)
 		{
 			return true;
 		}

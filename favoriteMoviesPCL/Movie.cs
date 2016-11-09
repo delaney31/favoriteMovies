@@ -8,10 +8,6 @@ namespace FavoriteMoviesPCL
 	public class Movie : IMovie
 	{
 		
-		public Movie ()
-		{
-		}
-
 		public string Title { get; set; }
 		public string HighResPosterPath { get; set; }
 		public string PosterPath { get; set; }
@@ -24,5 +20,10 @@ namespace FavoriteMoviesPCL
 		public bool Favorite { get; set; }
 
 	}
+	public class MoviePOCO
+	{
+		public string Id { get; set; }
+	}
+
 }
 
