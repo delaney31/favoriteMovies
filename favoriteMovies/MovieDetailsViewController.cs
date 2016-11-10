@@ -21,9 +21,12 @@ namespace FavoriteMovies
 
 		static string _googleApiKey = "AIzaSyCu634TJuZR_0iUhJQ6D8E9xr2a3VbU3_M";
 		static string _movieImdbApiKey= "ab41356b33d100ec61e6c098ecc92140";
+		static string _youTubeURl = "https://www.youtube.com/embed/";
 		string _embededMoveId;
 		Movie movieDetail;
 		UIImageView moviePlay;
+		UIWebView webView ;
+
 		ObservableCollection<Movie> similarMovies;
 
 		public MovieDetailsViewController (IntPtr handle) : base (handle)
@@ -85,7 +88,7 @@ namespace FavoriteMovies
 			nav.NavigationBar.Translucent = false;
 			nav.NavigationBar.TopItem.Title = UIColorExtensions.TITLE;
 
-			this.View.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
+			View.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 			posterImage.Layer.BorderWidth = 1.0f;
 
 			posterImage.ContentMode = UIViewContentMode.ScaleToFill;
@@ -100,11 +103,11 @@ namespace FavoriteMovies
 			moviePlay.Frame = new CGRect (posterImage.Frame.X+115, posterImage.Frame.Y+ 185, 30, 30);
 			//moviePlay.Frame = posterImage.Frame;
 			moviePlay.Alpha = .9f;
-		//moviePlay.Image.Size = new CoreGraphics.CGSize () { Width = 10, Height = 10 };
+			//moviePlay.Image.Size = new CoreGraphics.CGSize () { Width = 10, Height = 10 };
 			posterImage.ClipsToBounds = true;
 			posterImage.Image = MovieCell.GetImage (movieDetail.HighResPosterPath);
-
-			posterImage.AddSubview (moviePlay);
+			if (_embededMoveId != "")
+			   posterImage.AddSubview (moviePlay);
 			movieTitle.Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, 15);
 			movieTitle.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 			movieTitle.TextColor = UIColor.White;
@@ -126,15 +129,17 @@ namespace FavoriteMovies
 			descriptView.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 			descriptView.Text = movieDetail.Overview;
 			//descriptView.ScrollEnabled = true;
-			descriptView.Lines = 0;
+
 			descriptView.Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, 12);
 			descriptView.TextColor = UIColor.White;
 
-			descriptView.Frame = new RectangleF (10, 250, 300, ((movieDetail.Overview.Length / 50) * 25));
-
+			//descriptView.Frame = new RectangleF (10, 250, 300, ((movieDetail.Overview.Length / 50) * 25));
+			//descriptView.Frame = new RectangleF (10, 250, 300, movieDetail.Overview.Length);
+			var size = descriptView.Text.StringSize(descriptView.Font, descriptView.Frame.Size, UILineBreakMode.CharacterWrap);
 			descriptView.LineBreakMode = UILineBreakMode.WordWrap;
+			descriptView.Frame = new RectangleF (10, 250, 300, (float)size.Height+30);
+			descriptView.Lines = 0;
 			//descriptView.TextAlignment = UITextAlignment.Left;
-
 
 			var playClip  = new UITapGestureRecognizer(HandleAction);
 
@@ -144,29 +149,39 @@ namespace FavoriteMovies
 			playVideoButt.TouchDown += PlayVideoButt_TouchDown;
 			playVideoButt.BackgroundColor = UIColor.Green;
 			posterImage.UserInteractionEnabled = true;
-			posterImage.AddGestureRecognizer (playClip);
+			if (_embededMoveId != "")
+			   posterImage.AddGestureRecognizer (playClip);
 
 
 
 		}
+
+		public override bool ShouldAutorotate ()
+		{
+			return base.ShouldAutorotate ();
+
+		}
+
+		public override UIInterfaceOrientationMask GetSupportedInterfaceOrientations ()
+		{
+			return UIInterfaceOrientationMask.Portrait;
+		}
+
 
 		void HandleAction ()
 		{
-			var webView = new UIWebView (View.Bounds);
-			if (_embededMoveId != "")
-			   View.AddSubview (webView);
+			webView = new UIWebView (View.Bounds);
+			var url = _youTubeURl+ _embededMoveId;
 
-			//var url = "https://www.youtube.com/embed/watch?v=5794f3fdc3a3681ee9002e9f"; // NOTE: https secure request
-			//var url = "https://gdata.youtube.com/feeds/api/videos/5794f3fdc3a3681ee9002e9f?v=2";
-
-		//	var url = "https://www.googleapis.com/youtube/v3/videos?id=5794f3fdc3a3681ee9002e9f&key=AIzaSyCu634TJuZR_0iUhJQ6D8E9xr2a3VbU3_M&part=snippet,contentDetails,statistics,status";
-			//var url = "https://www.youtube.com/embed/7lCDEYXw3mM";
-			var url = "https://www.youtube.com/embed/" + _embededMoveId;
 			webView.LoadRequest (new NSUrlRequest (new NSUrl (url)));
+			webView.ScalesPageToFit = true;
+
+			View.AddSubview (webView);
+
 		}
 
 
-			                                        /// <summary>
+		                    /// <summary>
 		 /// This is the button press delegate for clear favorites button. It was a last minute change and needs to be renamed
 		 /// </summary>
 		 /// <param name="sender">Sender.</param>
@@ -199,7 +214,7 @@ namespace FavoriteMovies
 				using (var db = new SQLite.SQLiteConnection (MovieService.Database)) {
 					db.Insert (movieDetail);
 				}
-			} catch (SQLite.SQLiteException) {
+			} catch (SQLite.SQLiteException s) {
 
 				using (var conn = new SQLite.SQLiteConnection (MovieService.Database)) {
 					conn.CreateTable<Movie> ();
@@ -237,9 +252,7 @@ namespace FavoriteMovies
 		}
 
 		public List<SimilarMovie> Rows { get; private set; }
-
 		public float FontSize { get; set; }
-
 		public SizeF ImageViewSize { get; set; }
 
 		public override nint NumberOfSections (UICollectionView collectionView)
@@ -327,9 +340,7 @@ namespace FavoriteMovies
 		{
 
 			ImageView.Image = element.Image;
-
 			LabelView.Font = UIFont.FromName ("HelveticaNeue-Bold", fontSize);
-
 			ImageView.Frame = new RectangleF (0, 0, imageViewSize.Width, imageViewSize.Height);
 
 		}

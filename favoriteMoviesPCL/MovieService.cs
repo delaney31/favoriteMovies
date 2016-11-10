@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -30,6 +32,9 @@ namespace FavoriteMoviesPCL
 			Similar =3
 		}
 		public static string Database { get; set; }
+		public static int TotalPagesTopRated { get; set; }
+		public static int TotalPagesNowPlaying { get; set; }
+		public static int TotalPagesPopular { get; set; }
 		static FavoriteMovieStore store;
 		public static FavoriteMovieStore Store {
 			get {
@@ -106,6 +111,22 @@ namespace FavoriteMoviesPCL
 			if (result.IsSuccessStatusCode) {
 				try {
 					string content = await result.Content.ReadAsStringAsync ();
+					JObject jresponse = JObject.Parse (content);
+					var jarray = jresponse ["total_pages"];
+					switch (type) 
+					{
+
+					case MovieType.TopRated:
+
+						TotalPagesTopRated = (int)jarray;
+						break;
+					case MovieType.NowPaying:
+						TotalPagesNowPlaying = (int)jarray;
+						break;
+					case MovieType.Popular:
+						TotalPagesPopular = (int)jarray;
+						break;
+					}
 					MovieList = GetJsonData (content);
 					//return a ObservableCollection to fill a list of movies
 					return MovieList;
@@ -126,6 +147,7 @@ namespace FavoriteMoviesPCL
 
 			JObject jresponse = JObject.Parse (content);
 			var jarray = jresponse ["results"];
+
 			var movieList = new ObservableCollection<Movie> ();
 			try {
 				foreach (var jObj in jarray) {
@@ -138,13 +160,16 @@ namespace FavoriteMoviesPCL
 					newMovie.VoteCount = (double)jObj ["vote_count"];
 					newMovie.ReleaseDate = (DateTime)jObj ["release_date"];
 					newMovie.VoteAverage = (float)jObj ["vote_average"];
-					movieList.Add (newMovie);
+					newMovie.Adult = (bool)jObj ["adult"];
+					//newMovie.genre_ids = jObj ["genre_ids"].ToObject<List<string>>();
+					if(!newMovie.Adult)
+					   movieList.Add (newMovie);
 				}
 			} catch (Exception e) {
 
 				Debug.WriteLine (e.Message);
 				//if one of the json items is malformed delete it and send what we have.
-				movieList.RemoveAt (movieList.Count - 1);
+				//movieList.RemoveAt (movieList.Count - 1);
 				 //log message and send what we have.
 			}
 				return movieList;

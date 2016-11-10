@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using SQLite;
 
 namespace FavoriteMoviesPCL
@@ -18,6 +19,13 @@ namespace FavoriteMoviesPCL
 		public DateTime ReleaseDate { get; set;}
 		public float VoteAverage { get; set; }
 		public bool Favorite { get; set; }
+		public bool Adult { get; set; }
+		//public List<string> genre_ids { get; set; }
+		public string OriginalTitle { get; set; }
+		public string OriginalLanguage { get; set; }
+		public string BackdropPath { get; set; }
+		public string Popularity { get; set; }
+		public bool Video { get; set; }
 
 	}
 	public class MoviePOCO

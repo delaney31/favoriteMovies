@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using CoreGraphics;
 using FavoriteMoviesPCL;
@@ -22,8 +24,12 @@ namespace FavoriteMovies
 		ObservableCollection<Movie> TopRated;
 		ObservableCollection<Movie> Similar;
 		ObservableCollection<Movie> Popular;
-		UICollectionViewFlowLayout flowLayout;
 
+		static int RandomNumber (int min, int max)
+		{
+			Random random = new Random (); return random.Next (min, max);
+
+		}
 		public override bool FinishedLaunching (UIApplication application, NSDictionary launchOptions)
 		{
 			// Override point for customization after application launch.
@@ -32,30 +38,20 @@ namespace FavoriteMovies
 
 
 			var task = Task.Run (async () => {
-				NowPlaying = MovieService.GetMoviesAsync (MovieService.MovieType.NowPaying).Result;
-				TopRated = MovieService.GetMoviesAsync (MovieService.MovieType.TopRated).Result;
-				Popular = MovieService.GetMoviesAsync (MovieService.MovieType.Popular).Result;
+				NowPlaying = await MovieService.GetMoviesAsync (MovieService.MovieType.NowPaying,RandomNumber(1,50));
+				TopRated = await MovieService.GetMoviesAsync (MovieService.MovieType.TopRated,RandomNumber (1, 50));
+				Popular = await MovieService.GetMoviesAsync (MovieService.MovieType.Popular,RandomNumber (1, 50));
 			});
 			task.Wait ();
 
-			flowLayout = new UICollectionViewFlowLayout () {
-				//HeaderReferenceSize = new CGSize (50, 500),
-				//SectionInset = new UIEdgeInsets (140, 23, 150, 100),
-				//SectionInset = new UIEdgeInsets (600, 0, 0, 0),
-				ScrollDirection = UICollectionViewScrollDirection.Vertical,
-				                                              
-				//MinimumInteritemSpacing = 10, // minimum spacing between cells
-				MinimumLineSpacing = 10, // minimum spacing between rows if ScrollDirection is Vertical or between columns if Horizontal
-			//	ItemSize = new CGSize (322, 150)
-			};
-
-
-
-			var nav = new UINavigationController ();
+			var nav = new MainNavigationController ();
+			//var nav = new UINavigationController ();
 			//var scrollView = new UIScrollView ();
 		//	scrollView.AddSubview (new TopRatedCollectionViewController (flowLayout, TopRated, NowPlaying, Popular).View);
+
 			nav.AddChildViewController (new MainCollectionViewController (TopRated, NowPlaying, Popular));
 			nav.NavigationBar.BarTintColor = UIColor.Clear.FromHexString (UIColorExtensions.NAV_BAR_COLOR, 1.0f);
+			nav.View.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 			nav.NavigationBar.TintColor = UIColor.White;
 			nav.NavigationBar.Translucent = false;
 			nav.NavigationBar.TopItem.Title = UIColorExtensions.TITLE;
@@ -111,6 +107,23 @@ namespace FavoriteMovies
 		}
 	}
 
+	/// <summary>
+	/// This is very important it delegates the orientation so that it can be changed by each View Controller.
+	/// View Controllers must override ShouldAutoRotate and SupportedInterfaceOrientations
+	/// </summary>
+	public class MainNavigationController : UINavigationController
+	{
+		public override bool ShouldAutorotate ()
+		{
+			return this.VisibleViewController.ShouldAutorotate();;
+
+		}
+
+		public override UIInterfaceOrientationMask GetSupportedInterfaceOrientations ()
+		{
+			return this.VisibleViewController.GetSupportedInterfaceOrientations ();
+		}
+	}
 
 
 }

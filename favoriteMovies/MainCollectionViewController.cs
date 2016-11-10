@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using CoreGraphics;
 using FavoriteMoviesPCL;
 using Foundation;
@@ -74,8 +76,33 @@ namespace FavoriteMovies
 				//SectionInset = new UIEdgeInsets (80, -40, 97, 127)
 			};
 
+			//LoadMoreMovies ();
+		}
+		public override bool ShouldAutorotate ()
+		{
+			return base.ShouldAutorotate ();
+
 		}
 
+		void LoadMoreMovies ()
+		{
+			if (MovieService.TotalPagesNowPlaying > 0) {
+				List<Task> Tasks = new List<Task> ();
+				for (var x = 1; x < MovieService.TotalPagesNowPlaying; x++) {
+					Tasks.Add (Task.Run (async () => nowPlaying = new ObservableCollection<Movie>
+										 (nowPlaying.Concat (await MovieService.GetMoviesAsync
+															 (MovieService.MovieType.NowPaying, x)))));
+				}
+			
+
+				Task.WhenAll (Tasks);
+
+			}
+		}
+		public override UIInterfaceOrientationMask GetSupportedInterfaceOrientations ()
+		{
+			return UIInterfaceOrientationMask.Portrait;
+		}
 		public override void ViewWillAppear (bool animated)
 		{
 			base.ViewWillAppear (animated);
@@ -90,7 +117,6 @@ namespace FavoriteMovies
 				favoriteViewController.CollectionView.ReloadData ();
 				favoriteViewController.CollectionView.CollectionViewLayout.InvalidateLayout ();
 				favoriteViewController.CollectionView.CollectionViewLayout.PrepareLayout ();
-				//favoriteViewController.CollectionView.CollectionViewLayout.CollectionViewContentSize = 
 				scrollView.AddSubview (favoriteViewController.CollectionView);
 			}
 			;

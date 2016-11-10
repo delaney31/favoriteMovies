@@ -11,7 +11,7 @@ namespace FavoriteMovies
 		public const string TITLE_COLOR = "#DE9A2D";
 		public const string TITLE_FONT = "Arial-BoldMT";
 		public const string TAB_BACKGROUND_COLOR = "#555555";
-		public const Single HEADER_FONT_SIZE = 13f;
+		public const float HEADER_FONT_SIZE = 13f;
 		public const string SQL_TABLE = "MovieEntries.db3";
 
 
