@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<component format="1" id="SidebarNavigation">
+  <name>Sidebar Navigation</name>
+  <publisher>Jack Dehlin</publisher>
+  <publisher-url>https://github.com/jdehlin/Xamarin-Sidebar</publisher-url>
+  <version>1.9</version>
+  <summary>An easy to use and versatile slideout menu.</summary>
+  <samples>
+    <sample id="SimpleSample">
+      <name>A simple sample.</name>
+      <summary>In this simple sample the menu buttons replace the content view.</summary>
+    </sample>
+    <sample id="NavigationSample">
+      <name>A navigation sample.</name>
+      <summary>In this sample the the menu buttons push views onto a navigation controller.</summary>
+    </sample>
+    <sample id="UnifiedSample">
+      <name>A simple Unified API sample.</name>
+      <summary>In this simple sample the menu buttons replace the content view.</summary>
+    </sample>
+    <sample id="NavigationUnifiedSample">
+      <name>A navigation Unified API sample.</name>
+      <summary>In this sample the the menu buttons push views onto a navigation controller.</summary>
+    </sample>
+    <sample id="StoryboardSample">
+      <name>A navigation Unified API sample using a Storyboard.</name>
+      <summary>In this sample the the menu buttons push views created from the storyboard onto a navigation controller.</summary>
+    </sample>
+  </samples>
+</component>
