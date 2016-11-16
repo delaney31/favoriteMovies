@@ -11,7 +11,7 @@ namespace FavoriteMoviesPCL
 		int Id { get; set; }
 		string Overview { get; set; }
 		double VoteCount { get; set; }
-		DateTime ReleaseDate { get; set; }
+		DateTime? ReleaseDate { get; set; }
 		float VoteAverage { get; set; }
 
 	}

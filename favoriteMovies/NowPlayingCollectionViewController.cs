@@ -37,8 +37,14 @@ namespace FavoriteMovies
 		{
 
 			var cell = (MovieCell)collectionView.DequeueReusableCell (movieCellId, indexPath);
-			var row = _items [indexPath.Row];
-			cell.UpdateRow (row);
+
+			try {
+				var row = _items [indexPath.Row];
+				cell.UpdateRow (row);
+
+			} catch (Exception e) {
+				Debug.WriteLine (e.Message);
+			}
 			return cell;
 		}
 		public override void ItemSelected (UICollectionView collectionView, NSIndexPath indexPath)
@@ -99,7 +105,7 @@ namespace FavoriteMovies
 					try {
 						row.Favorite = false;
 						//cell.ContentView.Subviews [0].Layer.BorderWidth = 1.0f;
-						cell.ContentView.Subviews [0].Layer.BorderColor = UIColor.White.CGColor;
+						cell.ContentView.Subviews [0].Layer.BorderColor = UIColor.Clear.CGColor;
 
 						using (var db = new SQLite.SQLiteConnection (MovieService.Database)) {
 							// there is a sqllite bug here https://forums.xamarin.com/discussion/52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
@@ -134,8 +140,14 @@ namespace FavoriteMovies
 		{
 			
 			var cell = (MovieCell)collectionView.DequeueReusableCell (movieCellId, indexPath);
-			var row = _items [indexPath.Row];
-			cell.UpdateRow (row);
+
+			try {
+				var row = _items [indexPath.Row];
+				cell.UpdateRow (row);
+
+			} catch (Exception e) {
+				Debug.WriteLine (e.Message);
+			}
 			return cell;
 		}
 		public override void ItemSelected (UICollectionView collectionView, NSIndexPath indexPath)
@@ -168,8 +180,14 @@ namespace FavoriteMovies
 		{
 
 			var cell = (MovieCell)collectionView.DequeueReusableCell (movieCellId, indexPath);
-			var row = _items [indexPath.Row];
-			cell.UpdateRow (row);
+
+			try {
+				var row = _items [indexPath.Row];
+				cell.UpdateRow (row);
+
+			} catch (Exception e) {
+				Debug.WriteLine (e.Message);
+			}
 			return cell;
 		}
 		public override void ItemSelected (UICollectionView collectionView, NSIndexPath indexPath)
@@ -204,8 +222,52 @@ namespace FavoriteMovies
 		{
 
 			var cell = (MovieCell)collectionView.DequeueReusableCell (movieCellId, indexPath);
-			var row = _items [indexPath.Row];
-			cell.UpdateRow (row);
+
+			try {
+				var row = _items [indexPath.Row];
+				cell.UpdateRow (row);
+
+			} catch (Exception e) {
+				Debug.WriteLine (e.Message);
+			}
+			return cell;
+		}
+
+		public override void ItemSelected (UICollectionView collectionView, NSIndexPath indexPath)
+		{
+			try {
+				var row = _items [indexPath.Row];
+
+				rootNav.PushViewController (new MovieDetailsViewController (row), true);
+			} catch (Exception e) {
+				Debug.WriteLine (e.Message);
+			}
+		}
+	}
+	public class MovieCollectionViewController : NowPlayingCollectionViewController
+	{
+		public new ObservableCollection<Movie> _items { get; set; }
+		public MovieCollectionViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies, UIViewController rootnav) : base (layout, movies, rootnav)
+		{
+			_items = movies;
+		}
+		public override nint GetItemsCount (UICollectionView collectionView, nint section)
+		{
+			return _items.Count;
+		}
+		public override UICollectionViewCell GetCell (UICollectionView collectionView, NSIndexPath indexPath)
+		{
+
+			var cell = (MovieCell)collectionView.DequeueReusableCell (movieCellId, indexPath);
+
+			try 
+			{
+				var row = _items [indexPath.Row];
+				cell.UpdateRow (row);
+
+			} catch (Exception e) {
+				Debug.WriteLine (e.Message);
+			}
 			return cell;
 		}
 
@@ -221,4 +283,41 @@ namespace FavoriteMovies
 		}
 	}
 
+	public class MovieLatestViewController : NowPlayingCollectionViewController
+	{
+		public new ObservableCollection<Movie> _items { get; set; }
+		public MovieLatestViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies, UIViewController rootnav) : base (layout, movies, rootnav)
+		{
+			_items = movies;
+		}
+		public override nint GetItemsCount (UICollectionView collectionView, nint section)
+		{
+			return _items.Count;
+		}
+		public override UICollectionViewCell GetCell (UICollectionView collectionView, NSIndexPath indexPath)
+		{
+
+			var cell = (MovieCell)collectionView.DequeueReusableCell (movieCellId, indexPath);
+
+			try {
+				var row = _items [indexPath.Row];
+				cell.UpdateRow (row);
+
+			} catch (Exception e) {
+				Debug.WriteLine (e.Message);
+			}
+			return cell;
+		}
+
+		public override void ItemSelected (UICollectionView collectionView, NSIndexPath indexPath)
+		{
+			try {
+				var row = _items [indexPath.Row];
+
+				rootNav.PushViewController (new MovieDetailsViewController (row), true);
+			} catch (Exception e) {
+				Debug.WriteLine (e.Message);
+			}
+		}
+	}
 }

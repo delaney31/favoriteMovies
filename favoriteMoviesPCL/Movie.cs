@@ -1,14 +1,13 @@
 using System;
-using System.Collections.Generic;
 using SQLite;
 
 namespace FavoriteMoviesPCL
 {
-	
-	[Table ("DiaryEntry")]
+
+	[Table ("FavoriteMovies")]
 	public class Movie : IMovie
 	{
-		
+
 		public string Title { get; set; }
 		public string HighResPosterPath { get; set; }
 		public string PosterPath { get; set; }
@@ -16,7 +15,7 @@ namespace FavoriteMoviesPCL
 		public int Id { get; set; }
 		public string Overview { get; set; }
 		public double VoteCount { get; set; }
-		public DateTime ReleaseDate { get; set;}
+		public DateTime? ReleaseDate { get; set; }
 		public float VoteAverage { get; set; }
 		public bool Favorite { get; set; }
 		public bool Adult { get; set; }

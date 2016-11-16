@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">iPhoneSimulator</Platform>
@@ -86,17 +85,17 @@
     <MtouchTlsProvider>Default</MtouchTlsProvider>
     <PlatformTarget>x86</PlatformTarget>
     <CodesignProvision></CodesignProvision>
+<MtouchSdkVersion></MtouchSdkVersion>
+<MtouchExtraArgs>-v -v -v -v</MtouchExtraArgs>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
     <Reference Include="Xamarin.iOS" />
-    <Reference Include="Calabash">
-      <HintPath>..\packages\Xamarin.TestCloud.Agent.0.19.0\lib\Xamarin.iOS10\Calabash.dll</HintPath>
-    </Reference>
     <Reference Include="System.Data" />
     <Reference Include="Mono.Data.Sqlite" />
+    <Reference Include="MonoTouch.Dialog-1" />
   </ItemGroup>
   <ItemGroup>
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Contents.json" />
@@ -116,7 +115,7 @@
   <ItemGroup>
     <Compile Include="Main.cs" />
     <Compile Include="AppDelegate.cs" />
-    <Compile Include="MainCollectionViewController.cs" />
+    <Compile Include="MainViewController.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="NowPlayingCollectionViewController.cs" />
     <Compile Include="MovieDetailsViewController.cs" />
@@ -124,6 +123,17 @@
       <DependentUpon>MovieDetailsViewController.cs</DependentUpon>
     </Compile>
     <Compile Include="FileHelper.cs" />
+    <Compile Include="ContentController.cs" />
+    <Compile Include="BaseController.cs" />
+    <Compile Include="NavController.cs" />
+    <Compile Include="NavController.Designer.cs" />
+    <Compile Include="MenuController.cs" />
+    <Compile Include="ContentController.Designer.cs" />
+    <Compile Include="IntroController.cs" />
+    <Compile Include="IntroController.Designer.cs" />
+    <Compile Include="MenuController.Designer.cs" />
+    <Compile Include="RootViewController.cs" />
+    <Compile Include="asyncvoid.cs" />
     <Compile Include="SQLiteAsync.cs" />
     <Compile Include="SQLite.cs" />
   </ItemGroup>
@@ -137,15 +147,23 @@
     <BundleResource Include="Resources\Default-Portrait~ipad.png" />
     <BundleResource Include="Resources\Default.png" />
     <BundleResource Include="Resources\Default%402x.png" />
+    <BundleResource Include="Resources\threelines.png" />
+    <BundleResource Include="Resources\blank.png" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\favoriteMoviesPCL\favoriteMoviesPCL.csproj">
       <Project>{5E21058F-6E9D-49C9-B81F-9B975C2A44BD}</Project>
       <Name>favoriteMoviesPCL</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Xamarin-Sidebar-Unified\Xamarin-Sidebar-Unified.csproj">
+      <Project>{72600F4A-51F2-4E93-8688-8198DE0F8EF4}</Project>
+      <Name>Xamarin-Sidebar-Unified</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="MovieDetailsViewController.xib" />
+    <InterfaceDefinition Include="Phone.storyboard" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
+  <Import Project="..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
 </Project>

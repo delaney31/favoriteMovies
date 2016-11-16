@@ -7,10 +7,15 @@ namespace FavoriteMovies
 	public static class UIColorExtensions
 	{	
 		public const string TITLE = "Movie Explorer";
-		public const string NAV_BAR_COLOR = "#323232";
+		public const string NAV_BAR_COLOR ="#3B5998";//facebook blue
+		//public const string NAV_BAR_COLOR ="#323232";
 		public const string TITLE_COLOR = "#DE9A2D";
 		public const string TITLE_FONT = "Arial-BoldMT";
-		public const string TAB_BACKGROUND_COLOR = "#555555";
+		//public const string TAB_BACKGROUND_COLOR = "#000000";//black
+		//public const string TAB_BACKGROUND_COLOR = "#555555"; //grey
+		public const string TAB_BACKGROUND_COLOR = "#FFFFFF"; //white
+		//public const string TAB_BACKGROUND_COLOR = "#d3d3d3"; //light grey
+		//public const string TAB_BACKGROUND_COLOR = "#3B3B3B"; //dark grey
 		public const float HEADER_FONT_SIZE = 13f;
 		public const string SQL_TABLE = "MovieEntries.db3";
 

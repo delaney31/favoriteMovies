@@ -23,10 +23,10 @@ namespace FavoriteMoviesPCL
 		}
 		public Task SaveEntryAsync (Movie entry)
 		{
-			if (entry.Id == -1)
+			//if (entry.Id == -1)
 				return connection.InsertAsync (entry);
-			else
-				return connection.InsertOrReplaceAsync (entry);
+		//	else
+			//	return connection.InsertOrReplaceAsync (entry);
 		}
 
 		public Task DeleteEntryAsync (Movie entry)

@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -15,21 +13,25 @@ namespace FavoriteMoviesPCL
 {
 	public static class MovieService
 	{
-		
+
 		const string _baseUrl = "https://api.themoviedb.org/3/";
 		const string _pageString = "&page=";
-		static string _apiKey = "ab41356b33d100ec61e6c098ecc92140";
-
+		//static string _apiKey = "ab41356b33d100ec61e6c098ecc92140";
+		public static string _apiKey = "63ac84758e2d96000620e55b773fc312";
 		static string _sessionId = "";
 		public static ObservableCollection<Movie> MovieList;
 
 
 		public enum MovieType
 		{
-			TopRated =0,
-			NowPaying =1,
-			Popular =2,
-			Similar =3
+			TopRated = 0,
+			NowPaying = 1,
+			Popular = 2,
+			Similar = 3,
+			TVLatest = 4,
+			Upcoming = 5
+
+
 		}
 		public static string Database { get; set; }
 		public static int TotalPagesTopRated { get; set; }
@@ -49,7 +51,7 @@ namespace FavoriteMoviesPCL
 			if (result.IsSuccessStatusCode) {
 				try {
 					string content = await result.Content.ReadAsStringAsync ();
-					string videoId = ParceVideoId (content).Id.ToString();
+					string videoId = ParceVideoId (content).Id.ToString ();
 					//return a ObservableCollection to fill a list of movies
 					return videoId;
 
@@ -62,7 +64,7 @@ namespace FavoriteMoviesPCL
 			return "";
 		}
 
-	
+
 		static MoviePOCO ParceVideoId (string content)
 		{
 			JObject jresponse = JObject.Parse (content);
@@ -70,10 +72,10 @@ namespace FavoriteMoviesPCL
 			var newMovie = new MoviePOCO ();
 			try {
 				foreach (var jObj in jarray) {
-					
-					newMovie.Id = jObj ["key"].ToString();
+
+					newMovie.Id = jObj ["key"].ToString ();
 					break;
-				
+
 				}
 			} catch (Exception e) {
 
@@ -85,25 +87,32 @@ namespace FavoriteMoviesPCL
 		}
 
 		//GET movies from service
-		public static async Task<ObservableCollection<Movie>> GetMoviesAsync (MovieType type,int page = 1, int movieId=0)
+		public static async Task<ObservableCollection<Movie>> GetMoviesAsync (MovieType type, int page = 1, int movieId = 0)
 		{
 			var client = new HttpClient ();
 			string Url = "";
 
 			switch (type) {
 
-				case MovieType.TopRated:
-					Url = _baseUrl + "movie/top_rated?api_key=" + _apiKey + _pageString + page;              
-					break;
-				case MovieType.NowPaying:
-					Url = _baseUrl + "movie/now_playing?api_key=" + _apiKey + _pageString + page;
+			case MovieType.TopRated:
+				Url = _baseUrl + "movie/top_rated?api_key=" + _apiKey + _pageString + page;
 				break;
-				case MovieType.Popular:
-					Url = _baseUrl + "movie/popular?api_key=" + _apiKey + _pageString + page;
-					break;
-				case MovieType.Similar:
-					Url = _baseUrl + "movie/" + movieId+"/simular?api_key=" + _apiKey + _pageString + page;
+			case MovieType.NowPaying:
+				Url = _baseUrl + "movie/now_playing?api_key=" + _apiKey + _pageString + page;
 				break;
+			case MovieType.Popular:
+				Url = _baseUrl + "movie/popular?api_key=" + _apiKey + _pageString + page;
+				break;
+			case MovieType.Similar:
+				Url = _baseUrl + "movie/" + movieId + "/simular?api_key=" + _apiKey + _pageString + page;
+				break;
+			case MovieType.Upcoming:
+				Url = _baseUrl + "movie/upcoming?api_key=" + _apiKey + "&language=en-US";
+				break;
+			case MovieType.TVLatest:
+				Url = _baseUrl + "tv/airing_today?api_key=" + _apiKey + "&language=en-US";
+				break;
+
 			}
 
 			HttpResponseMessage result = await client.GetAsync (Url, CancellationToken.None);
@@ -113,20 +122,31 @@ namespace FavoriteMoviesPCL
 					string content = await result.Content.ReadAsStringAsync ();
 					JObject jresponse = JObject.Parse (content);
 					var jarray = jresponse ["total_pages"];
-					switch (type) 
-					{
+					MovieList = GetJsonData (content);
+					//return a ObservableCollection to fill a list of movies
+					return MovieList;
 
-					case MovieType.TopRated:
+				} catch (Exception ex) {
+					//Model Error
+					Debug.WriteLine (ex);
 
-						TotalPagesTopRated = (int)jarray;
-						break;
-					case MovieType.NowPaying:
-						TotalPagesNowPlaying = (int)jarray;
-						break;
-					case MovieType.Popular:
-						TotalPagesPopular = (int)jarray;
-						break;
-					}
+				}
+			}
+			//Server Error or no internet connection.
+			return null;
+		}
+
+		public static async Task<ObservableCollection<Movie>> MovieSearch (string query)
+		{
+			var client = new HttpClient ();
+			string Url = "https://api.themoviedb.org/3/search/movie?api_key=" + _apiKey + "&language=en-US&query=" + query;
+
+			HttpResponseMessage result = await client.GetAsync (Url, CancellationToken.None);
+			if (result.IsSuccessStatusCode) {
+				try {
+					string content = await result.Content.ReadAsStringAsync ();
+					JObject jresponse = JObject.Parse (content);
+					var jarray = jresponse ["total_pages"];
 					MovieList = GetJsonData (content);
 					//return a ObservableCollection to fill a list of movies
 					return MovieList;
@@ -153,26 +173,26 @@ namespace FavoriteMoviesPCL
 				foreach (var jObj in jarray) {
 					var newMovie = new Movie ();
 					newMovie.Title = (string)jObj ["title"];
-					newMovie.PosterPath = (string)jObj ["poster_path"];
-					newMovie.HighResPosterPath = (string)jObj ["poster_path"];
+					newMovie.PosterPath = (jObj ["poster_path"] == null) ? "" : (string)jObj ["poster_path"];
+					newMovie.HighResPosterPath = (jObj ["poster_path"] == null) ? "" : (string)jObj ["poster_path"];
 					newMovie.Id = (int)jObj ["id"];
 					newMovie.Overview = (string)jObj ["overview"];
 					newMovie.VoteCount = (double)jObj ["vote_count"];
-					newMovie.ReleaseDate = (DateTime)jObj ["release_date"];
+					newMovie.ReleaseDate = (DateTime?)jObj ["release_date"];
 					newMovie.VoteAverage = (float)jObj ["vote_average"];
-					newMovie.Adult = (bool)jObj ["adult"];
+					newMovie.Adult = (jObj ["adult"] == null) ? false : (bool)jObj ["adult"];
+					newMovie.BackdropPath = (jObj ["backdrop_path"] == null) ? "" : (string)jObj ["backdrop_path"];
 					//newMovie.genre_ids = jObj ["genre_ids"].ToObject<List<string>>();
-					if(!newMovie.Adult)
-					   movieList.Add (newMovie);
+					movieList.Add (newMovie);
 				}
 			} catch (Exception e) {
 
 				Debug.WriteLine (e.Message);
 				//if one of the json items is malformed delete it and send what we have.
 				//movieList.RemoveAt (movieList.Count - 1);
-				 //log message and send what we have.
+				//log message and send what we have.
 			}
-				return movieList;
+			return movieList;
 
 
 		}

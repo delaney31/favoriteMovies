@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
 using System.Globalization;
+using System.Text;
 using System.Threading.Tasks;
 using CoreGraphics;
 using FavoriteMoviesPCL;
@@ -20,13 +21,12 @@ namespace FavoriteMovies
 
 
 		static string _googleApiKey = "AIzaSyCu634TJuZR_0iUhJQ6D8E9xr2a3VbU3_M";
-		static string _movieImdbApiKey= "ab41356b33d100ec61e6c098ecc92140";
 		static string _youTubeURl = "https://www.youtube.com/embed/";
 		string _embededMoveId;
 		Movie movieDetail;
 		UIImageView moviePlay;
 		UIWebView webView ;
-
+		static UIScrollView scrollView = new UIScrollView ();
 		ObservableCollection<Movie> similarMovies;
 
 		public MovieDetailsViewController (IntPtr handle) : base (handle)
@@ -50,7 +50,7 @@ namespace FavoriteMovies
 
 		void Initialize ()
 		{
-			var imDbUrl = "http://api.themoviedb.org/3/movie/" + movieDetail.Id + "/videos?api_key=" + _movieImdbApiKey;
+			var imDbUrl = "http://api.themoviedb.org/3/movie/" + movieDetail.Id + "/videos?api_key=" + MovieService._apiKey;
 			var youtubeMovieId = "";
 
 			//var task = Task.Run (async () => {
@@ -65,12 +65,7 @@ namespace FavoriteMovies
 			});
 			UTubeMovidId.Wait ();
 
-
-
 			_embededMoveId = youtubeMovieId;
-
-
-
 
 		}
 		/// <summary>
@@ -84,20 +79,31 @@ namespace FavoriteMovies
 
 
 			nav.NavigationBar.BarTintColor = UIColor.Clear.FromHexString (UIColorExtensions.NAV_BAR_COLOR, 1.0f);
-			nav.NavigationBar.TintColor = UIColor.White;
+			nav.NavigationBar.TintColor = UIColor.Black;
 			nav.NavigationBar.Translucent = false;
-			nav.NavigationBar.TopItem.Title = UIColorExtensions.TITLE;
+			//nav.NavigationBar.TopItem.Title = UIColorExtensions.TITLE;
+
+			//UIImageView backgroundImageView = new UIImageView () { Frame = View.Frame };
+			//backgroundImageView.Image = MovieCell.GetImage (movieDetail.BackdropPath);
+			//backgroundImageView.Center = View.Center;
+			//backgroundImageView.ContentMode = UIViewContentMode.ScaleAspectFill;
 
 			View.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
+			//View.InsertSubview (backgroundImageView, 0);
+
 			posterImage.Layer.BorderWidth = 1.0f;
 
 			posterImage.ContentMode = UIViewContentMode.ScaleToFill;
 			if (UIColorExtensions.MovieIsFavorite (movieDetail.Id.ToString ())) {
-
+				saveFavoriteButt.SetTitle ("Delete Favorite", UIControlState.Normal);
 				posterImage.Layer.BorderColor = UIColor.Orange.CGColor;
+				saveFavoriteButt.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.NAV_BAR_COLOR, 1.0f);
+				saveFavoriteButt.SetTitleColor (UIColor.White, UIControlState.Normal);
 			} else {
-
-				posterImage.Layer.BorderColor = UIColor.White.CGColor;
+				saveFavoriteButt.SetTitle ("Save Favorite", UIControlState.Normal);
+				posterImage.Layer.BorderColor = UIColor.Clear.CGColor;
+				saveFavoriteButt.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.NAV_BAR_COLOR, 1.0f);
+				saveFavoriteButt.SetTitleColor (UIColor.White, UIControlState.Normal);
 			}
 
 			moviePlay.Frame = new CGRect (posterImage.Frame.X+115, posterImage.Frame.Y+ 185, 30, 30);
@@ -110,20 +116,20 @@ namespace FavoriteMovies
 			   posterImage.AddSubview (moviePlay);
 			movieTitle.Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, 15);
 			movieTitle.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
-			movieTitle.TextColor = UIColor.White;
+			movieTitle.TextColor = UIColor.Black;
 			movieTitle.Text = movieDetail.Title;
 			movieTitle.Lines = 0;
 
 			dateOpenView.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 			dateOpenView.Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, 10);
-			dateOpenView.TextColor = UIColor.White;
-			dateOpenView.Text = "Release Date: " + movieDetail.ReleaseDate.ToString ("MM/dd/yyyy",
+			dateOpenView.TextColor = UIColor.Black;
+			dateOpenView.Text = "Release Date: " + movieDetail.ReleaseDate.Value.ToString ("MM/dd/yyyy",
 				  CultureInfo.InvariantCulture);
 			dateOpenView.Frame = new RectangleF (180, 70, 300, 10);
 			voteResultText.Text = Convert.ToInt32 (movieDetail.VoteAverage) + " of 10 Stars";
 			voteResultText.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 			voteResultText.Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, 13);
-			voteResultText.TextColor = UIColor.White;
+			voteResultText.TextColor = UIColor.Black;
 
 
 			descriptView.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
@@ -131,23 +137,24 @@ namespace FavoriteMovies
 			//descriptView.ScrollEnabled = true;
 
 			descriptView.Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, 12);
-			descriptView.TextColor = UIColor.White;
+			descriptView.TextColor = UIColor.Black;
 
 			//descriptView.Frame = new RectangleF (10, 250, 300, ((movieDetail.Overview.Length / 50) * 25));
-			//descriptView.Frame = new RectangleF (10, 250, 300, movieDetail.Overview.Length);
+			descriptView.Frame = new RectangleF (10, 250, 300, 220);
 			var size = descriptView.Text.StringSize(descriptView.Font, descriptView.Frame.Size, UILineBreakMode.CharacterWrap);
-			descriptView.LineBreakMode = UILineBreakMode.WordWrap;
-			descriptView.Frame = new RectangleF (10, 250, 300, (float)size.Height+30);
+			descriptView.LineBreakMode = UILineBreakMode.TailTruncation;
+			descriptView.Frame = new RectangleF (10, 250, 300, (float)size.Height);
 			descriptView.Lines = 0;
 			//descriptView.TextAlignment = UITextAlignment.Left;
 
 			var playClip  = new UITapGestureRecognizer(HandleAction);
 
 			saveFavoriteButt.TouchDown += SaveFavoriteButt_TouchDown;
-			saveFavoriteButt.BackgroundColor = UIColor.Orange;
+
 			playVideoButt.SetTitle ("Delete Favorite", UIControlState.Normal);
 			playVideoButt.TouchDown += PlayVideoButt_TouchDown;
 			playVideoButt.BackgroundColor = UIColor.Green;
+			playVideoButt.Hidden = true;
 			posterImage.UserInteractionEnabled = true;
 			if (_embededMoveId != "")
 			   posterImage.AddGestureRecognizer (playClip);
@@ -155,7 +162,20 @@ namespace FavoriteMovies
 
 
 		}
+		public override void ViewWillAppear (bool animated)
+		{
+			base.ViewWillAppear (animated);
 
+			//scrollView.Frame = View.Frame;
+			scrollView.Frame = new CGRect () {
+				X = descriptView.Frame.X, Y = descriptView.Frame.Y,
+				Width = descriptView.Frame.Width, Height = descriptView.Frame.Height + 1500};
+			scrollView.Add (descriptView);
+			scrollView.ContentSize = new CGSize (descriptView.Frame.Width, descriptView.Frame.Height+1500);
+			scrollView.ContentOffset = new CGPoint (0, -scrollView.ContentInset.Top);
+			scrollView.Bounces = true;
+			View.AddSubview (scrollView);	
+		}
 		public override bool ShouldAutorotate ()
 		{
 			return base.ShouldAutorotate ();
@@ -170,13 +190,28 @@ namespace FavoriteMovies
 
 		void HandleAction ()
 		{
-			webView = new UIWebView (View.Bounds);
-			var url = _youTubeURl+ _embededMoveId;
+			string videoCode = _embededMoveId;//.Substring (_embededMoveId.LastIndexOf ("/"));
 
-			webView.LoadRequest (new NSUrlRequest (new NSUrl (url)));
-			webView.ScalesPageToFit = true;
+			webView = new UIWebView () {
+				AutoresizingMask = UIViewAutoresizing.FlexibleHeight | UIViewAutoresizing.FlexibleWidth,
+				BackgroundColor = UIColor.Black,
+			};
 
-			View.AddSubview (webView);
+			var sb = new StringBuilder ();
+			sb.Append ("<html><head>");
+			sb.Append ("<style>" +
+					  "body{font-family:Helvetica;font-size:10pt;}" +
+					  "</style>");
+			sb.Append ("</head>");
+			sb.Append ("<body>");
+			sb.Append ("<iframe width=\"300\" height=\"250\" src=\"" +_youTubeURl + videoCode + "\" frameborder=\"0\" allowfullscreen></iframe>");
+			sb.Append ("<h4>" + movieDetail.Title + "</h4>");
+			sb.Append ("<p>" + movieDetail.Overview + "</p>");
+			sb.Append ("</body></html>");
+
+			webView.Frame = new RectangleF (0, 0, (float)this.View.Frame.Width, (float)this.View.Frame.Height);
+			webView.LoadHtmlString (sb.ToString (), null);
+			this.View.AddSubview (webView);
 
 		}
 
@@ -189,15 +224,23 @@ namespace FavoriteMovies
 		void PlayVideoButt_TouchDown (object sender, EventArgs e)
 		{
 			posterImage.Layer.BorderWidth = 1.0f;
-			posterImage.Layer.BorderColor = UIColor.White.CGColor;
+			posterImage.Layer.BorderColor = UIColor.Clear.CGColor;
 			try {
 				using (var db = new SQLite.SQLiteConnection (MovieService.Database)) {
 					// there is a sqllite bug here https://forums.xamarin.com/discussion/52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
 					db.Query<Movie> ("DELETE FROM [Movie] WHERE [id] = " + movieDetail.Id);
+
+					saveFavoriteButt.TouchDown -= PlayVideoButt_TouchDown;
+					saveFavoriteButt.TouchDown += SaveFavoriteButt_TouchDown;
+					saveFavoriteButt.SetTitle ("Save Favorite", UIControlState.Normal);
+					saveFavoriteButt.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.NAV_BAR_COLOR, 1.0f);
+					saveFavoriteButt.SetTitleColor (UIColor.White, UIControlState.Normal);
 				}
 			} catch (SQLite.SQLiteException) {
 				//first time in no favorites yet.
 			}
+
+
 		}
 		/// <summary>
 		/// This is the delegate for the save favorite button. It also has visual indicator for the current poster image
@@ -218,22 +261,21 @@ namespace FavoriteMovies
 
 				using (var conn = new SQLite.SQLiteConnection (MovieService.Database)) {
 					conn.CreateTable<Movie> ();
-					using (var db = new SQLite.SQLiteConnection (MovieService.Database)) {
-						db.Insert (movieDetail);
-					}
+					//using (var db = new SQLite.SQLiteConnection (MovieService.Database)) {
+					//	db.Insert (movieDetail);
+					//}
 				}
 
 			}
-
+			saveFavoriteButt.TouchDown -= SaveFavoriteButt_TouchDown;
+			saveFavoriteButt.TouchDown += PlayVideoButt_TouchDown;
+			saveFavoriteButt.SetTitle ("Delete Favorite", UIControlState.Normal);
+			saveFavoriteButt.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.NAV_BAR_COLOR, 1.0f);
+			saveFavoriteButt.SetTitleColor (UIColor.White, UIControlState.Normal);
 
 		}
 
-		//dismiss keyboard
-		public override void TouchesBegan (NSSet touches, UIEvent evt)
-		{
-			descriptView.ResignFirstResponder ();
-			movieTitle.ResignFirstResponder ();
-		}
+
 		public override void DidReceiveMemoryWarning ()
 		{
 			base.DidReceiveMemoryWarning ();

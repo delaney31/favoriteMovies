@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using CoreGraphics;
+﻿using System.IO;
 using FavoriteMoviesPCL;
 using Foundation;
-using Mono.Data.Sqlite;
-using SQLite;
+using SidebarNavigation;
 using UIKit;
 
 namespace FavoriteMovies
@@ -19,58 +12,38 @@ namespace FavoriteMovies
 	public class AppDelegate : UIApplicationDelegate
 	{
 		// class-level declarations
-		UIWindow window;
-		ObservableCollection<Movie> NowPlaying;
-		ObservableCollection<Movie> TopRated;
-		ObservableCollection<Movie> Similar;
-		ObservableCollection<Movie> Popular;
 
-		static int RandomNumber (int min, int max)
-		{
-			Random random = new Random (); return random.Next (min, max);
 
+		public RootViewController RootViewController {
+			get { return Window.RootViewController as RootViewController; }
 		}
+		public override UIWindow Window {
+			get;
+			set;
+		}
+
+
 		public override bool FinishedLaunching (UIApplication application, NSDictionary launchOptions)
 		{
 			// Override point for customization after application launch.
 			// If not required for your application you can safely delete this method
-			window = new UIWindow (UIScreen.MainScreen.Bounds);
-
-
-			var task = Task.Run (async () => {
-				NowPlaying = await MovieService.GetMoviesAsync (MovieService.MovieType.NowPaying,RandomNumber(1,50));
-				TopRated = await MovieService.GetMoviesAsync (MovieService.MovieType.TopRated,RandomNumber (1, 50));
-				Popular = await MovieService.GetMoviesAsync (MovieService.MovieType.Popular,RandomNumber (1, 50));
-			});
-			task.Wait ();
-
-			var nav = new MainNavigationController ();
-			//var nav = new UINavigationController ();
-			//var scrollView = new UIScrollView ();
-		//	scrollView.AddSubview (new TopRatedCollectionViewController (flowLayout, TopRated, NowPlaying, Popular).View);
-
-			nav.AddChildViewController (new MainCollectionViewController (TopRated, NowPlaying, Popular));
-			nav.NavigationBar.BarTintColor = UIColor.Clear.FromHexString (UIColorExtensions.NAV_BAR_COLOR, 1.0f);
-			nav.View.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
-			nav.NavigationBar.TintColor = UIColor.White;
-			nav.NavigationBar.Translucent = false;
-			nav.NavigationBar.TopItem.Title = UIColorExtensions.TITLE;
-			nav.NavigationBar.TitleTextAttributes = new UIStringAttributes () {
-				Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, 18),
-				ForegroundColor =UIColor.White//= UIColor.Clear.FromHexString (UIColorExtensions.TITLE_COLOR, 1.0f)
-			};
+			Window = new UIWindow (UIScreen.MainScreen.Bounds);
 
 			MovieService.Database = Path.Combine (FileHelper.GetLocalStoragePath (), "MovieEntries.db3");
 
+			// create a new window instance based on the screen size
+			Window = new UIWindow (UIScreen.MainScreen.Bounds);
 
-			window.RootViewController = nav;
+			// If you have defined a root view controller, set it here:
+			Window.RootViewController = new RootViewController ();
 
-			window.MakeKeyAndVisible ();
+			// make the window visible
+			Window.MakeKeyAndVisible ();
 
-			// Code to start the Xamarin Test Cloud Agent
-#if ENABLE_TEST_CLOUD
-			Xamarin.Calabash.Start ();
-#endif
+			//			// Code to start the Xamarin Test Cloud Agent
+			//#if ENABLE_TEST_CLOUD
+			//			Xamarin.Calabash.Start ();
+			//#endif
 
 			return true;
 		}
@@ -113,15 +86,44 @@ namespace FavoriteMovies
 	/// </summary>
 	public class MainNavigationController : UINavigationController
 	{
+		// the sidebar controller for the app
+		public SidebarController SidebarController { get; private set; }
+		private UIStoryboard _storyboard;
+		// the navigation controller
+		public NavController NavController { get; private set; }
+
+		// the storyboard
+		public override UIStoryboard Storyboard {
+			get {
+				if (_storyboard == null)
+					_storyboard = UIStoryboard.FromName ("Phone", null);
+				return _storyboard;
+			}
+		}
+
 		public override bool ShouldAutorotate ()
 		{
-			return this.VisibleViewController.ShouldAutorotate();;
+			return this.VisibleViewController.ShouldAutorotate (); ;
 
 		}
 
 		public override UIInterfaceOrientationMask GetSupportedInterfaceOrientations ()
 		{
 			return this.VisibleViewController.GetSupportedInterfaceOrientations ();
+		}
+
+		public override void ViewDidLoad ()
+		{
+			base.ViewDidLoad ();
+			var introController = (IntroController)Storyboard.InstantiateViewController ("IntroController");
+			var menuController = (MenuController)Storyboard.InstantiateViewController ("MenuController");
+
+			// create a slideout navigation controller with the top navigation controller and the menu view controller
+			NavController = new NavController ();
+			NavController.PushViewController (introController, false);
+			SidebarController = new SidebarController (this, NavController, menuController);
+			SidebarController.MenuWidth = 220;
+			SidebarController.ReopenOnRotate = false;
 		}
 	}
 
