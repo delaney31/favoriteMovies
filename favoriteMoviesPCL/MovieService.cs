@@ -188,9 +188,7 @@ namespace FavoriteMoviesPCL
 			} catch (Exception e) {
 
 				Debug.WriteLine (e.Message);
-				//if one of the json items is malformed delete it and send what we have.
-				//movieList.RemoveAt (movieList.Count - 1);
-				//log message and send what we have.
+
 			}
 			return movieList;
 

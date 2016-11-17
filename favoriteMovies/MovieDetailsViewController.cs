@@ -78,9 +78,7 @@ namespace FavoriteMovies
 			var nav = NavigationController;
 
 
-			nav.NavigationBar.BarTintColor = UIColor.Clear.FromHexString (UIColorExtensions.NAV_BAR_COLOR, 1.0f);
-			nav.NavigationBar.TintColor = UIColor.Black;
-			nav.NavigationBar.Translucent = false;
+
 			//nav.NavigationBar.TopItem.Title = UIColorExtensions.TITLE;
 
 			//UIImageView backgroundImageView = new UIImageView () { Frame = View.Frame };

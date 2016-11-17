@@ -19,6 +19,13 @@ namespace FavoriteMovies
  /// </summary>
 	public class MainViewController : BaseController
 	{
+		
+
+		void SearchResultsController_TouchesCancelled (NSSet arg1, UIEvent arg2)
+		{
+
+		}
+
 		static NSString movieCellId = new NSString ("MovieCell");
 		static CGSize HeaderReferenceSize = new CGSize (50, 50);
 		static int MinimumInteritemSpacing = 30;
@@ -155,9 +162,12 @@ namespace FavoriteMovies
 		{
 			base.ViewDidAppear (animated);
 
+
+
 			//HACK until i find out why when you open a movie details and come back the view.height changes.
 			if (View.Frame.Height == 504) 
 			{
+		
 				if (favorites.Count > 0) {
 					scrollView.ContentSize = new CGSize (View.Frame.Width, 898 + 50);
 					scrollView.ContentOffset = new CGPoint (0, -scrollView.ContentInset.Top);
@@ -166,6 +176,12 @@ namespace FavoriteMovies
 					scrollView.ContentOffset = new CGPoint (0, -scrollView.ContentInset.Top);
 				}
 			}
+			////*****this fixes a problem with the uitableview adding space at the top after each selection*****
+
+			//Debug.Write (searchResultsController.TableView.ContentInset);
+			//searchResultsController.TableView.ContentInset = new UIEdgeInsets (80, 0, 0, 0);
+
+
 		}
 
 
@@ -179,7 +195,7 @@ namespace FavoriteMovies
 
 			//this fixes problem when coming out of full screen after watching a trailer
 			NavigationController.NavigationBar.Frame = new CGRect () { X = 0, Y = 20, Width = 320, Height = 44 };
-			DeleteAllSubviews (scrollView);
+			//DeleteAllSubviews (scrollView);
 			FavoritesDisplay ();
 
 			if (favorites.Count > 0) {
@@ -254,7 +270,7 @@ namespace FavoriteMovies
 				favoriteViewController.CollectionView.Frame = FavoriteControllerFrame;
 				FavoriteLabel.Frame = FavoriteLabelFrame;
 				//For scrolling to work the scrollview Content size has to be bigger than the View.Frame.Height
-				scrollView.ContentSize = new CGSize (View.Frame.Width, View.Frame.Height + 155+ 175);
+				scrollView.ContentSize = new CGSize (View.Frame.Width, 898);
 				scrollView.ContentOffset = new CGPoint (0, -scrollView.ContentInset.Top);
 
 			}
@@ -346,10 +362,12 @@ namespace FavoriteMovies
 				SearchResultsUpdater = searchUpdater,
 
 					WeakDelegate = searchUpdater,
-					WeakSearchResultsUpdater = searchUpdater
+					WeakSearchResultsUpdater = searchUpdater,
 			};
 
+
 			searchResultsController.searchController = searchController;
+
 
 			//format the search bar
 			searchController.SearchBar.SizeToFit ();
@@ -357,7 +375,7 @@ namespace FavoriteMovies
 			searchController.SearchBar.Placeholder = "Enter a search query";
 
 			//searchResultsController.TableView.WeakDelegate = this;
-			//searchController.SearchBar.WeakDelegate = this;
+			searchController.SearchBar.WeakDelegate = searchResultsController;
 
 			((UITextField)searchController.SearchBar.ValueForKey (new NSString ("_searchField"))).TextColor = UIColor.White;
 
@@ -433,6 +451,18 @@ namespace FavoriteMovies
 			((UITextField)searchController.SearchBar.ValueForKey (new NSString ("_searchField"))).ResignFirstResponder ();
 		}
 
+		[Export ("searchBarCancelButtonClicked:")]
+		public void searchBarCancelButtonClicked (UISearchBar searchBar)
+		{
+			Console.WriteLine ("The default search bar cancel button was tapped.");
+			var size = ((UIScrollView)navigationController.TopViewController.View.Subviews [0]).ContentSize;
+
+			searchBar.ResignFirstResponder ();
+
+			MovieItems.Clear ();
+			TableView.ReloadData ();
+		}
+
 
 		public SearchResultsViewController (UINavigationController navigationController)
 		{
@@ -467,26 +497,27 @@ namespace FavoriteMovies
 		public override void RowSelected (UITableView tableView, NSIndexPath indexPath)
 		{
 			try {
-				//*****this fixes a problem with the uitableview adding space at the top after each selection*****
-				TableView.ContentInset = new UIEdgeInsets (-16, 0, 0, 0);
-
+				
 				var row = MovieItems [indexPath.Row];
 				navigationController.PushViewController (new MovieDetailsViewController (row), true);
+				//*****this fixes a problem with the uitableview adding space at the top after each selection*****
+
+				Debug.Write (this.TableView.ContentInset);
+				this.TableView.ContentInset = new UIEdgeInsets (80, 0, 0, 0);
+
 
 			} catch (Exception e) 
 			{
 				Debug.WriteLine (e.Message);
 			}
-
 		}
 
 		public async void Search (string forSearchString)
 		{
 			// perform search
-			if (forSearchString.Length > 2)
-			{
-				this.MovieItems = await MovieService.MovieSearch (forSearchString);
-				this.TableView.ReloadData ();
+			if (forSearchString.Length > 0) {
+				MovieItems = await MovieService.MovieSearch (forSearchString);
+				TableView.ReloadData ();
 			}
 
 		}
