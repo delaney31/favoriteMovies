@@ -136,6 +136,7 @@
     <Compile Include="asyncvoid.cs" />
     <Compile Include="SQLiteAsync.cs" />
     <Compile Include="SQLite.cs" />
+    <Compile Include="MovieListPickerViewController.cs" />
   </ItemGroup>
   <ItemGroup>
     <BundleResource Include="Resources\placeholder.png" />

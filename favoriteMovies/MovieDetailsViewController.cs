@@ -26,6 +26,7 @@ namespace FavoriteMovies
 		Movie movieDetail;
 		UIImageView moviePlay;
 		UIWebView webView ;
+		CustomList listType;
 		static UIScrollView scrollView = new UIScrollView ();
 		ObservableCollection<Movie> similarMovies;
 
@@ -45,7 +46,8 @@ namespace FavoriteMovies
 			Initialize ();
 			moviePlay = new UIImageView ();
 			moviePlay.Image = UIImage.FromBundle ("download.png");
-
+			listType = new CustomList ();
+			listType.Id = movieDetail.Id;
 		}
 
 		void Initialize ()
@@ -167,9 +169,9 @@ namespace FavoriteMovies
 			//scrollView.Frame = View.Frame;
 			scrollView.Frame = new CGRect () {
 				X = descriptView.Frame.X, Y = descriptView.Frame.Y,
-				Width = descriptView.Frame.Width, Height = descriptView.Frame.Height + 1500};
+				Width = descriptView.Frame.Width, Height = descriptView.Frame.Height + 50};
 			scrollView.Add (descriptView);
-			scrollView.ContentSize = new CGSize (descriptView.Frame.Width, descriptView.Frame.Height+1500);
+			scrollView.ContentSize = new CGSize (descriptView.Frame.Width, descriptView.Frame.Height+ 50);
 			scrollView.ContentOffset = new CGPoint (0, -scrollView.ContentInset.Top);
 			scrollView.Bounces = true;
 			View.AddSubview (scrollView);	
@@ -247,30 +249,45 @@ namespace FavoriteMovies
 		/// <param name="e">E.</param>
 		void SaveFavoriteButt_TouchDown (object sender, EventArgs e)
 		{
-			posterImage.Layer.BorderWidth = 1.0f;
-			posterImage.Layer.BorderColor = UIColor.Orange.CGColor;
-			movieDetail.Favorite = true;
-			// Create the database and a table to hold Favorite information.
-			try {
-				using (var db = new SQLite.SQLiteConnection (MovieService.Database)) {
-					db.Insert (movieDetail);
-				}
-			} catch (SQLite.SQLiteException s) {
+			//posterImage.Layer.BorderWidth = 1.0f;
+			//posterImage.Layer.BorderColor = UIColor.Orange.CGColor;
+			//movieDetail.Favorite = true;
+			//listType.Name = "Favorites";
+			//// Create the database and a table to hold Favorite information.
+			//try {
+			//	using (var db = new SQLite.SQLiteConnection (MovieService.Database)) 
+			//	{
+			//		db.Insert(movieDetail, typeof(Movie));
+			//		db.Insert (listType, typeof (CustomList));
+			//	}
 
-				using (var conn = new SQLite.SQLiteConnection (MovieService.Database)) {
-					conn.CreateTable<Movie> ();
-					//using (var db = new SQLite.SQLiteConnection (MovieService.Database)) {
-					//	db.Insert (movieDetail);
-					//}
-				}
+			//} catch (SQLite.SQLiteException s) {
 
-			}
-			saveFavoriteButt.TouchDown -= SaveFavoriteButt_TouchDown;
-			saveFavoriteButt.TouchDown += PlayVideoButt_TouchDown;
-			saveFavoriteButt.SetTitle ("Delete Favorite", UIControlState.Normal);
-			saveFavoriteButt.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.NAV_BAR_COLOR, 1.0f);
-			saveFavoriteButt.SetTitleColor (UIColor.White, UIControlState.Normal);
+			//	using (var conn = new SQLite.SQLiteConnection (MovieService.Database)) 
+			//	{
+			//		conn.CreateTable<Movie> ();
+			//		conn.CreateTable<CustomList> ();
+			//	}
 
+			//}
+			//saveFavoriteButt.TouchDown -= SaveFavoriteButt_TouchDown;
+			//saveFavoriteButt.TouchDown += PlayVideoButt_TouchDown;
+			//saveFavoriteButt.SetTitle ("Delete Favorite", UIControlState.Normal);
+			//saveFavoriteButt.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.NAV_BAR_COLOR, 1.0f);
+			//saveFavoriteButt.SetTitleColor (UIColor.White, UIControlState.Normal);
+			//var movieList = new MovieListPickerViewController ()
+			//{
+			//	ModalPresentationStyle = UIModalPresentationStyle.FormSheet,
+			//	ModalTransitionStyle = UIModalTransitionStyle.CoverVertical
+			//};
+			//NavigationController.PushViewController(movieList, false);
+			//this.PresentViewController (movieList, true, null);
+
+			var popoverController = new MovieListPickerViewController ();
+			popoverController.PopoverPresentationController.SourceView = View;
+			popoverController.PopoverPresentationController.SourceRect = new CGRect (6, 0, 0, 0);
+			popoverController.PopoverPresentationController.PermittedArrowDirections = 0;
+			PresentViewController (popoverController, true, null);
 		}
 
 
@@ -280,6 +297,9 @@ namespace FavoriteMovies
 			// Release any cached data, images, etc that aren't in use.
 		}
 	}
+
+
+
 	#region Simlar Movies setup not used yet 
 	/// <summary>
 	/// This class ( and subsequent classes) is not currently being used. It is going to be the datassource for the similar movies collection

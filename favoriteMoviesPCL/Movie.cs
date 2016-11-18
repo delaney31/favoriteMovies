@@ -13,6 +13,7 @@ namespace FavoriteMoviesPCL
 		public string PosterPath { get; set; }
 		[PrimaryKey]
 		public int Id { get; set; }
+		public int CustomListID { get; set;}
 		public string Overview { get; set; }
 		public double VoteCount { get; set; }
 		public DateTime? ReleaseDate { get; set; }
@@ -31,6 +32,12 @@ namespace FavoriteMoviesPCL
 	{
 		public string Id { get; set; }
 	}
-
+	[Table ("CustomList")]
+	public class CustomList 
+	{
+		public string Name { get; set; }
+		[PrimaryKey]
+		public int Id { get; set; }
+	}
 }
 

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Drawing;
+using CoreGraphics;
 using FavoriteMoviesPCL;
 using UIKit;
 
@@ -19,7 +21,25 @@ namespace FavoriteMovies
 		public const float HEADER_FONT_SIZE = 13f;
 		public const string SQL_TABLE = "MovieEntries.db3";
 
+		public static PointF Rotate (this PointF pt)
+		{
+			return new PointF (pt.Y, pt.X);
+		}
 
+		public static PointF Center (this RectangleF rect)
+		{
+			return new PointF (
+				(rect.Right - rect.Left) / 2.0f,
+				(rect.Bottom - rect.Top) / 2.0f
+				);
+		}
+		public static PointF Center (this CGRect rect)
+		{
+			return new PointF (
+			(float)((rect.Right - rect.Left) / 2.0f),
+			(float)((rect.Bottom - rect.Top) / 2.0f)
+				);
+		}
 		public static bool MovieIsFavorite (string id)
 		{
 			try {
