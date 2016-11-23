@@ -46,8 +46,9 @@ namespace FavoriteMovies
 			Initialize ();
 			moviePlay = new UIImageView ();
 			moviePlay.Image = UIImage.FromBundle ("download.png");
-			listType = new CustomList ();
-			listType.Id = movieDetail.Id;
+			//listType = new CustomList ();
+			//listType.Id = movieDetail.Id;
+
 		}
 
 		void Initialize ()
@@ -94,17 +95,23 @@ namespace FavoriteMovies
 			posterImage.Layer.BorderWidth = 1.0f;
 
 			posterImage.ContentMode = UIViewContentMode.ScaleToFill;
-			if (UIColorExtensions.MovieIsFavorite (movieDetail.Id.ToString ())) {
-				saveFavoriteButt.SetTitle ("Delete Favorite", UIControlState.Normal);
-				posterImage.Layer.BorderColor = UIColor.Orange.CGColor;
-				saveFavoriteButt.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.NAV_BAR_COLOR, 1.0f);
-				saveFavoriteButt.SetTitleColor (UIColor.White, UIControlState.Normal);
-			} else {
-				saveFavoriteButt.SetTitle ("Save Favorite", UIControlState.Normal);
-				posterImage.Layer.BorderColor = UIColor.Clear.CGColor;
-				saveFavoriteButt.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.NAV_BAR_COLOR, 1.0f);
-				saveFavoriteButt.SetTitleColor (UIColor.White, UIControlState.Normal);
-			}
+			//if (UIColorExtensions.MovieIsFavorite (movieDetail.Id.ToString ())) {
+			//	saveFavoriteButt.SetTitle ("Delete Favorite", UIControlState.Normal);
+			//	posterImage.Layer.BorderColor = UIColor.Orange.CGColor;
+			//	saveFavoriteButt.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.NAV_BAR_COLOR, 1.0f);
+			//	saveFavoriteButt.SetTitleColor (UIColor.White, UIControlState.Normal);
+			//} else {
+
+			playVideoButt.SetTitle ("Add Review", UIControlState.Normal);
+			playVideoButt.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.NAV_BAR_COLOR, 1.0f);
+			playVideoButt.SetTitleColor (UIColor.White, UIControlState.Normal);
+			playVideoButt.Frame = new CGRect (saveFavoriteButt.Frame.X, saveFavoriteButt.Frame.Y - 40,saveFavoriteButt.Frame.Width, saveFavoriteButt.Frame.Height);
+			playVideoButt.Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, 13f);
+			saveFavoriteButt.SetTitle ("Add To List", UIControlState.Normal);
+			posterImage.Layer.BorderColor = UIColor.Clear.CGColor;
+			saveFavoriteButt.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.NAV_BAR_COLOR, 1.0f);
+			saveFavoriteButt.SetTitleColor (UIColor.White, UIControlState.Normal);
+			//}
 
 			moviePlay.Frame = new CGRect (posterImage.Frame.X+115, posterImage.Frame.Y+ 185, 30, 30);
 			//moviePlay.Frame = posterImage.Frame;
@@ -126,6 +133,7 @@ namespace FavoriteMovies
 			dateOpenView.Text = "Release Date: " + movieDetail.ReleaseDate.Value.ToString ("MM/dd/yyyy",
 				  CultureInfo.InvariantCulture);
 			dateOpenView.Frame = new RectangleF (180, 70, 300, 10);
+
 			voteResultText.Text = Convert.ToInt32 (movieDetail.VoteAverage) + " of 10 Stars";
 			voteResultText.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 			voteResultText.Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, 13);
@@ -138,43 +146,59 @@ namespace FavoriteMovies
 
 			descriptView.Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, 12);
 			descriptView.TextColor = UIColor.Black;
-
+			//descriptView.Layer.BorderWidth = 10f;
 			//descriptView.Frame = new RectangleF (10, 250, 300, ((movieDetail.Overview.Length / 50) * 25));
-			descriptView.Frame = new RectangleF (10, 250, 300, 220);
-			var size = descriptView.Text.StringSize(descriptView.Font, descriptView.Frame.Size, UILineBreakMode.CharacterWrap);
-			descriptView.LineBreakMode = UILineBreakMode.TailTruncation;
-			descriptView.Frame = new RectangleF (10, 250, 300, (float)size.Height);
+			//descriptView.Frame = new RectangleF (10, 260, 300, 220);
+			//var size = descriptView.Text.StringSize(descriptView.Font, descriptView.Frame.Size, UILineBreakMode.CharacterWrap);
+			//descriptView.LineBreakMode = UILineBreakMode.TailTruncation;
+			descriptView.Frame = new RectangleF (10, 250, 300, 300); //(int)size.Height+10);
 			descriptView.Lines = 0;
-			//descriptView.TextAlignment = UITextAlignment.Left;
+			descriptView.TextAlignment = UITextAlignment.Natural;
+			descriptView.SizeToFit ();
 
 			var playClip  = new UITapGestureRecognizer(HandleAction);
 
 			saveFavoriteButt.TouchDown += SaveFavoriteButt_TouchDown;
 
-			playVideoButt.SetTitle ("Delete Favorite", UIControlState.Normal);
-			playVideoButt.TouchDown += PlayVideoButt_TouchDown;
-			playVideoButt.BackgroundColor = UIColor.Green;
-			playVideoButt.Hidden = true;
+			//playVideoButt.SetTitle ("Delete Favorite", UIControlState.Normal);
+			//playVideoButt.TouchDown += PlayVideoButt_TouchDown;
+			//playVideoButt.BackgroundColor = UIColor.Green;
+			//playVideoButt.Hidden = true;
 			posterImage.UserInteractionEnabled = true;
 			if (_embededMoveId != "")
 			   posterImage.AddGestureRecognizer (playClip);
+			//For scrolling to work the scrollview Content size has to be bigger than the View.Frame.Height
+			scrollView.ContentSize = new CGSize (View.Frame.Width, 898);
+			scrollView.ContentOffset = new CGPoint (0, -scrollView.ContentInset.Top);
+			scrollView.Bounces = true;
+			//View.AddSubview (scrollView);	
 
+			scrollView.AddSubview (saveFavoriteButt);
+			scrollView.AddSubview (posterImage);
 
+			scrollView.AddSubview (movieTitle);
+			scrollView.AddSubview (dateOpenView);
+			scrollView.AddSubview (voteResultText);
+			scrollView.AddSubview (descriptView);
+			scrollView.AddSubview (playVideoButt);
+			//scrollView.AddSubview (createListButt);
+			View.AddSubview (scrollView);
 
 		}
 		public override void ViewWillAppear (bool animated)
 		{
 			base.ViewWillAppear (animated);
 
-			//scrollView.Frame = View.Frame;
-			scrollView.Frame = new CGRect () {
-				X = descriptView.Frame.X, Y = descriptView.Frame.Y,
-				Width = descriptView.Frame.Width, Height = descriptView.Frame.Height + 50};
-			scrollView.Add (descriptView);
-			scrollView.ContentSize = new CGSize (descriptView.Frame.Width, descriptView.Frame.Height+ 50);
-			scrollView.ContentOffset = new CGPoint (0, -scrollView.ContentInset.Top);
-			scrollView.Bounces = true;
-			View.AddSubview (scrollView);	
+			////scrollView.Frame = View.Frame;
+			//scrollView.Frame = new CGRect () {
+			//	X = descriptView.Frame.X, Y = descriptView.Frame.Y,
+			//	Width = descriptView.Frame.Width, Height = descriptView.Frame.Height + 50};
+			//scrollView.Add (descriptView);
+			//scrollView.ContentSize = new CGSize (descriptView.Frame.Width, descriptView.Frame.Height+ 50);
+			//scrollView.ContentOffset = new CGPoint (0, -scrollView.ContentInset.Top);
+
+
+
 		}
 		public override bool ShouldAutorotate ()
 		{
@@ -283,11 +307,12 @@ namespace FavoriteMovies
 			//NavigationController.PushViewController(movieList, false);
 			//this.PresentViewController (movieList, true, null);
 
-			var popoverController = new MovieListPickerViewController ();
-			popoverController.PopoverPresentationController.SourceView = View;
-			popoverController.PopoverPresentationController.SourceRect = new CGRect (6, 0, 0, 0);
-			popoverController.PopoverPresentationController.PermittedArrowDirections = 0;
-			PresentViewController (popoverController, true, null);
+			var popoverController = new MovieListPickerViewController (movieDetail);
+
+			ProvidesPresentationContextTransitionStyle = true;
+			DefinesPresentationContext = true;
+			popoverController.ModalPresentationStyle = UIModalPresentationStyle.CurrentContext;
+			NavigationController.PushViewController (popoverController, true);
 		}
 
 

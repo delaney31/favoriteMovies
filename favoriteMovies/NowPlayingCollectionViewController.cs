@@ -26,8 +26,10 @@ namespace FavoriteMovies
 		{
 			_items = movies;
 			rootNav =rootnav.NavigationController;
+		}
 
-
+		public NowPlayingCollectionViewController ()
+		{
 		}
 		public override nint GetItemsCount (UICollectionView collectionView, nint section)
 		{
@@ -214,6 +216,11 @@ namespace FavoriteMovies
 		{
 			_items = movies;
 		}
+
+		public FavoritesViewController ()
+		{
+		}
+
 		public override nint GetItemsCount (UICollectionView collectionView, nint section)
 		{
 			return _items.Count;

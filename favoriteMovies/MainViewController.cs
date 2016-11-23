@@ -40,17 +40,17 @@ namespace FavoriteMovies
 		static int DefaultYPositionMovieLatestController = 555;
 		static int DefaultHeaderHeight = 80;
 		static CGSize ItemSize = new CGSize (100, 150);
-		static CGRect FavoriteLabelFrame = new CGRect (7, 10, 90, 20);
-		static CGRect TopRatedLabelFrame = new CGRect (7, 185, 90, 20);
-		static CGRect NowPlayingLabelFrame = new CGRect (7, 360, 90, 20);
-		static CGRect PopularLabelFrame = new CGRect (7, 535, 90, 20);
-		static CGRect MovieLatestLabelFrame = new CGRect (7, 710, 90, 20);
+		static CGRect FavoriteLabelFrame = new CGRect (7, 10, 180, 20);
+		static CGRect TopRatedLabelFrame = new CGRect (7, 185, 180, 20);
+		static CGRect NowPlayingLabelFrame = new CGRect (7, 360, 180, 20);
+		static CGRect PopularLabelFrame = new CGRect (7, 535, 180, 20);
+		static CGRect MovieLatestLabelFrame = new CGRect (7, 710, 180, 20);
 		static int SpaceBetweenLabelsAndFrames = 175;
-		static CGRect FavoriteControllerFrame = new CGRect (-45, 30, 400, 150);
-		static CGRect TopRatedControllerFrame = new CGRect (-45, 205, 400, 150);
-		static CGRect NowPlayingControllerFrame = new CGRect (-45, 380, 400, 150);
-		static CGRect PopularControllerFrame = new CGRect (-45, 555, 400, 150);
-		static CGRect MovieLatestControllerFrame = new CGRect (-45, 730, 400, 150);
+		static CGRect FavoriteControllerFrame = new CGRect (-45, 30, 385, 150);
+		static CGRect TopRatedControllerFrame = new CGRect (-45, 205, 385, 150);
+		static CGRect NowPlayingControllerFrame = new CGRect (-45, 380, 385, 150);
+		static CGRect PopularControllerFrame = new CGRect (-45, 555, 385, 150);
+		static CGRect MovieLatestControllerFrame = new CGRect (-45, 730, 385, 150);
 		const float BackGroundColorAlpha = 1.0f;
 		static string TopRated = "Top Rated";
 		static string NowPlaying = "Now Playing";
@@ -62,7 +62,7 @@ namespace FavoriteMovies
 		ObservableCollection<Movie> topRated;
 		ObservableCollection<Movie> nowPlaying;
 		ObservableCollection<Movie> popular;
-		ObservableCollection<Movie> favorites;
+		ObservableCollection<CustomList> customLists;
 		ObservableCollection<Movie> MovieLatest;
 		ObservableCollection<Movie> TvNowAiring;
 		UICollectionViewFlowLayout flowLayout;
@@ -72,13 +72,15 @@ namespace FavoriteMovies
 		FavoritesViewController favoriteViewController;
 		MovieLatestViewController MovieLatestController;
 		UISearchController searchController;
+		FavoritesViewController [] customControllers;
+		UILabel [] customLabels = null;
 		static UILabel TopRatedLabel;
 		static UILabel PlayingNowLabel;
 		static UILabel PopularLabel;
 		static UILabel FavoriteLabel;
 		static UILabel nowPlayingLabel;
 		static UILabel MovieLatestLabel;
-		static MovieCollectionViewController movieCollection;
+		MovieCollectionViewController movieCollection;
 		static UIScrollView scrollView = new UIScrollView ();
 		static SearchResultsViewController searchResultsController;
 		static nfloat lastLabelY = PopularLabelFrame.Y;
@@ -100,6 +102,9 @@ namespace FavoriteMovies
 				ItemSize = ItemSize
 				//SectionInset = new UIEdgeInsets (80, -40, 97, 127)
 			};
+			customLists = GetCustomLists ();
+			customLabels = new UILabel [customLists.Count];
+			customControllers = new FavoritesViewController [customLists.Count];
 		}
 
 		public override bool ShouldAutorotate ()
@@ -128,22 +133,17 @@ namespace FavoriteMovies
 			return UIInterfaceOrientationMask.Portrait;
 		}
 
-		public async static Task<bool> AddCollectionView (ObservableCollection<Movie> movieList, string Label, MainViewController mainCollectionViewController)
+		public void AddCollectionView (ObservableCollection<Movie> movieList, string Label)
 		{
-			lastLabelY = lastLabelY + SpaceBetweenLabelsAndFrames;
-			lastFrameY = lastFrameY + SpaceBetweenLabelsAndFrames;
-			//UILabel nowPlayingLabel;
-			//FavoritesViewController movieCollection;
 
-
-			nowPlayingLabel = new UILabel () {
+			var listLabel = new UILabel () {
 				TextColor = UIColor.Black, Frame = new CGRect () { X = FavoriteLabelFrame.X, Y = lastLabelY, Width = FavoriteLabelFrame.Width, Height = FavoriteLabelFrame.Height },
 				BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha),
 				Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, UIColorExtensions.HEADER_FONT_SIZE),
 				Text = Label
 			};
 
-			movieCollection = new MovieCollectionViewController (new UICollectionViewFlowLayout () { MinimumInteritemSpacing = MinimumInteritemSpacing, MinimumLineSpacing = MinimumLineSpacing, HeaderReferenceSize = HeaderReferenceSize, ItemSize = ItemSize, ScrollDirection = UICollectionViewScrollDirection.Horizontal }, movieList, mainCollectionViewController);
+			movieCollection = new MovieCollectionViewController (new UICollectionViewFlowLayout () { MinimumInteritemSpacing = MinimumInteritemSpacing, MinimumLineSpacing = MinimumLineSpacing, HeaderReferenceSize = HeaderReferenceSize, ItemSize = ItemSize, ScrollDirection = UICollectionViewScrollDirection.Horizontal }, movieList, this);
 			movieCollection.CollectionView.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha);
 			movieCollection.CollectionView.RegisterClassForCell (typeof (MovieCell), movieCellId);
 			movieCollection.CollectionView.Frame = new CGRect () { X = FavoriteControllerFrame.X, Y = lastFrameY, Width = FavoriteControllerFrame.Width };
@@ -155,7 +155,7 @@ namespace FavoriteMovies
 			scrollView.AddSubview (nowPlayingLabel);
 			scrollView.AddSubview (movieCollection.CollectionView);
 	
-			return true;
+
 		}
 
 		public override void ViewDidAppear (bool animated)
@@ -168,7 +168,7 @@ namespace FavoriteMovies
 			if (View.Frame.Height == 504) 
 			{
 		
-				if (favorites.Count > 0) {
+				if (customLists.Count > 0) {
 					scrollView.ContentSize = new CGSize (View.Frame.Width, 898 + 50);
 					scrollView.ContentOffset = new CGPoint (0, -scrollView.ContentInset.Top);
 				} else {
@@ -188,27 +188,43 @@ namespace FavoriteMovies
 		public override void ViewWillAppear (bool animated)
 		{
 			base.ViewWillAppear (animated);
-			//this removes the search uitableview
-			//searchController.Active = false;
+
 
 			((UITextField)searchController.SearchBar.ValueForKey (new NSString ("_searchField"))).ResignFirstResponder ();
 
 			//this fixes problem when coming out of full screen after watching a trailer
 			NavigationController.NavigationBar.Frame = new CGRect () { X = 0, Y = 20, Width = 320, Height = 44 };
 			//DeleteAllSubviews (scrollView);
+
+			customLists = GetCustomLists ();
+			customLabels = new UILabel [customLists.Count];
+			customControllers = new FavoritesViewController [customLists.Count];
+			for (var cnt = 0; cnt < customLists.Count; cnt++) 
+			{
+				var movies = GetMovieList (customLists [cnt]);
+				if (movies.Count > 0) 
+				{
+					customLabels [cnt] = new UILabel () {
+						TextColor = UIColor.Black, Frame = FavoriteLabelFrame,
+						BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha),
+						Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, UIColorExtensions.HEADER_FONT_SIZE),
+						Text = customLists [cnt].Name
+					};
+
+					customControllers [cnt] = new FavoritesViewController (new UICollectionViewFlowLayout () {
+						MinimumInteritemSpacing = MinimumInteritemSpacing, MinimumLineSpacing = MinimumLineSpacing,
+						HeaderReferenceSize = HeaderReferenceSize, ItemSize = ItemSize,
+						ScrollDirection = UICollectionViewScrollDirection.Horizontal
+					}, movies, this);
+					customControllers [cnt].CollectionView.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha);
+					customControllers [cnt].CollectionView.RegisterClassForCell (typeof (MovieCell), movieCellId);
+					customControllers [cnt].CollectionView.Frame = FavoriteControllerFrame;
+				}
+			}
 			FavoritesDisplay ();
 
-			if (favorites.Count > 0) {
-				favoriteViewController.CollectionView.ReloadData ();
-				favoriteViewController.CollectionView.CollectionViewLayout.InvalidateLayout ();
-				favoriteViewController.CollectionView.CollectionViewLayout.PrepareLayout ();
-				scrollView.AddSubview (favoriteViewController.CollectionView);
-				scrollView.AddSubview (FavoriteLabel);
-			}
 
 			// adding label views to View. 
-			if (favorites.Count > 0)
-				scrollView.AddSubview (FavoriteLabel);
 			
 			scrollView.AddSubview (topRatedController.CollectionView);
 			scrollView.AddSubview (nowPlayingController.CollectionView);
@@ -233,48 +249,96 @@ namespace FavoriteMovies
 
 		void FavoritesDisplay ()
 		{
-			favorites = GetFavorites ();
-			favoriteViewController._items = new ObservableCollection<Movie> (favorites.Reverse ());
-			if (favorites.Count == 0) {
-				topRatedController.CollectionView.Frame = new CGRect (topRatedController.CollectionView.Frame.X, DefaultYPositionTopRatedController, topRatedController.CollectionView.Frame.Width, topRatedController.CollectionView.Frame.Height);
-				TopRatedLabel.Frame = new CGRect (TopRatedLabel.Frame.X, DefaultYPositionTopRatedLabel, TopRatedLabel.Frame.Width, TopRatedLabel.Frame.Height);
+			
+				//var listItems = GetMovieList (customList);
 
-				nowPlayingController.CollectionView.Frame = new CGRect (nowPlayingController.CollectionView.Frame.X, DefaultYPositionNowPlayingController, nowPlayingController.CollectionView.Frame.Width, nowPlayingController.CollectionView.Frame.Height);
-				PlayingNowLabel.Frame = new CGRect (PlayingNowLabel.Frame.X, DefaultYPositionNowPlayingLabel, PlayingNowLabel.Frame.Width, PlayingNowLabel.Frame.Height);
+				//favoriteViewController._items = new ObservableCollection<Movie> (listItems.Reverse ());
+				if (customLists.Count == 0) {
+					topRatedController.CollectionView.Frame = new CGRect (topRatedController.CollectionView.Frame.X, DefaultYPositionTopRatedController, topRatedController.CollectionView.Frame.Width, topRatedController.CollectionView.Frame.Height);
+					TopRatedLabel.Frame = new CGRect (TopRatedLabel.Frame.X, DefaultYPositionTopRatedLabel, TopRatedLabel.Frame.Width, TopRatedLabel.Frame.Height);
 
-				popularController.CollectionView.Frame = new CGRect (popularController.CollectionView.Frame.X, DefaultYPositionPopularController, popularController.CollectionView.Frame.Width, popularController.CollectionView.Frame.Height);
-				PopularLabel.Frame = new CGRect (PopularLabel.Frame.X, DefaultYPositionPopularLabel, PopularLabel.Frame.Width, PopularLabel.Frame.Height);
+					nowPlayingController.CollectionView.Frame = new CGRect (nowPlayingController.CollectionView.Frame.X, DefaultYPositionNowPlayingController, nowPlayingController.CollectionView.Frame.Width, nowPlayingController.CollectionView.Frame.Height);
+					PlayingNowLabel.Frame = new CGRect (PlayingNowLabel.Frame.X, DefaultYPositionNowPlayingLabel, PlayingNowLabel.Frame.Width, PlayingNowLabel.Frame.Height);
 
-				MovieLatestController.CollectionView.Frame = new CGRect (MovieLatestController.CollectionView.Frame.X, DefaultYPositionMovieLatestController, MovieLatestController.CollectionView.Frame.Width, popularController.CollectionView.Frame.Height);
-				MovieLatestLabel.Frame = new CGRect (MovieLatestLabel.Frame.X, DefaultYPositionMovieLatestLabel, MovieLatestLabel.Frame.Width, MovieLatestLabel.Frame.Height);
+					popularController.CollectionView.Frame = new CGRect (popularController.CollectionView.Frame.X, DefaultYPositionPopularController, popularController.CollectionView.Frame.Width, popularController.CollectionView.Frame.Height);
+					PopularLabel.Frame = new CGRect (PopularLabel.Frame.X, DefaultYPositionPopularLabel, PopularLabel.Frame.Width, PopularLabel.Frame.Height);
 
-				//For scrolling to work the scrollview Content size has to be bigger than the View.Frame.Height
-				scrollView.ContentSize = new CGSize (320, View.Frame.Height + 155);
-				scrollView.ContentOffset = new CGPoint (0, -scrollView.ContentInset.Top);
-				favoriteViewController.View.RemoveFromSuperview ();
-				FavoriteLabel.RemoveFromSuperview ();
+					MovieLatestController.CollectionView.Frame = new CGRect (MovieLatestController.CollectionView.Frame.X, DefaultYPositionMovieLatestController, MovieLatestController.CollectionView.Frame.Width, popularController.CollectionView.Frame.Height);
+					MovieLatestLabel.Frame = new CGRect (MovieLatestLabel.Frame.X, DefaultYPositionMovieLatestLabel, MovieLatestLabel.Frame.Width, MovieLatestLabel.Frame.Height);
 
-			} else {
-				TopRatedLabel.Frame = TopRatedLabelFrame;
-				topRatedController.CollectionView.Frame = TopRatedControllerFrame;
+					//For scrolling to work the scrollview Content size has to be bigger than the View.Frame.Height
+					scrollView.ContentSize = new CGSize (320, View.Frame.Height + 155);
+					scrollView.ContentOffset = new CGPoint (0, -scrollView.ContentInset.Top);
+					//favoriteViewController.View.RemoveFromSuperview ();
+					//FavoriteLabel.RemoveFromSuperview ();
 
-				nowPlayingController.CollectionView.Frame = NowPlayingControllerFrame;
-				PlayingNowLabel.Frame = NowPlayingLabelFrame;
+				} else {
+					
+					for (var cnt = 0; cnt < customLists.Count; cnt++)
+					{
+						customLabels[cnt].Frame = new CGRect () { X =FavoriteLabelFrame.X, 
+							Y = FavoriteLabelFrame.Y + (175 * cnt), 
+							Height = FavoriteLabelFrame.Height, Width = FavoriteLabelFrame.Width };
+ 						customControllers[cnt].CollectionView.Frame  = new CGRect () { X = FavoriteControllerFrame.X, 
+							Y = FavoriteControllerFrame.Y + (175 *cnt), Height = FavoriteControllerFrame.Height, 
+							Width = FavoriteControllerFrame.Width };
+						scrollView.AddSubview (customLabels [cnt]);
+						scrollView.AddSubview (customControllers [cnt].CollectionView);
+						
+					}
+				TopRatedLabel.Frame = new CGRect () { X = TopRatedLabelFrame.X, Y = TopRatedLabelFrame.Y + (175 * (customLists.Count-1)), Height = TopRatedLabelFrame.Height, Width = TopRatedLabelFrame.Width };
+				topRatedController.CollectionView.Frame = new CGRect () { X = TopRatedControllerFrame.X, Y = TopRatedControllerFrame.Y + (175 * (customLists.Count-1)), Height = TopRatedControllerFrame.Height, Width = TopRatedControllerFrame.Width };
 
-				popularController.CollectionView.Frame = PopularControllerFrame;
-				PopularLabel.Frame = PopularLabelFrame;
+				nowPlayingController.CollectionView.Frame = new CGRect () { X = NowPlayingControllerFrame.X, Y = NowPlayingControllerFrame.Y + (175 * (customLists.Count-1)), Height = NowPlayingControllerFrame.Height, Width = NowPlayingControllerFrame.Width };;
+				PlayingNowLabel.Frame = new CGRect () { X = NowPlayingLabelFrame.X, Y = NowPlayingLabelFrame.Y + (175 * (customLists.Count-1)), Height = NowPlayingLabelFrame.Height, Width = NowPlayingLabelFrame.Width };
 
-				MovieLatestController.CollectionView.Frame = MovieLatestControllerFrame;
-				MovieLatestLabel.Frame = MovieLatestLabelFrame;
+				popularController.CollectionView.Frame = new CGRect () { X = PopularControllerFrame.X, Y = PopularControllerFrame.Y + (175 * (customLists.Count-1)), Height = PopularControllerFrame.Height, Width = PopularControllerFrame.Width };
+				PopularLabel.Frame = new CGRect () { X = PopularLabelFrame.X, Y = PopularLabelFrame.Y + (175 * (customLists.Count-1)), Height = PopularLabelFrame.Height, Width = PopularLabelFrame.Width };
 
-				favoriteViewController.CollectionView.Frame = FavoriteControllerFrame;
-				FavoriteLabel.Frame = FavoriteLabelFrame;
-				//For scrolling to work the scrollview Content size has to be bigger than the View.Frame.Height
-				scrollView.ContentSize = new CGSize (View.Frame.Width, 898);
-				scrollView.ContentOffset = new CGPoint (0, -scrollView.ContentInset.Top);
+				MovieLatestController.CollectionView.Frame = new CGRect () { X = MovieLatestControllerFrame.X, Y = MovieLatestControllerFrame.Y + (175 * (customLists.Count-1)), Height = MovieLatestControllerFrame.Height, Width = MovieLatestControllerFrame.Width };
+				MovieLatestLabel.Frame = new CGRect () { X = MovieLatestLabelFrame.X, Y = MovieLatestLabelFrame.Y + (175 * (customLists.Count-1)), Height = MovieLatestLabelFrame.Height, Width = MovieLatestLabelFrame.Width };
 
+					//favoriteViewController.CollectionView.Frame = new CGRect () { X = FavoriteControllerFrame.X, Y = FavoriteControllerFrame.Y + (175 * customLists.Count), Height = FavoriteControllerFrame.Height, Width = FavoriteControllerFrame.Width };
+					//FavoriteLabel.Frame = new CGRect () { X = FavoriteLabelFrame.X, Y = FavoriteLabelFrame.Y + (175 * customLists.Count), Height = FavoriteLabelFrame.Height, Width = FavoriteLabelFrame.Width };
+
+					//For scrolling to work the scrollview Content size has to be bigger than the View.Frame.Height
+				scrollView.ContentSize = new CGSize (View.Frame.Width, 898 + (175 * (customLists.Count-1)));
+					scrollView.ContentOffset = new CGPoint (0, -scrollView.ContentInset.Top);
+
+				}
+			
+		}
+
+		ObservableCollection<Movie> GetMovieList (CustomList customList)
+		{
+			var returnList = new ObservableCollection<Movie> ();
+			try {
+				using (var db = new SQLite.SQLiteConnection (MovieService.Database)) {
+					// there is a sqllite bug here https://forums.xamarin.com/discussion/52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
+					var query = db.Query<Movie> ("SELECT * FROM [Movie] WHERE [CustomListID] = " + customList.Id);
+
+					foreach (var movie in query) {
+						var item = new Movie ();
+						item.Id = movie.Id;
+						item.Title = movie.Title;
+						item.Adult = movie.Adult;
+						item.BackdropPath = movie.BackdropPath;
+						item.CustomListID = movie.CustomListID;
+						item.Favorite = movie.Favorite;
+						item.HighResPosterPath = movie.HighResPosterPath;
+						item.OriginalLanguage = movie.OriginalLanguage;
+						item.Overview = movie.Overview;
+						item.Popularity = movie.Popularity;
+						item.PosterPath = movie.PosterPath;
+						item.ReleaseDate = movie.ReleaseDate;
+
+						returnList.Add (item);
+					}
+				}
+			} catch (SQLite.SQLiteException e) {
+				Debug.Write (e.Message);
 			}
-
+			return returnList;
 		}
 
 		public override void ViewDidLoad ()
@@ -323,11 +387,32 @@ namespace FavoriteMovies
 			#region   //Setup my movie collection controllers
 
 			//this collectionview can be differenct sizes so i have to new up a collectionviewflowlayout.
-			favoriteViewController = new FavoritesViewController (new UICollectionViewFlowLayout () { MinimumInteritemSpacing = MinimumInteritemSpacing, MinimumLineSpacing = MinimumLineSpacing, HeaderReferenceSize = HeaderReferenceSize, ItemSize = ItemSize, ScrollDirection = UICollectionViewScrollDirection.Horizontal }, favorites, this);
-			favoriteViewController.CollectionView.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha);
-			favoriteViewController.CollectionView.RegisterClassForCell (typeof (MovieCell), movieCellId);
-			favoriteViewController.CollectionView.Frame = FavoriteControllerFrame;
+			//favoriteViewController = new FavoritesViewController (new UICollectionViewFlowLayout () { MinimumInteritemSpacing = MinimumInteritemSpacing, MinimumLineSpacing = MinimumLineSpacing, HeaderReferenceSize = HeaderReferenceSize, ItemSize = ItemSize, ScrollDirection = UICollectionViewScrollDirection.Horizontal }, customLists, this);
+			//favoriteViewController.CollectionView.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha);
+			//favoriteViewController.CollectionView.RegisterClassForCell (typeof (MovieCell), movieCellId);
+			//favoriteViewController.CollectionView.Frame = FavoriteControllerFrame;
 
+
+
+			for (var cnt = 0; cnt < customLists.Count; cnt++) 
+			{
+				customLabels [cnt] = new UILabel () {
+					TextColor = UIColor.Black, Frame = FavoriteLabelFrame,
+					BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha),
+					Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, UIColorExtensions.HEADER_FONT_SIZE),
+					Text = customLists[cnt].Name
+				};
+
+				customControllers [cnt] = new FavoritesViewController (new UICollectionViewFlowLayout () {
+					MinimumInteritemSpacing = MinimumInteritemSpacing, MinimumLineSpacing = MinimumLineSpacing,
+					HeaderReferenceSize = HeaderReferenceSize, ItemSize = ItemSize,
+					ScrollDirection = UICollectionViewScrollDirection.Horizontal
+				}, GetMovieList(customLists[cnt]), this);
+				customControllers [cnt].CollectionView.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha);
+				customControllers [cnt].CollectionView.RegisterClassForCell (typeof (MovieCell), movieCellId);
+				customControllers [cnt].CollectionView.Frame = FavoriteControllerFrame;
+
+			}
 			topRatedController = new TopRatedCollectionViewController (flowLayout, topRated, this);
 			topRatedController.CollectionView.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha);
 			topRatedController.CollectionView.RegisterClassForCell (typeof (MovieCell), movieCellId);
@@ -394,27 +479,21 @@ namespace FavoriteMovies
 
 		}
 
-		ObservableCollection<Movie> GetFavorites ()
+		ObservableCollection<CustomList> GetCustomLists ()
 		{
 
-			ObservableCollection<Movie> result = new ObservableCollection<Movie> ();
+			ObservableCollection<CustomList> result = new ObservableCollection<CustomList> ();
 
 			try {
 
 				using (var db = new SQLiteConnection (MovieService.Database)) {
 					// there is a sqllite bug here https://forums.xamarin.com/discussion/52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
-					var query = db.Table<Movie> ();
-					foreach (var movie in query) {
-						var item = new Movie ();
-						item.Id = movie.Id;
-						item.Favorite = true;
-						item.PosterPath = movie.PosterPath;
-						item.HighResPosterPath = movie.HighResPosterPath;
-						item.Overview = movie.Overview;
-						item.ReleaseDate = movie.ReleaseDate;
-						item.Title = movie.Title;
-						item.VoteAverage = movie.VoteAverage;
-						item.VoteCount = movie.VoteCount;
+					var query = db.Query<CustomList> ("SELECT * FROM [CustomList]");
+					//var query = db.Table<CustomList> ();
+					foreach (var list in query) {
+						var item = new CustomList ();
+						item.Id = list.Id;
+						item.Name = list.Name;
 						result.Add (item);
 					}
 				}

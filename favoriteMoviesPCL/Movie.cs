@@ -4,16 +4,15 @@ using SQLite;
 namespace FavoriteMoviesPCL
 {
 
-	[Table ("FavoriteMovies")]
-	public class Movie : IMovie
+	[Table ("Movies")]
+	public class Movie 
 	{
-
 		public string Title { get; set; }
 		public string HighResPosterPath { get; set; }
 		public string PosterPath { get; set; }
 		[PrimaryKey]
 		public int Id { get; set; }
-		public int CustomListID { get; set;}
+		public int? CustomListID { get; set;}
 		public string Overview { get; set; }
 		public double VoteCount { get; set; }
 		public DateTime? ReleaseDate { get; set; }
@@ -33,11 +32,12 @@ namespace FavoriteMoviesPCL
 		public string Id { get; set; }
 	}
 	[Table ("CustomList")]
-	public class CustomList 
+	public class CustomList
 	{
+		[PrimaryKey, AutoIncrement]
+		public int? Id { get; set; }
+		[MaxLength (50)]
 		public string Name { get; set; }
-		[PrimaryKey]
-		public int Id { get; set; }
 	}
 }
 

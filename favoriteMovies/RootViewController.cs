@@ -77,17 +77,13 @@ namespace FavoriteMovies
 			NavController.View.BackgroundColor = UIColor.White;//UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 			NavController.NavigationBar.TintColor = UIColor.White;
 			NavController.NavigationBar.Translucent = true;
-			//nav.NavigationBar.TopItem.Title = UIColorExtensions.TITLE;
-			//NavController.NavigationBar.TitleTextAttributes = new UIStringAttributes () {
-			//	Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, 18),
-			//	ForegroundColor =UIColor.White//= UIColor.Clear.FromHexString (UIColorExtensions.TITLE_COLOR, 1.0f)
 
 			// create a slideout navigation controller with the top navigation controller and the menu view controller
 
 			NavController.PushViewController(introController, false);
 
-			SidebarController = new SidebarNavigation.SidebarController(this, NavController, menuController);
-			SidebarController.MenuWidth = 220;
+			SidebarController = new SidebarController(this, NavController, menuController);
+			SidebarController.MenuWidth = 260;
 			SidebarController.ReopenOnRotate = false;
 		}
 	}
