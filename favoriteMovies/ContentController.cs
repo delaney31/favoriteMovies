@@ -7,6 +7,12 @@ namespace FavoriteMovies
 {
 	partial class ContentController : BaseController
 	{
+		public UIButton ContentButton { get; set; }
+		public ContentController ()
+		{
+			ContentButton = new UIButton ();
+		}
+
 		public ContentController (IntPtr handle) : base (handle)
 		{
 		}

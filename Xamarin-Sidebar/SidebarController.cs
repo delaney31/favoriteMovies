@@ -23,7 +23,7 @@ namespace SidebarNavigation
 {
 	public class SidebarController : UIViewController {
 
-		private Sidebar _sidebar;
+		public Sidebar _sidebar;
 
 
 		/// <summary>

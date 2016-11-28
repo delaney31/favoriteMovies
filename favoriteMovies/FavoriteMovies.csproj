@@ -85,8 +85,8 @@
     <MtouchTlsProvider>Default</MtouchTlsProvider>
     <PlatformTarget>x86</PlatformTarget>
     <CodesignProvision></CodesignProvision>
-<MtouchSdkVersion></MtouchSdkVersion>
-<MtouchExtraArgs>-v -v -v -v</MtouchExtraArgs>
+    <MtouchSdkVersion></MtouchSdkVersion>
+    <MtouchExtraArgs>-v -v -v -v</MtouchExtraArgs>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -96,6 +96,9 @@
     <Reference Include="System.Data" />
     <Reference Include="Mono.Data.Sqlite" />
     <Reference Include="MonoTouch.Dialog-1" />
+    <Reference Include="Xamarin-Sidebar-Unified">
+      <HintPath>..\Components\SidebarNavigation-1.9\lib\ios-unified\Xamarin-Sidebar-Unified.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Contents.json" />
@@ -117,7 +120,7 @@
     <Compile Include="AppDelegate.cs" />
     <Compile Include="MainViewController.cs" />
     <Compile Include="Extensions.cs" />
-    <Compile Include="NowPlayingCollectionViewController.cs" />
+    <Compile Include="BaseViewController.cs" />
     <Compile Include="MovieDetailsViewController.cs" />
     <Compile Include="MovieDetailsViewController.designer.cs">
       <DependentUpon>MovieDetailsViewController.cs</DependentUpon>
@@ -125,6 +128,7 @@
     <Compile Include="FileHelper.cs" />
     <Compile Include="ContentController.cs" />
     <Compile Include="BaseController.cs" />
+    <Compile Include="RootViewController.cs" />
     <Compile Include="NavController.cs" />
     <Compile Include="NavController.Designer.cs" />
     <Compile Include="MenuController.cs" />
@@ -132,11 +136,12 @@
     <Compile Include="IntroController.cs" />
     <Compile Include="IntroController.Designer.cs" />
     <Compile Include="MenuController.Designer.cs" />
-    <Compile Include="RootViewController.cs" />
     <Compile Include="asyncvoid.cs" />
     <Compile Include="SQLiteAsync.cs" />
     <Compile Include="SQLite.cs" />
     <Compile Include="MovieListPickerViewController.cs" />
+    <Compile Include="TableItem.cs" />
+    <Compile Include="TableSourceTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <BundleResource Include="Resources\placeholder.png" />
@@ -153,14 +158,16 @@
       <Project>{5E21058F-6E9D-49C9-B81F-9B975C2A44BD}</Project>
       <Name>favoriteMoviesPCL</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Xamarin-Sidebar-Unified\Xamarin-Sidebar-Unified.csproj">
-      <Project>{72600F4A-51F2-4E93-8688-8198DE0F8EF4}</Project>
-      <Name>Xamarin-Sidebar-Unified</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="MovieDetailsViewController.xib" />
     <InterfaceDefinition Include="Phone.storyboard" />
+  </ItemGroup>
+  <ItemGroup>
+    <XamarinComponentReference Include="SidebarNavigation">
+      <Version>1.9</Version>
+      <Visible>False</Visible>
+    </XamarinComponentReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
   <Import Project="..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />

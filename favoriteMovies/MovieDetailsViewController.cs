@@ -307,11 +307,13 @@ namespace FavoriteMovies
 			//NavigationController.PushViewController(movieList, false);
 			//this.PresentViewController (movieList, true, null);
 
+			//(UIApplication.SharedApplication.Delegate as AppDelegate).rootViewController.SidebarController._sidebar.DestroyGestureRecognizers ();
 			var popoverController = new MovieListPickerViewController (movieDetail);
 
 			ProvidesPresentationContextTransitionStyle = true;
 			DefinesPresentationContext = true;
 			popoverController.ModalPresentationStyle = UIModalPresentationStyle.CurrentContext;
+			NavigationController.HidesBarsOnSwipe = false;
 			NavigationController.PushViewController (popoverController, true);
 		}
 

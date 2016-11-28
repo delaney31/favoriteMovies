@@ -38,6 +38,8 @@ namespace FavoriteMoviesPCL
 		public int? Id { get; set; }
 		[MaxLength (50)]
 		public string Name { get; set; }
+		[AutoIncrement]
+		public int Order { get; set;}
 	}
 }
 

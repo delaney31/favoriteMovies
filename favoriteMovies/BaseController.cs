@@ -11,21 +11,21 @@ namespace FavoriteMovies
 		// provide access to the sidebar controller to all inheriting controllers
 		protected SidebarNavigation.SidebarController SidebarController {
 			get {
-				return (UIApplication.SharedApplication.Delegate as AppDelegate).RootViewController.SidebarController;
+				return (UIApplication.SharedApplication.Delegate as AppDelegate).rootViewController.SidebarController;
 			}
 		}
 
-		// provide access to the navigation controller to all inheriting controllers
+		//// provide access to the navigation controller to all inheriting controllers
 		protected NavController NavController {
 			get {
-				return (UIApplication.SharedApplication.Delegate as AppDelegate).RootViewController.NavController;
+				return (UIApplication.SharedApplication.Delegate as AppDelegate).rootViewController.NavController;
 			}
 		}
 
 		// provide access to the storyboard to all inheriting controllers
 		public override UIStoryboard Storyboard {
 			get {
-				return (UIApplication.SharedApplication.Delegate as AppDelegate).RootViewController.Storyboard;
+				return (UIApplication.SharedApplication.Delegate as AppDelegate).rootViewController.Storyboard;
 			}
 		}
 

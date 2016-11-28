@@ -10,7 +10,7 @@ using UIKit;
 
 namespace FavoriteMovies
 {
-	public class MovieListPickerViewController : UIViewController//,IUIPopoverPresentationControllerDelegate, IUIAdaptivePresentationControllerDelegate
+	public class MovieListPickerViewController : UIViewController
 	{
 		Movie movieDetail;
 		UITableView table;
@@ -22,10 +22,8 @@ namespace FavoriteMovies
 			this.movieDetail = movieDetail;
 		}
 
-		public override void ViewWillDisappear (bool animated)
+		public MovieListPickerViewController ()
 		{
-			base.ViewWillDisappear (animated);
-			//UpdateCustomList ();
 		}
 
 		public void UpdateCustomList ()
@@ -65,8 +63,23 @@ namespace FavoriteMovies
 			}
 
 		}
+		internal void updateMovieOrder (CustomList item, int row)
+		{
+			try {
+				using (var db = new SQLite.SQLiteConnection (MovieService.Database)) {
+					// there is a sqllite bug here https://forums.xamarin.com/discussion/52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
 
-		void DeleteAll ()
+					//db.Execute ("UPDATE [CustomList] SET [Order] = ? Where Id = ?",row,item.Id);
+					item.Order = row;
+					db.InsertOrReplace (item, typeof (CustomList));
+
+				}
+
+			} catch (SQLite.SQLiteException s) {
+				Debug.Write (s.Message);
+			}
+		}
+		public void DeleteAll ()
 		{
 			try {
 				using (var db = new SQLite.SQLiteConnection (MovieService.Database)) {
@@ -106,24 +119,37 @@ namespace FavoriteMovies
 					// there is a sqllite bug here https://forums.xamarin.com/discussion/
 					//52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
 					//var query = db.Table<CustomList> ();
-					DeleteAll (movieDetail.Id);
+
+					if (upDateMovieDetail)
+						DeleteAll (movieDetail.Id);
+					else
+						DeleteAll ();
 
 					for (var list=0; list < tableItems.Count; list++) 
 					{
-
+						
 						if (tableItems[list].Name!="add new")
 						{
-							 db.Insert (tableItems [list]);
+							db.Insert (tableItems [list],typeof(CustomList));
 						}
 
-						if (upDateMovieDetail && (tableItems [list].Name == listItem.Name)) 
-						{
-							movieDetail.CustomListID = listItem.Id;
+						if (upDateMovieDetail && (tableItems [list].Name == listItem.Name)) {
+
+							//get id of last inserted row
+							string sql = "select last_insert_rowid()";
+							var scalarValue = db.ExecuteScalar<string> (sql);
+							int value = scalarValue == null ? 0 : Convert.ToInt32 (scalarValue);
+
+							if (listItem.Id != null)
+								movieDetail.CustomListID = listItem.Id;
+							else
+								movieDetail.CustomListID = value;
 							db.Insert (movieDetail, typeof (Movie));
 						}
 					 }
 
-				}
+						
+					}
 
 			} catch (SQLiteException e) {
 				Debug.WriteLine (e.Message);
@@ -136,19 +162,32 @@ namespace FavoriteMovies
 				;
 				using (var db = new SQLiteConnection (MovieService.Database)) 
 				{
-					DeleteAll ();
-					for (var list = 0; list < tableItems.Count; list++) {
+					if (upDateMovieDetail)
+						DeleteAll (movieDetail.Id);
+					else
+						DeleteAll ();
 
+					for (var list = 0; list < tableItems.Count; list++) {
+						
 						if (tableItems [list].Name != "add new") 
 						{
-							db.Insert (tableItems [list]);
+							 db.Insert (tableItems [list], typeof (CustomList));
 						}
 
 						if (upDateMovieDetail && (tableItems [list].Name == listItem.Name)) {
-							movieDetail.CustomListID = listItem.Id;
+
+							string sql = "select last_insert_rowid()";
+							var scalarValue = db.ExecuteScalar<string> (sql);
+							int value = scalarValue == null ? 0 : Convert.ToInt32 (scalarValue);
+
+							if (listItem.Id != null)
+								movieDetail.CustomListID = listItem.Id;
+							else
+								movieDetail.CustomListID = value;
 							db.Insert (movieDetail, typeof (Movie));
 						}
 					}
+
 				}
 			}
 
@@ -158,14 +197,13 @@ namespace FavoriteMovies
 		public override void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
-			//table = new UITableView (new CGRect () { X = 0, Y = 50, Width = 320, Height = 350 });
 			table = new UITableView (View.Bounds);
-			//table.AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight;
+			table.AutoresizingMask = UIViewAutoresizing.All;
 			tableItems = GetMovieList ();
 			tableSource = new TableSource (tableItems, this);
 			table.Source = tableSource;
 			table.AllowsSelectionDuringEditing = true;
-
+	
 			done = new UIBarButtonItem (UIBarButtonSystemItem.Done, (s, e) => {
 				table.SetEditing (false, true);
 				NavigationItem.RightBarButtonItem = edit;
@@ -181,8 +219,7 @@ namespace FavoriteMovies
 			});
 
 			NavigationItem.RightBarButtonItem = edit;
-
-			View.AddSubview (table);
+			Add (table);
 
 		}
 		List<CustomList> GetMovieList ()
@@ -195,10 +232,7 @@ namespace FavoriteMovies
 				using (var db = new SQLiteConnection (MovieService.Database)) {
 					// there is a sqllite bug here https://forums.xamarin.com/discussion/
 					//52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
-					//var query = db.Query<CustomList> ("SELECT * FROM CUSTOMLIST");
-					var query = db.Table<CustomList> ();
-					//var addItem = new CustomList ();
-					//result.Add (addItem);
+					var query = db.Query<CustomList> ("SELECT * FROM [CustomList] ORDER BY [Order]");
 				
 
 					foreach (var list in query) {
@@ -209,7 +243,7 @@ namespace FavoriteMovies
 					}
 				}
 
-				//favoriteViewController.CollectionView.ReloadData ();
+
 			} catch (SQLiteException e) {
 				Debug.WriteLine (e.Message);
 
@@ -221,7 +255,7 @@ namespace FavoriteMovies
 					// there is a sqllite bug here https://forums.xamarin.com/discussion/
 					//52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
 				//	var query = db.Query<CustomList> ("SELECT * FROM CUSTOMLIST");
-					var query = db.Table<CustomList> ();
+					var query = db.Query<CustomList> ("SELECT * FROM [CustomList] ORDER BY [Order]");
 					foreach (var list in query) {
 						var item = new CustomList ();
 						item.Id = list.Id;
@@ -235,50 +269,7 @@ namespace FavoriteMovies
 
 			return result;
 		}
-	}
-	public class ModalViewController : UIViewController
-	{
-		public SizeF OriginalViewSize { get; private set; }
 
-		void Initialize ()
-		{
-
-		}
-
-		public override void ViewDidLoad ()
-		{
-			OriginalViewSize = (System.Drawing.SizeF)View.Bounds.Size;
-			base.ViewDidLoad ();
-			ModalPresentationStyle = UIModalPresentationStyle.CurrentContext;
-			View.Alpha = .2f;
-		}
-
-		public ModalViewController (IntPtr handle) : base (handle)
-		{
-			Initialize ();
-		}
-
-		public ModalViewController (string nibName, NSBundle bundle) : base (nibName, bundle)
-		{
-			Initialize ();
-		}
-
-		public ModalViewController () : base ()
-		{
-			Initialize ();
-		}
-	}
-
-	public static class ModalViewControllerExtensions
-	{
-		public static void PresentModalViewController (this UIViewController parent, ModalViewController target)
-		{
-			parent.PresentViewController (target, true, null);
-
-			target.View.Superview.AutoresizingMask = UIViewAutoresizing.FlexibleMargins;
-			target.View.Superview.Frame = new RectangleF (PointF.Empty, target.OriginalViewSize);
-			target.View.Superview.Center = UIScreen.MainScreen.Bounds.Center ().Rotate ();
-		}
 	}
 
 
@@ -286,12 +277,12 @@ namespace FavoriteMovies
 	{
 		List<CustomList> tableItems;
 		string cellIdentifier = "TableCell";
-		MovieListPickerViewController owner;
+		MovieListPickerViewController Owner;
 
 		public TableSource (List<CustomList> items, MovieListPickerViewController owner)
 		{
 			tableItems = items;
-			this.owner = owner;
+			this.Owner = owner;
 
 		}
 		public void WillBeginTableEditing (UITableView tableView)
@@ -302,7 +293,7 @@ namespace FavoriteMovies
 			NSIndexPath.FromRowSection (tableView.NumberOfRowsInSection (0), 0)
 		}, UITableViewRowAnimation.Fade);
 			// create a new item and add it to our underlying data (it is not intended to be permanent)
-			tableItems.Add (new CustomList () { Name = "add new"});
+			tableItems.Add (new CustomList () { Name = "add new" });
 			tableView.EndUpdates (); // applies the changes
 		}
 		public void DidFinishTableEditing (UITableView tableView)
@@ -313,21 +304,13 @@ namespace FavoriteMovies
 																				// remove the row from the table display
 			tableView.DeleteRows (new NSIndexPath [] { NSIndexPath.FromRowSection (tableView.NumberOfRowsInSection (0) - 1, 0) }, UITableViewRowAnimation.Fade);
 			tableView.EndUpdates (); // applies the changes
-			if(tableView.NumberOfRowsInSection (0) - 1 >0)
-			   owner.UpdateCustomAndMovieList (tableItems[(int)tableView.NumberOfRowsInSection (0) - 1], false);
-			else
-				owner.UpdateCustomAndMovieList (new CustomList () { Name = "add new" }, false);
+			if (tableView.NumberOfRowsInSection (0) > 0) 
+			{
+				Owner.UpdateCustomAndMovieList (tableItems [(int)tableView.NumberOfRowsInSection (0)-1], false);
+			} else
+				Owner.DeleteAll ();
 		}
-		//public override UITableViewCellEditingStyle EditingStyleForRow (UITableView tableView, NSIndexPath indexPath)
-		//{
-		//	if (tableView.Editing) {
-		//		if (indexPath.Row == tableView.NumberOfRowsInSection (0) - 1)
-		//			return UITableViewCellEditingStyle.Insert;
-		//		else
-		//			return UITableViewCellEditingStyle.Delete;
-		//	} else // not in editing mode, enable swipe-to-delete for all rows
-		//		return UITableViewCellEditingStyle.Delete;
-		//}
+
 		public override NSIndexPath CustomizeMoveTarget (UITableView tableView, NSIndexPath sourceIndexPath, NSIndexPath proposedIndexPath)
 		{
 			var numRows = tableView.NumberOfRowsInSection (0) - 1; // less the (add new) one
@@ -369,23 +352,35 @@ namespace FavoriteMovies
 		{
 			return tableItems.Count;
 		}
+	
 		public override void MoveRow (UITableView tableView, NSIndexPath sourceIndexPath, NSIndexPath destinationIndexPath)
 		{
+			//---- get a reference to the item
 			var item = tableItems [sourceIndexPath.Row];
 			var deleteAt = sourceIndexPath.Row;
 			var insertAt = destinationIndexPath.Row;
 
-			// are we inserting 
-			if (destinationIndexPath.Row < sourceIndexPath.Row) {
-				// add one to where we delete, because we're increasing the index by inserting
+			//---- if we're moving within the same section, and we're inserting it before
+			if ((sourceIndexPath.Section == destinationIndexPath.Section) && (destinationIndexPath.Row < sourceIndexPath.Row)) 
+			{
+				//---- add one to where we delete, because we're increasing the index by inserting
 				deleteAt += 1;
 			} else {
-				// add one to where we insert, because we haven't deleted the original yet
 				insertAt += 1;
 			}
-			tableItems.Insert (insertAt, item);
+
+			//---- copy the item to the new location
+			item.Order = destinationIndexPath.Row;
+			tableItems.Insert (destinationIndexPath.Row, item);
+
+			//---- remove from the old
 			tableItems.RemoveAt (deleteAt);
+
+			//Owner.updateMovieOrder (item,destinationIndexPath.Row);
+			ArrangeCustomList (true);
 		}
+
+
 		public override UITableViewCellEditingStyle EditingStyleForRow (UITableView tableView, NSIndexPath indexPath)
 		{
 			if (tableView.Editing) {
@@ -403,54 +398,79 @@ namespace FavoriteMovies
 		/// </summary>
 		public override void RowSelected (UITableView tableView, NSIndexPath indexPath)
 		{
-			if (tableView.Editing) { 
-				//Create Alert
-				var textInputAlertController = UIAlertController.Create ("Create Movie List", "List Name", UIAlertControllerStyle.Alert);
+			if (tableView.Editing )
+			{
+				if (tableItems [indexPath.Row].Name == "add new") 
+				{
+					//Create Alert
+					var textInputAlertController = UIAlertController.Create ("Create Movie List", "List Name", UIAlertControllerStyle.Alert);
 
-				//Add Text Input
-				textInputAlertController.AddTextField (textField => {});
+					//Add Text Input
+					textInputAlertController.AddTextField (textField => { });
 
-				//Add Actions
-				var cancelAction = UIAlertAction.Create ("Cancel", UIAlertActionStyle.Cancel, alertAction => {
-					Console.WriteLine ("Cancel was Pressed");
-				});
-				var okayAction = UIAlertAction.Create ("Okay", UIAlertActionStyle.Default, alertAction => {
-					Console.WriteLine ("The user entered '{0}'", textInputAlertController.TextFields [0].Text);
-					var listItem = new CustomList ();
-					listItem.Name = textInputAlertController.TextFields [0].Text;
-					tableItems.Insert (0,listItem);
-					tableView.EndUpdates (); // applies the changes
-					tableView.ReloadData ();
-					owner.UpdateCustomAndMovieList (tableItems [indexPath.Row], true);
-				});
+					//Add Actions
+					var cancelAction = UIAlertAction.Create ("Cancel", UIAlertActionStyle.Cancel, alertAction => {
+						Console.WriteLine ("Cancel was Pressed");
+					});
+					var okayAction = UIAlertAction.Create ("Okay", UIAlertActionStyle.Default, alertAction => {
+						Console.WriteLine ("The user entered '{0}'", textInputAlertController.TextFields [0].Text);
+						if (ValueUnique (textInputAlertController.TextFields [0].Text)) {
+							ArrangeCustomList (false);
+							var listItem = new CustomList ();
+							listItem.Order = 0;
+							listItem.Name = textInputAlertController.TextFields [0].Text;
+							tableItems.Insert (0, listItem);
+							tableView.EndUpdates (); // applies the changes
+							tableView.ReloadData ();
+							ArrangeCustomList (true);
+							Owner.UpdateCustomAndMovieList (tableItems [indexPath.Row], true);
+						} else 
+						{
+							new UIAlertView ("Duplicate!"
+							, "List already exist", null, "OK", null).Show ();
+						}
+					});
 
-				textInputAlertController.AddAction (cancelAction);
-				textInputAlertController.AddAction (okayAction);
+					textInputAlertController.AddAction (cancelAction);
+					textInputAlertController.AddAction (okayAction);
 
-				//Present Alert
-				owner.PresentViewController (textInputAlertController, true, null);
+					//Present Alert
+					Owner.PresentViewController (textInputAlertController, true, null);
+				}
 			} else 
 			{
-				owner.UpdateCustomAndMovieList (tableItems [indexPath.Row], true);
-				owner.NavigationController.PopViewController (true);
+				ArrangeCustomList (true);
+				Owner.UpdateCustomAndMovieList (tableItems [indexPath.Row], true);
+				Owner.NavigationController.PopToRootViewController (true);
 			}
 			tableView.DeselectRow (indexPath, true);
 		}
 
-		/// <summary>
-		/// Called when the DetailDisclosureButton is touched.
-		/// Does nothing if DetailDisclosureButton isn't in the cell
-		/// </summary>
-		//public override void AccessoryButtonTapped (UITableView tableView, NSIndexPath indexPath)
-		//{
-		////	UIAlertController okAlertController = UIAlertController.Create ("DetailDisclosureButton Touched", tableItems [indexPath.Row].Name, UIAlertControllerStyle.Alert);
-		////	okAlertController.AddAction (UIAlertAction.Create ("OK", UIAlertActionStyle.Default, null));
-		////	owner.PresentViewController (okAlertController, true, null);
+		void ArrangeCustomList (bool StartAtZero)
+		{
 
-		//	tableView.DeselectRow (indexPath, true);
+			for (var list = StartAtZero ? 0 : 1; list < tableItems.Count; list++) 
+			{
+				int num = StartAtZero ? 0 : 1;
+				if (tableItems [list - num].Name != "add new" && tableItems [list - num].Order == 0)
+					tableItems [list - num].Order = list;
+			}
+		}
+
+		bool ValueUnique (string text)
+		{
+			foreach (var item in tableItems) 
+			{
+				if (item.Name == text) 
+				{
+					return false;
+
+				}
+			}
+			return true;
+		}
 
 
-		//}
 
 		/// <summary>
 		/// Called by the TableView to get the actual UITableViewCell to render for the particular row
@@ -461,7 +481,6 @@ namespace FavoriteMovies
 			UITableViewCell cell =tableView.DequeueReusableCell (cellIdentifier);
 
 
-			// UNCOMMENT one of these to use that style
 			var cellStyle = UITableViewCellStyle.Default;
 
 			// if there are no cells to reuse, create a new one
@@ -469,14 +488,9 @@ namespace FavoriteMovies
 				cell = new UITableViewCell (cellStyle, cellIdentifier);
 
 			}
-
-			if (indexPath.Row == 0) 
-			{
-				var accessButt = new UIButton (UIButtonType.ContactAdd);
-				accessButt.UserInteractionEnabled = false;
-				//cell.AccessoryView = accessButt;
-			}
 			cell.TextLabel.Text = tableItems [indexPath.Row].Name;
+
+
 
 			return cell;
 		}

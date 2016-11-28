@@ -7,6 +7,10 @@ namespace FavoriteMovies
 {
 	partial class MenuController : BaseController
 	{
+		public MenuController ()
+		{
+		}
+
 		public MenuController (IntPtr handle) : base (handle)
 		{
 		}
@@ -15,9 +19,9 @@ namespace FavoriteMovies
 		{
 			base.ViewDidLoad ();
 
-			var contentController = (ContentController)Storyboard.InstantiateViewController ("ContentController");
-
-			ContentButton.TouchUpInside += (o, e) => {
+			//var contentController = (ContentController)Storyboard.InstantiateViewController ("ContentController");
+			var contentController = new ContentController ();
+			contentController.ContentButton.TouchUpInside += (o, e) => {
 				if (NavController.TopViewController as ContentController == null)
 					NavController.PushViewController (contentController, false);
 				SidebarController.CloseMenu ();

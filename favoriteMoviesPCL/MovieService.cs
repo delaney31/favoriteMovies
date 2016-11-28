@@ -25,7 +25,7 @@ namespace FavoriteMoviesPCL
 		public enum MovieType
 		{
 			TopRated = 0,
-			NowPaying = 1,
+			NowPlaying = 1,
 			Popular = 2,
 			Similar = 3,
 			TVLatest = 4,
@@ -97,7 +97,7 @@ namespace FavoriteMoviesPCL
 			case MovieType.TopRated:
 				Url = _baseUrl + "movie/top_rated?api_key=" + _apiKey + _pageString + page;
 				break;
-			case MovieType.NowPaying:
+			case MovieType.NowPlaying:
 				Url = _baseUrl + "movie/now_playing?api_key=" + _apiKey + _pageString + page;
 				break;
 			case MovieType.Popular:

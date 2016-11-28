@@ -1,4 +1,5 @@
-﻿using UIKit;
+﻿using SidebarNavigation;
+using UIKit;
 
 
 namespace FavoriteMovies
@@ -6,6 +7,9 @@ namespace FavoriteMovies
 {
 	public partial class NavController : UINavigationController
 	{
+		// the sidebar controller for the app
+		public SidebarController SidebarController { get; set; }
+
 		public NavController () : base ((string)null, null)
 		{
 		}

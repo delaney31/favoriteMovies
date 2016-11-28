@@ -27,7 +27,8 @@ namespace SidebarNavigation
 		public const float DefaultFlingVelocity = 800f;
 		public const int DefaultMenuWidth = 260;
 		public const int DefaultGestureActiveArea = 50;
-
+		public UIGestureRecognizer.Token tokenPan;
+		public UIGestureRecognizer.Token tokenClose;
 
 		public static readonly nfloat SlideSpeed = 0.2f;
 
@@ -35,7 +36,7 @@ namespace SidebarNavigation
 		private bool _isOpen = false;
 		private bool _disabled = false;
 		private bool _shadowShown = false;
-
+		private Action _clickHandler;
 		private SidebarContentArea _sidebarContentArea;
 		private SidebarMenuArea _sidebarMenuArea;
 
@@ -210,18 +211,33 @@ namespace SidebarNavigation
 			ReopenOnRotate = true;
 		}
 
-		private void SetupGestureRecognizers() {
+		public void SetupGestureRecognizers() {
 			TapGesture = new UITapGestureRecognizer ();
-			TapGesture.AddTarget (() => CloseMenu());
+			tokenClose=TapGesture.AddTarget (() => CloseMenu());
 			TapGesture.NumberOfTapsRequired = 1;
 			PanGesture = new UIPanGestureRecognizer {
 				Delegate = new SlideoutPanDelegate(),
 				MaximumNumberOfTouches = 1,
 				MinimumNumberOfTouches = 1
 			};
-			PanGesture.AddTarget(() => Pan());
+			tokenPan=PanGesture.AddTarget(Pan);
 		}
+		public void DestroyGestureRecognizers ()
+		{
+			TapGesture.RemoveTarget (tokenClose);
+			TapGesture = null;
+			//TapGesture.AddTarget (() => CloseMenu ());
+			//TapGesture.NumberOfTapsRequired = 1;
 
+			PanGesture.RemoveTarget(tokenPan);
+			PanGesture = null;			
+			//PanGesture = new UIPanGestureRecognizer {
+			//	Delegate = new SlideoutPanDelegate (),
+			//	MaximumNumberOfTouches = 1,
+			//	MinimumNumberOfTouches = 1
+			//};
+			//PanGesture.AddTarget (() => Pan ());
+		}
 
 		private class SlideoutPanDelegate : UIGestureRecognizerDelegate
 		{
