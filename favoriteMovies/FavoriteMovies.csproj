@@ -99,6 +99,9 @@
     <Reference Include="Xamarin-Sidebar-Unified">
       <HintPath>..\Components\SidebarNavigation-1.9\lib\ios-unified\Xamarin-Sidebar-Unified.dll</HintPath>
     </Reference>
+    <Reference Include="Calabash">
+      <HintPath>..\packages\Xamarin.TestCloud.Agent.0.20.3\lib\Xamarin.iOS10\Calabash.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Contents.json" />
@@ -120,7 +123,7 @@
     <Compile Include="AppDelegate.cs" />
     <Compile Include="MainViewController.cs" />
     <Compile Include="Extensions.cs" />
-    <Compile Include="BaseViewController.cs" />
+    <Compile Include="BaseCollectionViewController.cs" />
     <Compile Include="MovieDetailsViewController.cs" />
     <Compile Include="MovieDetailsViewController.designer.cs">
       <DependentUpon>MovieDetailsViewController.cs</DependentUpon>
@@ -142,6 +145,7 @@
     <Compile Include="MovieListPickerViewController.cs" />
     <Compile Include="TableItem.cs" />
     <Compile Include="TableSourceTest.cs" />
+    <Compile Include="MovieDetailViewController.cs" />
   </ItemGroup>
   <ItemGroup>
     <BundleResource Include="Resources\placeholder.png" />
@@ -152,6 +156,9 @@
     <BundleResource Include="Resources\Default.png" />
     <BundleResource Include="Resources\threelines.png" />
     <BundleResource Include="Resources\blank.png" />
+    <BundleResource Include="Resources\star.png" />
+    <BundleResource Include="Resources\imdb.png" />
+    <BundleResource Include="Resources\play-468292_640.png" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\favoriteMoviesPCL\favoriteMoviesPCL.csproj">

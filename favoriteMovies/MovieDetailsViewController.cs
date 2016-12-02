@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics.Contracts;
 using System.Drawing;
 using System.Globalization;
 using System.Text;
@@ -15,6 +16,9 @@ namespace FavoriteMovies
 	public partial class MovieDetailsViewController : UIViewController
 	{
 		
+
+
+
 		/// <summary>
 		/// This is the view controller for the movie details page. In addition it allows you to save and clear favorite movies
 		/// </summary>
@@ -26,7 +30,6 @@ namespace FavoriteMovies
 		Movie movieDetail;
 		UIImageView moviePlay;
 		UIWebView webView ;
-		CustomList listType;
 		static UIScrollView scrollView = new UIScrollView ();
 		ObservableCollection<Movie> similarMovies;
 
@@ -46,8 +49,7 @@ namespace FavoriteMovies
 			Initialize ();
 			moviePlay = new UIImageView ();
 			moviePlay.Image = UIImage.FromBundle ("download.png");
-			//listType = new CustomList ();
-			//listType.Id = movieDetail.Id;
+
 
 		}
 
@@ -55,12 +57,6 @@ namespace FavoriteMovies
 		{
 			var imDbUrl = "http://api.themoviedb.org/3/movie/" + movieDetail.Id + "/videos?api_key=" + MovieService._apiKey;
 			var youtubeMovieId = "";
-
-			//var task = Task.Run (async () => {
-			//	similarMovies = MovieService.GetMoviesAsync (MovieService.MovieType.Similar).Result;
-
-			//});
-			//task.Wait ();
 
 			var UTubeMovidId = Task.Run (async () => {
 				youtubeMovieId = await MovieService.GetYouTubeMovieId(imDbUrl);
@@ -71,51 +67,35 @@ namespace FavoriteMovies
 			_embededMoveId = youtubeMovieId;
 
 		}
-		/// <summary>
-		/// /Setup the UI Elements based on the passed in movieDetails
-		/// </summary>
+	
 		public override void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
 
-			var nav = NavigationController;
-
-
-
-			//nav.NavigationBar.TopItem.Title = UIColorExtensions.TITLE;
-
-			//UIImageView backgroundImageView = new UIImageView () { Frame = View.Frame };
-			//backgroundImageView.Image = MovieCell.GetImage (movieDetail.BackdropPath);
-			//backgroundImageView.Center = View.Center;
-			//backgroundImageView.ContentMode = UIViewContentMode.ScaleAspectFill;
+			scrollView.Frame = new CGRect () { X = View.Frame.X, Y = View.Frame.Y, Width = View.Frame.Width, Height = View.Frame.Height };
 
 			View.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
-			//View.InsertSubview (backgroundImageView, 0);
+
 
 			posterImage.Layer.BorderWidth = 1.0f;
 
 			posterImage.ContentMode = UIViewContentMode.ScaleToFill;
-			//if (UIColorExtensions.MovieIsFavorite (movieDetail.Id.ToString ())) {
-			//	saveFavoriteButt.SetTitle ("Delete Favorite", UIControlState.Normal);
-			//	posterImage.Layer.BorderColor = UIColor.Orange.CGColor;
-			//	saveFavoriteButt.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.NAV_BAR_COLOR, 1.0f);
-			//	saveFavoriteButt.SetTitleColor (UIColor.White, UIControlState.Normal);
-			//} else {
-
-			playVideoButt.SetTitle ("Add Review", UIControlState.Normal);
-			playVideoButt.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.NAV_BAR_COLOR, 1.0f);
-			playVideoButt.SetTitleColor (UIColor.White, UIControlState.Normal);
-			playVideoButt.Frame = new CGRect (saveFavoriteButt.Frame.X, saveFavoriteButt.Frame.Y - 40,saveFavoriteButt.Frame.Width, saveFavoriteButt.Frame.Height);
-			playVideoButt.Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, 13f);
+		
+			AddReviewButt.SetTitle ("Add Review", UIControlState.Normal);
+			AddReviewButt.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.NAV_BAR_COLOR, 1.0f);
+			AddReviewButt.SetTitleColor (UIColor.White, UIControlState.Normal);
+			AddReviewButt.Frame = new CGRect (saveFavoriteButt.Frame.X, saveFavoriteButt.Frame.Y - 40,saveFavoriteButt.Frame.Width, saveFavoriteButt.Frame.Height);
+			AddReviewButt.Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, 13f);
+			AddReviewButt.TouchDown += AddReviewButt_TouchDown;
 			saveFavoriteButt.SetTitle ("Add To List", UIControlState.Normal);
 			posterImage.Layer.BorderColor = UIColor.Clear.CGColor;
 			saveFavoriteButt.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.NAV_BAR_COLOR, 1.0f);
 			saveFavoriteButt.SetTitleColor (UIColor.White, UIControlState.Normal);
 			//}
 
-			moviePlay.Frame = new CGRect (posterImage.Frame.X+115, posterImage.Frame.Y+ 185, 30, 30);
+			moviePlay.Frame = new CGRect (posterImage.Frame.X+125, posterImage.Frame.Y+ 185, 20, 20);
 			//moviePlay.Frame = posterImage.Frame;
-			moviePlay.Alpha = .9f;
+			moviePlay.Alpha = 1f;
 			//moviePlay.Image.Size = new CoreGraphics.CGSize () { Width = 10, Height = 10 };
 			posterImage.ClipsToBounds = true;
 			posterImage.Image = MovieCell.GetImage (movieDetail.HighResPosterPath);
@@ -126,13 +106,15 @@ namespace FavoriteMovies
 			movieTitle.TextColor = UIColor.Black;
 			movieTitle.Text = movieDetail.Title;
 			movieTitle.Lines = 0;
+			movieTitle.Frame = new CGRect  (180, 30, 140, 40);
+
 
 			dateOpenView.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 			dateOpenView.Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, 10);
 			dateOpenView.TextColor = UIColor.Black;
 			dateOpenView.Text = "Release Date: " + movieDetail.ReleaseDate.Value.ToString ("MM/dd/yyyy",
 				  CultureInfo.InvariantCulture);
-			dateOpenView.Frame = new RectangleF (180, 70, 300, 10);
+			dateOpenView.Frame = new CGRect  (180, 70, 300, 20);
 
 			voteResultText.Text = Convert.ToInt32 (movieDetail.VoteAverage) + " of 10 Stars";
 			voteResultText.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
@@ -142,61 +124,46 @@ namespace FavoriteMovies
 
 			descriptView.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 			descriptView.Text = movieDetail.Overview;
-			//descriptView.ScrollEnabled = true;
-
 			descriptView.Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, 12);
 			descriptView.TextColor = UIColor.Black;
-			//descriptView.Layer.BorderWidth = 10f;
-			//descriptView.Frame = new RectangleF (10, 250, 300, ((movieDetail.Overview.Length / 50) * 25));
-			//descriptView.Frame = new RectangleF (10, 260, 300, 220);
-			//var size = descriptView.Text.StringSize(descriptView.Font, descriptView.Frame.Size, UILineBreakMode.CharacterWrap);
-			//descriptView.LineBreakMode = UILineBreakMode.TailTruncation;
-			descriptView.Frame = new RectangleF (10, 250, 300, 300); //(int)size.Height+10);
+			descriptView.Frame = new CGRect  (10, 250, 300, 300); //(int)size.Height+10);
 			descriptView.Lines = 0;
 			descriptView.TextAlignment = UITextAlignment.Natural;
 			descriptView.SizeToFit ();
+
+			descReview.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
+			//descReview.Text = movieDetail.Overview;
+			//descriptView.ScrollEnabled = true;
+
+			descReview.Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, 12);
+			descReview.TextColor = UIColor.Black;
+			descReview.Frame = new CGRect  (10, 600, 300, 300); //(int)size.Height+10);
+			descReview.Lines = 0;
+			descReview.TextAlignment = UITextAlignment.Natural;
+			descReview.SizeToFit ();
+			descReview.Text = movieDetail.UserReview;
+
 
 			var playClip  = new UITapGestureRecognizer(HandleAction);
 
 			saveFavoriteButt.TouchDown += SaveFavoriteButt_TouchDown;
 
-			//playVideoButt.SetTitle ("Delete Favorite", UIControlState.Normal);
-			//playVideoButt.TouchDown += PlayVideoButt_TouchDown;
-			//playVideoButt.BackgroundColor = UIColor.Green;
-			//playVideoButt.Hidden = true;
+
 			posterImage.UserInteractionEnabled = true;
 			if (_embededMoveId != "")
 			   posterImage.AddGestureRecognizer (playClip);
 			//For scrolling to work the scrollview Content size has to be bigger than the View.Frame.Height
-			scrollView.ContentSize = new CGSize (View.Frame.Width, 898);
-			scrollView.ContentOffset = new CGPoint (0, -scrollView.ContentInset.Top);
+
+			scrollView.ContentSize = new CGSize (320, View.Frame.Height + 155);
+			scrollView.ContentOffset = new CGPoint (0, -scrollView.ContentInset.Top);			
 			scrollView.Bounces = true;
-			//View.AddSubview (scrollView);	
 
-			scrollView.AddSubview (saveFavoriteButt);
-			scrollView.AddSubview (posterImage);
-
-			scrollView.AddSubview (movieTitle);
-			scrollView.AddSubview (dateOpenView);
-			scrollView.AddSubview (voteResultText);
-			scrollView.AddSubview (descriptView);
-			scrollView.AddSubview (playVideoButt);
-			//scrollView.AddSubview (createListButt);
-			View.AddSubview (scrollView);
 
 		}
 		public override void ViewWillAppear (bool animated)
 		{
 			base.ViewWillAppear (animated);
-
-			////scrollView.Frame = View.Frame;
-			//scrollView.Frame = new CGRect () {
-			//	X = descriptView.Frame.X, Y = descriptView.Frame.Y,
-			//	Width = descriptView.Frame.Width, Height = descriptView.Frame.Height + 50};
-			//scrollView.Add (descriptView);
-			//scrollView.ContentSize = new CGSize (descriptView.Frame.Width, descriptView.Frame.Height+ 50);
-			//scrollView.ContentOffset = new CGPoint (0, -scrollView.ContentInset.Top);
-
+			descReview.Text = movieDetail.UserReview;
 
 
 		}
@@ -233,7 +200,7 @@ namespace FavoriteMovies
 			sb.Append ("<p>" + movieDetail.Overview + "</p>");
 			sb.Append ("</body></html>");
 
-			webView.Frame = new RectangleF (0, 0, (float)this.View.Frame.Width, (float)this.View.Frame.Height);
+			webView.Frame = new CGRect  (0, 0, (float)this.View.Frame.Width, (float)this.View.Frame.Height);
 			webView.LoadHtmlString (sb.ToString (), null);
 			this.View.AddSubview (webView);
 
@@ -266,6 +233,33 @@ namespace FavoriteMovies
 
 
 		}
+
+		void AddReviewButt_TouchDown (object sender, EventArgs e)
+		{
+			//Create Alert
+			var textInputAlertController = UIAlertController.Create ("My Movie Review", "120 characters or less", UIAlertControllerStyle.Alert);
+
+			//Add Text Input
+			textInputAlertController.AddTextField (textField => { });
+
+			//Add Actions
+			var cancelAction = UIAlertAction.Create ("Cancel", UIAlertActionStyle.Cancel, alertAction => {
+				Console.WriteLine ("Cancel was Pressed");
+			});
+			var okayAction = UIAlertAction.Create ("Okay", UIAlertActionStyle.Default, alertAction => {
+			Console.WriteLine ("The user entered '{0}'", textInputAlertController.TextFields [0].Text);
+			movieDetail.UserReview = textInputAlertController.TextFields [0].Text;
+			});
+
+			textInputAlertController.AddAction (cancelAction);
+			textInputAlertController.AddAction (okayAction);
+
+			//Present Alert
+			PresentViewController (textInputAlertController, true, null);
+
+		}
+
+
 		/// <summary>
 		/// This is the delegate for the save favorite button. It also has visual indicator for the current poster image
 		/// </summary>
@@ -273,42 +267,7 @@ namespace FavoriteMovies
 		/// <param name="e">E.</param>
 		void SaveFavoriteButt_TouchDown (object sender, EventArgs e)
 		{
-			//posterImage.Layer.BorderWidth = 1.0f;
-			//posterImage.Layer.BorderColor = UIColor.Orange.CGColor;
-			//movieDetail.Favorite = true;
-			//listType.Name = "Favorites";
-			//// Create the database and a table to hold Favorite information.
-			//try {
-			//	using (var db = new SQLite.SQLiteConnection (MovieService.Database)) 
-			//	{
-			//		db.Insert(movieDetail, typeof(Movie));
-			//		db.Insert (listType, typeof (CustomList));
-			//	}
-
-			//} catch (SQLite.SQLiteException s) {
-
-			//	using (var conn = new SQLite.SQLiteConnection (MovieService.Database)) 
-			//	{
-			//		conn.CreateTable<Movie> ();
-			//		conn.CreateTable<CustomList> ();
-			//	}
-
-			//}
-			//saveFavoriteButt.TouchDown -= SaveFavoriteButt_TouchDown;
-			//saveFavoriteButt.TouchDown += PlayVideoButt_TouchDown;
-			//saveFavoriteButt.SetTitle ("Delete Favorite", UIControlState.Normal);
-			//saveFavoriteButt.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.NAV_BAR_COLOR, 1.0f);
-			//saveFavoriteButt.SetTitleColor (UIColor.White, UIControlState.Normal);
-			//var movieList = new MovieListPickerViewController ()
-			//{
-			//	ModalPresentationStyle = UIModalPresentationStyle.FormSheet,
-			//	ModalTransitionStyle = UIModalTransitionStyle.CoverVertical
-			//};
-			//NavigationController.PushViewController(movieList, false);
-			//this.PresentViewController (movieList, true, null);
-
-			//(UIApplication.SharedApplication.Delegate as AppDelegate).rootViewController.SidebarController._sidebar.DestroyGestureRecognizers ();
-			var popoverController = new MovieListPickerViewController (movieDetail);
+			var popoverController = new MovieListPickerViewController (movieDetail, true);
 
 			ProvidesPresentationContextTransitionStyle = true;
 			DefinesPresentationContext = true;
@@ -327,111 +286,111 @@ namespace FavoriteMovies
 
 
 
-	#region Simlar Movies setup not used yet 
-	/// <summary>
-	/// This class ( and subsequent classes) is not currently being used. It is going to be the datassource for the similar movies collection
-	/// </summary>
-	public class SimilarMoviesDataSource : UICollectionViewSource
-	{
-		public SimilarMoviesDataSource ()
-		{
-			Rows = new List<SimilarMovie> ();
-		}
+	//#region Simlar Movies setup not used yet 
+	///// <summary>
+	///// This class ( and subsequent classes) is not currently being used. It is going to be the datassource for the similar movies collection
+	///// </summary>
+	//public class SimilarMoviesDataSource : UICollectionViewSource
+	//{
+	//	public SimilarMoviesDataSource ()
+	//	{
+	//		Rows = new List<SimilarMovie> ();
+	//	}
 
-		public List<SimilarMovie> Rows { get; private set; }
-		public float FontSize { get; set; }
-		public SizeF ImageViewSize { get; set; }
+	//	public List<SimilarMovie> Rows { get; private set; }
+	//	public float FontSize { get; set; }
+	//	public SizeF ImageViewSize { get; set; }
 
-		public override nint NumberOfSections (UICollectionView collectionView)
-		{
-			return 1;
-		}
+	//	public override nint NumberOfSections (UICollectionView collectionView)
+	//	{
+	//		return 1;
+	//	}
 
-		public override nint GetItemsCount (UICollectionView collectionView, nint section)
-		{
-			return Rows.Count;
-		}
+	//	public override nint GetItemsCount (UICollectionView collectionView, nint section)
+	//	{
+	//		return Rows.Count;
+	//	}
 
-		public override bool ShouldHighlightItem (UICollectionView collectionView, NSIndexPath indexPath)
-		{
-			return true;
-		}
+	//	public override bool ShouldHighlightItem (UICollectionView collectionView, NSIndexPath indexPath)
+	//	{
+	//		return true;
+	//	}
 
-		public override void ItemHighlighted (UICollectionView collectionView, NSIndexPath indexPath)
-		{
-			var cell = (UserCell)collectionView.CellForItem (indexPath);
-			cell.ImageView.Alpha = 0.5f;
-		}
+	//	public override void ItemHighlighted (UICollectionView collectionView, NSIndexPath indexPath)
+	//	{
+	//		var cell = (UserCell)collectionView.CellForItem (indexPath);
+	//		cell.ImageView.Alpha = 0.5f;
+	//	}
 
-		public override void ItemUnhighlighted (UICollectionView collectionView, NSIndexPath indexPath)
-		{
-			var cell = (UserCell)collectionView.CellForItem (indexPath);
-			cell.ImageView.Alpha = 1;
+	//	public override void ItemUnhighlighted (UICollectionView collectionView, NSIndexPath indexPath)
+	//	{
+	//		var cell = (UserCell)collectionView.CellForItem (indexPath);
+	//		cell.ImageView.Alpha = 1;
 
-			SimilarMovie row = Rows [indexPath.Row];
-			row.Tapped.Invoke ();
-		}
+	//		SimilarMovie row = Rows [indexPath.Row];
+	//		row.Tapped.Invoke ();
+	//	}
 
-		public override UICollectionViewCell GetCell (UICollectionView collectionView, NSIndexPath indexPath)
-		{
-			var cell = (UserCell)collectionView.DequeueReusableCell (UserCell.CellID, indexPath);
+	//	public override UICollectionViewCell GetCell (UICollectionView collectionView, NSIndexPath indexPath)
+	//	{
+	//		var cell = (UserCell)collectionView.DequeueReusableCell (UserCell.CellID, indexPath);
 
-			SimilarMovie row = Rows [indexPath.Row];
+	//		SimilarMovie row = Rows [indexPath.Row];
 
-			cell.UpdateRow (row, FontSize, ImageViewSize);
+	//		cell.UpdateRow (row, FontSize, ImageViewSize);
 
-			return cell;
-		}
-	}
+	//		return cell;
+	//	}
+	//}
 
-	public class SimilarMovie
-	{
-		public SimilarMovie (UIImage image, Action tapped)
-		{
+	//public class SimilarMovie
+	//{
+	//	public SimilarMovie (UIImage image, Action tapped)
+	//	{
 
-			Image = image;
-			Tapped = tapped;
-		}
-
-
-		public UIImage Image { get; set; }
-
-		public Action Tapped { get; set; }
-	}
-
-	public class UserCell : UICollectionViewCell
-	{
-		public static NSString CellID = new NSString ("SimilarMoviesDataSource");
-
-		[Export ("initWithFrame:")]
-		public UserCell (RectangleF frame)
-			: base (frame)
-		{
-			ImageView = new UIImageView ();
-			ImageView.Layer.BorderColor = UIColor.DarkGray.CGColor;
-			ImageView.Layer.BorderWidth = 1f;
-			ImageView.Layer.CornerRadius = 3f;
-			ImageView.Layer.MasksToBounds = true;
-			ImageView.ContentMode = UIViewContentMode.ScaleToFill;
-
-			ContentView.AddSubview (ImageView);
+	//		Image = image;
+	//		Tapped = tapped;
+	//	}
 
 
-		}
+	//	public UIImage Image { get; set; }
 
-		public UIImageView ImageView { get; private set; }
+	//	public Action Tapped { get; set; }
+	//}
 
-		public UILabel LabelView { get; private set; }
+	//public class UserCell : UICollectionViewCell
+	//{
+	//	public static NSString CellID = new NSString ("SimilarMoviesDataSource");
 
-		public void UpdateRow (SimilarMovie element, Single fontSize, SizeF imageViewSize)
-		{
+	//	[Export ("initWithFrame:")]
+	//	public UserCell (CGRect  frame)
+	//		: base (frame)
+	//	{
+	//		ImageView = new UIImageView ();
+	//		ImageView.Layer.BorderColor = UIColor.DarkGray.CGColor;
+	//		ImageView.Layer.BorderWidth = 1f;
+	//		ImageView.Layer.CornerRadius = 3f;
+	//		ImageView.Layer.MasksToBounds = true;
+	//		ImageView.ContentMode = UIViewContentMode.ScaleToFill;
 
-			ImageView.Image = element.Image;
-			LabelView.Font = UIFont.FromName ("HelveticaNeue-Bold", fontSize);
-			ImageView.Frame = new RectangleF (0, 0, imageViewSize.Width, imageViewSize.Height);
+	//		ContentView.AddSubview (ImageView);
 
-		}
-	}
-	#endregion
+
+	//	}
+
+	//	public UIImageView ImageView { get; private set; }
+
+	//	public UILabel LabelView { get; private set; }
+
+	//	public void UpdateRow (SimilarMovie element, Single fontSize, SizeF imageViewSize)
+	//	{
+
+	//		ImageView.Image = element.Image;
+	//		LabelView.Font = UIFont.FromName ("HelveticaNeue-Bold", fontSize);
+	//		ImageView.Frame = new CGRect  (0, 0, imageViewSize.Width, imageViewSize.Height);
+
+	//	}
+	//}
+	//#endregion
 }
 

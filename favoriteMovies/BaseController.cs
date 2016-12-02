@@ -9,23 +9,23 @@ namespace FavoriteMovies
 	public partial class BaseController : UIViewController
 	{
 		// provide access to the sidebar controller to all inheriting controllers
-		protected SidebarNavigation.SidebarController SidebarController {
+		public SidebarNavigation.SidebarController SidebarController {
 			get {
-				return (UIApplication.SharedApplication.Delegate as AppDelegate).rootViewController.SidebarController;
+				return (UIApplication.SharedApplication.Delegate as AppDelegate).NavController.SidebarController;
 			}
 		}
 
 		//// provide access to the navigation controller to all inheriting controllers
 		protected NavController NavController {
 			get {
-				return (UIApplication.SharedApplication.Delegate as AppDelegate).rootViewController.NavController;
+				return (UIApplication.SharedApplication.Delegate as AppDelegate).NavController;
 			}
 		}
 
 		// provide access to the storyboard to all inheriting controllers
 		public override UIStoryboard Storyboard {
 			get {
-				return (UIApplication.SharedApplication.Delegate as AppDelegate).rootViewController.Storyboard;
+				return (UIApplication.SharedApplication.Delegate as AppDelegate).NavController.Storyboard;
 			}
 		}
 

@@ -15,16 +15,16 @@ namespace FavoriteMovies
 		Movie movieDetail;
 		UITableView table;
 		List<CustomList> tableItems = new List<CustomList> ();
-		UIBarButtonItem edit, done;
+		UIBarButtonItem edit, done, add;
 		TableSource tableSource;
-		public MovieListPickerViewController (Movie movieDetail)
+		bool fromAddList;
+		public MovieListPickerViewController (Movie movieDetail, bool fromAddList)
 		{
 			this.movieDetail = movieDetail;
+			this.fromAddList = fromAddList;
 		}
 
-		public MovieListPickerViewController ()
-		{
-		}
+
 
 		public void UpdateCustomList ()
 		{
@@ -68,8 +68,6 @@ namespace FavoriteMovies
 			try {
 				using (var db = new SQLite.SQLiteConnection (MovieService.Database)) {
 					// there is a sqllite bug here https://forums.xamarin.com/discussion/52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
-
-					//db.Execute ("UPDATE [CustomList] SET [Order] = ? Where Id = ?",row,item.Id);
 					item.Order = row;
 					db.InsertOrReplace (item, typeof (CustomList));
 
@@ -93,18 +91,19 @@ namespace FavoriteMovies
 			}
 		}
 
-		void DeleteAll (int Id)
+		void DeleteAll (int? CustomId, int id)
 		{
 			
 			try {
 				using (var db = new SQLite.SQLiteConnection (MovieService.Database)) {
 					// there is a sqllite bug here https://forums.xamarin.com/discussion/52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
-					db.Query<Movie> ("DELETE FROM [Movie] WHERE [id] = " + Id);
-					db.Query<Movie> ("DELETE FROM [CustomList]");
+					db.Query<Movie> ("DELETE FROM [Movie] WHERE [CustomListID] = " + CustomId + " AND [Id] = " + id);
+
 
 				}
-			} catch (SQLite.SQLiteException) {
+			} catch (SQLite.SQLiteException e) {
 				//first time in no favorites yet.
+				Debug.Write (e.Message);
 			}
 
 
@@ -120,9 +119,10 @@ namespace FavoriteMovies
 					//52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
 					//var query = db.Table<CustomList> ();
 
-					if (upDateMovieDetail)
-						DeleteAll (movieDetail.Id);
-					else
+					if (upDateMovieDetail) {
+						DeleteAll (listItem.Id, movieDetail.Id);
+						DeleteAll ();
+					} else
 						DeleteAll ();
 
 					for (var list=0; list < tableItems.Count; list++) 
@@ -162,9 +162,11 @@ namespace FavoriteMovies
 				;
 				using (var db = new SQLiteConnection (MovieService.Database)) 
 				{
-					if (upDateMovieDetail)
-						DeleteAll (movieDetail.Id);
-					else
+					if (upDateMovieDetail) 
+					{
+						DeleteAll (listItem.Id, movieDetail.Id);
+						DeleteAll ();
+					} else
 						DeleteAll ();
 
 					for (var list = 0; list < tableItems.Count; list++) {
@@ -203,22 +205,70 @@ namespace FavoriteMovies
 			tableSource = new TableSource (tableItems, this);
 			table.Source = tableSource;
 			table.AllowsSelectionDuringEditing = true;
-	
-			done = new UIBarButtonItem (UIBarButtonSystemItem.Done, (s, e) => {
-				table.SetEditing (false, true);
-				NavigationItem.RightBarButtonItem = edit;
-				tableSource.DidFinishTableEditing (table);
-			});
-			edit = new UIBarButtonItem (UIBarButtonSystemItem.Edit, (s, e) => {
-				if (table.Editing)
-					table.SetEditing (false, true); // if we've half-swiped a row
-				tableSource.WillBeginTableEditing (table);
-				table.SetEditing (true, true);
-				NavigationItem.LeftBarButtonItem = null;
-				NavigationItem.RightBarButtonItem = done;
-			});
+			NavigationItem.Title = "Add To Custom List";
 
-			NavigationItem.RightBarButtonItem = edit;
+			if (!fromAddList) {
+				done = new UIBarButtonItem (UIBarButtonSystemItem.Done, (s, e) => {
+					table.SetEditing (false, true);
+					NavigationItem.RightBarButtonItem = edit;
+					tableSource.DidFinishTableEditing (table);
+				});
+				edit = new UIBarButtonItem (UIBarButtonSystemItem.Edit, (s, e) => {
+					if (table.Editing)
+						table.SetEditing (false, true); // if we've half-swiped a row
+					tableSource.WillBeginTableEditing (table);
+					table.SetEditing (true, true);
+					NavigationItem.LeftBarButtonItem = null;
+					NavigationItem.RightBarButtonItem = done;
+				});
+				NavigationItem.RightBarButtonItem = edit;
+			} else 
+			{
+				add = new UIBarButtonItem (UIBarButtonSystemItem.Add, (s, e) => 
+				{
+					//Create Alert
+					var textInputAlertController = UIAlertController.Create ("Create Movie List", "List Name", UIAlertControllerStyle.Alert);
+
+					//Add Text Input
+					textInputAlertController.AddTextField (textField => { });
+
+					//Add Actions
+					var cancelAction = UIAlertAction.Create ("Cancel", UIAlertActionStyle.Cancel, alertAction => {
+						Console.WriteLine ("Cancel was Pressed");
+					});
+					var okayAction = UIAlertAction.Create ("Okay", UIAlertActionStyle.Default, alertAction => {
+						Console.WriteLine ("The user entered '{0}'", textInputAlertController.TextFields [0].Text);
+						if (tableSource.ValueUnique (textInputAlertController.TextFields [0].Text)) {
+							tableSource.ArrangeCustomList (false);
+							var listItem = new CustomList ();
+							listItem.Order = 0;
+							listItem.Name = textInputAlertController.TextFields [0].Text;
+							tableItems.Insert (0, listItem);
+							table.EndUpdates (); // applies the changes
+							table.ReloadData ();
+							tableSource.ArrangeCustomList (true);
+							UpdateCustomAndMovieList (tableItems [0], true);
+							MainViewController.NewCustomListToRefresh = 0;
+							NavigationController.PopToRootViewController (true);
+						} else {
+							new UIAlertView ("Duplicate!"
+							, "List already exist", null, "OK", null).Show ();
+						}
+					});
+
+					textInputAlertController.AddAction (cancelAction);
+					textInputAlertController.AddAction (okayAction);
+
+					//Present Alert
+					PresentViewController (textInputAlertController, true, null);
+
+
+
+				});
+
+				NavigationItem.RightBarButtonItem = add;
+			}
+
 			Add (table);
 
 		}
@@ -442,11 +492,12 @@ namespace FavoriteMovies
 				ArrangeCustomList (true);
 				Owner.UpdateCustomAndMovieList (tableItems [indexPath.Row], true);
 				Owner.NavigationController.PopToRootViewController (true);
+				MainViewController.NewCustomListToRefresh = indexPath.Row;
 			}
 			tableView.DeselectRow (indexPath, true);
 		}
 
-		void ArrangeCustomList (bool StartAtZero)
+		public void ArrangeCustomList (bool StartAtZero)
 		{
 
 			for (var list = StartAtZero ? 0 : 1; list < tableItems.Count; list++) 
@@ -457,7 +508,7 @@ namespace FavoriteMovies
 			}
 		}
 
-		bool ValueUnique (string text)
+		public bool ValueUnique (string text)
 		{
 			foreach (var item in tableItems) 
 			{

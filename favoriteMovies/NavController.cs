@@ -13,7 +13,16 @@ namespace FavoriteMovies
 		public NavController () : base ((string)null, null)
 		{
 		}
+		public override bool ShouldAutorotate ()
+		{
+			return base.ShouldAutorotate ();
 
+		}
+
+		public override UIInterfaceOrientationMask GetSupportedInterfaceOrientations ()
+		{
+			return UIInterfaceOrientationMask.Portrait;
+		}
 		public override void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();

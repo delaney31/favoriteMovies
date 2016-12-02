@@ -71,6 +71,9 @@ namespace FavoriteMovies
 			NavController.View.BackgroundColor = UIColor.White;//UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 			NavController.NavigationBar.TintColor = UIColor.White;
 			NavController.NavigationBar.Translucent = true;
+			NavController.NavigationBar.TitleTextAttributes = new UIStringAttributes () {
+				ForegroundColor = UIColor.White
+			};
 			rootViewController = new RootViewController ();
 			var main = new MainViewController (TopRated, NowPlaying, Popular, MovieLatest, TVNowAiring, Page);
 			var menuController = new MenuController ();
@@ -83,10 +86,10 @@ namespace FavoriteMovies
 
 
 		
-			//			// Code to start the Xamarin Test Cloud Agent
-			//#if ENABLE_TEST_CLOUD
-			//			Xamarin.Calabash.Start ();
-			//#endif
+						// Code to start the Xamarin Test Cloud Agent
+			#if ENABLE_TEST_CLOUD
+						Xamarin.Calabash.Start ();
+			#endif
 
 			return true;
 		}
@@ -158,15 +161,7 @@ namespace FavoriteMovies
 		public override void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
-			var introController = (IntroController)Storyboard.InstantiateViewController ("IntroController");
-			var menuController = (MenuController)Storyboard.InstantiateViewController ("MenuController");
 
-			// create a slideout navigation controller with the top navigation controller and the menu view controller
-			NavController = new NavController ();
-			NavController.PushViewController (introController, false);
-			SidebarController = new SidebarController (this, NavController, menuController);
-			SidebarController.MenuWidth = 220;
-			SidebarController.ReopenOnRotate = false;
 		}
 	}
 

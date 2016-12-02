@@ -25,6 +25,8 @@ namespace FavoriteMoviesPCL
 		public string BackdropPath { get; set; }
 		public string Popularity { get; set; }
 		public bool Video { get; set; }
+		public string UserReview { get; set; }
+		public int UserRating{ get; set; }
 
 	}
 	public class MoviePOCO

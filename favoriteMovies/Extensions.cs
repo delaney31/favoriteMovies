@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Drawing;
 using CoreGraphics;
 using FavoriteMoviesPCL;
@@ -26,7 +26,7 @@ namespace FavoriteMovies
 			return new PointF (pt.Y, pt.X);
 		}
 
-		public static PointF Center (this RectangleF rect)
+		public static PointF Center (this RectangleF  rect)
 		{
 			return new PointF (
 				(rect.Right - rect.Left) / 2.0f,
