@@ -17,6 +17,7 @@ namespace FavoriteMovies
 		ObservableCollection<Movie> _items { get; set; }
 		public float FontSize { get; set; }
 		public SizeF ImageViewSize { get; set; }
+		LoadingOverlay loadingOverlay;
 
 		protected BaseCollectionViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies) : base (layout)
 		{
@@ -30,8 +31,12 @@ namespace FavoriteMovies
 		{
 			try {
 				var row = _items [indexPath.Row];
+				var bounds = UIScreen.MainScreen.Bounds;
+				// show the loading overlay on the UI thread using the correct orientation sizing
+				loadingOverlay = new LoadingOverlay (bounds);
+				View.Add (loadingOverlay);
 				((UINavigationController)(UIApplication.SharedApplication.Delegate as AppDelegate).Window.RootViewController).PushViewController (new MovieDetailViewController (row, false), true);
-
+				loadingOverlay.Hide ();
 			} catch (Exception e) {
 				Debug.WriteLine (e.Message);
 			}
@@ -73,7 +78,7 @@ namespace FavoriteMovies
 	}
 
 	/// <summary>
-	/// This is the view controller for the Popular Movies scrollable list of movies
+	/// This is the view controller for the TopRated Movies scrollable list of movies
 	/// </summary>
 	public class TopRatedCollectionViewController : BaseCollectionViewController
 	{
@@ -212,8 +217,33 @@ namespace FavoriteMovies
 			return cell;
 		}
 
-
 	}
+	public class SimilarCollectionViewController : BaseCollectionViewController
+	{
+		ObservableCollection<Movie> _items { get; set; }
+		public static NSString movieCellId = new NSString ("SimilarMovieCell");
+		public SimilarCollectionViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies) : base (layout, movies)
+		{
+			_items = movies;
+		}
+		public override nint GetItemsCount (UICollectionView collectionView, nint section)
+		{
+			return _items.Count;
+		}
+		public override UICollectionViewCell GetCell (UICollectionView collectionView, NSIndexPath indexPath)
+		{
+			var cell = (MovieCell)collectionView.DequeueReusableCell (movieCellId, indexPath);
+			try {
 
+				var row = _items [indexPath.Row];
+				cell.UpdateRow (row);
+				return cell;
+			} catch (Exception e) {
+				Debug.WriteLine (e.Message);
+
+			}
+			return cell;
+		}
+	}
 
 }

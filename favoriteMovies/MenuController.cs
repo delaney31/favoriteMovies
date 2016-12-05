@@ -2,18 +2,17 @@
 using System;
 using System.CodeDom.Compiler;
 using UIKit;
+using FavoriteMoviesPCL;
+using System.Collections.Generic;
 
 namespace FavoriteMovies
 {
-	partial class MenuController : BaseController
+	public class MenuController : BaseController
 	{
 		public MenuController ()
 		{
 		}
 
-		public MenuController (IntPtr handle) : base (handle)
-		{
-		}
 
 		public override void ViewDidLoad ()
 		{
@@ -26,6 +25,9 @@ namespace FavoriteMovies
 					NavController.PushViewController (contentController, false);
 				SidebarController.CloseMenu ();
 			};
+
+
 		}
 	}
+
 }

@@ -2,21 +2,34 @@ using Foundation;
 using System;
 using System.CodeDom.Compiler;
 using UIKit;
+using System.Collections.Generic;
 
 namespace FavoriteMovies
 {
-	partial class ContentController : BaseController
+	public class ContentController : BaseController
 	{
 		public UIButton ContentButton { get; set; }
+
+
 		public ContentController ()
 		{
 			ContentButton = new UIButton ();
+
+
+		}
+		public override void ViewDidLoad ()
+		{
+			base.ViewDidLoad ();
+
 		}
 
-		public ContentController (IntPtr handle) : base (handle)
-		{
-		}
+
 	}
+
+
+
+
+
 }
 
 	

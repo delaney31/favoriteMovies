@@ -9,22 +9,22 @@ using System;
 using System.CodeDom.Compiler;
 using UIKit;
 
-namespace FavoriteMovies
-{
-	[Register ("MenuController")]
-	partial class MenuController
-	{
-		[Outlet]
-		[GeneratedCode ("iOS Designer", "1.0")]
-		UIButton ContentButton { get; set; }
+//namespace FavoriteMovies
+//{
+//	[Register ("MenuController")]
+//	partial class MenuController
+//	{
+//		[Outlet]
+//		[GeneratedCode ("iOS Designer", "1.0")]
+//		UIButton ContentButton { get; set; }
 
-		void ReleaseDesignerOutlets ()
-		{
-			if (ContentButton != null) {
-				ContentButton.Dispose ();
-				ContentButton = null;
-			}
-		}
-	}
-}
+//		void ReleaseDesignerOutlets ()
+//		{
+//			if (ContentButton != null) {
+//				ContentButton.Dispose ();
+//				ContentButton = null;
+//			}
+//		}
+//	}
+//}
 

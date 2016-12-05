@@ -58,9 +58,9 @@ namespace FavoriteMovies
 		ObservableCollection<Movie> MovieLatest;
 		UICollectionViewFlowLayout flowLayout;
 		BaseCollectionViewController nowPlayingController;
-		PopularCollectionViewController popularController;
-		TopRatedCollectionViewController topRatedController;
-		MovieLatestViewController MovieLatestController;
+		static PopularCollectionViewController popularController;
+		static TopRatedCollectionViewController topRatedController;
+		static MovieLatestViewController MovieLatestController;
 		UISearchController searchController;
 		FavoritesViewController [] customControllers;
 		UILabel [] customLabels = null;
@@ -71,7 +71,7 @@ namespace FavoriteMovies
 		static UIScrollView scrollView = new UIScrollView ();
 		static SearchResultsViewController searchResultsController;
 
-		public MainViewController (ObservableCollection<Movie> topRated, ObservableCollection<Movie> nowPlaying, ObservableCollection<Movie> popular, ObservableCollection<Movie> movieLatest, ObservableCollection<Movie> TVNowAiring,int page)
+		public MainViewController (ObservableCollection<Movie> topRated, ObservableCollection<Movie> nowPlaying, ObservableCollection<Movie> popular, ObservableCollection<Movie> movieLatest,int page)
 		{
 			this.topRated = topRated;
 			this.nowPlaying = nowPlaying;
@@ -127,8 +127,7 @@ namespace FavoriteMovies
 		{
 			base.ViewDidAppear (animated);
 
-
-
+		
 			//HACK until i find out why when you open a movie details and come back the view.height changes.
 			if (View.Frame.Height == 504) 
 			{
@@ -158,6 +157,7 @@ namespace FavoriteMovies
 			//this fixes problem when coming out of full screen after watching a trailer
 			NavigationController.NavigationBar.Frame = new CGRect () { X = 0, Y = 20, Width = 320, Height = 44 };
 			//DeleteAllSubviews (scrollView);
+
 
 			if(NewCustomListToRefresh != -1)
 			   FavoritesDisplay ();

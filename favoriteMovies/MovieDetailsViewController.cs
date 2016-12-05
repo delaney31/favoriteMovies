@@ -27,11 +27,11 @@ namespace FavoriteMovies
 		static string _googleApiKey = "AIzaSyCu634TJuZR_0iUhJQ6D8E9xr2a3VbU3_M";
 		static string _youTubeURl = "https://www.youtube.com/embed/";
 		string _embededMoveId;
+
 		Movie movieDetail;
 		UIImageView moviePlay;
 		UIWebView webView ;
 		static UIScrollView scrollView = new UIScrollView ();
-		ObservableCollection<Movie> similarMovies;
 
 		public MovieDetailsViewController (IntPtr handle) : base (handle)
 		{
@@ -59,7 +59,7 @@ namespace FavoriteMovies
 			var youtubeMovieId = "";
 
 			var UTubeMovidId = Task.Run (async () => {
-				youtubeMovieId = await MovieService.GetYouTubeMovieId(imDbUrl);
+				youtubeMovieId = await MovieService.GetYouTubeMovieId (imDbUrl);
 
 			});
 			UTubeMovidId.Wait ();
@@ -67,7 +67,6 @@ namespace FavoriteMovies
 			_embededMoveId = youtubeMovieId;
 
 		}
-	
 		public override void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
@@ -153,10 +152,11 @@ namespace FavoriteMovies
 			if (_embededMoveId != "")
 			   posterImage.AddGestureRecognizer (playClip);
 			//For scrolling to work the scrollview Content size has to be bigger than the View.Frame.Height
-
 			scrollView.ContentSize = new CGSize (320, View.Frame.Height + 155);
-			scrollView.ContentOffset = new CGPoint (0, -scrollView.ContentInset.Top);			
+			scrollView.ContentOffset = new CGPoint (0, -scrollView.ContentInset.Top);
 			scrollView.Bounces = true;
+
+
 
 
 		}

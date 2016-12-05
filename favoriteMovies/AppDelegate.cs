@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Threading.Tasks;
+using CoreGraphics;
 using FavoriteMoviesPCL;
 using Foundation;
 using SidebarNavigation;
@@ -20,7 +21,7 @@ namespace FavoriteMovies
 		ObservableCollection<Movie> TopRated;
 		ObservableCollection<Movie> Popular;
 		ObservableCollection<Movie> MovieLatest;
-		ObservableCollection<Movie> TVNowAiring;
+
 
 		public static int RandomNumber (int min, int max)
 		{
@@ -42,12 +43,13 @@ namespace FavoriteMovies
 
 		// the navigation controller
 		public NavController NavController { get; private set; }
-
+	
 		public override bool FinishedLaunching (UIApplication application, NSDictionary launchOptions)
 		{
 			// Override point for customization after application launch.
 			// If not required for your application you can safely delete this method
 			Window = new UIWindow (UIScreen.MainScreen.Bounds);
+
 			// make the window visible
 			Window.MakeKeyAndVisible ();
 			MovieService.Database = Path.Combine (FileHelper.GetLocalStoragePath (), "MovieEntries.db3");
@@ -68,20 +70,22 @@ namespace FavoriteMovies
 			NavController = new NavController ();
 
 			NavController.NavigationBar.BarTintColor = UIColor.Clear.FromHexString (UIColorExtensions.NAV_BAR_COLOR, 1.0f);
-			NavController.View.BackgroundColor = UIColor.White;//UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
+			NavController.View.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 			NavController.NavigationBar.TintColor = UIColor.White;
 			NavController.NavigationBar.Translucent = true;
 			NavController.NavigationBar.TitleTextAttributes = new UIStringAttributes () {
 				ForegroundColor = UIColor.White
 			};
+
 			rootViewController = new RootViewController ();
-			var main = new MainViewController (TopRated, NowPlaying, Popular, MovieLatest, TVNowAiring, Page);
+			var main = new MainViewController (TopRated, NowPlaying, Popular, MovieLatest, Page);
 			var menuController = new MenuController ();
 			SidebarController = new SidebarController (rootViewController, main, menuController);
 			SidebarController.MenuWidth = 260;
 			SidebarController.ReopenOnRotate = false;
 			NavController.SidebarController = SidebarController;
 			NavController.PushViewController (main, false);
+
 			Window.RootViewController = NavController;
 
 
@@ -112,13 +116,16 @@ namespace FavoriteMovies
 		{
 			// Called as part of the transiton from background to active state.
 			// Here you can undo many of the changes made on entering the background.
+
+
+
 		}
 
 		public override void OnActivated (UIApplication application)
 		{
 			// Restart any tasks that were paused (or not yet started) while the application was inactive. 
 			// If the application was previously in the background, optionally refresh the user interface.
-		}
+}
 
 		public override void WillTerminate (UIApplication application)
 		{
@@ -138,14 +145,6 @@ namespace FavoriteMovies
 		// the navigation controller
 		public NavController NavController { get; private set; }
 
-		// the storyboard
-		public override UIStoryboard Storyboard {
-			get {
-				if (_storyboard == null)
-					_storyboard = UIStoryboard.FromName ("Phone", null);
-				return _storyboard;
-			}
-		}
 
 		public override bool ShouldAutorotate ()
 		{

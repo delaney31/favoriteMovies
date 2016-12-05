@@ -43,5 +43,12 @@ namespace FavoriteMoviesPCL
 		[AutoIncrement]
 		public int Order { get; set;}
 	}
+
+	public class CastCrew
+	{
+		public string Character { get; set; }
+		public string Actor { get; set; }
+		public string ProfilePath { get; set; }
+	}
 }
 

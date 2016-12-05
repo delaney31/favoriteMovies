@@ -104,7 +104,7 @@ namespace FavoriteMoviesPCL
 				Url = _baseUrl + "movie/popular?api_key=" + _apiKey + _pageString + page;
 				break;
 			case MovieType.Similar:
-				Url = _baseUrl + "movie/" + movieId + "/simular?api_key=" + _apiKey + _pageString + page;
+				Url = _baseUrl + "movie/" + movieId + "/similar?api_key=" + _apiKey + _pageString + page;
 				break;
 			case MovieType.Upcoming:
 				Url = _baseUrl + "movie/upcoming?api_key=" + _apiKey + "&language=en-US";
@@ -135,7 +135,30 @@ namespace FavoriteMoviesPCL
 			//Server Error or no internet connection.
 			return null;
 		}
+		public static async Task<ObservableCollection<CastCrew>> MovieCreditsAsync (string query)
+		{
+			var client = new HttpClient ();
+			string Url = "https://api.themoviedb.org/3/movie/" + query + "/credits?api_key=" + _apiKey;
 
+			HttpResponseMessage result = await client.GetAsync (Url, CancellationToken.None);
+			if (result.IsSuccessStatusCode) {
+				try {
+					string content = await result.Content.ReadAsStringAsync ();
+					JObject jresponse = JObject.Parse (content);
+					var jarray = jresponse ["cast"];
+					var castCrew = GetCastJsonData (content);
+					//return a ObservableCollection to fill a list of movies
+					return castCrew;
+
+				} catch (Exception ex) {
+					//Model Error
+					Debug.WriteLine (ex);
+
+				}
+			}
+			//Server Error or no internet connection.
+			return null;
+		}
 		public static async Task<ObservableCollection<Movie>> MovieSearch (string query)
 		{
 			var client = new HttpClient ();
@@ -161,6 +184,31 @@ namespace FavoriteMoviesPCL
 			return null;
 		}
 
+		static ObservableCollection<CastCrew> GetCastJsonData (string content)
+		{
+
+			JObject jresponse = JObject.Parse (content);
+			var jarray = jresponse ["cast"];
+
+			var castList = new ObservableCollection<CastCrew> ();
+			try {
+				foreach (var jObj in jarray) {
+					var castCrew = new CastCrew ();
+					castCrew.Character = (string)jObj ["character"];
+					castCrew.ProfilePath = (jObj ["profile_path"] == null) ? "" : (string)jObj ["profile_path"];
+					castCrew.Actor = (string)jObj ["name"];
+				
+					castList.Add (castCrew);
+				}
+			} catch (Exception e) {
+
+				Debug.WriteLine (e.Message);
+
+			}
+			return castList;
+
+
+		}
 
 		static ObservableCollection<Movie> GetJsonData (string content)
 		{

@@ -11,11 +11,11 @@ using UIKit;
 
 namespace FavoriteMovies
 {
-	[Register ("ContentController")]
-	partial class ContentController
-	{
-		void ReleaseDesignerOutlets ()
-		{
-		}
-	}
+//	[Register ("ContentController")]
+//	partial class ContentController
+//	{
+//		void ReleaseDesignerOutlets ()
+//		{
+//		}
+//	}
 }

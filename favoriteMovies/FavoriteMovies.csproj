@@ -124,10 +124,6 @@
     <Compile Include="MainViewController.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="BaseCollectionViewController.cs" />
-    <Compile Include="MovieDetailsViewController.cs" />
-    <Compile Include="MovieDetailsViewController.designer.cs">
-      <DependentUpon>MovieDetailsViewController.cs</DependentUpon>
-    </Compile>
     <Compile Include="FileHelper.cs" />
     <Compile Include="ContentController.cs" />
     <Compile Include="BaseController.cs" />
@@ -146,6 +142,7 @@
     <Compile Include="TableItem.cs" />
     <Compile Include="TableSourceTest.cs" />
     <Compile Include="MovieDetailViewController.cs" />
+    <Compile Include="LoadingOverLay.cs" />
   </ItemGroup>
   <ItemGroup>
     <BundleResource Include="Resources\placeholder.png" />
@@ -167,7 +164,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <InterfaceDefinition Include="MovieDetailsViewController.xib" />
     <InterfaceDefinition Include="Phone.storyboard" />
   </ItemGroup>
   <ItemGroup>

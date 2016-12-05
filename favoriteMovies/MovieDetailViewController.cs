@@ -27,6 +27,7 @@ namespace FavoriteMovies
 		UIImageView IMDB = new UIImageView ();
 		UILabel voteResultText = new UILabel ();
 		UILabel userResultText = new UILabel ();
+
 		/// <summary>
 		/// This is the view controller for the movie details page. In addition it allows you to save and clear favorite movies
 		/// </summary>
@@ -34,25 +35,33 @@ namespace FavoriteMovies
 		//static string _googleApiKey = "AIzaSyCu634TJuZR_0iUhJQ6D8E9xr2a3VbU3_M";
 		static string _youTubeURl = "https://www.youtube.com/embed/";
 		string _embededMoveId;
+		static CGSize HeaderReferenceSize = new CGSize (50, 50);
+		static int MinimumInteritemSpacing = 30;
+		static int MinimumLineSpacing = 5;
+		static UILabel similarMoviesLabel;
+		static CGSize ItemSize = new CGSize (100, 150);
+		ObservableCollection<Movie> similarMovies;
+		ObservableCollection<CastCrew> castList;
+		SimilarCollectionViewController similarMoviesController;
 		Movie movieDetail;
 		UIImageView moviePlay;
 		UILabel userName;
 		UIWebView webView;
 		UIScrollView scrollView = new UIScrollView ();
-		UIImageView Userstar1;
-		UIImageView Userstar2;
-		UIImageView Userstar3;
-		UIImageView Userstar4;
-		UIImageView Userstar5;
+		static UILabel castHeader;
+		//static UILabel cast;
+		static UIImageView Userstar1;
+		static UIImageView Userstar2;
+		static UIImageView Userstar3;
+		static UIImageView Userstar4;
+		static UIImageView Userstar5;
 		bool canReview;
-
-		//ObservableCollection<Movie> similarMovies;
 
 		public MovieDetailViewController (Movie movie, bool canReview) 
 		{
 			movieDetail = movie;
 			this.canReview = canReview;
-			Initialize ();
+
 			moviePlay = new UIImageView () { UserInteractionEnabled = true};
 			Userstar1 = new UIImageView (){ UserInteractionEnabled = true };
 			Userstar2 = new UIImageView (){ UserInteractionEnabled = true };
@@ -68,6 +77,10 @@ namespace FavoriteMovies
 			Userstar4.Image = UIImage.FromBundle ("star.png");
 			Userstar5.Image = UIImage.FromBundle ("star.png");
 			IMDB.Image = UIImage.FromBundle ("imdb.png");
+			UIImageView backGroundImage = new UIImageView ();
+			backGroundImage.Image = MovieCell.GetImage (movieDetail.PosterPath);
+			//View.BackgroundColor = UIColor.FromPatternImage (backGroundImage.Image);
+
 		}
 
 		void Initialize ()
@@ -82,7 +95,15 @@ namespace FavoriteMovies
 			UTubeMovidId.Wait ();
 
 			_embededMoveId = youtubeMovieId;
+			var getSimilarMovies = Task.Run (async () => {
+				similarMovies = await MovieService.GetMoviesAsync (MovieService.MovieType.Similar,1,movieDetail.Id);
+			});
+			getSimilarMovies.Wait ();
 
+			var getCast = Task.Run (async () => {
+				castList = await MovieService.MovieCreditsAsync (movieDetail.Id.ToString ());
+			});
+			getCast.Wait ();
 		}
 
 		public override void ViewDidLoad ()
@@ -90,6 +111,7 @@ namespace FavoriteMovies
 			base.ViewDidLoad ();
 			scrollView.Frame = new CGRect () { X = View.Frame.X, Y = View.Frame.Y, Width = View.Frame.Width, Height = View.Frame.Height };
 
+			Initialize ();
 			View.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 			posterImage.Layer.BorderWidth = 1.0f;
 			posterImage.ContentMode = UIViewContentMode.ScaleToFill;
@@ -204,18 +226,21 @@ namespace FavoriteMovies
 			descriptView.Text = movieDetail.Overview;
 			descriptView.Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, 12);
 			descriptView.TextColor = UIColor.Black;
-			descriptView.Frame = new CGRect  (16, 250, 300, 300); //(int)size.Height+10);
+			descriptView.BackgroundColor = UIColor.Clear;
+			descriptView.Frame = new CGRect  (16, 255, 290, 300); //(int)size.Height+10);
 			descriptView.Lines = 0;
-			descriptView.TextAlignment = UITextAlignment.Natural;
+			descriptView.TextAlignment = UITextAlignment.Justified;
+
 			descriptView.SizeToFit ();
 
 			descReview.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 			descReview.Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, 12);
 			descReview.TextColor = UIColor.Black;
-			descReview.Frame = new CGRect  (16, descriptView.Frame.Y + descriptView.Frame.Height + 20, 300, 100); //(int)size.Height+10);
+			descReview.Frame = new CGRect  (16, descriptView.Frame.Y + descriptView.Frame.Height + 30, 300, 100); //(int)size.Height+10);
 			descReview.Lines = 0;
 			descReview.TextAlignment = UITextAlignment.Natural;
 			descReview.Text = movieDetail.UserReview;
+
 			descReview.SizeToFit ();
 
 			userName = new UILabel ();
@@ -225,13 +250,109 @@ namespace FavoriteMovies
 				userName.Text = GetUserName ();
 			userName.Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, 12);
 			userName.SizeToFit ();
+
+
+
+
 			var playClip = new UITapGestureRecognizer (HandleAction);
 
 			saveFavoriteButt.TouchDown += SaveFavoriteButt_TouchDown;
 			posterImage.UserInteractionEnabled = true;
 			if (_embededMoveId != "")
 				moviePlay.AddGestureRecognizer (playClip);
+
+			if (similarMovies.Count > 0) {
+				//similar movies
+				similarMoviesLabel = new UILabel () {
+					TextColor = UIColor.Black, Frame = new CGRect (16, descReview.Frame.Y + descReview.Frame.Height + userName.Frame.Height, 180, 20),
+					BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, 1f),
+					Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, UIColorExtensions.HEADER_FONT_SIZE),
+					Text = "Similar Movies"
+				};
+				similarMoviesController = new SimilarCollectionViewController (new UICollectionViewFlowLayout () {
+					MinimumInteritemSpacing = MinimumInteritemSpacing, MinimumLineSpacing = MinimumLineSpacing,
+					HeaderReferenceSize = HeaderReferenceSize, ItemSize = ItemSize,
+					ScrollDirection = UICollectionViewScrollDirection.Horizontal
+				}, similarMovies);
+				similarMoviesController.CollectionView.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, 1f);
+				similarMoviesController.CollectionView.RegisterClassForCell (typeof (MovieCell), SimilarCollectionViewController.movieCellId);
+				//similar movies
+				similarMoviesLabel.Frame = new CGRect (16, descReview.Frame.Y + descReview.Frame.Height + userName.Frame.Height , 180, 20);
+				similarMoviesController.CollectionView.Frame = new CGRect (-35, descReview.Frame.Y + descReview.Frame.Height + userName.Frame.Height  + 20, 345, 150);
 			
+				castHeader = new UILabel ();
+				castHeader.Frame = new CGRect () { X = 16, Y = similarMoviesController.CollectionView.Frame.Y + similarMoviesController.CollectionView.Frame.Height + 20 };
+			} else 
+			{
+				castHeader = new UILabel ();
+				castHeader.Frame = new CGRect () { X = 16, Y = descReview.Frame.Y + descReview.Frame.Height +userName.Frame.Height};
+
+			}
+			if (castList.Count > 0) 
+			{
+				castHeader.Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, UIColorExtensions.HEADER_FONT_SIZE);
+				castHeader.Text = "Cast";
+				castHeader.SizeToFit ();
+			}
+			DeleteAllSubviews (scrollView);
+			int castCount = 0;
+			foreach (var cast in castList) 
+			{
+				var actorName = new UILabel ();
+				actorName.Frame = new CGRect () { X = castHeader.Frame.X, Y = castHeader.Frame.Y + 20 + (30* castCount),Width= 150};
+				actorName.Font = UIFont.FromName (UIColorExtensions.CONTENT_FONT, UIColorExtensions.CAST_FONT_SIZE);
+				actorName.Text = cast.Actor;
+				actorName.Lines = 2;
+				actorName.SizeToFit ();
+
+				var character = new UILabel ();
+				character.Frame = new CGRect () { X = castHeader.Frame.X + 150, Y = castHeader.Frame.Y + 20 + (30 * castCount),Width = 150 };
+				character.Font = UIFont.FromName (UIColorExtensions.CONTENT_FONT, UIColorExtensions.CAST_FONT_SIZE);
+				character.Text = cast.Character;
+				character.TextAlignment = UITextAlignment.Left;
+				character.Lines = 2;
+				character.SizeToFit ();
+
+				scrollView.Add (actorName);
+				scrollView.Add (character);
+				castCount ++;
+			}
+
+
+
+
+			scrollView.AddSubview (dateOpenView);
+			scrollView.AddSubview (descReview);
+			scrollView.AddSubview (descriptView);
+			scrollView.AddSubview (movieTitle);
+			if (this.canReview)
+				scrollView.AddSubview (addReviewButt);
+			scrollView.AddSubview (posterImage);
+			scrollView.AddSubview (saveFavoriteButt);
+			scrollView.AddSubview (voteResultText);
+			if (_embededMoveId != "")
+				scrollView.AddSubview (moviePlay);
+			if (this.canReview) {
+				scrollView.Add (Userstar1);
+				scrollView.Add (Userstar2);
+				scrollView.Add (Userstar3);
+				scrollView.Add (Userstar4);
+				scrollView.Add (Userstar5);
+				scrollView.Add (userResultText);
+			}
+			if (similarMovies.Count > 0) {
+				scrollView.Add (similarMoviesLabel);
+				scrollView.Add (similarMoviesController.CollectionView);
+			}
+			scrollView.Add (userName);
+			scrollView.Add (castHeader);
+			scrollView.Add (IMDB);
+
+			//For scrolling to work the scrollview Content size has to be bigger than the View.Frame.Height
+			scrollView.ContentSize = new CGSize (320,  CalculateScrollContent ());
+			scrollView.ContentOffset = new CGPoint (0, -scrollView.ContentInset.Top);
+			scrollView.Bounces = true;
+			View.AddSubview (scrollView);
 		}
 
 		void AddStarAction (UIGestureRecognizer gesture)
@@ -251,54 +372,43 @@ namespace FavoriteMovies
 
 		string GetUserName ()
 		{
-			return "Review:@tldelaney";
+			return "User Review by @tldelaney:";
 		}
 
 		public override void ViewDidAppear (bool animated)
 		{
 			base.ViewDidAppear (animated);
 
+
+
+			//HACK until i find out why when you open a movie details and come back the view.height changes.
+			if (View.Frame.Height == 504) {
+
+				scrollView.ContentSize = new CGSize (View.Frame.Width, 723 + 50);
+				scrollView.ContentOffset = new CGPoint (0, -scrollView.ContentInset.Top);
+
+			}
+
 		}
 		public override void ViewWillAppear (bool animated)
 		{
 			base.ViewWillAppear (animated);
 
-			scrollView.AddSubview (dateOpenView);
-			scrollView.AddSubview (descReview);
-			scrollView.AddSubview (descriptView);
-			scrollView.AddSubview (movieTitle);
-			if (this.canReview)
-			   scrollView.AddSubview (addReviewButt);
-			scrollView.AddSubview (posterImage);
-			scrollView.AddSubview (saveFavoriteButt);
-			scrollView.AddSubview (voteResultText);
-			if (_embededMoveId != "")
-				scrollView.AddSubview (moviePlay);
-			if (this.canReview) 
-			{
-				scrollView.Add (Userstar1);
-				scrollView.Add (Userstar2);
-				scrollView.Add (Userstar3);
-				scrollView.Add (Userstar4);
-				scrollView.Add (Userstar5);
-				scrollView.Add (userResultText);
-			}
-			scrollView.Add (userName);
-			scrollView.Add (IMDB);
-			//For scrolling to work the scrollview Content size has to be bigger than the View.Frame.Height
-			scrollView.ContentSize = new CGSize (320, View.Frame.Height + 10);
-			scrollView.ContentOffset = new CGPoint (0, -scrollView.ContentInset.Top);
-			scrollView.Bounces = true;
-			//HACK until i find out why when you open a movie details and come back the view.height changes.
-			if (View.Frame.Height == 504) {
-				
-				scrollView.ContentSize = new CGSize (View.Frame.Width, 723 + 50);
-				scrollView.ContentOffset = new CGPoint (0, -scrollView.ContentInset.Top);
-
-			}
-			View.AddSubview (scrollView);
 
 		}
+
+		nfloat CalculateScrollContent ()
+		{
+			nfloat scrollViewHeight = 0;
+
+			foreach (var view in scrollView.Subviews) {
+				Debug.Write (view.Frame.X);
+				//if (view.Frame.X == 16 ||view.Frame.X ==166)
+					scrollViewHeight += view.Frame.Size.Height;
+			}
+			return scrollViewHeight ;
+		}
+
 		public override bool ShouldAutorotate ()
 		{
 			return base.ShouldAutorotate ();
@@ -343,6 +453,9 @@ namespace FavoriteMovies
 
 		void HandleAction ()
 		{
+			//NavigationController.NavigationBar.Frame = new CGRect () { X = 0, Y = 20, Width = 320, Height = 10 };
+			//NavigationController.NavigationBarHidden = true;
+
 			string videoCode = _embededMoveId;//.Substring (_embededMoveId.LastIndexOf ("/"));
 
 			webView = new UIWebView () {
@@ -357,7 +470,7 @@ namespace FavoriteMovies
 					  "</style>");
 			sb.Append ("</head>");
 			sb.Append ("<body>");
-			sb.Append ("<iframe width=\"300\" height=\"250\" src=\"" + _youTubeURl + videoCode + "\" frameborder=\"40\" allowfullscreen></iframe>");
+			sb.Append ("<iframe width=\"300\" height=\"250\" src=\"" + _youTubeURl + videoCode + "\" frameborder=\"0\" allowfullscreen></iframe>");
 			sb.Append ("<h4>" + movieDetail.Title + "</h4>");
 			sb.Append ("<p>" + movieDetail.Overview + "</p>");
 			sb.Append ("</body></html>");
@@ -410,14 +523,19 @@ namespace FavoriteMovies
 				var okayAction = UIAlertAction.Create ("Okay", UIAlertActionStyle.Default, alertAction => {
 				Console.WriteLine ("The user entered '{0}'", textInputAlertController.TextFields [0].Text);
 				movieDetail.UserReview = textInputAlertController.TextFields [0].Text;
-				userName.Text = "Review:@tldelaney";
+
+				userName.Text = GetUserName();
 				userName.SizeToFit ();
-				descReview.Frame = new CGRect (16, descriptView.Frame.Y + descriptView.Frame.Height + 20, 300, 100); //(int)size.Height+10);
+				descReview.Frame = new CGRect (16, descriptView.Frame.Y + descriptView.Frame.Height + 30, 300, 100); //(int)size.Height+10);
 				descReview.Lines = 0;
+				descReview.Layer.BorderWidth = .2f;
 				descReview.TextAlignment = UITextAlignment.Natural;
-				descReview.Text = movieDetail.UserReview.Substring(0,(movieDetail.UserReview.Length<125?movieDetail.UserReview.Length:125));
+				descReview.Text = movieDetail.UserReview.Substring(0,(movieDetail.UserReview.Length<120?movieDetail.UserReview.Length:120));
 				descReview.SizeToFit ();
+
 				updateMovie(movieDetail);
+
+				this.ViewWillAppear (true);
 			});
 
 			textInputAlertController.AddAction (cancelAction);
@@ -428,7 +546,13 @@ namespace FavoriteMovies
 
 		}
 
+		void DeleteAllSubviews (UIScrollView view)
+		{
+			foreach (UIView subview in view.Subviews) {
+				subview.RemoveFromSuperview ();
+			}
 
+		}
 		/// <summary>
 		/// This is the delegate for the save favorite button. It also has visual indicator for the current poster image
 		/// </summary>
@@ -455,111 +579,6 @@ namespace FavoriteMovies
 
 
 
-	#region Simlar Movies setup not used yet 
-	/// <summary>
-	/// This class ( and subsequent classes) is not currently being used. It is going to be the datassource for the similar movies collection
-	/// </summary>
-	public class SimilarMoviesDataSource : UICollectionViewSource
-	{
-		public SimilarMoviesDataSource ()
-		{
-			Rows = new List<SimilarMovie> ();
-		}
+}	
 
-		public List<SimilarMovie> Rows { get; private set; }
-		public float FontSize { get; set; }
-		public SizeF ImageViewSize { get; set; }
-
-		public override nint NumberOfSections (UICollectionView collectionView)
-		{
-			return 1;
-		}
-
-		public override nint GetItemsCount (UICollectionView collectionView, nint section)
-		{
-			return Rows.Count;
-		}
-
-		public override bool ShouldHighlightItem (UICollectionView collectionView, NSIndexPath indexPath)
-		{
-			return true;
-		}
-
-		public override void ItemHighlighted (UICollectionView collectionView, NSIndexPath indexPath)
-		{
-			var cell = (UserCell)collectionView.CellForItem (indexPath);
-			cell.ImageView.Alpha = 0.5f;
-		}
-
-		public override void ItemUnhighlighted (UICollectionView collectionView, NSIndexPath indexPath)
-		{
-			var cell = (UserCell)collectionView.CellForItem (indexPath);
-			cell.ImageView.Alpha = 1;
-
-			SimilarMovie row = Rows [indexPath.Row];
-			row.Tapped.Invoke ();
-		}
-
-		public override UICollectionViewCell GetCell (UICollectionView collectionView, NSIndexPath indexPath)
-		{
-			var cell = (UserCell)collectionView.DequeueReusableCell (UserCell.CellID, indexPath);
-
-			SimilarMovie row = Rows [indexPath.Row];
-
-			cell.UpdateRow (row, FontSize, ImageViewSize);
-
-			return cell;
-		}
-	}
-
-	public class SimilarMovie
-	{
-		public SimilarMovie (UIImage image, Action tapped)
-		{
-
-			Image = image;
-			Tapped = tapped;
-		}
-
-
-		public UIImage Image { get; set; }
-
-		public Action Tapped { get; set; }
-	}
-
-	public class UserCell : UICollectionViewCell
-	{
-		public static NSString CellID = new NSString ("SimilarMoviesDataSource");
-
-		[Export ("initWithFrame:")]
-		public UserCell (CGRect  frame)
-			: base (frame)
-		{
-			ImageView = new UIImageView ();
-			ImageView.Layer.BorderColor = UIColor.DarkGray.CGColor;
-			ImageView.Layer.BorderWidth = 1f;
-			ImageView.Layer.CornerRadius = 3f;
-			ImageView.Layer.MasksToBounds = true;
-			ImageView.ContentMode = UIViewContentMode.ScaleToFill;
-
-			ContentView.AddSubview (ImageView);
-
-
-		}
-
-		public UIImageView ImageView { get; private set; }
-
-		public UILabel LabelView { get; private set; }
-
-		public void UpdateRow (SimilarMovie element, Single fontSize, SizeF imageViewSize)
-		{
-
-			ImageView.Image = element.Image;
-			LabelView.Font = UIFont.FromName ("HelveticaNeue-Bold", fontSize);
-			ImageView.Frame = new CGRect  (0, 0, imageViewSize.Width, imageViewSize.Height);
-
-		}
-	}
-	#endregion
-}
 

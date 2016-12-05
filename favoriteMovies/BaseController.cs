@@ -45,6 +45,7 @@ namespace FavoriteMovies
 					, UIBarButtonItemStyle.Plain
 					, (sender, args) => {
 						SidebarController.ToggleMenu ();
+						
 					}), true);
 		}
 	}
