@@ -5,7 +5,7 @@ using UIKit;
 
 namespace FavoriteMovies
 {
-	partial class IntroController : BaseController
+	public partial class IntroController : BaseController
 	{
 		public IntroController (IntPtr handle) : base (handle)
 		{

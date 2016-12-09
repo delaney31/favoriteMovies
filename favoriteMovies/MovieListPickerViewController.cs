@@ -10,18 +10,19 @@ using UIKit;
 
 namespace FavoriteMovies
 {
-	public class MovieListPickerViewController : UIViewController
+	public class MovieListPickerViewController : BaseController
 	{
 		Movie movieDetail;
 		UITableView table;
 		List<CustomList> tableItems = new List<CustomList> ();
 		UIBarButtonItem edit, done, add;
 		TableSource tableSource;
-		bool fromAddList;
+		public bool fromAddList;
 		public MovieListPickerViewController (Movie movieDetail, bool fromAddList)
 		{
 			this.movieDetail = movieDetail;
 			this.fromAddList = fromAddList;
+
 		}
 
 
@@ -205,7 +206,7 @@ namespace FavoriteMovies
 			tableSource = new TableSource (tableItems, this);
 			table.Source = tableSource;
 			table.AllowsSelectionDuringEditing = true;
-			NavigationItem.Title = "Add To Custom List";
+			NavigationItem.Title = "Movie List";
 
 			if (!fromAddList) {
 				done = new UIBarButtonItem (UIBarButtonSystemItem.Done, (s, e) => {
@@ -220,6 +221,8 @@ namespace FavoriteMovies
 					table.SetEditing (true, true);
 					NavigationItem.LeftBarButtonItem = null;
 					NavigationItem.RightBarButtonItem = done;
+					SidebarController.Disabled = true;
+					MainViewController.NewCustomListToRefresh = 0;
 				});
 				NavigationItem.RightBarButtonItem = edit;
 			} else 
@@ -463,17 +466,18 @@ namespace FavoriteMovies
 						Console.WriteLine ("Cancel was Pressed");
 					});
 					var okayAction = UIAlertAction.Create ("Okay", UIAlertActionStyle.Default, alertAction => {
-						Console.WriteLine ("The user entered '{0}'", textInputAlertController.TextFields [0].Text);
-						if (ValueUnique (textInputAlertController.TextFields [0].Text)) {
-							ArrangeCustomList (false);
-							var listItem = new CustomList ();
-							listItem.Order = 0;
-							listItem.Name = textInputAlertController.TextFields [0].Text;
-							tableItems.Insert (0, listItem);
-							tableView.EndUpdates (); // applies the changes
-							tableView.ReloadData ();
-							ArrangeCustomList (true);
-							Owner.UpdateCustomAndMovieList (tableItems [indexPath.Row], true);
+					Console.WriteLine ("The user entered '{0}'", textInputAlertController.TextFields [0].Text);
+					if (ValueUnique (textInputAlertController.TextFields [0].Text)) {
+						ArrangeCustomList (false);
+						var listItem = new CustomList ();
+						listItem.Order = 0;
+						listItem.Name = textInputAlertController.TextFields [0].Text;
+						tableItems.Insert (0, listItem);
+						tableView.EndUpdates (); // applies the changes
+						tableView.ReloadData ();
+						ArrangeCustomList (true);
+
+						Owner.UpdateCustomAndMovieList (tableItems [indexPath.Row], Owner.fromAddList);
 						} else 
 						{
 							new UIAlertView ("Duplicate!"
@@ -490,7 +494,7 @@ namespace FavoriteMovies
 			} else 
 			{
 				ArrangeCustomList (true);
-				Owner.UpdateCustomAndMovieList (tableItems [indexPath.Row], true);
+				Owner.UpdateCustomAndMovieList (tableItems [indexPath.Row], Owner.fromAddList);
 				Owner.NavigationController.PopToRootViewController (true);
 				MainViewController.NewCustomListToRefresh = indexPath.Row;
 			}
@@ -540,7 +544,7 @@ namespace FavoriteMovies
 
 			}
 			cell.TextLabel.Text = tableItems [indexPath.Row].Name;
-
+			cell.TextLabel.Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, UIColorExtensions.HEADER_FONT_SIZE);
 
 
 			return cell;

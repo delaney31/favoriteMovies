@@ -11,28 +11,33 @@ namespace FavoriteMovies
 		// provide access to the sidebar controller to all inheriting controllers
 		public SidebarNavigation.SidebarController SidebarController {
 			get {
-				return (UIApplication.SharedApplication.Delegate as AppDelegate).NavController.SidebarController;
+				//return (UIApplication.SharedApplication.Delegate as AppDelegate).NavController.SidebarController;
+				return (UIApplication.SharedApplication.Delegate as AppDelegate).rootViewController.SidebarController;
 			}
 		}
 
 		//// provide access to the navigation controller to all inheriting controllers
 		protected NavController NavController {
 			get {
-				return (UIApplication.SharedApplication.Delegate as AppDelegate).NavController;
+				//return (UIApplication.SharedApplication.Delegate as AppDelegate).NavController;
+				return (UIApplication.SharedApplication.Delegate as AppDelegate).rootViewController.NavController;
 			}
 		}
 
-		// provide access to the storyboard to all inheriting controllers
-		public override UIStoryboard Storyboard {
-			get {
-				return (UIApplication.SharedApplication.Delegate as AppDelegate).NavController.Storyboard;
-			}
-		}
+		//// provide access to the storyboard to all inheriting controllers
+		//public override UIStoryboard Storyboard {
+		//	get {
+		//		return (UIApplication.SharedApplication.Delegate as AppDelegate).NavController.Storyboard;
+		//	}
+		//}
 
 		public BaseController (IntPtr handle) : base (handle)
 		{
 		}
 		public BaseController ()
+		{
+		}
+		public BaseController (string nibName, NSBundle bundle) : base (nibName, bundle)
 		{
 		}
 
@@ -45,7 +50,15 @@ namespace FavoriteMovies
 					, UIBarButtonItemStyle.Plain
 					, (sender, args) => {
 						SidebarController.ToggleMenu ();
-						
+					//var contentController = new ContentController ();
+					//if (NavController.TopViewController as ContentController == null)
+					//		NavController.PushViewController (contentController, false);
+
+
+					    //if (NavController.table.Hidden)
+						//   NavController.table.Hidden = false;
+						//else
+						//   NavController.table.Hidden = true;
 					}), true);
 		}
 	}

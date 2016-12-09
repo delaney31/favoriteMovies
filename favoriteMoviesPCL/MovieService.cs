@@ -90,6 +90,7 @@ namespace FavoriteMoviesPCL
 		public static async Task<ObservableCollection<Movie>> GetMoviesAsync (MovieType type, int page = 1, int movieId = 0)
 		{
 			var client = new HttpClient ();
+
 			string Url = "";
 
 			switch (type) {

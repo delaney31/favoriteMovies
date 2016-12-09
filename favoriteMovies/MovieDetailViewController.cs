@@ -14,7 +14,7 @@ using UIKit;
 
 namespace FavoriteMovies
 {
-	public class MovieDetailViewController : UIViewController
+	public class MovieDetailViewController : BaseController
 	{
 		
 		UILabel dateOpenView = new UILabel ();
@@ -97,14 +97,14 @@ namespace FavoriteMovies
 
 
 		}
-		void UpdateColor
+
 		public override void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
 			scrollView.Frame = new CGRect () { X = View.Frame.X, Y = View.Frame.Y, Width = View.Frame.Width, Height = View.Frame.Height };
 
 			Initialize ();
-			View.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
+			View.BackgroundColor = backGroundColor;
 			posterImage.Layer.BorderWidth = 1.0f;
 			posterImage.ContentMode = UIViewContentMode.ScaleToFill;
 			posterImage.Frame = new CGRect () { X = 16, Y = 15, Width = 159, Height = 225 };
@@ -112,14 +112,14 @@ namespace FavoriteMovies
 			addReviewButt.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.NAV_BAR_COLOR, 1.0f);
 			addReviewButt.SetTitleColor (UIColor.White, UIControlState.Normal);
 			addReviewButt.Frame = new CGRect (saveFavoriteButt.Frame.X, saveFavoriteButt.Frame.Y - 40, saveFavoriteButt.Frame.Width, saveFavoriteButt.Frame.Height);
-			addReviewButt.Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, 13f);
+			addReviewButt.Font = UIFont.FromName (UIColorExtensions.CONTENT_FONT, UIColorExtensions.CAST_FONT_SIZE);
 			addReviewButt.TouchDown += AddReviewButt_TouchDown;
 			addReviewButt.Frame = new CGRect () { X = 183, Y = 180, Width = 130, Height = 25 };
 
 			saveFavoriteButt.SetTitle ("Add To List", UIControlState.Normal);
 			posterImage.Layer.BorderColor = UIColor.Clear.CGColor;
 			saveFavoriteButt.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.NAV_BAR_COLOR, 1.0f);
-			saveFavoriteButt.Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, 13f);
+			saveFavoriteButt.Font = UIFont.FromName (UIColorExtensions.CONTENT_FONT, UIColorExtensions.CAST_FONT_SIZE);
 			saveFavoriteButt.SetTitleColor (UIColor.White, UIControlState.Normal);
 			saveFavoriteButt.Frame = new CGRect () { X = 183, Y = 215, Width = 130, Height = 25 };
 
@@ -128,25 +128,29 @@ namespace FavoriteMovies
 			posterImage.Image = MovieCell.GetImage (movieDetail.HighResPosterPath);
 
 			movieTitle.Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, 15);
-			movieTitle.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
-			movieTitle.TextColor = UIColor.Black;
+			movieTitle.BackgroundColor = backGroundColor;
+			movieTitle.TextColor =IsDarkColor (backGroundColor) ? UIColor.White : UIColor.Black;
 			movieTitle.Text = movieDetail.Title;
 			movieTitle.Lines = 0;
 			movieTitle.Frame = new CGRect (183, 30, 135, 40);
 
-			dateOpenView.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
-			dateOpenView.Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, 10);
-			dateOpenView.TextColor = UIColor.Black;
+			dateOpenView.BackgroundColor = backGroundColor;
+			dateOpenView.Font = UIFont.FromName (UIColorExtensions.CONTENT_FONT, 11);
+			dateOpenView.TextColor = IsDarkColor (backGroundColor) ? UIColor.White : UIColor.Black;
 			dateOpenView.Text = "Release Date: " + movieDetail.ReleaseDate.Value.ToString ("MM/dd/yyyy",
 				  CultureInfo.InvariantCulture);
-			dateOpenView.Frame = new CGRect  (183, 70, 140, 20);
+			dateOpenView.Frame = new CGRect  (183, 70, 135, 20);
 
 			Userstar1.Frame = new CGRect (183, 115, 20, 20);
 			Userstar2.Frame = new CGRect (203, 115, 20, 20);
 			Userstar3.Frame = new CGRect (223, 115, 20, 20);
 			Userstar4.Frame = new CGRect (243, 115, 20, 20);
 			Userstar5.Frame = new CGRect (263, 115, 20, 20);
-
+			Userstar1.BackgroundColor = backGroundColor;
+			Userstar2.BackgroundColor = backGroundColor;
+			Userstar3.BackgroundColor = backGroundColor;
+			Userstar4.BackgroundColor = backGroundColor;
+			Userstar5.BackgroundColor = backGroundColor;
 			Userstar1.Alpha = .2f;
 			Userstar2.Alpha = .2f;
 			Userstar3.Alpha = .2f;
@@ -202,32 +206,31 @@ namespace FavoriteMovies
 			Userstar5.AddGestureRecognizer (AddStar5);
 
 			userResultText.Text = "Your Rating: " + Convert.ToInt32 (movieDetail.UserRating) + " of 5";
-			userResultText.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
-			userResultText.Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, 13);
-			userResultText.TextColor = UIColor.Black;
+			userResultText.BackgroundColor = backGroundColor;
+			userResultText.Font = UIFont.FromName (UIColorExtensions.CONTENT_FONT, UIColorExtensions.CAST_FONT_SIZE);
+			userResultText.TextColor = IsDarkColor (backGroundColor) ? UIColor.White : UIColor.Black;
 			userResultText.Frame = new CGRect (183, 95, 140, 20);
 
 			IMDB.Frame = new CGRect (183, 145, 30, 30);
 			voteResultText.Text = Convert.ToInt32 (movieDetail.VoteAverage) + " of 10 Stars";
-			voteResultText.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
-			voteResultText.Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, 13);
-			voteResultText.TextColor = UIColor.Black;
+			voteResultText.BackgroundColor = backGroundColor;
+			voteResultText.Font = UIFont.FromName (UIColorExtensions.CONTENT_FONT, UIColorExtensions.CAST_FONT_SIZE);
+			voteResultText.TextColor = IsDarkColor (backGroundColor) ? UIColor.White : UIColor.Black;
 			voteResultText.Frame = new CGRect (215, 155, 110, 20);
 
-			descriptView.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
+			descriptView.BackgroundColor = backGroundColor;
 			descriptView.Text = movieDetail.Overview;
-			descriptView.Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, 12);
-			descriptView.TextColor = UIColor.Black;
-			descriptView.BackgroundColor = UIColor.Clear;
+			descriptView.Font = UIFont.FromName (UIColorExtensions.CONTENT_FONT, UIColorExtensions.CAST_FONT_SIZE);
+			descriptView.TextColor = IsDarkColor (backGroundColor) ? UIColor.White : UIColor.Black;
 			descriptView.Frame = new CGRect  (16, 255, 290, 300); //(int)size.Height+10);
 			descriptView.Lines = 0;
 			descriptView.TextAlignment = UITextAlignment.Justified;
 
 			descriptView.SizeToFit ();
 
-			descReview.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
-			descReview.Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, 12);
-			descReview.TextColor = UIColor.Black;
+			descReview.BackgroundColor = backGroundColor;
+			descReview.Font = UIFont.FromName (UIColorExtensions.CONTENT_FONT, UIColorExtensions.CAST_FONT_SIZE);
+			descReview.TextColor = IsDarkColor(backGroundColor)? UIColor.White: UIColor.Black;
 			descReview.Frame = new CGRect  (16, descriptView.Frame.Y + descriptView.Frame.Height + 30, 300, 100); //(int)size.Height+10);
 			descReview.Lines = 0;
 			descReview.TextAlignment = UITextAlignment.Natural;
@@ -236,7 +239,7 @@ namespace FavoriteMovies
 			descReview.SizeToFit ();
 
 			userName = new UILabel ();
-			userName.TextColor = UIColor.Blue;
+			userName.TextColor = IsDarkColor (backGroundColor) ? UIColor.White : UIColor.Black;
 			userName.Frame = new CGRect () { X = descReview.Frame.X, Y = descReview.Frame.Y - 15 };
 			if (movieDetail.UserReview != null)
 				userName.Text = GetUserName ();
@@ -277,9 +280,16 @@ namespace FavoriteMovies
 		{
 			return "User Review by @tldelaney:";
 		}
-		void updateColor (UIColor newColor)
+		bool IsDarkColor (UIColor newColor)
 		{
 			 nfloat[] componentColors = newColor.CGColor.Components;
+
+			nfloat colorBrightness = ((componentColors[0] * 299) + (componentColors[1] * 587) + 
+				(componentColors[2] * 114))/ 1000;
+			if (colorBrightness < 0.5)
+				return true;
+			else
+				return false;
 		}
 		public override void ViewDidAppear (bool animated)
 		{
@@ -291,8 +301,8 @@ namespace FavoriteMovies
 
 				//similar movies
 				similarMoviesLabel = new UILabel () {
-					TextColor = UIColor.Black, Frame = new CGRect (16, descReview.Frame.Y + descReview.Frame.Height + userName.Frame.Height, 180, 20),
-					BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, 1f),
+					TextColor = IsDarkColor (backGroundColor) ? UIColor.White : UIColor.Black, Frame = new CGRect (16, descReview.Frame.Y + descReview.Frame.Height + userName.Frame.Height, 180, 20),
+					BackgroundColor =backGroundColor,
 					Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, UIColorExtensions.HEADER_FONT_SIZE),
 					Text = "Similar Movies"
 				};
@@ -300,8 +310,8 @@ namespace FavoriteMovies
 					MinimumInteritemSpacing = MinimumInteritemSpacing, MinimumLineSpacing = MinimumLineSpacing,
 					HeaderReferenceSize = HeaderReferenceSize, ItemSize = ItemSize,
 					ScrollDirection = UICollectionViewScrollDirection.Horizontal
-				}, similarMovies);
-				similarMoviesController.CollectionView.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, 1f);
+				}, similarMovies, this.NavController);
+				similarMoviesController.CollectionView.BackgroundColor = backGroundColor;
 				similarMoviesController.CollectionView.RegisterClassForCell (typeof (MovieCell), SimilarCollectionViewController.movieCellId);
 				//similar movies
 				similarMoviesLabel.Frame = new CGRect (16, descReview.Frame.Y + descReview.Frame.Height + userName.Frame.Height, 180, 20);
@@ -328,6 +338,7 @@ namespace FavoriteMovies
 			if (castList.Count > 0) {
 				castHeader.Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, UIColorExtensions.HEADER_FONT_SIZE);
 				castHeader.Text = "Cast";
+				castHeader.TextColor = IsDarkColor (backGroundColor) ? UIColor.White : UIColor.Black;
 				castHeader.SizeToFit ();
 				scrollView.Add (castHeader);
 			}
@@ -338,6 +349,7 @@ namespace FavoriteMovies
 				actorName.Frame = new CGRect () { X = castHeader.Frame.X, Y = castHeader.Frame.Y + 20 + (30 * castCount), Width = 150 };
 				actorName.Font = UIFont.FromName (UIColorExtensions.CONTENT_FONT, UIColorExtensions.CAST_FONT_SIZE);
 				actorName.Text = cast.Actor;
+				actorName.TextColor = IsDarkColor (backGroundColor) ? UIColor.White : UIColor.Black;
 				actorName.Lines = 2;
 				actorName.SizeToFit ();
 
@@ -345,6 +357,7 @@ namespace FavoriteMovies
 				character.Frame = new CGRect () { X = castHeader.Frame.X + 150, Y = castHeader.Frame.Y + 20 + (30 * castCount), Width = 150 };
 				character.Font = UIFont.FromName (UIColorExtensions.CONTENT_FONT, UIColorExtensions.CAST_FONT_SIZE);
 				character.Text = cast.Character;
+				character.TextColor = IsDarkColor (backGroundColor) ? UIColor.White : UIColor.Black;
 				character.TextAlignment = UITextAlignment.Left;
 				character.Lines = 2;
 				character.SizeToFit ();
@@ -370,7 +383,7 @@ namespace FavoriteMovies
 			getSimilarMovies.Wait ();
 
 
-
+			DeleteAllSubviews (scrollView);
 
 			scrollView.AddSubview (dateOpenView);
 			scrollView.AddSubview (descReview);
@@ -414,7 +427,7 @@ namespace FavoriteMovies
 			nfloat scrollViewHeight = 0;
 
 			foreach (var view in scrollView.Subviews) {
-				Debug.Write (view.Frame.X);
+				//Debug.Write (view.Frame.X);
 				//if (view.Frame.X == 16 ||view.Frame.X ==166)
 					scrollViewHeight += view.Frame.Size.Height;
 			}
@@ -474,11 +487,12 @@ namespace FavoriteMovies
 				AutoresizingMask = UIViewAutoresizing.FlexibleHeight | UIViewAutoresizing.FlexibleWidth,
 				BackgroundColor = UIColor.Black,
 			};
+			var viewController = new UIViewController ();
 
 			var sb = new StringBuilder ();
 			sb.Append ("<html><head>");
 			sb.Append ("<style>" +
-			           "body{font-family:Helvetica;font-size:10pt;margin-top:5.67em;}" +
+			           "body{font-family:Helvetica;font-size:10pt}" +
 					  "</style>");
 			sb.Append ("</head>");
 			sb.Append ("<body>");
@@ -489,7 +503,9 @@ namespace FavoriteMovies
 
 			webView.Frame = new CGRect (0, 0, (float)this.View.Frame.Width, (float)this.scrollView.Frame.Height);
 			webView.LoadHtmlString (sb.ToString (), null);
-			this.View.AddSubview (webView);
+			viewController.View.Add (webView);
+			//this.View.AddSubview (webView);
+			NavController.PushViewController (viewController, true);
 
 		}
 
@@ -510,7 +526,7 @@ namespace FavoriteMovies
 					saveFavoriteButt.TouchDown -= PlayVideoButt_TouchDown;
 					saveFavoriteButt.TouchDown += SaveFavoriteButt_TouchDown;
 					saveFavoriteButt.SetTitle ("Save Favorite", UIControlState.Normal);
-					saveFavoriteButt.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.NAV_BAR_COLOR, 1.0f);
+					saveFavoriteButt.BackgroundColor = backGroundColor;
 					saveFavoriteButt.SetTitleColor (UIColor.White, UIControlState.Normal);
 				}
 			} catch (SQLite.SQLiteException) {

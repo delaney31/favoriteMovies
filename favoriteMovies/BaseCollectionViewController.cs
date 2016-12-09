@@ -12,19 +12,57 @@ namespace FavoriteMovies
  /// This is the View Controller for the scrollable movies under the Now Playing header. It also serves as a base class for the 
  /// Popular movies header
  /// </summary>
+
 	public abstract class BaseCollectionViewController : UICollectionViewController
 	{
 		ObservableCollection<Movie> _items { get; set; }
 		public float FontSize { get; set; }
 		public SizeF ImageViewSize { get; set; }
-		LoadingOverlay loadingOverlay;
+		UINavigationController nav;
 
-		protected BaseCollectionViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies) : base (layout)
+		protected BaseCollectionViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies, UINavigationController nav) : base (layout)
 		{
 			_items = movies;
+			this.nav = nav;
+		}
+
+
+		public override void ViewDidLoad ()
+		{
+			base.ViewDidLoad ();
+
+			var longPress = new UILongPressGestureRecognizer(HandleAction);
+			longPress.MinimumPressDuration = .5f;
+			longPress.DelaysTouchesBegan = true;
+			CollectionView.AddGestureRecognizer (longPress);
+
+
 
 		}
 
+		void HandleAction (UILongPressGestureRecognizer lpgr)
+		{
+			if (lpgr.State != UIGestureRecognizerState.Ended)
+				return;
+
+			var p = lpgr.LocationInView (CollectionView);
+
+			var indexPath = CollectionView.IndexPathForItemAtPoint (p);
+
+			if (indexPath == null)
+				Console.WriteLine ("Could not find index path");
+			else 
+			{
+				var cell = CollectionView.CellForItem (indexPath);
+				CollectionView.Delete (cell);
+				CollectionView.ReloadData ();
+			}
+
+		//let p = gestureRecognizer.locationInView (self.collectionView)
+
+  //  if let indexPath : NSIndexPath = (self.collectionView?.indexPathForItemAtPoint (p))!{
+  //      //do whatever you need to do
+    	}
 
 
 		public override void ItemSelected (UICollectionView collectionView, NSIndexPath indexPath)
@@ -32,11 +70,13 @@ namespace FavoriteMovies
 			try {
 				var row = _items [indexPath.Row];
 				var bounds = UIScreen.MainScreen.Bounds;
-				// show the loading overlay on the UI thread using the correct orientation sizing
-				loadingOverlay = new LoadingOverlay (bounds);
-				View.Add (loadingOverlay);
-				((UINavigationController)(UIApplication.SharedApplication.Delegate as AppDelegate).Window.RootViewController).PushViewController (new MovieDetailViewController (row, false), true);
-				loadingOverlay.Hide ();
+				//// show the loading overlay on the UI thread using the correct orientation sizing
+				//loadingOverlay = new LoadingOverlay (bounds);
+				//View.Add (loadingOverlay);
+				nav.PushViewController (new MovieDetailViewController (row, false), true);
+				//this.ParentViewController.NavigationController.PushViewController(new MovieDetailViewController (row, false), true);
+
+				//loadingOverlay.Hide ();
 			} catch (Exception e) {
 				Debug.WriteLine (e.Message);
 			}
@@ -45,6 +85,8 @@ namespace FavoriteMovies
 
 
 	}
+
+
 	/// <summary>
 	/// This is the view controller for the Popular Movies scrollable list of movies
 	/// </summary>
@@ -52,7 +94,7 @@ namespace FavoriteMovies
 	{
 		ObservableCollection<Movie> _items { get; set; }
 		public static NSString movieCellId = new NSString ("PopularPlayingMovieCell");
-		public PopularCollectionViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies) : base (layout, movies)
+		public PopularCollectionViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies, UINavigationController nav) : base (layout, movies, nav)
 		{
 			_items = movies;
 		}
@@ -72,7 +114,7 @@ namespace FavoriteMovies
 		}
 		public override nint GetItemsCount (UICollectionView collectionView, nint section)
 		{
-			return _items.Count;
+			return (_items !=null?_items.Count:0);
 		}
 
 	}
@@ -84,14 +126,14 @@ namespace FavoriteMovies
 	{
 		ObservableCollection<Movie> _items { get; set; }
 		public static NSString movieCellId = new NSString ("TopRatedMovieCell");
-		public TopRatedCollectionViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies) : base (layout, movies)
+		public TopRatedCollectionViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies, UINavigationController nav) : base (layout, movies, nav)
 		{
 			_items = movies;
 		}
 
 		public override nint GetItemsCount (UICollectionView collectionView, nint section)
 		{
-			return _items.Count;
+			return (_items!=null?_items.Count:0);
 		}
 		public override UICollectionViewCell GetCell (UICollectionView collectionView, NSIndexPath indexPath)
 		{
@@ -103,7 +145,7 @@ namespace FavoriteMovies
 				return cell;
 			} catch (Exception e) {
 				Debug.WriteLine (e.Message);
-
+				Console.WriteLine (e.Message);
 			}
 			return cell;
 		}
@@ -117,10 +159,11 @@ namespace FavoriteMovies
 	{
 		ObservableCollection<Movie> _items { get; set; }
 		public static NSString movieCellId = new NSString ("FavoritesMovieCell");
-
-		public FavoritesViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies) : base (layout, movies)
+		UINavigationController nav;
+		public FavoritesViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies, UINavigationController nav) : base (layout, movies, nav)
 		{
 			_items = movies;
+			this.nav = nav;
 		}
 		protected override void Dispose (bool disposing)
 		{
@@ -154,7 +197,7 @@ namespace FavoriteMovies
 			try {
 				var row = _items [indexPath.Row];
 				//MainViewController.OldCustomListToRefresh = this.Row;
-				((UINavigationController)(UIApplication.SharedApplication.Delegate as AppDelegate).Window.RootViewController).PushViewController (new MovieDetailViewController (row, true), true);
+				nav.PushViewController (new MovieDetailViewController (row, true), true);
 
 			} catch (Exception e) {
 				Debug.WriteLine (e.Message);
@@ -165,13 +208,14 @@ namespace FavoriteMovies
 	{
 		ObservableCollection<Movie> _items { get; set; }
 		public static NSString movieCellId = new NSString ("LatestMovieCell");
-		public MovieLatestViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies) : base (layout, movies)
+		public MovieLatestViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies, UINavigationController nav) : base (layout, movies, nav)
 		{
 			_items = movies;
 		}
 		public override nint GetItemsCount (UICollectionView collectionView, nint section)
 		{
-			return _items.Count;
+
+			return (_items != null?_items.Count:0);
 		}
 		public override UICollectionViewCell GetCell (UICollectionView collectionView, NSIndexPath indexPath)
 		{
@@ -194,13 +238,13 @@ namespace FavoriteMovies
 	{
 		ObservableCollection<Movie> _items { get; set; }
 		public static NSString movieCellId = new NSString ("NowPlayingMovieCell");
-		public NowPlayingCollectionViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies) : base (layout, movies)
+		public NowPlayingCollectionViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies, UINavigationController nav) : base (layout, movies, nav)
 		{
 			_items = movies;
 		}
 		public override nint GetItemsCount (UICollectionView collectionView, nint section)
 		{
-			return _items.Count;
+			return (_items!=null?_items.Count:0);
 		}
 		public override UICollectionViewCell GetCell (UICollectionView collectionView, NSIndexPath indexPath)
 		{
@@ -222,13 +266,13 @@ namespace FavoriteMovies
 	{
 		ObservableCollection<Movie> _items { get; set; }
 		public static NSString movieCellId = new NSString ("SimilarMovieCell");
-		public SimilarCollectionViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies) : base (layout, movies)
+		public SimilarCollectionViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies, UINavigationController nav) : base (layout, movies, nav)
 		{
 			_items = movies;
 		}
 		public override nint GetItemsCount (UICollectionView collectionView, nint section)
 		{
-			return _items.Count;
+			return (_items!=null?_items.Count:0);
 		}
 		public override UICollectionViewCell GetCell (UICollectionView collectionView, NSIndexPath indexPath)
 		{

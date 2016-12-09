@@ -31,7 +31,7 @@
     <CodesignProvision>6ef5b5fb-c259-4bb1-bfa1-57abe71923ba</CodesignProvision>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
-    <DebugType>pdbonly</DebugType>
+    <DebugType></DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\iPhone\Release</OutputPath>
     <ErrorReport>prompt</ErrorReport>
@@ -46,6 +46,11 @@
     <MtouchHttpClientHandler>HttpClientHandler</MtouchHttpClientHandler>
     <MtouchTlsProvider>Default</MtouchTlsProvider>
     <PlatformTarget>x86</PlatformTarget>
+    <MtouchDebug>false</MtouchDebug>
+    <MtouchFastDev>true</MtouchFastDev>
+    <MtouchUseLlvm>true</MtouchUseLlvm>
+    <MtouchProfiling>false</MtouchProfiling>
+    <MtouchSdkVersion>10.1</MtouchSdkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
     <DebugType>pdbonly</DebugType>
@@ -61,6 +66,7 @@
     <MtouchHttpClientHandler>HttpClientHandler</MtouchHttpClientHandler>
     <MtouchTlsProvider>Default</MtouchTlsProvider>
     <PlatformTarget>x86</PlatformTarget>
+    <MtouchSdkVersion>10.1</MtouchSdkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhone' ">
     <DebugSymbols>true</DebugSymbols>
@@ -101,6 +107,9 @@
     </Reference>
     <Reference Include="Calabash">
       <HintPath>..\packages\Xamarin.TestCloud.Agent.0.20.3\lib\Xamarin.iOS10\Calabash.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.provider.sqlite3">
+      <HintPath>..\packages\SQLitePCLRaw.provider.sqlite3.ios_unified.1.1.0\lib\Xamarin.iOS10\SQLitePCLRaw.provider.sqlite3.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -143,6 +152,7 @@
     <Compile Include="TableSourceTest.cs" />
     <Compile Include="MovieDetailViewController.cs" />
     <Compile Include="LoadingOverLay.cs" />
+    <Compile Include="SideMenuController.cs" />
   </ItemGroup>
   <ItemGroup>
     <BundleResource Include="Resources\placeholder.png" />
@@ -173,5 +183,4 @@
     </XamarinComponentReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
-  <Import Project="..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
 </Project>

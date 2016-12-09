@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using CoreGraphics;
 using Foundation;
 using SidebarNavigation;
 using UIKit;
@@ -12,10 +13,7 @@ namespace FavoriteMovies
 	{
 		// the sidebar controller for the app
 		public SidebarController SidebarController { get; set; }
-		UITableView table;
-		List<string> tableItems = new List<string> ();
-
-		MenuTableSource tableSource;
+		public ContentController ContentController { get; set; }
 		public NavController () : base ((string)null, null)
 		{
 		}
@@ -32,28 +30,20 @@ namespace FavoriteMovies
 		public override void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
-			table = new UITableView (View.Bounds);
-			table.AutoresizingMask = UIViewAutoresizing.All;
-			tableItems = new List<string> () { "Login", "Connections", "Flic Lists", "Settings" };
-			tableSource = new MenuTableSource (tableItems, this);
-			table.Source = tableSource;
-			View.AddSubview(table);
-			View.SendSubviewToBack (table);
+
+			//View.SendSubviewToBack (table);
 			// Perform any additional setup after loading the view, typically from a nib.
 		}
 
-		public void ShowMenu ()
-		{
-			Add (table);
-		}
+
 	}
 	public class MenuTableSource : UITableViewSource
 	{
 		List<string> tableItems;
 		string cellIdentifier = "TableCell";
-		NavController Owner;
+		ContentController Owner;
 
-		public MenuTableSource (List<string> items, NavController owner)
+		public MenuTableSource (List<string> items, ContentController owner)
 		{
 			tableItems = items;
 			this.Owner = owner;
@@ -76,9 +66,10 @@ namespace FavoriteMovies
 		/// </summary>
 		public override void RowSelected (UITableView tableView, NSIndexPath indexPath)
 		{
-
+			//NavController.table.Hidden = true;
+			//(UIApplication.SharedApplication.Delegate as AppDelegate).NavController.SidebarController.ToggleMenu ();
 			var row = tableItems [indexPath.Row];
-			((UINavigationController)(UIApplication.SharedApplication.Delegate as AppDelegate).Window.RootViewController).PushViewController (new MovieListPickerViewController (null, true), true);
+			(UIApplication.SharedApplication.Delegate as AppDelegate).rootViewController.NavController.PushViewController (new MovieListPickerViewController (null, false), true);
 
 
 			tableView.DeselectRow (indexPath, true);

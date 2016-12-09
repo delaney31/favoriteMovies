@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Threading.Tasks;
@@ -17,33 +17,13 @@ namespace FavoriteMovies
 	{
 		// class-level declarations
 
-		ObservableCollection<Movie> NowPlaying;
-		ObservableCollection<Movie> TopRated;
-		ObservableCollection<Movie> Popular;
-		ObservableCollection<Movie> MovieLatest;
-
-
-		public static int RandomNumber (int min, int max)
-		{
-			Random random = new Random (); return random.Next (min, max);
-
-		}
-
 		public RootViewController rootViewController { get; private set;}
 		public override UIWindow Window {
 			get;
 			set;
 		}
 
-		// the sidebar controller for the app
-		//public MenuController menuController { get; private set; }
 
-		// the sidebar controller for the app
-		public SidebarController SidebarController { get; private set; }
-
-		// the navigation controller
-		public NavController NavController { get; private set; }
-	
 		public override bool FinishedLaunching (UIApplication application, NSDictionary launchOptions)
 		{
 			// Override point for customization after application launch.
@@ -54,42 +34,11 @@ namespace FavoriteMovies
 			Window.MakeKeyAndVisible ();
 			MovieService.Database = Path.Combine (FileHelper.GetLocalStoragePath (), "MovieEntries.db3");
 
-			var Page = RandomNumber (1, 50);
-
-			var task = Task.Run (async () => {
-				 NowPlaying = await MovieService.GetMoviesAsync (MovieService.MovieType.NowPlaying, 1);
-				 TopRated = await MovieService.GetMoviesAsync (MovieService.MovieType.TopRated, Page);
-				 Popular = await MovieService.GetMoviesAsync (MovieService.MovieType.Popular, Page);
-				 MovieLatest = await MovieService.GetMoviesAsync (MovieService.MovieType.Upcoming, Page);
-				//TVNowAiring = await MovieService.GetMoviesAsync (MovieService.MovieType.TVLatest, Page);
-			});
-			task.Wait ();
-
-
-
-			NavController = new NavController ();
-
-			NavController.NavigationBar.BarTintColor = UIColor.Clear.FromHexString (UIColorExtensions.NAV_BAR_COLOR, 1.0f);
-			NavController.View.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
-			NavController.NavigationBar.TintColor = UIColor.White;
-			NavController.NavigationBar.Translucent = true;
-			NavController.NavigationBar.TitleTextAttributes = new UIStringAttributes () {
-				ForegroundColor = UIColor.White
-			};
-
 			rootViewController = new RootViewController ();
-			var main = new MainViewController (TopRated, NowPlaying, Popular, MovieLatest, Page);
-			var menuController = new MenuController ();
-			SidebarController = new SidebarController (rootViewController, main, menuController);
-			SidebarController.MenuWidth = 260;
-			SidebarController.ReopenOnRotate = false;
-			NavController.SidebarController = SidebarController;
-			NavController.PushViewController (main, false);
-
-			Window.RootViewController = NavController;
 
 
-		
+			Window.RootViewController = rootViewController;
+
 						// Code to start the Xamarin Test Cloud Agent
 			#if ENABLE_TEST_CLOUD
 						Xamarin.Calabash.Start ();
