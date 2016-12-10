@@ -18,12 +18,12 @@ namespace FavoriteMovies
 		ObservableCollection<Movie> _items { get; set; }
 		public float FontSize { get; set; }
 		public SizeF ImageViewSize { get; set; }
-		UINavigationController nav;
+		UIViewController viewController;
 
-		protected BaseCollectionViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies, UINavigationController nav) : base (layout)
+		protected BaseCollectionViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies, UIViewController vc) : base (layout)
 		{
 			_items = movies;
-			this.nav = nav;
+			this.viewController = vc;
 		}
 
 
@@ -32,7 +32,7 @@ namespace FavoriteMovies
 			base.ViewDidLoad ();
 
 			var longPress = new UILongPressGestureRecognizer(HandleAction);
-			longPress.MinimumPressDuration = .5f;
+			//longPress.MinimumPressDuration = .5f;
 			longPress.DelaysTouchesBegan = true;
 			CollectionView.AddGestureRecognizer (longPress);
 
@@ -53,16 +53,25 @@ namespace FavoriteMovies
 				Console.WriteLine ("Could not find index path");
 			else 
 			{
-				var cell = CollectionView.CellForItem (indexPath);
-				CollectionView.Delete (cell);
+				MovieListPickerViewController.DeleteAll (_items [indexPath.Row].CustomListID, _items [indexPath.Row].Id);
+				var customListId = _items [indexPath.Row].CustomListID;
+				_items.RemoveAt (indexPath.Row);
+
+				CollectionView.DeleteItems (new NSIndexPath [] { indexPath });
+
+				//cell.RemoveFromSuperview ();
 				CollectionView.ReloadData ();
+
+				if (_items.Count == 0) 
+				{
+					MovieListPickerViewController.DeleteCustomList (customListId);
+					MainViewController.NewCustomListToRefresh = 0;
+					viewController.ViewWillAppear (true);
+				}
+
+
 			}
-
-		//let p = gestureRecognizer.locationInView (self.collectionView)
-
-  //  if let indexPath : NSIndexPath = (self.collectionView?.indexPathForItemAtPoint (p))!{
-  //      //do whatever you need to do
-    	}
+		}
 
 
 		public override void ItemSelected (UICollectionView collectionView, NSIndexPath indexPath)
@@ -73,7 +82,7 @@ namespace FavoriteMovies
 				//// show the loading overlay on the UI thread using the correct orientation sizing
 				//loadingOverlay = new LoadingOverlay (bounds);
 				//View.Add (loadingOverlay);
-				nav.PushViewController (new MovieDetailViewController (row, false), true);
+				viewController.NavigationController.PushViewController (new MovieDetailViewController (row, false), true);
 				//this.ParentViewController.NavigationController.PushViewController(new MovieDetailViewController (row, false), true);
 
 				//loadingOverlay.Hide ();
@@ -94,7 +103,7 @@ namespace FavoriteMovies
 	{
 		ObservableCollection<Movie> _items { get; set; }
 		public static NSString movieCellId = new NSString ("PopularPlayingMovieCell");
-		public PopularCollectionViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies, UINavigationController nav) : base (layout, movies, nav)
+		public PopularCollectionViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies, UIViewController vc) : base (layout, movies, vc)
 		{
 			_items = movies;
 		}
@@ -126,7 +135,7 @@ namespace FavoriteMovies
 	{
 		ObservableCollection<Movie> _items { get; set; }
 		public static NSString movieCellId = new NSString ("TopRatedMovieCell");
-		public TopRatedCollectionViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies, UINavigationController nav) : base (layout, movies, nav)
+		public TopRatedCollectionViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies, UIViewController vc) : base (layout, movies, vc)
 		{
 			_items = movies;
 		}
@@ -159,11 +168,11 @@ namespace FavoriteMovies
 	{
 		ObservableCollection<Movie> _items { get; set; }
 		public static NSString movieCellId = new NSString ("FavoritesMovieCell");
-		UINavigationController nav;
-		public FavoritesViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies, UINavigationController nav) : base (layout, movies, nav)
+		UIViewController viewController;
+		public FavoritesViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies, UIViewController vc) : base (layout, movies, vc)
 		{
 			_items = movies;
-			this.nav = nav;
+			this.viewController = vc;
 		}
 		protected override void Dispose (bool disposing)
 		{
@@ -197,7 +206,7 @@ namespace FavoriteMovies
 			try {
 				var row = _items [indexPath.Row];
 				//MainViewController.OldCustomListToRefresh = this.Row;
-				nav.PushViewController (new MovieDetailViewController (row, true), true);
+				viewController.NavigationController.PushViewController (new MovieDetailViewController (row, true), true);
 
 			} catch (Exception e) {
 				Debug.WriteLine (e.Message);
@@ -208,7 +217,7 @@ namespace FavoriteMovies
 	{
 		ObservableCollection<Movie> _items { get; set; }
 		public static NSString movieCellId = new NSString ("LatestMovieCell");
-		public MovieLatestViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies, UINavigationController nav) : base (layout, movies, nav)
+		public MovieLatestViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies, UIViewController vc) : base (layout, movies, vc)
 		{
 			_items = movies;
 		}
@@ -238,7 +247,7 @@ namespace FavoriteMovies
 	{
 		ObservableCollection<Movie> _items { get; set; }
 		public static NSString movieCellId = new NSString ("NowPlayingMovieCell");
-		public NowPlayingCollectionViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies, UINavigationController nav) : base (layout, movies, nav)
+		public NowPlayingCollectionViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies, UIViewController vc) : base (layout, movies, vc)
 		{
 			_items = movies;
 		}
@@ -266,7 +275,7 @@ namespace FavoriteMovies
 	{
 		ObservableCollection<Movie> _items { get; set; }
 		public static NSString movieCellId = new NSString ("SimilarMovieCell");
-		public SimilarCollectionViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies, UINavigationController nav) : base (layout, movies, nav)
+		public SimilarCollectionViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies, UIViewController vc) : base (layout, movies, vc)
 		{
 			_items = movies;
 		}

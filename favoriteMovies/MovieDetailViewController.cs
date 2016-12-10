@@ -310,7 +310,7 @@ namespace FavoriteMovies
 					MinimumInteritemSpacing = MinimumInteritemSpacing, MinimumLineSpacing = MinimumLineSpacing,
 					HeaderReferenceSize = HeaderReferenceSize, ItemSize = ItemSize,
 					ScrollDirection = UICollectionViewScrollDirection.Horizontal
-				}, similarMovies, this.NavController);
+				}, similarMovies, this);
 				similarMoviesController.CollectionView.BackgroundColor = backGroundColor;
 				similarMoviesController.CollectionView.RegisterClassForCell (typeof (MovieCell), SimilarCollectionViewController.movieCellId);
 				//similar movies

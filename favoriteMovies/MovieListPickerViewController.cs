@@ -78,7 +78,7 @@ namespace FavoriteMovies
 				Debug.Write (s.Message);
 			}
 		}
-		public void DeleteAll ()
+		public static  void DeleteAll ()
 		{
 			try {
 				using (var db = new SQLite.SQLiteConnection (MovieService.Database)) {
@@ -92,7 +92,7 @@ namespace FavoriteMovies
 			}
 		}
 
-		void DeleteAll (int? CustomId, int id)
+		public static void DeleteAll (int? CustomId, int id)
 		{
 			
 			try {
@@ -107,6 +107,22 @@ namespace FavoriteMovies
 				Debug.Write (e.Message);
 			}
 
+		}
+
+		public static void DeleteCustomList (int? CustomId)
+		{
+
+			try {
+				using (var db = new SQLite.SQLiteConnection (MovieService.Database)) {
+					// there is a sqllite bug here https://forums.xamarin.com/discussion/52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
+					db.Query<Movie> ("DELETE FROM [CustomList] WHERE [ID] = " + CustomId);
+
+
+				}
+			} catch (SQLite.SQLiteException e) {
+				//first time in no favorites yet.
+				Debug.Write (e.Message);
+			}
 
 		}
 		public void UpdateCustomAndMovieList (CustomList listItem, bool upDateMovieDetail)
@@ -361,7 +377,7 @@ namespace FavoriteMovies
 			{
 				Owner.UpdateCustomAndMovieList (tableItems [(int)tableView.NumberOfRowsInSection (0)-1], false);
 			} else
-				Owner.DeleteAll ();
+				MovieListPickerViewController.DeleteAll ();
 		}
 
 		public override NSIndexPath CustomizeMoveTarget (UITableView tableView, NSIndexPath sourceIndexPath, NSIndexPath proposedIndexPath)
@@ -496,7 +512,8 @@ namespace FavoriteMovies
 				ArrangeCustomList (true);
 				Owner.UpdateCustomAndMovieList (tableItems [indexPath.Row], Owner.fromAddList);
 				Owner.NavigationController.PopToRootViewController (true);
-				MainViewController.NewCustomListToRefresh = indexPath.Row;
+				MainViewController.NewCustomListToRefresh = 0;
+
 			}
 			tableView.DeselectRow (indexPath, true);
 		}

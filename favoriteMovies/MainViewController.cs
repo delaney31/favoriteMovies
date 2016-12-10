@@ -32,7 +32,7 @@ namespace FavoriteMovies
 		static int DefaultYPositionMovieLatestController = 555;
 		public static int NewCustomListToRefresh =-1;
 		//public static int OldCustomListToRefresh;
-		static CGSize ItemSize = new CGSize (100, 150);
+		static CGSize ItemSize = new CGSize (100,150);
 		static CGRect FavoriteLabelFrame = new CGRect (7, 10, 180, 20);
 		static CGRect TopRatedLabelFrame = new CGRect (7, 185, 180, 20);
 		static CGRect NowPlayingLabelFrame = new CGRect (7, 360, 180, 20);
@@ -142,7 +142,7 @@ namespace FavoriteMovies
 			}
 			////*****this fixes a problem with the uitableview adding space at the top after each selection*****
 			//Debug.Write (searchResultsController.TableView.ContentInset);
-			//searchResultsController.TableView.ContentInset = new UIEdgeInsets (80, 0, 0, 0);
+			searchResultsController.TableView.ContentInset = new UIEdgeInsets (80, 0, 0, 0);
 
 		}
 
@@ -188,7 +188,7 @@ namespace FavoriteMovies
 				MinimumInteritemSpacing = MinimumInteritemSpacing, MinimumLineSpacing = MinimumLineSpacing,
 				HeaderReferenceSize = HeaderReferenceSize, ItemSize = ItemSize,
 				ScrollDirection = UICollectionViewScrollDirection.Horizontal
-			},new ObservableCollection<Movie>(GetMovieList (customLists [cnt]).Reverse ()),this.NavigationController);
+			},new ObservableCollection<Movie>(GetMovieList (customLists [cnt]).Reverse ()),this);
 
 			customControllers [cnt].CollectionView.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha);
 			customControllers [cnt].CollectionView.RegisterClassForCell (typeof (MovieCell), FavoritesViewController.movieCellId);
@@ -206,6 +206,7 @@ namespace FavoriteMovies
 
 		void FavoritesDisplay ()
 		{
+			DeleteAllSubviews (scrollView);
 			customLists = GetCustomLists ();
 			if (customLists.Count == 0) {
 				topRatedController.CollectionView.Frame =new CGRect (TopRatedControllerFrame.X, DefaultYPositionTopRatedController, TopRatedControllerFrame.Width, TopRatedControllerFrame.Height);
@@ -370,7 +371,7 @@ namespace FavoriteMovies
 				MinimumInteritemSpacing = MinimumInteritemSpacing, MinimumLineSpacing = MinimumLineSpacing,
 				HeaderReferenceSize = HeaderReferenceSize, ItemSize = ItemSize,
 				ScrollDirection = UICollectionViewScrollDirection.Horizontal
-			}, topRated, this.NavigationController);
+			}, topRated, this);
 			topRatedController.CollectionView.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha);
 			topRatedController.CollectionView.RegisterClassForCell (typeof (MovieCell), TopRatedCollectionViewController.movieCellId);
 		
@@ -381,7 +382,7 @@ namespace FavoriteMovies
 				MinimumInteritemSpacing = MinimumInteritemSpacing, MinimumLineSpacing = MinimumLineSpacing,
 				HeaderReferenceSize = HeaderReferenceSize, ItemSize = ItemSize,
 				ScrollDirection = UICollectionViewScrollDirection.Horizontal
-			}, nowPlaying, this.NavigationController);
+			}, nowPlaying, this);
 			nowPlayingController.CollectionView.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha);
 			nowPlayingController.CollectionView.RegisterClassForCell (typeof (MovieCell), NowPlayingCollectionViewController.movieCellId);
 
@@ -391,12 +392,12 @@ namespace FavoriteMovies
 				MinimumInteritemSpacing = MinimumInteritemSpacing, MinimumLineSpacing = MinimumLineSpacing,
 				HeaderReferenceSize = HeaderReferenceSize, ItemSize = ItemSize,
 				ScrollDirection = UICollectionViewScrollDirection.Horizontal
-			}, popular, this.NavigationController);
+			}, popular, this);
 			popularController.CollectionView.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha);
 			popularController.CollectionView.RegisterClassForCell (typeof (MovieCell), PopularCollectionViewController.movieCellId);
 
 
-			MovieLatestController = new MovieLatestViewController (flowLayout, MovieLatest, this.NavigationController);
+			MovieLatestController = new MovieLatestViewController (flowLayout, MovieLatest, this);
 			MovieLatestController.CollectionView.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha);
 			MovieLatestController.CollectionView.RegisterClassForCell (typeof (MovieCell), MovieLatestViewController.movieCellId);
 
