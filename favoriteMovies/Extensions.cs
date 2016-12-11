@@ -17,7 +17,7 @@ namespace FavoriteMovies
 		//public const string TAB_BACKGROUND_COLOR = "#000000";//black
 		//public const string TAB_BACKGROUND_COLOR = "#555555"; //grey
 		public const string TAB_BACKGROUND_COLOR = "#FFFFFF"; //white
-		//public const string TAB_BACKGROUND_COLOR = "#d3d3d3"; //light grey
+		public const string PROFILE_BACKGROUND_COLOR = "#4B5F82"; //light grey
 		//public const string TAB_BACKGROUND_COLOR = "#3B3B3B"; //dark grey
 		public const float HEADER_FONT_SIZE = 14f;
 		public const float CAST_FONT_SIZE = 13f;

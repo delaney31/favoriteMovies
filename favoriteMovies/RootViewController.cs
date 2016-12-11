@@ -62,7 +62,7 @@ namespace FavoriteMovies
 			base.ViewDidLoad();
 			// create a slideout navigation controller with the top navigation controller and the menu view controller
 			NavController = new NavController ();
-			NavController.NavigationBar.BarTintColor = UIColor.Clear.FromHexString (UIColorExtensions.NAV_BAR_COLOR, 1.0f);
+			NavController.NavigationBar.BarTintColor= UIColor.Clear.FromHexString (UIColorExtensions.NAV_BAR_COLOR, 1.0f);
 			NavController.View.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 			NavController.NavigationBar.TintColor = UIColor.White;
 			NavController.NavigationBar.Translucent = true;
@@ -73,6 +73,8 @@ namespace FavoriteMovies
 			SidebarController = new SidebarController (this, NavController, new SideMenuController ());
 			SidebarController.MenuWidth = 220;
 			SidebarController.ReopenOnRotate = false;
+
+
 
 		}
 	}

@@ -166,6 +166,18 @@
     <BundleResource Include="Resources\star.png" />
     <BundleResource Include="Resources\imdb.png" />
     <BundleResource Include="Resources\play-468292_640.png" />
+    <BundleResource Include="Resources\images.png" />
+    <BundleResource Include="Resources\1481439966_user.png" />
+    <BundleResource Include="Resources\1481443482_document.png" />
+    <BundleResource Include="Resources\1481444239_Myspace.png" />
+    <BundleResource Include="Resources\1481445346_tools.png" />
+    <BundleResource Include="Resources\1481444239_AddFriends.png" />
+    <BundleResource Include="Resources\profile.png" />
+    <BundleResource Include="Resources\1481450570_05-myhouse.png" />
+    <BundleResource Include="Resources\1481506307_mail.png" />
+    <BundleResource Include="Resources\1481507483_compose.png" />
+    <BundleResource Include="Resources\persona-only-signin-link.png" />
+    <BundleResource Include="Resources\124817-matte-white-square-icon-business-signature1.png" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\favoriteMoviesPCL\favoriteMoviesPCL.csproj">
