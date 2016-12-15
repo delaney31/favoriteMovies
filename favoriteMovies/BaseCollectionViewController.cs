@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Drawing;
+using System.Threading.Tasks;
 using CoreGraphics;
 using FavoriteMoviesPCL;
 using Foundation;
@@ -39,38 +40,56 @@ namespace FavoriteMovies
 
 
 		}
+		public Task<bool> ShowAlert (string title, string message)
+		{
+			var tcs = new TaskCompletionSource<bool> ();
 
-		void HandleAction (UILongPressGestureRecognizer lpgr)
+			UIApplication.SharedApplication.InvokeOnMainThread (new Action (() => {
+				UIAlertView alert = new UIAlertView (title, message, null, NSBundle.MainBundle.LocalizedString ("Cancel", "Cancel"),
+									NSBundle.MainBundle.LocalizedString ("OK", "OK"));
+				alert.Clicked += (sender, buttonArgs) => tcs.SetResult (buttonArgs.ButtonIndex != alert.CancelButtonIndex);
+				alert.Show ();
+			}));
+
+			return tcs.Task;
+		}
+		async void HandleAction (UILongPressGestureRecognizer lpgr)
 		{
 			if (lpgr.State != UIGestureRecognizerState.Ended)
 				return;
 
-			var p = lpgr.LocationInView (CollectionView);
 
-			var indexPath = CollectionView.IndexPathForItemAtPoint (p);
 
-			if (indexPath == null)
-				Console.WriteLine ("Could not find index path");
-			else 
-			{
-				MovieListPickerViewController.DeleteAll (_items [indexPath.Row].CustomListID, _items [indexPath.Row].Id);
-				var customListId = _items [indexPath.Row].CustomListID;
-				_items.RemoveAt (indexPath.Row);
+				var p = lpgr.LocationInView (CollectionView);
 
-				CollectionView.DeleteItems (new NSIndexPath [] { indexPath });
+				var indexPath = CollectionView.IndexPathForItemAtPoint (p);
 
-				//cell.RemoveFromSuperview ();
-				CollectionView.ReloadData ();
+				if (indexPath == null)
+					Console.WriteLine ("Could not find index path");
+				else {
+					MovieListPickerViewController.DeleteAll (_items [indexPath.Row].CustomListID, _items [indexPath.Row].Id);
+					var customListId = _items [indexPath.Row].CustomListID;
 
-				if (_items.Count == 0) 
-				{
-					MovieListPickerViewController.DeleteCustomList (customListId);
-					MainViewController.NewCustomListToRefresh = 0;
-					viewController.ViewWillAppear (true);
+					bool accepted = await ShowAlert ("Confirm", "Are you sure you want to delete this movie?");
+					Console.WriteLine ("Selected button {0}", accepted ? "Accepted" : "Canceled");
+					if (accepted) 
+					{
+						_items.RemoveAt (indexPath.Row);
+
+						CollectionView.DeleteItems (new NSIndexPath [] { indexPath });
+
+						//cell.RemoveFromSuperview ();
+						CollectionView.ReloadData ();
+					}
+					if (_items.Count == 0) 
+					{
+						MovieListPickerViewController.DeleteCustomList (customListId);
+						MainViewController.NewCustomListToRefresh = 0;
+						viewController.ViewWillAppear (true);
+					}
+
 				}
 
-
-			}
 		}
 
 

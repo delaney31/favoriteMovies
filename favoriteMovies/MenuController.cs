@@ -18,7 +18,6 @@ namespace FavoriteMovies
 		{
 			base.ViewDidLoad ();
 
-			//var contentController = (ContentController)Storyboard.InstantiateViewController ("ContentController");
 			var contentController = new ContentController ();
 			contentController.ContentButton.TouchUpInside += (o, e) => {
 				if (NavController.TopViewController as ContentController == null)

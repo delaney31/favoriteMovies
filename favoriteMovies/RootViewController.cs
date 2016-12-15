@@ -72,7 +72,9 @@ namespace FavoriteMovies
 			NavController.PushViewController (new MainViewController (TopRated, NowPlaying, Popular, MovieLatest,Page), false);
 			SidebarController = new SidebarController (this, NavController, new SideMenuController ());
 			SidebarController.MenuWidth = 220;
+			SidebarController.MenuLocation = SidebarController.MenuLocations.Right;
 			SidebarController.ReopenOnRotate = false;
+			SidebarController.HasShadowing = true;
 
 
 

@@ -50,15 +50,7 @@ namespace FavoriteMovies
 					, UIBarButtonItemStyle.Plain
 					, (sender, args) => {
 						SidebarController.ToggleMenu ();
-					//var contentController = new ContentController ();
-					//if (NavController.TopViewController as ContentController == null)
-					//		NavController.PushViewController (contentController, false);
 
-
-					    //if (NavController.table.Hidden)
-						//   NavController.table.Hidden = false;
-						//else
-						//   NavController.table.Hidden = true;
 					}), true);
 		}
 	}

@@ -35,9 +35,27 @@ namespace FavoriteMovies
 			MovieService.Database = Path.Combine (FileHelper.GetLocalStoragePath (), "MovieEntries.db3");
 
 			rootViewController = new RootViewController ();
-
-
+			var settings = UIUserNotificationSettings.GetSettingsForTypes (
+  			UIUserNotificationType.Alert | UIUserNotificationType.Badge | UIUserNotificationType.Sound
+  			, null);
+			UIApplication.SharedApplication.RegisterUserNotificationSettings (settings);
+		
+			UIApplication.SharedApplication.ApplicationIconBadgeNumber = 0;
 			Window.RootViewController = rootViewController;
+			// check for a local notification
+			if (launchOptions != null) {
+				if (launchOptions.ContainsKey (UIApplication.LaunchOptionsLocalNotificationKey)) {
+					var localNotification = launchOptions [UIApplication.LaunchOptionsLocalNotificationKey] as UILocalNotification;
+					if (localNotification != null) {
+						UIAlertController okayAlertController = UIAlertController.Create (localNotification.AlertAction, localNotification.AlertBody, UIAlertControllerStyle.Alert);
+						okayAlertController.AddAction (UIAlertAction.Create ("OK", UIAlertActionStyle.Default, null));
+						rootViewController.PresentViewController (okayAlertController, true, null);
+
+						// reset our badge
+						UIApplication.SharedApplication.ApplicationIconBadgeNumber = 0;
+					}
+				}
+			}
 
 						// Code to start the Xamarin Test Cloud Agent
 			#if ENABLE_TEST_CLOUD
@@ -74,7 +92,9 @@ namespace FavoriteMovies
 		{
 			// Restart any tasks that were paused (or not yet started) while the application was inactive. 
 			// If the application was previously in the background, optionally refresh the user interface.
-}
+
+
+		}
 
 		public override void WillTerminate (UIApplication application)
 		{
@@ -90,21 +110,21 @@ namespace FavoriteMovies
 	{
 		// the sidebar controller for the app
 		public SidebarController SidebarController { get; private set; }
-		private UIStoryboard _storyboard;
+
 		// the navigation controller
 		public NavController NavController { get; private set; }
 
 
-		public override bool ShouldAutorotate ()
-		{
-			return this.VisibleViewController.ShouldAutorotate (); ;
+		//public override bool ShouldAutorotate ()
+		//{
+		//	return this.VisibleViewController.ShouldAutorotate (); ;
 
-		}
+		//}
 
-		public override UIInterfaceOrientationMask GetSupportedInterfaceOrientations ()
-		{
-			return this.VisibleViewController.GetSupportedInterfaceOrientations ();
-		}
+		//public override UIInterfaceOrientationMask GetSupportedInterfaceOrientations ()
+		//{
+		//	return this.VisibleViewController.GetSupportedInterfaceOrientations ();
+		//}
 
 		public override void ViewDidLoad ()
 		{

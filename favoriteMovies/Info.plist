@@ -31,6 +31,6 @@
 	<key>XSLaunchImageAssets</key>
 	<string>Assets.xcassets/LaunchImage.launchimage</string>
 	<key>CFBundleName</key>
-	<string>Movie Share</string>
+	<string>Movie Friends</string>
 </dict>
 </plist>

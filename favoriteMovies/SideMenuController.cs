@@ -10,8 +10,9 @@ namespace FavoriteMovies
 		public static UIImage signUpImage;
 		public SideMenuController() : base(null, null)
 		{
-			signUpImage = UIImage.FromBundle ("124817-matte-white-square-icon-business-signature1.png");
+			//signUpImage = UIImage.FromBundle ("124817-matte-white-square-icon-business-signature1.png");
 			//signUpImage = UIImage.FromBundle ("profile.png");
+			signUpImage = UIImage.FromBundle ("1481507483_compose.png");
 		}
 
 
@@ -27,14 +28,18 @@ namespace FavoriteMovies
 			//userProfileImage.Layer.BorderWidth = 2;
 			userProfileImage.Layer.CornerRadius = userProfileImage.Frame.Size.Width / 2;
 			userProfileImage.Layer.MasksToBounds = true;
-			var title = new UILabel(new RectangleF(10, 220, 192, 20));
+			var title = new UIButton(new RectangleF(10, 220, 192, 20));
 			title.Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, 20);
 			////title.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.NAV_BAR_COLOR, 1.0f);
-			title.TextAlignment = UITextAlignment.Center;
+			title.HorizontalAlignment = UIControlContentHorizontalAlignment.Center;
 			//title.Font = UIFont.FromName (UIColorExtensions.CONTENT_FONT, 15);
-			title.TextColor = UIColor.White;
-			title.Text = "Unknown";
-			title.Lines = 2;
+			title.SetTitleColor (UIColor.White, UIControlState.Normal);
+			title.SetTitle ("Sign-In/ Sign-Up", UIControlState.Normal);
+			//title.Lines = 2;
+			title.TouchUpInside += (sender, e) => {
+				NavController.PopToRootViewController (false);
+				SidebarController.CloseMenu ();
+			};
 
 			UIImageView profileImage = new UIImageView () { Image = UIImage.FromBundle ("1481450570_05-myhouse.png")};
 			profileImage.Frame = new RectangleF (50, 275, 25, 30);
