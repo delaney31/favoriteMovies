@@ -5,13 +5,13 @@ namespace FavoriteMoviesPCL
 {
 
 	[Table ("Movies")]
-	public class Movie 
+	public class Movie :ICustomList
 	{
-		public string Title { get; set; }
+		public string Name { get; set; }
 		public string HighResPosterPath { get; set; }
 		public string PosterPath { get; set; }
 		[PrimaryKey]
-		public int Id { get; set; }
+		public int ?Id { get; set; }
 		public int? CustomListID { get; set;}
 		public string Overview { get; set; }
 		public double VoteCount { get; set; }
@@ -27,6 +27,8 @@ namespace FavoriteMoviesPCL
 		public bool Video { get; set; }
 		public string UserReview { get; set; }
 		public int UserRating{ get; set; }
+		[AutoIncrement]
+		public int Order { get; set; }
 
 	}
 	public class MoviePOCO
@@ -34,7 +36,7 @@ namespace FavoriteMoviesPCL
 		public string Id { get; set; }
 	}
 	[Table ("CustomList")]
-	public class CustomList
+	public class CustomList:ICustomList
 	{
 		[PrimaryKey, AutoIncrement]
 		public int? Id { get; set; }

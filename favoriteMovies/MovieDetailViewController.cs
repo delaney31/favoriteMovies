@@ -130,7 +130,7 @@ namespace FavoriteMovies
 			movieTitle.Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, 15);
 			movieTitle.BackgroundColor = backGroundColor;
 			movieTitle.TextColor =IsDarkColor (backGroundColor) ? UIColor.White : UIColor.Black;
-			movieTitle.Text = movieDetail.Title;
+			movieTitle.Text = movieDetail.Name;
 			movieTitle.Lines = 0;
 			movieTitle.Frame = new CGRect (183, 30, 135, 40);
 
@@ -378,7 +378,7 @@ namespace FavoriteMovies
 
 			_embededMoveId = youtubeMovieId;
 			var getSimilarMovies = Task.Run (async () => {
-				similarMovies = await MovieService.GetMoviesAsync (MovieService.MovieType.Similar, 1, movieDetail.Id);
+				similarMovies = await MovieService.GetMoviesAsync (MovieService.MovieType.Similar, 1, (int)movieDetail.Id);
 			});
 			getSimilarMovies.Wait ();
 
@@ -461,7 +461,7 @@ namespace FavoriteMovies
 			try {
 				using (var db = new SQLite.SQLiteConnection (MovieService.Database)) {
 					// there is a sqllite bug here https://forums.xamarin.com/discussion/52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
-					DeleteAll (item.CustomListID, item.Id);
+					DeleteAll (item.CustomListID, (int)item.Id);
 					db.InsertOrReplace (item, typeof (Movie));
 
 				}
@@ -497,7 +497,7 @@ namespace FavoriteMovies
 			sb.Append ("</head>");
 			sb.Append ("<body>");
 			sb.Append ("<iframe width=\"300\" height=\"250\" src=\"" + _youTubeURl + videoCode + "\" frameborder=\"0\" allowfullscreen></iframe>");
-			sb.Append ("<h4>" + movieDetail.Title + "</h4>");
+			sb.Append ("<h4>" + movieDetail.Name + "</h4>");
 			sb.Append ("<p>" + movieDetail.Overview + "</p>");
 			sb.Append ("</body></html>");
 

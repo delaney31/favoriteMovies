@@ -23,26 +23,27 @@ namespace FavoriteMovies
 		static int MinimumInteritemSpacing = 30;
 		static int SpaceBetweenContainers = 30;
 		static int SeparationBuffer = 20;
+		static int SpaceBetweenListTypes = 50;
 		static int MinimumLineSpacing = 5;
-		static int DefaultYPositionTopRatedController = 30;
 		static int DefaultYPositionTopRatedLabel = 10;
-		static int DefaultYPositionNowPlayingLabel = 215;
-		static int DefaultYPositionPopularLabel = 420;
-		static int DefaultYPositionMovieLatestLabel = 625;
+		static int DefaultYPositionTopRatedController = 30;
+		static int DefaultYPositionNowPlayingLabel = 270;
+		static int DefaultYPositionPopularLabel = 530;
+		static int DefaultYPositionMovieLatestLabel = 790;
 		public static int NewCustomListToRefresh =-1;
 		//public static int OldCustomListToRefresh;
-		static CGSize ItemSize = new CGSize (100,150);
+		static CGSize ItemSize = new CGSize (153,205);
 		static CGRect FavoriteLabelFrame = new CGRect (7, 10, 180, 20);
-		static CGRect TopRatedLabelFrame = new CGRect (7, 185, 180, 20);
-		static CGRect NowPlayingLabelFrame = new CGRect (7, 360, 180, 20);
-		static CGRect PopularLabelFrame = new CGRect (7, 535, 180, 20);
-		static CGRect MovieLatestLabelFrame = new CGRect (7, 710, 180, 20);
-		static int SpaceBetweenLabelsAndFrames = 200;
-		static CGRect FavoriteControllerFrame = new CGRect (-45, 30, 385, 150);
-		static CGRect TopRatedControllerFrame = new CGRect (-45, 205, 385, 150);
-		static CGRect NowPlayingControllerFrame = new CGRect (-45, 380, 385, 150);
-		static CGRect PopularControllerFrame = new CGRect (-45, 555, 385, 150);
-		static CGRect MovieLatestControllerFrame = new CGRect (-45, 730, 385, 150);
+		static CGRect TopRatedLabelFrame = new CGRect (7, 205, 180, 20);
+		static CGRect NowPlayingLabelFrame = new CGRect (7, 400, 180, 20);
+		static CGRect PopularLabelFrame = new CGRect (7, 595, 180, 20);
+		static CGRect MovieLatestLabelFrame = new CGRect (7, 790, 180, 20);
+		static int SpaceBetweenLabelsAndFrames = 245;
+		static CGRect FavoriteControllerFrame = new CGRect (-45, 30, 385, 205);
+		static CGRect TopRatedControllerFrame = new CGRect (-45, 225, 385, 205);
+		static CGRect NowPlayingControllerFrame = new CGRect (-45, 420, 385, 205);
+		static CGRect PopularControllerFrame = new CGRect (-45, 615, 385, 205);
+		static CGRect MovieLatestControllerFrame = new CGRect (-45, 810, 385, 205);
 		const float BackGroundColorAlpha = 1.0f;
 		static string TopRated = "Top Rated";
 		static string NowPlaying = "Now Playing";
@@ -208,8 +209,8 @@ namespace FavoriteMovies
 			DeleteAllSubviews (scrollView);
 			customLists = GetCustomLists ();
 			if (customLists.Count == 0) {
-				topRatedController.CollectionView.Frame =new CGRect (TopRatedControllerFrame.X, DefaultYPositionTopRatedController, TopRatedControllerFrame.Width, TopRatedControllerFrame.Height);
 				TopRatedLabel.Frame = new CGRect (TopRatedLabel.Frame.X, DefaultYPositionTopRatedLabel, TopRatedLabel.Frame.Width, TopRatedLabel.Frame.Height);
+				topRatedController.CollectionView.Frame = new CGRect (TopRatedControllerFrame.X, DefaultYPositionTopRatedController, TopRatedControllerFrame.Width, TopRatedControllerFrame.Height);
 
 				PlayingNowLabel.Frame = new CGRect (PlayingNowLabel.Frame.X, DefaultYPositionNowPlayingLabel, PlayingNowLabel.Frame.Width, PlayingNowLabel.Frame.Height);
 				nowPlayingController.CollectionView.Frame = new CGRect (NowPlayingControllerFrame.X, DefaultYPositionNowPlayingLabel+SeparationBuffer , NowPlayingControllerFrame.Width, NowPlayingControllerFrame.Height);
@@ -244,7 +245,7 @@ namespace FavoriteMovies
 						UpdateCustomListsPosition (cnt);
 						
 					}
-					TopRatedLabel.Frame = new CGRect () { X = TopRatedLabelFrame.X, Y = TopRatedLabelFrame.Y + (SpaceBetweenLabelsAndFrames * (customLists.Count - 1)+ SpaceBetweenContainers+ SeparationBuffer), Height = TopRatedLabelFrame.Height, Width = TopRatedLabelFrame.Width };
+					TopRatedLabel.Frame = new CGRect () { X = TopRatedLabelFrame.X, Y = TopRatedLabelFrame.Y + (SpaceBetweenLabelsAndFrames * (customLists.Count - 1)+ SpaceBetweenContainers+ SeparationBuffer+ SpaceBetweenListTypes), Height = TopRatedLabelFrame.Height, Width = TopRatedLabelFrame.Width };
 					topRatedController.CollectionView.Frame = new CGRect () { X = TopRatedControllerFrame.X, Y = TopRatedLabel.Frame.Y + SeparationBuffer, Height = TopRatedControllerFrame.Height, Width = TopRatedControllerFrame.Width };
 
 					PlayingNowLabel.Frame = new CGRect () { X = NowPlayingLabelFrame.X, Y = topRatedController.CollectionView.Frame.Y +topRatedController.CollectionView.Frame.Height+ SpaceBetweenContainers, Height = NowPlayingLabelFrame.Height, Width = NowPlayingLabelFrame.Width };
@@ -266,6 +267,7 @@ namespace FavoriteMovies
 
 			}
 			NewCustomListToRefresh = -1;
+
 			//For scrolling to work the scrollview Content size has to be bigger than the View.Frame.Height
 			scrollView.ContentSize = new CGSize (View.Frame.Width, MovieLatestController.CollectionView.Frame.Y + MovieLatestController.CollectionView.Frame.Height + SeparationBuffer);
 			scrollView.ContentOffset = new CGPoint (0, -scrollView.ContentInset.Top);
@@ -276,12 +278,13 @@ namespace FavoriteMovies
 		{
 			customLabels [customList].Frame = new CGRect () {
 				X = FavoriteLabelFrame.X,
-				Y = FavoriteLabelFrame.Y + (SpaceBetweenLabelsAndFrames * customList),
+				Y = FavoriteLabelFrame.Y + (SpaceBetweenLabelsAndFrames * customList) + SpaceBetweenContainers   ,
 				Height = FavoriteLabelFrame.Height, Width = FavoriteLabelFrame.Width
 			};
 			customControllers [customList].CollectionView.Frame = new CGRect () {
 				X = FavoriteControllerFrame.X,
-				Y = FavoriteControllerFrame.Y + (SpaceBetweenLabelsAndFrames * customList), Height = FavoriteControllerFrame.Height,
+				Y = customLabels [customList].Frame.Y + 17,// FavoteControllerFrame.Y + (SpaceBetweenLabelsAndFrames * customList)
+			    Height = FavoriteControllerFrame.Height,
 				Width = FavoriteControllerFrame.Width
 			};
 			scrollView.Add(customLabels [customList]);
@@ -299,7 +302,7 @@ namespace FavoriteMovies
 					foreach (var movie in query) {
 						var item = new Movie ();
 						item.Id = movie.Id;
-						item.Title = movie.Title;
+						item.Name = movie.Name;
 						item.BackdropPath = movie.BackdropPath;
 						item.CustomListID = movie.CustomListID;
 						item.Favorite = movie.Favorite;
@@ -312,6 +315,7 @@ namespace FavoriteMovies
 						item.VoteAverage = movie.VoteAverage;
 						item.UserReview = movie.UserReview;
 						item.UserRating = movie.UserRating;
+						item.Order = movie.Order;
 						returnList.Add (item);
 					}
 				}
@@ -543,7 +547,7 @@ namespace FavoriteMovies
 			}
 			if (MovieItems.Count > indexPath.Row) 
 			{
-				cell.TextLabel.Text = MovieItems [indexPath.Row].Title;
+				cell.TextLabel.Text = MovieItems [indexPath.Row].Name;
 				cell.TextLabel.Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, UIColorExtensions.HEADER_FONT_SIZE);
 				cell.DetailTextLabel.Text = MovieItems [indexPath.Row].Overview;
 				cell.ImageView.Image = MovieCell.GetImage (MovieItems [indexPath.Row].PosterPath); // don't use for Value2

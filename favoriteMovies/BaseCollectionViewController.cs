@@ -67,13 +67,14 @@ namespace FavoriteMovies
 				if (indexPath == null)
 					Console.WriteLine ("Could not find index path");
 				else {
-					MovieListPickerViewController.DeleteAll (_items [indexPath.Row].CustomListID, _items [indexPath.Row].Id);
+					
 					var customListId = _items [indexPath.Row].CustomListID;
-
 					bool accepted = await ShowAlert ("Confirm", "Are you sure you want to delete this movie?");
 					Console.WriteLine ("Selected button {0}", accepted ? "Accepted" : "Canceled");
 					if (accepted) 
 					{
+						BaseListViewController.DeleteMovie ((int)_items [indexPath.Row].Id);
+
 						_items.RemoveAt (indexPath.Row);
 
 						CollectionView.DeleteItems (new NSIndexPath [] { indexPath });
@@ -83,7 +84,7 @@ namespace FavoriteMovies
 					}
 					if (_items.Count == 0) 
 					{
-						MovieListPickerViewController.DeleteCustomList (customListId);
+						BaseListViewController.DeleteCustomList (customListId);
 						MainViewController.NewCustomListToRefresh = 0;
 						viewController.ViewWillAppear (true);
 					}
@@ -109,8 +110,6 @@ namespace FavoriteMovies
 				Debug.WriteLine (e.Message);
 			}
 		}
-
-
 
 	}
 
