@@ -59,7 +59,7 @@ namespace FavoriteMovies
 						item.VoteAverage = mov.VoteAverage;
 						item.UserReview = mov.UserReview;
 						item.UserRating = mov.UserRating;
-						item.Order = movie.Order;
+						item.Order = mov.Order;
 						result.Add (item);
 					}
 				}
@@ -77,10 +77,23 @@ namespace FavoriteMovies
 					//52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
 					//	var query = db.Query<CustomList> ("SELECT * FROM CUSTOMLIST");
 					var query = db.Query<Movie> ("SELECT * FROM [Movie] WHERE CustomListID = " + movie.Id + " ORDER BY [Order]");
-					foreach (var list in query) {
+					foreach (var mov in query) {
 						var item = new Movie ();
-						item.Id = list.Id;
-						item.Name = list.Name;
+						item.Id = mov.Id;
+						item.Name = mov.Name;
+						item.BackdropPath = mov.BackdropPath;
+						item.CustomListID = mov.CustomListID;
+						item.Favorite = mov.Favorite;
+						item.HighResPosterPath = mov.HighResPosterPath;
+						item.OriginalLanguage = mov.OriginalLanguage;
+						item.Overview = mov.Overview;
+						item.Popularity = mov.Popularity;
+						item.PosterPath = mov.PosterPath;
+						item.ReleaseDate = mov.ReleaseDate;
+						item.VoteAverage = mov.VoteAverage;
+						item.UserReview = mov.UserReview;
+						item.UserRating = mov.UserRating;
+						item.Order = mov.Order;
 						result.Add (item);
 					}
 

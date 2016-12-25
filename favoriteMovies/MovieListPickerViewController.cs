@@ -20,7 +20,7 @@ namespace FavoriteMovies
 		public override void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
-
+			NavigationItem.Title = "Share Lists";
 		}
 	}
 

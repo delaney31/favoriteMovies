@@ -27,6 +27,7 @@ namespace FavoriteMoviesPCL
 		public bool Video { get; set; }
 		public string UserReview { get; set; }
 		public int UserRating{ get; set; }
+		public bool Shared { get; set; }
 		[AutoIncrement]
 		public int Order { get; set; }
 
@@ -44,6 +45,7 @@ namespace FavoriteMoviesPCL
 		public string Name { get; set; }
 		[AutoIncrement]
 		public int Order { get; set;}
+		public bool Shared { get; set;}
 	}
 
 	public class CastCrew
@@ -51,6 +53,18 @@ namespace FavoriteMoviesPCL
 		public string Character { get; set; }
 		public string Actor { get; set; }
 		public string ProfilePath { get; set; }
+	}
+
+	public class FeedItem
+	{
+		public string Title { get; set; }
+		public string Link { get; set; }
+		public string PubDate { get; set; }
+		public string Creator { get; set; }
+		public string Category { get; set; }
+		public string Description { get; set; }
+		public string Content { get; set; }
+		public string ImageLink { get; set; }
 	}
 }
 

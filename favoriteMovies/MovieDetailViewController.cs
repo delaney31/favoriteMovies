@@ -280,7 +280,7 @@ namespace FavoriteMovies
 		{
 			return "User Review by @tldelaney:";
 		}
-		bool IsDarkColor (UIColor newColor)
+		public static bool IsDarkColor (UIColor newColor)
 		{
 			 nfloat[] componentColors = newColor.CGColor.Components;
 
@@ -310,7 +310,7 @@ namespace FavoriteMovies
 					MinimumInteritemSpacing = MinimumInteritemSpacing, MinimumLineSpacing = MinimumLineSpacing,
 					HeaderReferenceSize = HeaderReferenceSize, ItemSize = ItemSize,
 					ScrollDirection = UICollectionViewScrollDirection.Horizontal
-				}, similarMovies, this);
+				}, similarMovies, NavController);
 				similarMoviesController.CollectionView.BackgroundColor = backGroundColor;
 				similarMoviesController.CollectionView.RegisterClassForCell (typeof (MovieCell), SimilarCollectionViewController.movieCellId);
 				//similar movies

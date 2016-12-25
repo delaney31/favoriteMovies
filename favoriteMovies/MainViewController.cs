@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Web;
 using CoreGraphics;
 using FavoriteMoviesPCL;
 using Foundation;
@@ -44,7 +45,6 @@ namespace FavoriteMovies
 		static CGRect NowPlayingControllerFrame = new CGRect (-45, 420, 385, 205);
 		static CGRect PopularControllerFrame = new CGRect (-45, 615, 385, 205);
 		static CGRect MovieLatestControllerFrame = new CGRect (-45, 810, 385, 205);
-		const float BackGroundColorAlpha = 1.0f;
 		static string TopRated = "Top Rated";
 		static string NowPlaying = "Now Playing";
 		static string Popular = "Popular";
@@ -61,6 +61,7 @@ namespace FavoriteMovies
 		static PopularCollectionViewController popularController;
 		static TopRatedCollectionViewController topRatedController;
 		static MovieLatestViewController MovieLatestController;
+		static SearchResultsViewController searchResultsController;
 		UISearchController searchController;
 		FavoritesViewController [] customControllers;
 		UILabel [] customLabels = null;
@@ -69,7 +70,7 @@ namespace FavoriteMovies
 		static UILabel PopularLabel;
 		static UILabel MovieLatestLabel;
 		static UIScrollView scrollView = new UIScrollView ();
-		static SearchResultsViewController searchResultsController;
+
 
 		public MainViewController (ObservableCollection<Movie> topRated, ObservableCollection<Movie> nowPlaying, ObservableCollection<Movie> popular, ObservableCollection<Movie> movieLatest,int page)
 		{
@@ -127,7 +128,7 @@ namespace FavoriteMovies
 		{
 			base.ViewDidAppear (animated);
 
-		
+			//searchResultsController.TableView.ContentInset = new UIEdgeInsets (80, 0, 0, 0);
 			//HACK until i find out why when you open a movie details and come back the view.height changes.
 			if (View.Frame.Height == 504) 
 			{
@@ -142,7 +143,6 @@ namespace FavoriteMovies
 			}
 			////*****this fixes a problem with the uitableview adding space at the top after each selection*****
 			//Debug.Write (searchResultsController.TableView.ContentInset);
-			searchResultsController.TableView.ContentInset = new UIEdgeInsets (80, 0, 0, 0);
 
 		}
 
@@ -151,8 +151,6 @@ namespace FavoriteMovies
 		{
 			base.ViewWillAppear (animated);
 			SidebarController.Disabled = false;
-
-			((UITextField)searchController.SearchBar.ValueForKey (new NSString ("_searchField"))).ResignFirstResponder ();
 
 			//this fixes problem when coming out of full screen after watching a trailer
 			NavigationController.NavigationBar.Frame = new CGRect () { X = 0, Y = 20, Width = 320, Height = 44 };
@@ -172,7 +170,7 @@ namespace FavoriteMovies
 			scrollView.AddSubview (MovieLatestLabel);
 			scrollView.AddSubview (TopRatedLabel);
 			View.AddSubview (scrollView);
-
+			((UITextField)searchController.SearchBar.ValueForKey (new NSString ("_searchField"))).ResignFirstResponder ();
 		}
 
 		void UpdateCustomListMovies (int cnt)
@@ -188,7 +186,7 @@ namespace FavoriteMovies
 				MinimumInteritemSpacing = MinimumInteritemSpacing, MinimumLineSpacing = MinimumLineSpacing,
 				HeaderReferenceSize = HeaderReferenceSize, ItemSize = ItemSize,
 				ScrollDirection = UICollectionViewScrollDirection.Horizontal
-			},new ObservableCollection<Movie>(GetMovieList (customLists [cnt]).Reverse ()),this);
+			},new ObservableCollection<Movie>(GetMovieList (customLists [cnt]).Reverse ()),NavController);
 
 			customControllers [cnt].CollectionView.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha);
 			customControllers [cnt].CollectionView.RegisterClassForCell (typeof (MovieCell), FavoritesViewController.movieCellId);
@@ -367,18 +365,14 @@ namespace FavoriteMovies
 			TopRatedLabel.Layer.ZPosition = LabelZPosition;
 			PlayingNowLabel.Layer.ZPosition = LabelZPosition;
 			PopularLabel.Layer.ZPosition = LabelZPosition;
-
-			#region   //Setup my movie collection controllers
-
-
 			topRatedController = new TopRatedCollectionViewController (new UICollectionViewFlowLayout () {
 				MinimumInteritemSpacing = MinimumInteritemSpacing, MinimumLineSpacing = MinimumLineSpacing,
 				HeaderReferenceSize = HeaderReferenceSize, ItemSize = ItemSize,
 				ScrollDirection = UICollectionViewScrollDirection.Horizontal
-			}, topRated, this);
+			}, topRated, NavController);
 			topRatedController.CollectionView.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha);
 			topRatedController.CollectionView.RegisterClassForCell (typeof (MovieCell), TopRatedCollectionViewController.movieCellId);
-		
+
 
 			View.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha);
 
@@ -386,7 +380,7 @@ namespace FavoriteMovies
 				MinimumInteritemSpacing = MinimumInteritemSpacing, MinimumLineSpacing = MinimumLineSpacing,
 				HeaderReferenceSize = HeaderReferenceSize, ItemSize = ItemSize,
 				ScrollDirection = UICollectionViewScrollDirection.Horizontal
-			}, nowPlaying, this);
+			}, nowPlaying, NavController);
 			nowPlayingController.CollectionView.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha);
 			nowPlayingController.CollectionView.RegisterClassForCell (typeof (MovieCell), NowPlayingCollectionViewController.movieCellId);
 
@@ -396,12 +390,12 @@ namespace FavoriteMovies
 				MinimumInteritemSpacing = MinimumInteritemSpacing, MinimumLineSpacing = MinimumLineSpacing,
 				HeaderReferenceSize = HeaderReferenceSize, ItemSize = ItemSize,
 				ScrollDirection = UICollectionViewScrollDirection.Horizontal
-			}, popular, this);
+			}, popular, NavController);
 			popularController.CollectionView.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha);
 			popularController.CollectionView.RegisterClassForCell (typeof (MovieCell), PopularCollectionViewController.movieCellId);
 
 
-			MovieLatestController = new MovieLatestViewController (flowLayout, MovieLatest, this);
+			MovieLatestController = new MovieLatestViewController (flowLayout, MovieLatest, NavController);
 			MovieLatestController.CollectionView.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha);
 			MovieLatestController.CollectionView.RegisterClassForCell (typeof (MovieCell), MovieLatestViewController.movieCellId);
 
@@ -415,8 +409,9 @@ namespace FavoriteMovies
 				UpdateCustomListMovies (NewCustomListToRefresh);
 			}
 			FavoritesDisplay ();
+
 			// Creates an instance of a custom View Controller that holds the results
-			searchResultsController = new SearchResultsViewController (NavigationController);
+			searchResultsController = new SearchResultsViewController ();
 
 			//Creates a search controller updater
 			var searchUpdater = new SearchResultsUpdator ();
@@ -426,23 +421,24 @@ namespace FavoriteMovies
 			searchController = new UISearchController (searchResultsController) {
 				SearchResultsUpdater = searchUpdater,
 
-					WeakDelegate = searchUpdater,
-					WeakSearchResultsUpdater = searchUpdater,
+				WeakDelegate = searchUpdater,
+				WeakSearchResultsUpdater = searchUpdater,
 			};
 
 			searchResultsController.searchController = searchController;
 
 			//format the search bar
 			searchController.SearchBar.SizeToFit ();
-			searchController.SearchBar.SearchBarStyle = UISearchBarStyle.Minimal;
+			searchController.SearchBar.SearchBarStyle = UISearchBarStyle.Prominent;
 			searchController.SearchBar.Placeholder = "Find a movie";
-			
+
 			//searchResultsController.TableView.WeakDelegate = this;
 			searchController.SearchBar.WeakDelegate = searchResultsController;
 
 			((UITextField)searchController.SearchBar.ValueForKey (new NSString ("_searchField"))).TextColor = UIColor.White;
 			((UITextField)searchController.SearchBar.ValueForKey (new NSString ("_searchField"))).Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, UIColorExtensions.HEADER_FONT_SIZE);
 			((UITextField)searchController.SearchBar.ValueForKey (new NSString ("_searchField"))).BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.NAV_BAR_COLOR, BackGroundColorAlpha);
+
 			//the search bar is contained in the navigation bar, so it should be visible
 			searchController.HidesNavigationBarDuringPresentation = false;
 
@@ -450,12 +446,11 @@ namespace FavoriteMovies
 			DefinesPresentationContext = true;
 
 			//Set the search bar in the navigation bar
-			NavigationItem.TitleView = searchController.SearchBar;
-
-
-			#endregion
+			TabController.NavigationItem.TitleView = searchController.SearchBar;
 
 		}
+
+	
 
 		ObservableCollection<CustomList> GetCustomLists ()
 		{
@@ -488,109 +483,6 @@ namespace FavoriteMovies
 			base.ViewWillDisappear (animated);
 		}
 	}
-	public class SearchResultsUpdator : UISearchResultsUpdating
-	{
-		public event Action<string> UpdateSearchResults = delegate { };
-
-		public override void UpdateSearchResultsForSearchController (UISearchController searchController)
-		{
-			this.UpdateSearchResults (searchController.SearchBar.Text);
-
-		}
-	}
-	public class SearchResultsViewController : UITableViewController
-	{
-		static readonly string movieItemCellId = "movieItemCellId";
-		public UISearchController searchController;
-		UINavigationController navController;
-		public ObservableCollection<Movie> MovieItems { get; set; }
-
-		 [Export ("scrollViewWillEndDragging:withVelocity:targetContentOffset:")]
-		public void WillEndDragging (UIScrollView scrollView, CGPoint velocity, ref CGPoint targetContentOffset)
-		{
-			((UITextField)searchController.SearchBar.ValueForKey (new NSString ("_searchField"))).ResignFirstResponder ();
-		}
-
-		[Export ("searchBarCancelButtonClicked:")]
-		public void searchBarCancelButtonClicked (UISearchBar searchBar)
-		{
-			Console.WriteLine ("The default search bar cancel button was tapped.");
-			//var size = ((UIScrollView)navigationController.TopViewController.View.Subviews [0]).ContentSize;
-
-			searchBar.ResignFirstResponder ();
-
-			MovieItems.Clear ();
-			TableView.ReloadData ();
-		}
-
-
-		public SearchResultsViewController (UINavigationController navigationController)
-		{
-			MovieItems = new ObservableCollection<Movie> ();
-			navController = navigationController;
-	
-		}
-
-
-		public override nint RowsInSection (UITableView tableView, nint section)
-		{
-			return MovieItems.Count;
-		}
-
-		public override UITableViewCell GetCell (UITableView tableView, NSIndexPath indexPath)
-		{
-			var cell = tableView.DequeueReusableCell (movieItemCellId);
-
-			if (cell == null) 
-			{
-				cell = new UITableViewCell (UITableViewCellStyle.Subtitle, movieItemCellId);
-			}
-			if (MovieItems.Count > indexPath.Row) 
-			{
-				cell.TextLabel.Text = MovieItems [indexPath.Row].Name;
-				cell.TextLabel.Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, UIColorExtensions.HEADER_FONT_SIZE);
-				cell.DetailTextLabel.Text = MovieItems [indexPath.Row].Overview;
-				cell.ImageView.Image = MovieCell.GetImage (MovieItems [indexPath.Row].PosterPath); // don't use for Value2
-			}
-			return cell;
-		}
-
-		public override void RowSelected (UITableView tableView, NSIndexPath indexPath)
-		{
-			try {
-				
-				var row = MovieItems [indexPath.Row];
-
-				navController.PushViewController (new MovieDetailViewController (row, false), true);
-
-				//*****this fixes a problem with the uitableview adding space at the top after each selection*****
-
-				Debug.Write (this.TableView.ContentInset);
-				this.TableView.ContentInset = new UIEdgeInsets (80, 0, 0, 0);
-
-
-			} catch (Exception e) 
-			{
-				Debug.WriteLine (e.Message);
-			}
-		}
-
-		public async void Search (string forSearchString)
-		{
-			try {
-				// perform search
-				if (forSearchString.Length > 0) {
-					MovieItems = await MovieService.MovieSearch (forSearchString);
-					TableView.ReloadData ();
-				}
-			} catch (Exception ex) 
-			{
-				Debug.WriteLine (ex.Message);
-			}
-
-		}
-	}
-
 
 	public class MovieCell : UICollectionViewCell
 	{
@@ -631,19 +523,46 @@ namespace FavoriteMovies
 				Debug.Write (ex.Message);
 			}
 		}
-
-		public static UIImage GetImage (string posterPath)
+		public static UIImage GetImageUrl (string posterPath)
 		{
-			if (posterPath != null) {
+			if (posterPath != null) 
+			{
 				var uri = new Uri (posterPath);
-				using (var imgUrl = new NSUrl (baseUrl + uri.AbsoluteUri.Substring (8))) {
-					using (var data = NSData.FromUrl (imgUrl)) {
+				using (var imgUrl = new NSUrl (HttpUtility.UrlPathEncode (uri.AbsoluteUri)))
+				{
+					using (var data = NSData.FromUrl (imgUrl)) 
+					{
 						return (UIImage.LoadFromData (data));
 					}
 				}
 			} else {
 				return UIImage.FromBundle ("blank.png");
 			}
+
+		}
+		public static UIImage GetImage (string posterPath)
+		{
+			var returnImage = new UIImage ();
+			var task = Task.Run (async () => 
+			{
+				if (posterPath != null) {
+					var uri = new Uri (posterPath);
+					using (var imgUrl = new NSUrl (baseUrl + uri.AbsoluteUri.Substring (8))) {
+						using (var data = NSData.FromUrl (imgUrl)) {
+							returnImage= (UIImage.LoadFromData (data));
+						}
+					}
+				} else {
+					returnImage= UIImage.FromBundle ("blank.png");
+				}
+			});
+			TimeSpan ts = TimeSpan.FromMilliseconds (1000);
+			task.Wait (ts);
+
+			if (!task.Wait (ts))
+				Console.WriteLine ("The timeout interval elapsed.");
+			return returnImage;
+
 
 		}
 	}

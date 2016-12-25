@@ -11,8 +11,8 @@ namespace FavoriteMovies
 		public SideMenuController() : base(null, null)
 		{
 			//signUpImage = UIImage.FromBundle ("124817-matte-white-square-icon-business-signature1.png");
-			//signUpImage = UIImage.FromBundle ("profile.png");
-			signUpImage = UIImage.FromBundle ("1481507483_compose.png");
+			signUpImage = UIImage.FromBundle ("profile.png");
+			//signUpImage = UIImage.FromBundle ("1481507483_compose.png");
 		}
 
 
@@ -24,7 +24,7 @@ namespace FavoriteMovies
 			UIImageView userProfileImage = new UIImageView();
 			userProfileImage.Image = signUpImage;
 			userProfileImage.BackgroundColor = UIColor.Clear;
-			userProfileImage.Frame = new RectangleF (30, 55, 150, 150);
+			userProfileImage.Frame = new RectangleF (55, 55, 100, 100);
 			//userProfileImage.Layer.BorderWidth = 2;
 			userProfileImage.Layer.CornerRadius = userProfileImage.Frame.Size.Width / 2;
 			userProfileImage.Layer.MasksToBounds = true;
@@ -57,7 +57,7 @@ namespace FavoriteMovies
 			customImage.Frame = new RectangleF (40, 325, 40, 40);
 			var contentButton = new UIButton(UIButtonType.System);
 			contentButton.Frame = new RectangleF(90, 340, 230, 20);
-			contentButton.SetTitle("Movie Lists", UIControlState.Normal);
+			contentButton.SetTitle("Share Lists", UIControlState.Normal);
 			contentButton.SetTitleColor (UIColor.White, UIControlState.Normal);
 			contentButton.HorizontalAlignment = UIControlContentHorizontalAlignment.Left;
 			contentButton.Font = UIFont.FromName (UIColorExtensions.CONTENT_FONT, 18);
@@ -112,15 +112,15 @@ namespace FavoriteMovies
 				SidebarController.CloseMenu ();
 			};
 
-			UIImageView inviteFriendsImage = new UIImageView () { Image = UIImage.FromBundle ("1481506307_mail.png") };
-			inviteFriendsImage.Frame = new RectangleF (40, 486, 40, 40);
-			var inviteFriendsButton = new UIButton (UIButtonType.System);
-			inviteFriendsButton.Frame = new RectangleF (90, 500, 230, 20);
-			inviteFriendsButton.SetTitle ("Invite Friends", UIControlState.Normal);
-			inviteFriendsButton.HorizontalAlignment = UIControlContentHorizontalAlignment.Left;
-			inviteFriendsButton.SetTitleColor (UIColor.White, UIControlState.Normal);
-			inviteFriendsButton.Font = UIFont.FromName (UIColorExtensions.CONTENT_FONT, 18);
-			inviteFriendsButton.TouchUpInside += (sender, e) => {
+			UIImageView showTipsImage = new UIImageView () { Image = UIImage.FromBundle ("tips.png") };
+			showTipsImage.Frame = new RectangleF (40, 486, 40, 40);
+			var showTipsButton = new UIButton (UIButtonType.System);
+			showTipsButton.Frame = new RectangleF (90, 500, 230, 20);
+			showTipsButton.SetTitle ("Show Tips", UIControlState.Normal);
+			showTipsButton.HorizontalAlignment = UIControlContentHorizontalAlignment.Left;
+			showTipsButton.SetTitleColor (UIColor.White, UIControlState.Normal);
+			showTipsButton.Font = UIFont.FromName (UIColorExtensions.CONTENT_FONT, 18);
+			showTipsButton.TouchUpInside += (sender, e) => {
 				//NavController.PushViewController(new ContentController(), false);
 				//NavController.PushViewController (new MovieListPickerViewController (null, false), false);
 				//SidebarController.ChangeContentView (new MovieListPickerViewController (null, true));
@@ -140,8 +140,8 @@ namespace FavoriteMovies
 			View.Add (settingsImage);
 			View.Add (addFriendsImage);
 			View.Add (userProfileImage);
-			View.Add (inviteFriendsImage);
-			View.Add (inviteFriendsButton);
+			View.Add (showTipsImage);
+			View.Add (showTipsButton);
 
 		}
 	}

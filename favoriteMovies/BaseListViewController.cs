@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using FavoriteMovies;
 using FavoriteMoviesPCL;
 using Foundation;
@@ -30,7 +31,6 @@ namespace FavoriteMovies
 			tableItems = GetMovieList ();
 			table = new UITableView (View.Bounds);
 			table.AutoresizingMask = UIViewAutoresizing.All;
-			tableItems = GetMovieList ();
 			tableSource = new TableSource<ICustomList>(tableItems, this);
 			table.Source = tableSource;
 			table.AllowsSelectionDuringEditing = true;
@@ -103,101 +103,103 @@ namespace FavoriteMovies
 
 		public void UpdateCustomAndMovieList (int? Id, bool upDateMovieDetail, List<ICustomList> tableItems)
 		{
+			var task = Task.Run (async () => 
+			{
+				try {
 
-			try {
+					using (var db = new SQLiteConnection (MovieService.Database)) {
+						// there is a sqllite bug here https://forums.xamarin.com/discussion/
+						//52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
+						//var query = db.Table<CustomList> ();
 
-				using (var db = new SQLiteConnection (MovieService.Database)) {
-					// there is a sqllite bug here https://forums.xamarin.com/discussion/
-					//52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
-					//var query = db.Table<CustomList> ();
+						if (movieDetail != null)
+							DeleteMovie (movieDetail.Id);
 
-					if (movieDetail != null) 
-						DeleteMovie (movieDetail.Id);
-				
-					DeleteAll ();
-					//if (Id != null)
-					//	DeleteAll (Id);
-					//else
+						DeleteAll ();
+						//if (Id != null)
+						//	DeleteAll (Id);
+						//else
 
 
-					for (var list = 0; list < tableItems.Count; list++) {
+						for (var list = 0; list < tableItems.Count; list++) {
 
-						if (tableItems [list].Name != "add new") 
-						{
-							var item = tableItems [list] as CustomList;
-							if (item!=null)
-							   db.Insert (tableItems [list], typeof (CustomList));
-							else
-								db.InsertOrReplace (tableItems [list], typeof (Movie));
+							if (tableItems [list].Name != "add new") {
+								var item = tableItems [list] as CustomList;
+								if (item != null)
+									db.Insert (tableItems [list], typeof (CustomList));
+								else
+									db.InsertOrReplace (tableItems [list], typeof (Movie));
 
+							}
+
+							if (movieDetail != null && (tableItems [list].Id == Id)) {
+
+								//get id of last inserted row
+								string sql = "select last_insert_rowid()";
+								var scalarValue = db.ExecuteScalar<string> (sql);
+								int value = scalarValue == null ? 0 : Convert.ToInt32 (scalarValue);
+
+								if (Id > 0)
+									movieDetail.CustomListID = Id;
+								else
+									movieDetail.CustomListID = value;
+
+								db.InsertOrReplace (movieDetail, typeof (Movie));
+							}
 						}
 
-						if (movieDetail!=null && (tableItems [list].Id == Id)) {
 
-							//get id of last inserted row
-							string sql = "select last_insert_rowid()";
-							var scalarValue = db.ExecuteScalar<string> (sql);
-							int value = scalarValue == null ? 0 : Convert.ToInt32 (scalarValue);
-
-							if (Id > 0)
-								movieDetail.CustomListID = Id;
-							else
-								movieDetail.CustomListID = value;
-							
-							db.InsertOrReplace (movieDetail, typeof (Movie));
-						}
 					}
 
+				} catch (SQLiteException e) {
+					Debug.WriteLine (e.Message);
 
-				}
-
-			} catch (SQLiteException e) {
-				Debug.WriteLine (e.Message);
-
-				using (var conn = new SQLite.SQLiteConnection (MovieService.Database)) {
-					conn.CreateTable<Movie> ();
-					conn.CreateTable<CustomList> (CreateFlags.ImplicitPK | CreateFlags.AutoIncPK);
-				}
-				;
-				using (var db = new SQLiteConnection (MovieService.Database)) {
-					if (movieDetail != null)
-						DeleteMovie (movieDetail.Id);
-
-					DeleteAll ();
-
-					for (var list = 0; list < tableItems.Count; list++) {
-
-						if (tableItems [list].Name != "add new") {
-							var item = tableItems [list] as CustomList;
-							if (item != null)
-								db.Insert (tableItems [list], typeof (CustomList));
-							else
-								db.InsertOrReplace (tableItems [list], typeof (Movie));
-
-						}
-
-						if (upDateMovieDetail && (tableItems [list].Id == Id)) {
-
-							//get id of last inserted row
-							string sql = "select last_insert_rowid()";
-							var scalarValue = db.ExecuteScalar<string> (sql);
-							int value = scalarValue == null ? 0 : Convert.ToInt32 (scalarValue);
-
-							if (Id > 0)
-								movieDetail.CustomListID = Id;
-							else
-								movieDetail.CustomListID = value;
-
-							db.InsertOrReplace (movieDetail, typeof (Movie));
-						}
+					using (var conn = new SQLite.SQLiteConnection (MovieService.Database)) {
+						conn.CreateTable<Movie> ();
+						conn.CreateTable<CustomList> (CreateFlags.ImplicitPK | CreateFlags.AutoIncPK);
 					}
+					;
+					using (var db = new SQLiteConnection (MovieService.Database)) {
+						if (movieDetail != null)
+							DeleteMovie (movieDetail.Id);
+
+						DeleteAll ();
+
+						for (var list = 0; list < tableItems.Count; list++) {
+
+							if (tableItems [list].Name != "add new") {
+								var item = tableItems [list] as CustomList;
+								if (item != null)
+									db.Insert (tableItems [list], typeof (CustomList));
+								else
+									db.InsertOrReplace (tableItems [list], typeof (Movie));
+
+							}
+
+							if (upDateMovieDetail && (tableItems [list].Id == Id)) {
+
+								//get id of last inserted row
+								string sql = "select last_insert_rowid()";
+								var scalarValue = db.ExecuteScalar<string> (sql);
+								int value = scalarValue == null ? 0 : Convert.ToInt32 (scalarValue);
+
+								if (Id > 0)
+									movieDetail.CustomListID = Id;
+								else
+									movieDetail.CustomListID = value;
+
+								db.InsertOrReplace (movieDetail, typeof (Movie));
+							}
+						}
 
 
+					}
 				}
-			}
-
-
+			});
+			task.Wait ();                     
 		}
+
+		
 		public static void DeleteCustomList (int? CustomId)
 		{
 
@@ -265,47 +267,54 @@ namespace FavoriteMovies
 		{
 
 			List<ICustomList> result = new List<ICustomList> ();
+			var task = Task.Run(async () => 
+			{
+				try {
 
-			try {
-
-				using (var db = new SQLiteConnection (MovieService.Database)) {
-					// there is a sqllite bug here https://forums.xamarin.com/discussion/
-					//52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
-					var query = db.Query<CustomList> ("SELECT * FROM [CustomList] ORDER BY [Order]");
-
-
-					foreach (var list in query) {
-						var item = new CustomList ();
-						item.Id = list.Id;
-						item.Name = list.Name;
-						result.Add (item);
-					}
-				}
+					using (var db = new SQLiteConnection (MovieService.Database)) {
+						// there is a sqllite bug here https://forums.xamarin.com/discussion/
+						//52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
+						var query = db.Query<CustomList> ("SELECT * FROM [CustomList] ORDER BY [Order]");
 
 
-			} catch (SQLiteException e) {
-				Debug.WriteLine (e.Message);
-
-				using (var conn = new SQLite.SQLiteConnection (MovieService.Database)) {
-					conn.CreateTable<Movie> ();
-					conn.CreateTable<CustomList> (CreateFlags.ImplicitPK | CreateFlags.AutoIncPK);
-				}
-				using (var db = new SQLiteConnection (MovieService.Database)) {
-					// there is a sqllite bug here https://forums.xamarin.com/discussion/
-					//52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
-					//	var query = db.Query<CustomList> ("SELECT * FROM CUSTOMLIST");
-					var query = db.Query<CustomList> ("SELECT * FROM [CustomList] ORDER BY [Order]");
-					foreach (var list in query) {
-						var item = new CustomList ();
-						item.Id = list.Id;
-						item.Name = list.Name;
-						result.Add (item);
+						foreach (var list in query) {
+							var item = new CustomList ();
+							item.Id = list.Id;
+							item.Name = list.Name;
+							item.Order = list.Order;
+							item.Shared = list.Shared;
+							result.Add (item);
+						}
 					}
 
+
+				} catch (SQLiteException e) {
+					Debug.WriteLine (e.Message);
+
+					using (var conn = new SQLite.SQLiteConnection (MovieService.Database)) {
+						conn.CreateTable<Movie> ();
+						conn.CreateTable<CustomList> (CreateFlags.ImplicitPK | CreateFlags.AutoIncPK);
+					}
+					using (var db = new SQLiteConnection (MovieService.Database)) {
+						// there is a sqllite bug here https://forums.xamarin.com/discussion/
+						//52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
+						//	var query = db.Query<CustomList> ("SELECT * FROM CUSTOMLIST");
+						var query = db.Query<CustomList> ("SELECT * FROM [CustomList] ORDER BY [Order]");
+						foreach (var list in query) {
+							var item = new CustomList ();
+							item.Id = list.Id;
+							item.Name = list.Name;
+							item.Order = list.Order;
+							item.Shared = list.Shared;
+							result.Add (item);
+
+						}
+
+					}
+
 				}
-
-			}
-
+			});
+			task.Wait ();
 			return result;
 		}
 		public static void DeleteAll (int? Id)
@@ -323,17 +332,21 @@ namespace FavoriteMovies
 		}
 		public static void DeleteAll ()
 		{
-			try {
-				using (var db = new SQLite.SQLiteConnection (MovieService.Database)) {
-					// there is a sqllite bug here https://forums.xamarin.com/discussion/52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
+			var task = Task.Run (async () => 
+			{
+				try {
+					using (var db = new SQLite.SQLiteConnection (MovieService.Database)) {
+						// there is a sqllite bug here https://forums.xamarin.com/discussion/52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
 
-					db.Query<Movie> ("DELETE FROM [CustomList]");
+						db.Query<Movie> ("DELETE FROM [CustomList]");
 
+					}
+				} catch (SQLite.SQLiteException e) {
+					//first time in no favorites yet.
+					Debug.Write (e.Message);
 				}
-			} catch (SQLite.SQLiteException e) {
-				//first time in no favorites yet.
-				Debug.Write (e.Message);
-			}
+			});
+			task.Wait ();
 		}
 
 		protected void UpdateCustomList ()
@@ -374,6 +387,7 @@ namespace FavoriteMovies
 	}
 	public class TableSource<T> : UITableViewSource
 		{
+		
 			List<ICustomList> tableItems;
 			string cellIdentifier = "TableCell";
 			BaseListViewController Owner;
@@ -600,7 +614,13 @@ namespace FavoriteMovies
 				return true;
 			}
 
-
+		   public override UIView GetViewForHeader (UITableView tableView, nint section)
+			{
+			UILabel headerLabel = new UILabel () { Text = "List Name" }; // Set the frame size you need
+				headerLabel.TextColor = UIColor.Red; // Set your color
+				return headerLabel;
+			}
+			
 
 			/// <summary>
 			/// Called by the TableView to get the actual UITableViewCell to render for the particular row
@@ -618,10 +638,33 @@ namespace FavoriteMovies
 					cell = new UITableViewCell (cellStyle, cellIdentifier);
 
 				}
+				if (tableItems [indexPath.Row] is CustomList) 
+				{
+					var switchView = (UISwitch)cell.AccessoryView;
+					if (switchView == null) {
+						switchView = new UISwitch ();
+						switchView.AddTarget ((sender, e) => {
+							if (((UISwitch)sender).On)
+								tableItems [indexPath.Row].Shared = true;
+							else
+								tableItems [indexPath.Row].Shared = false;
+							Owner.UpdateCustomAndMovieList (((CustomList)tableItems [indexPath.Row]).Id, false, tableItems);
+
+						}, UIControlEvent.ValueChanged);
+					}
+
+					if (tableItems [indexPath.Row].Shared)
+						switchView.On = true;
+					else
+						switchView.On = false;
+
+
+					cell.AccessoryView = switchView;
+				}
 				cell.TextLabel.Text = tableItems [indexPath.Row].Name;
 				cell.TextLabel.Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, UIColorExtensions.HEADER_FONT_SIZE);
 
-
+				
 				return cell;
 			}
 		}

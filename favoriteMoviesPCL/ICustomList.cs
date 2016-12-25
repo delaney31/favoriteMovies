@@ -5,5 +5,6 @@
 		int ?Id { get; set; }
 		string Name { get; set; }
 		int Order { get; set; }
+		bool Shared { get; set; }
 	}
 }

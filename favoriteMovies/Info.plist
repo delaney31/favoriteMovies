@@ -32,5 +32,10 @@
 	<string>Assets.xcassets/LaunchImage.launchimage</string>
 	<key>CFBundleName</key>
 	<string>Movie Friends</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
 </dict>
 </plist>
