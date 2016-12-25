@@ -70,13 +70,13 @@ namespace FavoriteMovies
 						if (tableSource.ValueUnique (textInputAlertController.TextFields [0].Text)) {
 							tableSource.ArrangeCustomList (false);
 							var listItem = new CustomList ();
-							listItem.Order = 0;
-							listItem.Name = textInputAlertController.TextFields [0].Text;
+							listItem.order = 0;
+							listItem.name = textInputAlertController.TextFields [0].Text;
 							tableItems.Insert (0, listItem);
 							table.EndUpdates (); // applies the changes
 							table.ReloadData ();
 							tableSource.ArrangeCustomList (true);
-							UpdateCustomAndMovieList (tableItems [0].Id, true, tableItems);
+							UpdateCustomAndMovieList (tableItems [0].id, true, tableItems);
 							MainViewController.NewCustomListToRefresh = 0;
 							NavigationController.PopToRootViewController (true);
 						} else {
@@ -113,7 +113,7 @@ namespace FavoriteMovies
 						//var query = db.Table<CustomList> ();
 
 						if (movieDetail != null)
-							DeleteMovie (movieDetail.Id);
+							DeleteMovie (movieDetail.id);
 
 						DeleteAll ();
 						//if (Id != null)
@@ -123,7 +123,7 @@ namespace FavoriteMovies
 
 						for (var list = 0; list < tableItems.Count; list++) {
 
-							if (tableItems [list].Name != "add new") {
+							if (tableItems [list].name != "add new") {
 								var item = tableItems [list] as CustomList;
 								if (item != null)
 									db.Insert (tableItems [list], typeof (CustomList));
@@ -132,7 +132,7 @@ namespace FavoriteMovies
 
 							}
 
-							if (movieDetail != null && (tableItems [list].Id == Id)) {
+							if (movieDetail != null && (tableItems [list].id == Id)) {
 
 								//get id of last inserted row
 								string sql = "select last_insert_rowid()";
@@ -161,13 +161,13 @@ namespace FavoriteMovies
 					;
 					using (var db = new SQLiteConnection (MovieService.Database)) {
 						if (movieDetail != null)
-							DeleteMovie (movieDetail.Id);
+							DeleteMovie (movieDetail.id);
 
 						DeleteAll ();
 
 						for (var list = 0; list < tableItems.Count; list++) {
 
-							if (tableItems [list].Name != "add new") {
+							if (tableItems [list].name != "add new") {
 								var item = tableItems [list] as CustomList;
 								if (item != null)
 									db.Insert (tableItems [list], typeof (CustomList));
@@ -176,7 +176,7 @@ namespace FavoriteMovies
 
 							}
 
-							if (upDateMovieDetail && (tableItems [list].Id == Id)) {
+							if (upDateMovieDetail && (tableItems [list].id == Id)) {
 
 								//get id of last inserted row
 								string sql = "select last_insert_rowid()";
@@ -221,7 +221,7 @@ namespace FavoriteMovies
 			try {
 				using (var db = new SQLite.SQLiteConnection (MovieService.Database)) {
 					// there is a sqllite bug here https://forums.xamarin.com/discussion/52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
-					item.Order = row;
+					item.order = row;
 					db.InsertOrReplace (item, typeof (CustomList));
 
 				}
@@ -279,10 +279,10 @@ namespace FavoriteMovies
 
 						foreach (var list in query) {
 							var item = new CustomList ();
-							item.Id = list.Id;
-							item.Name = list.Name;
-							item.Order = list.Order;
-							item.Shared = list.Shared;
+							item.id = list.id;
+							item.name = list.name;
+							item.order = list.order;
+							item.shared = list.shared;
 							result.Add (item);
 						}
 					}
@@ -302,10 +302,10 @@ namespace FavoriteMovies
 						var query = db.Query<CustomList> ("SELECT * FROM [CustomList] ORDER BY [Order]");
 						foreach (var list in query) {
 							var item = new CustomList ();
-							item.Id = list.Id;
-							item.Name = list.Name;
-							item.Order = list.Order;
-							item.Shared = list.Shared;
+							item.id = list.id;
+							item.name = list.name;
+							item.order = list.order;
+							item.shared = list.shared;
 							result.Add (item);
 
 						}
@@ -360,7 +360,7 @@ namespace FavoriteMovies
 					DeleteAll ();
 					foreach (var list in tableItems) {
 
-						if (list.Name != null) {
+						if (list.name != null) {
 							db.Insert (list, typeof (CustomList));
 						}
 					}
@@ -376,7 +376,7 @@ namespace FavoriteMovies
 				DeleteAll ();
 				using (var db = new SQLiteConnection (MovieService.Database)) {
 					foreach (var list in tableItems) {
-						if (list.Name != null) {
+						if (list.name != null) {
 							db.Insert (list, typeof (CustomList));
 						}
 					}
@@ -409,7 +409,7 @@ namespace FavoriteMovies
 		}, UITableViewRowAnimation.Fade);
 				// create a new item and add it to our underlying data (it is not intended to be permanent)
 				//if(tableItems.Equals(typeof(List<CustomList>)))
-					tableItems.Add (new CustomList () { Name = "add new" });
+					tableItems.Add (new CustomList () { name = "add new" });
 				//else
 				//	tableItems.Add (new Movie () { Name = "add new" });
 				tableView.EndUpdates (); // applies the changes
@@ -428,7 +428,7 @@ namespace FavoriteMovies
 					var item = tableItems [(int)tableView.NumberOfRowsInSection (0) - 1] as CustomList;
 					if (item is CustomList) 
 					{
-						Owner.UpdateCustomAndMovieList (((CustomList)tableItems [(int)tableView.NumberOfRowsInSection (0) - 1]).Id, false, tableItems);
+						Owner.UpdateCustomAndMovieList (((CustomList)tableItems [(int)tableView.NumberOfRowsInSection (0) - 1]).id, false, tableItems);
 					} else 
 					{
 						Owner.UpdateCustomAndMovieList (((Movie)tableItems [(int)tableView.NumberOfRowsInSection (0) - 1]).CustomListID, true, tableItems);
@@ -495,7 +495,7 @@ namespace FavoriteMovies
 				}
 
 				//---- copy the item to the new location
-				((ICustomList)item).Order = destinationIndexPath.Row;
+				((ICustomList)item).order = destinationIndexPath.Row;
 				tableItems.Insert (destinationIndexPath.Row, item);
 
 				//---- remove from the old
@@ -526,7 +526,7 @@ namespace FavoriteMovies
 				try {
 					if (tableView.Editing) {
 
-						if (tableItems [indexPath.Row] as CustomList!=null ? ((CustomList)tableItems [indexPath.Row]).Name == "add new" : ((Movie)tableItems [indexPath.Row]).Name == "add new") 
+						if (tableItems [indexPath.Row] as CustomList!=null ? ((CustomList)tableItems [indexPath.Row]).name == "add new" : ((Movie)tableItems [indexPath.Row]).name == "add new") 
 						{
 							//Create Alert
 							var textInputAlertController = UIAlertController.Create ("Create Movie List", "List Name", UIAlertControllerStyle.Alert);
@@ -543,17 +543,17 @@ namespace FavoriteMovies
 								if (ValueUnique (textInputAlertController.TextFields [0].Text)) {
 									ArrangeCustomList (false);
 									var listItem = new CustomList ();
-									listItem.Order = 0;
-									listItem.Name = textInputAlertController.TextFields [0].Text;
+									listItem.order = 0;
+									listItem.name = textInputAlertController.TextFields [0].Text;
 									tableItems.Insert (0, listItem);
 									tableView.EndUpdates (); // applies the changes
 									tableView.ReloadData ();
 									ArrangeCustomList (true);
 									var item = tableItems [(int)indexPath.Row] as CustomList;
 									if (item is CustomList) {
-										Owner.UpdateCustomAndMovieList (((CustomList)tableItems [(int)tableView.NumberOfRowsInSection (0) - 1]).Id, false, tableItems);
+										Owner.UpdateCustomAndMovieList (((CustomList)tableItems [(int)tableView.NumberOfRowsInSection (0) - 1]).id, false, tableItems);
 									} else {
-										Owner.UpdateCustomAndMovieList (((Movie)tableItems [(int)tableView.NumberOfRowsInSection (0) - 1]).Id, true, tableItems);
+										Owner.UpdateCustomAndMovieList (((Movie)tableItems [(int)tableView.NumberOfRowsInSection (0) - 1]).id, true, tableItems);
 									}
 								} else {
 									new UIAlertView ("Duplicate!"
@@ -573,7 +573,7 @@ namespace FavoriteMovies
 						//Debug.Write (tableItems [(int)tableView.NumberOfRowsInSection (0) - 1].GetType());
 						var item = tableItems [(int)indexPath.Row] as CustomList;
 						if (item is CustomList) {
-							Owner.UpdateCustomAndMovieList (((CustomList)tableItems [indexPath.Row]).Id, false, tableItems);
+							Owner.UpdateCustomAndMovieList (((CustomList)tableItems [indexPath.Row]).id, false, tableItems);
 						} else {
 							//Owner.UpdateCustomAndMovieList (((Movie)tableItems [(int)indexPath.Row]).Id, Owner.fromAddList, tableItems);
 							Owner.NavigationController.PushViewController (new MovieDetailViewController (tableItems [indexPath.Row] as Movie, true), true);
@@ -598,15 +598,15 @@ namespace FavoriteMovies
 
 				for (var list = StartAtZero ? 0 : 1; list < tableItems.Count; list++) {
 					int num = StartAtZero ? 0 : 1;
-					if (tableItems [list - num].Name != "add new")
-						tableItems [list - num].Order = list;
+					if (tableItems [list - num].name != "add new")
+						tableItems [list - num].order = list;
 				}
 			}
 
 			public bool ValueUnique (string text)
 			{
 				foreach (var item in tableItems) {
-					if (item.Name == text) {
+					if (item.name == text) {
 						return false;
 
 					}
@@ -645,15 +645,15 @@ namespace FavoriteMovies
 						switchView = new UISwitch ();
 						switchView.AddTarget ((sender, e) => {
 							if (((UISwitch)sender).On)
-								tableItems [indexPath.Row].Shared = true;
+								tableItems [indexPath.Row].shared = true;
 							else
-								tableItems [indexPath.Row].Shared = false;
-							Owner.UpdateCustomAndMovieList (((CustomList)tableItems [indexPath.Row]).Id, false, tableItems);
+								tableItems [indexPath.Row].shared = false;
+							Owner.UpdateCustomAndMovieList (((CustomList)tableItems [indexPath.Row]).id, false, tableItems);
 
 						}, UIControlEvent.ValueChanged);
 					}
 
-					if (tableItems [indexPath.Row].Shared)
+					if (tableItems [indexPath.Row].shared)
 						switchView.On = true;
 					else
 						switchView.On = false;
@@ -661,7 +661,7 @@ namespace FavoriteMovies
 
 					cell.AccessoryView = switchView;
 				}
-				cell.TextLabel.Text = tableItems [indexPath.Row].Name;
+				cell.TextLabel.Text = tableItems [indexPath.Row].name;
 				cell.TextLabel.Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, UIColorExtensions.HEADER_FONT_SIZE);
 
 				

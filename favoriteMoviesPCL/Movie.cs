@@ -7,11 +7,11 @@ namespace FavoriteMoviesPCL
 	[Table ("Movies")]
 	public class Movie :ICustomList
 	{
-		public string Name { get; set; }
+		public string name { get; set; }
 		public string HighResPosterPath { get; set; }
 		public string PosterPath { get; set; }
 		[PrimaryKey]
-		public int ?Id { get; set; }
+		public int ?id { get; set; }
 		public int? CustomListID { get; set;}
 		public string Overview { get; set; }
 		public double VoteCount { get; set; }
@@ -27,9 +27,13 @@ namespace FavoriteMoviesPCL
 		public bool Video { get; set; }
 		public string UserReview { get; set; }
 		public int UserRating{ get; set; }
-		public bool Shared { get; set; }
+		public bool shared { get; set; }
 		[AutoIncrement]
-		public int Order { get; set; }
+		public int order { get; set; }
+		public bool deleted { get; set;}
+		//public Version version { get; set;}
+		public DateTime createdAt { get; set;}
+		public DateTime updatedAt { get; set;}
 
 	}
 	public class MoviePOCO
@@ -40,12 +44,17 @@ namespace FavoriteMoviesPCL
 	public class CustomList:ICustomList
 	{
 		[PrimaryKey, AutoIncrement]
-		public int? Id { get; set; }
+		public int? id { get; set; }
 		[MaxLength (50)]
-		public string Name { get; set; }
+		public string name { get; set; }
 		[AutoIncrement]
-		public int Order { get; set;}
-		public bool Shared { get; set;}
+		public int order { get; set;}
+		public bool shared { get; set;}
+		//public Version version { get; set;}
+		public DateTime createdAt { get; set;}
+		public DateTime updatedAt { get; set;}
+		public bool deleted { get; set;}
+		public int userid { get; set;}
 	}
 
 	public class CastCrew
@@ -54,9 +63,11 @@ namespace FavoriteMoviesPCL
 		public string Actor { get; set; }
 		public string ProfilePath { get; set; }
 	}
-
+	[Table ("FeedItem")]
 	public class FeedItem
 	{
+		[PrimaryKey, AutoIncrement]
+		public int? id { get; set; }
 		public string Title { get; set; }
 		public string Link { get; set; }
 		public string PubDate { get; set; }
@@ -65,6 +76,59 @@ namespace FavoriteMoviesPCL
 		public string Description { get; set; }
 		public string Content { get; set; }
 		public string ImageLink { get; set; }
+		public int Likes { get; set;}
+		public int? CommentID { get; set; }
+		public string Image { get; set; }
+		//public Version version { get; set; }
+		public DateTime createdAt { get; set; }
+		public DateTime updatedAt { get; set; }
+		public bool deleted { get; set; }
+
+	}
+	[Table ("Comments")]
+	public class Comments
+	{
+		[PrimaryKey, AutoIncrement]
+		public int? id { get; set; }
+		[MaxLength (500)]
+		public string Comment { get; set;}
+		//public Version version { get; set; }
+		public DateTime createdAt { get; set; }
+		public DateTime updatedAt { get; set; }
+		public bool deleted { get; set; }
+	}
+
+	[Table ("UserFriends")]
+	public class UserFriends
+	{
+		[PrimaryKey, AutoIncrement]
+		public int? id { get; set; }
+		public int? CustomListID { get; set; }
+		public int? friendid { get; set;}
+		public int? userid { get; set;}
+		//public Version version { get; set; }
+		public DateTime createdAt { get; set; }
+		public DateTime updatedAt { get; set; }
+		public bool deleted { get; set; }
+	}
+
+	[Table ("User")]
+	public class User
+
+	{
+		[PrimaryKey, AutoIncrement]
+		public int? id { get; set; }
+		public string lastname { get; set;}
+		public string firstname { get; set;}
+		public string email { get; set;}
+		public string profilepic { get; set;}
+		public string username { get; set;}
+		public string password { get; set;}
+		//public Version version { get; set; }
+		public DateTime createdAt { get; set; }
+		public DateTime updatedAt { get; set; }
+		public bool deleted { get; set; }
+
 	}
 }
 

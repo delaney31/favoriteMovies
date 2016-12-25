@@ -73,7 +73,7 @@ namespace FavoriteMovies
 					Console.WriteLine ("Selected button {0}", accepted ? "Accepted" : "Canceled");
 					if (accepted) 
 					{
-						BaseListViewController.DeleteMovie ((int)_items [indexPath.Row].Id);
+						BaseListViewController.DeleteMovie ((int)_items [indexPath.Row].id);
 
 						_items.RemoveAt (indexPath.Row);
 
@@ -103,6 +103,7 @@ namespace FavoriteMovies
 				//loadingOverlay = new LoadingOverlay (bounds);
 				//View.Add (loadingOverlay);
 				viewController.PushViewController (new MovieDetailViewController (row, false), true);
+				viewController.ViewDidAppear (true);
 				//this.ParentViewController.NavigationController.PushViewController(new MovieDetailViewController (row, false), true);
 
 				//loadingOverlay.Hide ();

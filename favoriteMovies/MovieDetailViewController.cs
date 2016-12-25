@@ -84,7 +84,7 @@ namespace FavoriteMovies
 
 		void Initialize ()
 		{
-			var imDbUrl = "http://api.themoviedb.org/3/movie/" + movieDetail.Id + "/videos?api_key=" + MovieService._apiKey;
+			var imDbUrl = "http://api.themoviedb.org/3/movie/" + movieDetail.id + "/videos?api_key=" + MovieService._apiKey;
 
 
 			var UTubeMovidId = Task.Run (async () => {
@@ -130,7 +130,7 @@ namespace FavoriteMovies
 			movieTitle.Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, 15);
 			movieTitle.BackgroundColor = backGroundColor;
 			movieTitle.TextColor =IsDarkColor (backGroundColor) ? UIColor.White : UIColor.Black;
-			movieTitle.Text = movieDetail.Name;
+			movieTitle.Text = movieDetail.name;
 			movieTitle.Lines = 0;
 			movieTitle.Frame = new CGRect (183, 30, 135, 40);
 
@@ -331,7 +331,7 @@ namespace FavoriteMovies
 			}
 
 			var getCast = Task.Run (async () => {
-				castList = await MovieService.MovieCreditsAsync (movieDetail.Id.ToString ());
+				castList = await MovieService.MovieCreditsAsync (movieDetail.id.ToString ());
 			});
 			getCast.Wait ();
 			//DeleteAllSubviews (scrollView);
@@ -378,7 +378,7 @@ namespace FavoriteMovies
 
 			_embededMoveId = youtubeMovieId;
 			var getSimilarMovies = Task.Run (async () => {
-				similarMovies = await MovieService.GetMoviesAsync (MovieService.MovieType.Similar, 1, (int)movieDetail.Id);
+				similarMovies = await MovieService.GetMoviesAsync (MovieService.MovieType.Similar, 1, (int)movieDetail.id);
 			});
 			getSimilarMovies.Wait ();
 
@@ -461,7 +461,7 @@ namespace FavoriteMovies
 			try {
 				using (var db = new SQLite.SQLiteConnection (MovieService.Database)) {
 					// there is a sqllite bug here https://forums.xamarin.com/discussion/52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
-					DeleteAll (item.CustomListID, (int)item.Id);
+					DeleteAll (item.CustomListID, (int)item.id);
 					db.InsertOrReplace (item, typeof (Movie));
 
 				}
@@ -497,7 +497,7 @@ namespace FavoriteMovies
 			sb.Append ("</head>");
 			sb.Append ("<body>");
 			sb.Append ("<iframe width=\"300\" height=\"250\" src=\"" + _youTubeURl + videoCode + "\" frameborder=\"0\" allowfullscreen></iframe>");
-			sb.Append ("<h4>" + movieDetail.Name + "</h4>");
+			sb.Append ("<h4>" + movieDetail.name + "</h4>");
 			sb.Append ("<p>" + movieDetail.Overview + "</p>");
 			sb.Append ("</body></html>");
 
@@ -521,7 +521,7 @@ namespace FavoriteMovies
 			try {
 				using (var db = new SQLite.SQLiteConnection (MovieService.Database)) {
 					// there is a sqllite bug here https://forums.xamarin.com/discussion/52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
-					db.Query<Movie> ("DELETE FROM [Movie] WHERE [id] = " + movieDetail.Id);
+					db.Query<Movie> ("DELETE FROM [Movie] WHERE [id] = " + movieDetail.id);
 
 					saveFavoriteButt.TouchDown -= PlayVideoButt_TouchDown;
 					saveFavoriteButt.TouchDown += SaveFavoriteButt_TouchDown;

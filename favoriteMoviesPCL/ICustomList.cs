@@ -2,9 +2,9 @@
 {
 	public interface ICustomList
 	{
-		int ?Id { get; set; }
-		string Name { get; set; }
-		int Order { get; set; }
-		bool Shared { get; set; }
+		int ?id { get; set; }
+		string name { get; set; }
+		int order { get; set; }
+		bool shared { get; set; }
 	}
 }

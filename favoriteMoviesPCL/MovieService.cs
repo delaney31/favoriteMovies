@@ -221,10 +221,10 @@ namespace FavoriteMoviesPCL
 			try {
 				foreach (var jObj in jarray) {
 					var newMovie = new Movie ();
-					newMovie.Name = (string)jObj ["title"];
+					newMovie.name = (string)jObj ["title"];
 					newMovie.PosterPath = (jObj ["poster_path"] == null) ? "" : (string)jObj ["poster_path"];
 					newMovie.HighResPosterPath = (jObj ["poster_path"] == null) ? "" : (string)jObj ["poster_path"];
-					newMovie.Id = (int)jObj ["id"];
+					newMovie.id = (int)jObj ["id"];
 					newMovie.Overview = (string)jObj ["overview"];
 					newMovie.VoteCount = (double)jObj ["vote_count"];
 					newMovie.ReleaseDate = (DateTime?)jObj ["release_date"];
@@ -253,7 +253,7 @@ namespace FavoriteMoviesPCL
 				string tokenUrl = _baseUrl + "account/id/favorite?" + _apiKey + sessionId;
 				string postBody = JsonConvert.SerializeObject (new Favorite {
 					favorite = !movie.Favorite,
-					media_id = (int)movie.Id
+					media_id = (int)movie.id
 				});
 
 				client.DefaultRequestHeaders.Accept.Add (new MediaTypeWithQualityHeaderValue ("application/json"));

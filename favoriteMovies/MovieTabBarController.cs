@@ -126,7 +126,7 @@ namespace FavoriteMovies
 				cell = new UITableViewCell (UITableViewCellStyle.Subtitle, movieItemCellId);
 			}
 			if (MovieItems.Count > indexPath.Row) {
-				cell.TextLabel.Text = MovieItems [indexPath.Row].Name;
+				cell.TextLabel.Text = MovieItems [indexPath.Row].name;
 				cell.TextLabel.Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, UIColorExtensions.HEADER_FONT_SIZE);
 				cell.DetailTextLabel.Text = MovieItems [indexPath.Row].Overview;
 				cell.ImageView.Image = MovieCell.GetImage (MovieItems [indexPath.Row].PosterPath); // don't use for Value2

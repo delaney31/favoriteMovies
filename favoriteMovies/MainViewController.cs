@@ -180,7 +180,7 @@ namespace FavoriteMovies
 				//Frame = FavoriteLabelFrame,
 				BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha),
 				Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, UIColorExtensions.HEADER_FONT_SIZE),
-				Text = customLists [cnt].Name
+				Text = customLists [cnt].name
 			};
 			customControllers [cnt] = new FavoritesViewController (new UICollectionViewFlowLayout () {
 				MinimumInteritemSpacing = MinimumInteritemSpacing, MinimumLineSpacing = MinimumLineSpacing,
@@ -295,12 +295,12 @@ namespace FavoriteMovies
 			try {
 				using (var db = new SQLite.SQLiteConnection (MovieService.Database)) {
 					// there is a sqllite bug here https://forums.xamarin.com/discussion/52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
-					var query = db.Query<Movie> ("SELECT * FROM [Movie] WHERE [CustomListID] = " + customList.Id);
+					var query = db.Query<Movie> ("SELECT * FROM [Movie] WHERE [CustomListID] = " + customList.id);
 
 					foreach (var movie in query) {
 						var item = new Movie ();
-						item.Id = movie.Id;
-						item.Name = movie.Name;
+						item.id = movie.id;
+						item.name = movie.name;
 						item.BackdropPath = movie.BackdropPath;
 						item.CustomListID = movie.CustomListID;
 						item.Favorite = movie.Favorite;
@@ -313,7 +313,7 @@ namespace FavoriteMovies
 						item.VoteAverage = movie.VoteAverage;
 						item.UserReview = movie.UserReview;
 						item.UserRating = movie.UserRating;
-						item.Order = movie.Order;
+						item.order = movie.order;
 						returnList.Add (item);
 					}
 				}
@@ -465,8 +465,8 @@ namespace FavoriteMovies
 					//var query = db.Table<CustomList> ();
 					foreach (var list in query) {
 						var item = new CustomList ();
-						item.Id = list.Id;
-						item.Name = list.Name;
+						item.id = list.id;
+						item.name = list.name;
 						result.Add (item);
 					}
 				}
@@ -511,7 +511,7 @@ namespace FavoriteMovies
 			
 			try {
 				ImageView.Image = GetImage (element.PosterPath);
-				if (UIColorExtensions.MovieIsFavorite (element.Id.ToString ()))
+				if (UIColorExtensions.MovieIsFavorite (element.id.ToString ()))
 				{
 					ContentView.Layer.BorderColor = UIColor.Orange.CGColor;
 

@@ -36,12 +36,12 @@ namespace FavoriteMoviesPCL
 
 		public Task<List<Movie>> GetEntriesAsync (string title)
 		{
-			return connection.Table<Movie> ().Where (d => d.Name == title).ToListAsync ();
+			return connection.Table<Movie> ().Where (d => d.name == title).ToListAsync ();
 		}
 
 		public Task<Movie> GetEntry (int id)
 		{
-			return connection.Table<Movie> ().Where (d => d.Id == id).FirstOrDefaultAsync ();
+			return connection.Table<Movie> ().Where (d => d.id == id).FirstOrDefaultAsync ();
 		}
 
 	}

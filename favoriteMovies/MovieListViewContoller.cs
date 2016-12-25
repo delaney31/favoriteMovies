@@ -40,13 +40,13 @@ namespace FavoriteMovies
 				using (var db = new SQLiteConnection (MovieService.Database)) {
 					// there is a sqllite bug here https://forums.xamarin.com/discussion/
 					//52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
-					var query = db.Query<Movie> ("SELECT * FROM [Movie] WHERE CustomListID = "+ movie.Id + " ORDER BY [Order]");
+					var query = db.Query<Movie> ("SELECT * FROM [Movie] WHERE CustomListID = "+ movie.id + " ORDER BY [Order]");
 
 
 					foreach (var mov in query) {
 						var item = new Movie ();
-						item.Id = mov.Id;
-						item.Name = mov.Name;
+						item.id = mov.id;
+						item.name = mov.name;
 						item.BackdropPath = mov.BackdropPath;
 						item.CustomListID = mov.CustomListID;
 						item.Favorite = mov.Favorite;
@@ -59,7 +59,7 @@ namespace FavoriteMovies
 						item.VoteAverage = mov.VoteAverage;
 						item.UserReview = mov.UserReview;
 						item.UserRating = mov.UserRating;
-						item.Order = mov.Order;
+						item.order = mov.order;
 						result.Add (item);
 					}
 				}
