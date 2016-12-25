@@ -28,19 +28,30 @@ namespace FavoriteMovies
 			//userProfileImage.Layer.BorderWidth = 2;
 			userProfileImage.Layer.CornerRadius = userProfileImage.Frame.Size.Width / 2;
 			userProfileImage.Layer.MasksToBounds = true;
-			var title = new UIButton(new RectangleF(10, 220, 192, 20));
+			var title = new UIButton(new RectangleF(10, 200, 192, 20));
 			title.Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, 20);
 			////title.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.NAV_BAR_COLOR, 1.0f);
 			title.HorizontalAlignment = UIControlContentHorizontalAlignment.Center;
 			//title.Font = UIFont.FromName (UIColorExtensions.CONTENT_FONT, 15);
 			title.SetTitleColor (UIColor.White, UIControlState.Normal);
-			title.SetTitle ("Sign-In/ Sign-Up", UIControlState.Normal);
+			title.SetTitle ("Tim Delaney", UIControlState.Normal);
 			//title.Lines = 2;
 			title.TouchUpInside += (sender, e) => {
 				NavController.PopToRootViewController (false);
 				SidebarController.CloseMenu ();
 			};
-
+			var location = new UIButton (new RectangleF (10, 230, 192, 20));
+			location.Font = UIFont.FromName (UIColorExtensions.CONTENT_FONT, 13);
+			////title.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.NAV_BAR_COLOR, 1.0f);
+			location.HorizontalAlignment = UIControlContentHorizontalAlignment.Center;
+			//title.Font = UIFont.FromName (UIColorExtensions.CONTENT_FONT, 15);
+			location.SetTitleColor (UIColor.White, UIControlState.Normal);
+			location.SetTitle ("Tampa, Florida USA", UIControlState.Normal);
+			//title.Lines = 2;
+			location.TouchUpInside += (sender, e) => {
+				NavController.PopToRootViewController (false);
+				SidebarController.CloseMenu ();
+			};
 			UIImageView profileImage = new UIImageView () { Image = UIImage.FromBundle ("1481450570_05-myhouse.png")};
 			profileImage.Frame = new RectangleF (50, 275, 25, 30);
 			var introButton = new UIButton(UIButtonType.System);
@@ -120,7 +131,8 @@ namespace FavoriteMovies
 			showTipsButton.HorizontalAlignment = UIControlContentHorizontalAlignment.Left;
 			showTipsButton.SetTitleColor (UIColor.White, UIControlState.Normal);
 			showTipsButton.Font = UIFont.FromName (UIColorExtensions.CONTENT_FONT, 18);
-			showTipsButton.TouchUpInside += (sender, e) => {
+			showTipsButton.TouchUpInside += (sender, e) => 
+			{
 				//NavController.PushViewController(new ContentController(), false);
 				//NavController.PushViewController (new MovieListPickerViewController (null, false), false);
 				//SidebarController.ChangeContentView (new MovieListPickerViewController (null, true));
@@ -129,6 +141,7 @@ namespace FavoriteMovies
 
 
 			View.Add(title);
+			View.Add (location);
 			View.Add(introButton);
 			View.Add(contentButton);
 			View.Add(connectionsButton);

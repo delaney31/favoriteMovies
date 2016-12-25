@@ -80,9 +80,10 @@ namespace FavoriteMovies
 		}
 		public override UITableViewCell GetCell (UITableView tableView, NSIndexPath indexPath)
 		{
-			var cell = (MDCard)tableView.DequeueReusableCell ("CardCell");
+			const string CellIdentifier = @"CardCell";
+			var cell = (MDCard)tableView.DequeueReusableCell (CellIdentifier);
 			if (cell == null) {
-				cell = new MDCard (UITableViewCellStyle.Default, "CardCell");
+				cell = new MDCard (UITableViewCellStyle.Default, CellIdentifier);
 			}
 			cell.profileImage.Image = MovieCell.GetImageUrl(tableItems [indexPath.Row].ImageLink);
 			var backGroundColor = MovieDetailViewController.averageColor (cell.profileImage.Image);

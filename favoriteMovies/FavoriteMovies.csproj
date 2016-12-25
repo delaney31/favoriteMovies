@@ -36,7 +36,7 @@
     <OutputPath>bin\iPhone\Release</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CodesignKey>iPhone Developer</CodesignKey>
+    <CodesignKey>iPhone Distribution</CodesignKey>
     <MtouchUseSGen>true</MtouchUseSGen>
     <MtouchUseRefCounting>true</MtouchUseRefCounting>
     <MtouchFloat32>true</MtouchFloat32>
@@ -139,6 +139,9 @@
     <Reference Include="Xamarin-Sidebar-Unified">
       <HintPath>..\Components\SidebarNavigation-1.9\lib\ios-unified\Xamarin-Sidebar-Unified.dll</HintPath>
     </Reference>
+    <Reference Include="JSQMessagesViewController">
+      <HintPath>..\Components\jsqmessagesviewcontroller-7.2.0\lib\ios-unified\JSQMessagesViewController.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Contents.json" />
@@ -188,6 +191,7 @@
     <Compile Include="MovieNewsFeed.cs" />
     <Compile Include="NewsFeedViewController.cs" />
     <Compile Include="CustomControls\MDCard.cs" />
+    <Compile Include="AzureUserService.cs" />
   </ItemGroup>
   <ItemGroup>
     <BundleResource Include="Resources\placeholder.png" />
@@ -233,6 +237,14 @@
   <ItemGroup>
     <XamarinComponentReference Include="SidebarNavigation">
       <Version>1.9</Version>
+      <Visible>False</Visible>
+    </XamarinComponentReference>
+    <XamarinComponentReference Include="jsqmessagesviewcontroller">
+      <Version>7.2.0</Version>
+      <Visible>False</Visible>
+    </XamarinComponentReference>
+    <XamarinComponentReference Include="azure-messaging">
+      <Version>1.2.5.2</Version>
       <Visible>False</Visible>
     </XamarinComponentReference>
   </ItemGroup>
