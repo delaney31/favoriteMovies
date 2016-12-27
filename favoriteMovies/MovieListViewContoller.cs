@@ -69,7 +69,7 @@ namespace FavoriteMovies
 				Debug.WriteLine (e.Message);
 
 				using (var conn = new SQLite.SQLiteConnection (MovieService.Database)) {
-					conn.CreateTable<Movie> ();
+					conn.CreateTable<Movie> (CreateFlags.ImplicitPK | CreateFlags.AutoIncPK);
 					conn.CreateTable<CustomList> (CreateFlags.ImplicitPK | CreateFlags.AutoIncPK);
 				}
 

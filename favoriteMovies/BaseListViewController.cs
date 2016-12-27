@@ -115,7 +115,7 @@ namespace FavoriteMovies
 						if (movieDetail != null)
 							DeleteMovie (movieDetail.id);
 
-						DeleteAll ();
+						//DeleteAll ();
 						//if (Id != null)
 						//	DeleteAll (Id);
 						//else
@@ -126,9 +126,12 @@ namespace FavoriteMovies
 							if (tableItems [list].name != "add new") {
 								var item = tableItems [list] as CustomList;
 								if (item != null)
-									db.Insert (tableItems [list], typeof (CustomList));
-								else
-									db.InsertOrReplace (tableItems [list], typeof (Movie));
+									db.InsertOrReplace (tableItems [list], typeof (CustomList));
+								else 
+								{
+									
+									db.Insert (tableItems [list], typeof (Movie));
+								}
 
 							}
 
@@ -144,7 +147,8 @@ namespace FavoriteMovies
 								else
 									movieDetail.CustomListID = value;
 
-								db.InsertOrReplace (movieDetail, typeof (Movie));
+
+								db.Insert (movieDetail, typeof (Movie));
 							}
 						}
 
@@ -155,7 +159,7 @@ namespace FavoriteMovies
 					Debug.WriteLine (e.Message);
 
 					using (var conn = new SQLite.SQLiteConnection (MovieService.Database)) {
-						conn.CreateTable<Movie> ();
+						conn.CreateTable<Movie> (CreateFlags.ImplicitPK | CreateFlags.AutoIncPK);
 						conn.CreateTable<CustomList> (CreateFlags.ImplicitPK | CreateFlags.AutoIncPK);
 					}
 					;
@@ -163,7 +167,7 @@ namespace FavoriteMovies
 						if (movieDetail != null)
 							DeleteMovie (movieDetail.id);
 
-						DeleteAll ();
+						//DeleteAll ();
 
 						for (var list = 0; list < tableItems.Count; list++) {
 
@@ -171,9 +175,11 @@ namespace FavoriteMovies
 								var item = tableItems [list] as CustomList;
 								if (item != null)
 									db.Insert (tableItems [list], typeof (CustomList));
-								else
-									db.InsertOrReplace (tableItems [list], typeof (Movie));
-
+								else 
+								{
+									
+									db.Insert (tableItems [list], typeof (Movie));
+								}
 							}
 
 							if (upDateMovieDetail && (tableItems [list].id == Id)) {
@@ -188,7 +194,8 @@ namespace FavoriteMovies
 								else
 									movieDetail.CustomListID = value;
 
-								db.InsertOrReplace (movieDetail, typeof (Movie));
+
+								db.Insert (movieDetail, typeof (Movie));
 							}
 						}
 
@@ -292,7 +299,7 @@ namespace FavoriteMovies
 					Debug.WriteLine (e.Message);
 
 					using (var conn = new SQLite.SQLiteConnection (MovieService.Database)) {
-						conn.CreateTable<Movie> ();
+						conn.CreateTable<Movie> (CreateFlags.ImplicitPK | CreateFlags.AutoIncPK);;
 						conn.CreateTable<CustomList> (CreateFlags.ImplicitPK | CreateFlags.AutoIncPK);
 					}
 					using (var db = new SQLiteConnection (MovieService.Database)) {
@@ -370,7 +377,7 @@ namespace FavoriteMovies
 				Debug.WriteLine (e.Message);
 
 				using (var conn = new SQLite.SQLiteConnection (MovieService.Database)) {
-					conn.CreateTable<Movie> ();
+					conn.CreateTable<Movie> (CreateFlags.ImplicitPK | CreateFlags.AutoIncPK);
 					conn.CreateTable<CustomList> (CreateFlags.ImplicitPK | CreateFlags.AutoIncPK);
 				}
 				DeleteAll ();

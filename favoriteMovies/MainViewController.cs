@@ -186,7 +186,7 @@ namespace FavoriteMovies
 				MinimumInteritemSpacing = MinimumInteritemSpacing, MinimumLineSpacing = MinimumLineSpacing,
 				HeaderReferenceSize = HeaderReferenceSize, ItemSize = ItemSize,
 				ScrollDirection = UICollectionViewScrollDirection.Horizontal
-			},new ObservableCollection<Movie>(GetMovieList (customLists [cnt]).Reverse ()),NavController);
+			},new ObservableCollection<Movie>(GetMovieList (customLists [cnt]).Reverse ()),this);
 
 			customControllers [cnt].CollectionView.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha);
 			customControllers [cnt].CollectionView.RegisterClassForCell (typeof (MovieCell), FavoritesViewController.movieCellId);
@@ -313,6 +313,7 @@ namespace FavoriteMovies
 						item.VoteAverage = movie.VoteAverage;
 						item.UserReview = movie.UserReview;
 						item.UserRating = movie.UserRating;
+						item.OriginalId = movie.OriginalId;
 						item.order = movie.order;
 						returnList.Add (item);
 					}
@@ -326,7 +327,7 @@ namespace FavoriteMovies
 		public override void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
-			scrollView.Frame = new CGRect () { X = View.Frame.X, Y = View.Frame.Y, Width = View.Frame.Width, Height = View.Frame.Height};
+			scrollView.Frame = new CGRect () { X = View.Frame.X, Y = View.Frame.Y, Width = View.Frame.Width, Height = View.Frame.Height- 44};
 			//scrollView.PagingEnabled = true;
 
 			customLists = GetCustomLists ();
@@ -369,7 +370,7 @@ namespace FavoriteMovies
 				MinimumInteritemSpacing = MinimumInteritemSpacing, MinimumLineSpacing = MinimumLineSpacing,
 				HeaderReferenceSize = HeaderReferenceSize, ItemSize = ItemSize,
 				ScrollDirection = UICollectionViewScrollDirection.Horizontal
-			}, topRated, NavController);
+			}, topRated, this);
 			topRatedController.CollectionView.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha);
 			topRatedController.CollectionView.RegisterClassForCell (typeof (MovieCell), TopRatedCollectionViewController.movieCellId);
 
@@ -380,7 +381,7 @@ namespace FavoriteMovies
 				MinimumInteritemSpacing = MinimumInteritemSpacing, MinimumLineSpacing = MinimumLineSpacing,
 				HeaderReferenceSize = HeaderReferenceSize, ItemSize = ItemSize,
 				ScrollDirection = UICollectionViewScrollDirection.Horizontal
-			}, nowPlaying, NavController);
+			}, nowPlaying, this);
 			nowPlayingController.CollectionView.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha);
 			nowPlayingController.CollectionView.RegisterClassForCell (typeof (MovieCell), NowPlayingCollectionViewController.movieCellId);
 
@@ -390,12 +391,12 @@ namespace FavoriteMovies
 				MinimumInteritemSpacing = MinimumInteritemSpacing, MinimumLineSpacing = MinimumLineSpacing,
 				HeaderReferenceSize = HeaderReferenceSize, ItemSize = ItemSize,
 				ScrollDirection = UICollectionViewScrollDirection.Horizontal
-			}, popular, NavController);
+			}, popular, this);
 			popularController.CollectionView.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha);
 			popularController.CollectionView.RegisterClassForCell (typeof (MovieCell), PopularCollectionViewController.movieCellId);
 
 
-			MovieLatestController = new MovieLatestViewController (flowLayout, MovieLatest, NavController);
+			MovieLatestController = new MovieLatestViewController (flowLayout, MovieLatest, this);
 			MovieLatestController.CollectionView.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha);
 			MovieLatestController.CollectionView.RegisterClassForCell (typeof (MovieCell), MovieLatestViewController.movieCellId);
 

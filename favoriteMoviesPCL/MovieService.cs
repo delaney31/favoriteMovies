@@ -224,7 +224,8 @@ namespace FavoriteMoviesPCL
 					newMovie.name = (string)jObj ["title"];
 					newMovie.PosterPath = (jObj ["poster_path"] == null) ? "" : (string)jObj ["poster_path"];
 					newMovie.HighResPosterPath = (jObj ["poster_path"] == null) ? "" : (string)jObj ["poster_path"];
-					newMovie.id = (int)jObj ["id"];
+					newMovie.OriginalId= (int)jObj ["id"];
+					newMovie.id = null;
 					newMovie.Overview = (string)jObj ["overview"];
 					newMovie.VoteCount = (double)jObj ["vote_count"];
 					newMovie.ReleaseDate = (DateTime?)jObj ["release_date"];

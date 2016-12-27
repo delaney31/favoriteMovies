@@ -19,9 +19,9 @@ namespace FavoriteMovies
 		ObservableCollection<Movie> _items { get; set; }
 		public float FontSize { get; set; }
 		public SizeF ImageViewSize { get; set; }
-		UINavigationController viewController;
+		BaseController viewController;
 
-		protected BaseCollectionViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies, UINavigationController vc) : base (layout)
+		protected BaseCollectionViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies, BaseController vc) : base (layout)
 		{
 			_items = movies;
 			this.viewController = vc;
@@ -102,7 +102,7 @@ namespace FavoriteMovies
 				//// show the loading overlay on the UI thread using the correct orientation sizing
 				//loadingOverlay = new LoadingOverlay (bounds);
 				//View.Add (loadingOverlay);
-				viewController.PushViewController (new MovieDetailViewController (row, false), true);
+				viewController.NavController.PushViewController (new MovieDetailViewController (row, false), true);
 				viewController.ViewDidAppear (true);
 				//this.ParentViewController.NavigationController.PushViewController(new MovieDetailViewController (row, false), true);
 
@@ -122,7 +122,7 @@ namespace FavoriteMovies
 	{
 		ObservableCollection<Movie> _items { get; set; }
 		public static NSString movieCellId = new NSString ("PopularPlayingMovieCell");
-		public PopularCollectionViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies, UINavigationController vc) : base (layout, movies, vc)
+		public PopularCollectionViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies, MainViewController vc) : base (layout, movies, vc)
 		{
 			_items = movies;
 		}
@@ -154,7 +154,7 @@ namespace FavoriteMovies
 	{
 		ObservableCollection<Movie> _items { get; set; }
 		public static NSString movieCellId = new NSString ("TopRatedMovieCell");
-		public TopRatedCollectionViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies, UINavigationController vc) : base (layout, movies, vc)
+		public TopRatedCollectionViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies, MainViewController vc) : base (layout, movies, vc)
 		{
 			_items = movies;
 		}
@@ -187,8 +187,8 @@ namespace FavoriteMovies
 	{
 		ObservableCollection<Movie> _items { get; set; }
 		public static NSString movieCellId = new NSString ("FavoritesMovieCell");
-		UINavigationController viewController;
-		public FavoritesViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies, UINavigationController vc) : base (layout, movies, vc)
+		MainViewController viewController;
+		public FavoritesViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies, MainViewController vc) : base (layout, movies, vc)
 		{
 			_items = movies;
 			this.viewController = vc;
@@ -225,7 +225,7 @@ namespace FavoriteMovies
 			try {
 				var row = _items [indexPath.Row];
 				//MainViewController.OldCustomListToRefresh = this.Row;
-				viewController.PushViewController (new MovieDetailViewController (row, true), true);
+				viewController.NavController.PushViewController (new MovieDetailViewController (row, true), true);
 
 			} catch (Exception e) {
 				Debug.WriteLine (e.Message);
@@ -236,7 +236,7 @@ namespace FavoriteMovies
 	{
 		ObservableCollection<Movie> _items { get; set; }
 		public static NSString movieCellId = new NSString ("LatestMovieCell");
-		public MovieLatestViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies, UINavigationController vc) : base (layout, movies, vc)
+		public MovieLatestViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies, MainViewController vc) : base (layout, movies, vc)
 		{
 			_items = movies;
 		}
@@ -266,7 +266,7 @@ namespace FavoriteMovies
 	{
 		ObservableCollection<Movie> _items { get; set; }
 		public static NSString movieCellId = new NSString ("NowPlayingMovieCell");
-		public NowPlayingCollectionViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies, UINavigationController vc) : base (layout, movies, vc)
+		public NowPlayingCollectionViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies, MainViewController vc) : base (layout, movies, vc)
 		{
 			_items = movies;
 		}
@@ -294,7 +294,7 @@ namespace FavoriteMovies
 	{
 		ObservableCollection<Movie> _items { get; set; }
 		public static NSString movieCellId = new NSString ("SimilarMovieCell");
-		public SimilarCollectionViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies, UINavigationController vc) : base (layout, movies, vc)
+		public SimilarCollectionViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies, MovieDetailViewController vc) : base (layout, movies, vc)
 		{
 			_items = movies;
 		}

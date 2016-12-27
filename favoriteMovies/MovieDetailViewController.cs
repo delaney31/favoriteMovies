@@ -84,7 +84,7 @@ namespace FavoriteMovies
 
 		void Initialize ()
 		{
-			var imDbUrl = "http://api.themoviedb.org/3/movie/" + movieDetail.id + "/videos?api_key=" + MovieService._apiKey;
+			var imDbUrl = "http://api.themoviedb.org/3/movie/" + movieDetail.OriginalId+ "/videos?api_key=" + MovieService._apiKey;
 
 
 			var UTubeMovidId = Task.Run (async () => {
@@ -310,7 +310,7 @@ namespace FavoriteMovies
 					MinimumInteritemSpacing = MinimumInteritemSpacing, MinimumLineSpacing = MinimumLineSpacing,
 					HeaderReferenceSize = HeaderReferenceSize, ItemSize = ItemSize,
 					ScrollDirection = UICollectionViewScrollDirection.Horizontal
-				}, similarMovies, NavController);
+				}, similarMovies, this);
 				similarMoviesController.CollectionView.BackgroundColor = backGroundColor;
 				similarMoviesController.CollectionView.RegisterClassForCell (typeof (MovieCell), SimilarCollectionViewController.movieCellId);
 				//similar movies
@@ -331,7 +331,7 @@ namespace FavoriteMovies
 			}
 
 			var getCast = Task.Run (async () => {
-				castList = await MovieService.MovieCreditsAsync (movieDetail.id.ToString ());
+				castList = await MovieService.MovieCreditsAsync (movieDetail.OriginalId.ToString ());
 			});
 			getCast.Wait ();
 			//DeleteAllSubviews (scrollView);
@@ -378,7 +378,7 @@ namespace FavoriteMovies
 
 			_embededMoveId = youtubeMovieId;
 			var getSimilarMovies = Task.Run (async () => {
-				similarMovies = await MovieService.GetMoviesAsync (MovieService.MovieType.Similar, 1, (int)movieDetail.id);
+				similarMovies = await MovieService.GetMoviesAsync (MovieService.MovieType.Similar, 1, movieDetail.OriginalId);
 			});
 			getSimilarMovies.Wait ();
 
@@ -462,7 +462,8 @@ namespace FavoriteMovies
 				using (var db = new SQLite.SQLiteConnection (MovieService.Database)) {
 					// there is a sqllite bug here https://forums.xamarin.com/discussion/52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
 					DeleteAll (item.CustomListID, (int)item.id);
-					db.InsertOrReplace (item, typeof (Movie));
+
+					db.Insert (item, typeof (Movie));
 
 				}
 

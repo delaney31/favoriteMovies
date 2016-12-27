@@ -10,8 +10,9 @@ namespace FavoriteMoviesPCL
 		public string name { get; set; }
 		public string HighResPosterPath { get; set; }
 		public string PosterPath { get; set; }
-		[PrimaryKey]
+		[PrimaryKey, AutoIncrement]
 		public int ?id { get; set; }
+		public int OriginalId { get; set;}
 		public int? CustomListID { get; set;}
 		public string Overview { get; set; }
 		public double VoteCount { get; set; }
