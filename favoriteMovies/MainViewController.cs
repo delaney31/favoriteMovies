@@ -153,7 +153,7 @@ namespace FavoriteMovies
 			SidebarController.Disabled = false;
 
 			//this fixes problem when coming out of full screen after watching a trailer
-			NavigationController.NavigationBar.Frame = new CGRect () { X = 0, Y = 20, Width = 320, Height = 44 };
+			NavController.NavigationBar.Frame = new CGRect () { X = 0, Y = 20, Width = 320, Height = 44 };
 			//DeleteAllSubviews (scrollView);
 
 

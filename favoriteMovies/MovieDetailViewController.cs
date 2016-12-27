@@ -195,7 +195,7 @@ namespace FavoriteMovies
 
 			var AddStar3 = new UITapGestureRecognizer ();
 			AddStar3.AddTarget (() => { AddStarAction (AddStar3); });
-			Userstar3.AddGestureRecognizer (AddStar3);
+			Userstar3.AddGestureRecognizer(AddStar3);
 
 			var AddStar4 = new UITapGestureRecognizer ();
 			AddStar4.AddTarget (() => { AddStarAction (AddStar4); });
@@ -203,7 +203,7 @@ namespace FavoriteMovies
 
 			var AddStar5 = new UITapGestureRecognizer ();
 			AddStar5.AddTarget (() => { AddStarAction (AddStar5); });
-			Userstar5.AddGestureRecognizer (AddStar5);
+			Userstar5.AddGestureRecognizer(AddStar5);
 
 			userResultText.Text = "Your Rating: " + Convert.ToInt32 (movieDetail.UserRating) + " of 5";
 			userResultText.BackgroundColor = backGroundColor;

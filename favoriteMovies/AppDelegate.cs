@@ -34,6 +34,7 @@ namespace FavoriteMovies
 			Window.MakeKeyAndVisible ();
 			MovieService.Database = Path.Combine (FileHelper.GetLocalStoragePath (), "MovieEntries.db3");
 
+
 			rootViewController = new RootViewController ();
 			var settings = UIUserNotificationSettings.GetSettingsForTypes (
   			UIUserNotificationType.Alert | UIUserNotificationType.Badge | UIUserNotificationType.Sound

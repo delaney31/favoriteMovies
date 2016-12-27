@@ -67,12 +67,18 @@ namespace FavoriteMovies
 		public override void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
-				
+			//// create a slideout navigation controller with the top navigation controller and the menu view controller
+			NavController = new NavController ();
+			NavController.NavigationBar.BarTintColor = UIColor.Clear.FromHexString (UIColorExtensions.NAV_BAR_COLOR, 1.0f);
+			NavController.NavigationBar.TintColor = UIColor.White;
+			NavController.NavigationBar.Translucent = true;
+			NavController.NavigationBar.TitleTextAttributes = new UIStringAttributes () {
+				ForegroundColor = UIColor.White
+			};
+
 			var mainView = new MainViewController (TopRated, NowPlaying, Popular, MovieLatest, Page);
 			mainView.Title = "Home";
 			mainView.TabBarItem.SetFinishedImages(UIImage.FromBundle ("home-7.png"),UIImage.FromBundle ("home-7.png"));
-
-			var uinc1 = new UINavigationController (mainView);
 
 
 			var tab2 = new NewsFeedViewController ();
@@ -80,9 +86,12 @@ namespace FavoriteMovies
 			tab2.View.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 			tab2.TabBarItem.SetFinishedImages (UIImage.FromBundle ("newspaper-7.png"), UIImage.FromBundle ("newspaper-7.png"));
 			var uinc2 = new UINavigationController (tab2);
-			//uinc2.PushViewController (tab2,true);
-			//var controllers = new UIViewController [] { tab2 };
-			//uinc2.SetViewControllers (controllers, true);
+			uinc2.NavigationBar.BarTintColor = UIColor.Clear.FromHexString (UIColorExtensions.NAV_BAR_COLOR, 1.0f);
+			uinc2.NavigationBar.TintColor = UIColor.White;
+			uinc2.NavigationBar.Translucent = true;
+			uinc2.NavigationBar.TitleTextAttributes = new UIStringAttributes () {
+				ForegroundColor = UIColor.White
+			};
 			Console.WriteLine (uinc2.ViewControllers.Length);
 
 			var tab3 = new UIViewController ();
@@ -91,8 +100,13 @@ namespace FavoriteMovies
 			tab3.TabBarItem.SetFinishedImages (UIImage.FromBundle ("message-7.png"), UIImage.FromBundle ("message-7.png"));
 
 			var uinc3 = new UINavigationController (tab3);
-			//uinc3.PushViewController (tab3, true);
-
+		
+			uinc3.NavigationBar.BarTintColor = UIColor.Clear.FromHexString (UIColorExtensions.NAV_BAR_COLOR, 1.0f);
+			uinc3.NavigationBar.TintColor = UIColor.White;
+			uinc3.NavigationBar.Translucent = true;
+			uinc3.NavigationBar.TitleTextAttributes = new UIStringAttributes () {
+				ForegroundColor = UIColor.White
+			};
 
 			var tab4 = new UIViewController ();
 			tab4.Title = "Invite";
@@ -100,11 +114,15 @@ namespace FavoriteMovies
 			tab4.TabBarItem.SetFinishedImages (UIImage.FromBundle ("email-7.png"), UIImage.FromBundle ("email-7.png"));
 
 			var uinc4 = new UINavigationController (tab4);
-			//uinc4.PushViewController (tab4, true);
+			uinc4.NavigationBar.BarTintColor = UIColor.Clear.FromHexString (UIColorExtensions.NAV_BAR_COLOR, 1.0f);
+			uinc4.NavigationBar.TintColor = UIColor.White;
+			uinc4.NavigationBar.Translucent = true;
+			uinc4.NavigationBar.TitleTextAttributes = new UIStringAttributes () {
+				ForegroundColor = UIColor.White
+			};
 
-
-			var tabs = new UINavigationController [] {
-				uinc1, uinc2, uinc3, uinc4};
+			var tabs = new UIViewController [] {
+				mainView, uinc2, uinc3, uinc4};
 			TabController = new MovieTabBarController ();
 
 
@@ -123,16 +141,9 @@ namespace FavoriteMovies
 				Debug.Write (ex.Message);
 			}
 
-			// create a slideout navigation controller with the top navigation controller and the menu view controller
-			NavController = new NavController ();
-			NavController.NavigationBar.BarTintColor = UIColor.Clear.FromHexString (UIColorExtensions.NAV_BAR_COLOR, 1.0f);
-			NavController.NavigationBar.TintColor = UIColor.White;
-			NavController.NavigationBar.Translucent = true;
-			NavController.NavigationBar.TitleTextAttributes = new UIStringAttributes () {
-				ForegroundColor = UIColor.White
-			};
 
-			SidebarController = new SidebarController (this, NavController, new SideMenuController ());
+
+			SidebarController = new SidebarController (this,NavController , new SideMenuController ());
 			SidebarController.MenuWidth = 220;
 			SidebarController.MenuLocation = SidebarController.MenuLocations.Right;
 			SidebarController.ReopenOnRotate = false;

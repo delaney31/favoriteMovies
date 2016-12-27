@@ -17,7 +17,7 @@
     <DefineConstants>DEBUG;ENABLE_TEST_CLOUD;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CodesignKey>iPhone Developer: TIMOTHY DELANEY (LP695RTGQ3)</CodesignKey>
+    <CodesignKey>iPhone Developer</CodesignKey>
     <MtouchDebug>true</MtouchDebug>
     <MtouchFastDev>true</MtouchFastDev>
     <MtouchProfiling>true</MtouchProfiling>
@@ -28,7 +28,7 @@
     <MtouchHttpClientHandler>HttpClientHandler</MtouchHttpClientHandler>
     <MtouchTlsProvider>Default</MtouchTlsProvider>
     <PlatformTarget>x86</PlatformTarget>
-    <CodesignProvision>82288864-66cc-4797-9fd2-518ee9b08144</CodesignProvision>
+    <CodesignProvision></CodesignProvision>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
     <DebugType></DebugType>
@@ -224,6 +224,8 @@
     <BundleResource Include="Resources\newspaper-7.png" />
     <BundleResource Include="Resources\email-7.png" />
     <BundleResource Include="Resources\tips.png" />
+    <BundleResource Include="Resources\432920-200.png" />
+    <BundleResource Include="Resources\432920-200 %281%29.png" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\favoriteMoviesPCL\favoriteMoviesPCL.csproj">

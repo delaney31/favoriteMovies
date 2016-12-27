@@ -20,8 +20,8 @@ namespace FavoriteMovies
 
 			var contentController = new ContentController ();
 			contentController.ContentButton.TouchUpInside += (o, e) => {
-				if (NavController.NavigationController.TopViewController as ContentController == null)
-					NavController.NavigationController.PushViewController (contentController, false);
+			//	if (NavController.NavigationController.TopViewController as ContentController == null)
+			//		NavController.NavigationController.PushViewController (contentController, false);
 				SidebarController.CloseMenu ();
 			};
 

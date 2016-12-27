@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Globalization;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,9 +14,15 @@ namespace FavoriteMovies
 
 	public class NewsFeedViewController : UIViewController
 	{
+		void HandleAction ()
+		{
+
+		}
+
 		List<FeedItem> tableItems = new List<FeedItem> ();
 		UITableView table;
 		NewsFeedTableSource tableSource;
+		UIBarButtonItem add;
 		public override void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
@@ -27,17 +34,196 @@ namespace FavoriteMovies
 			task.Wait (ts);
 			if (!task.Wait (ts))
 				Console.WriteLine ("The timeout interval elapsed.");
-			
+
 			table = new UITableView (View.Bounds);
 			table.AutoresizingMask = UIViewAutoresizing.All;
 			tableSource = new NewsFeedTableSource (tableItems, this);
 			table.Source = tableSource;
 			table.AllowsSelectionDuringEditing = true;
-			Add (table);
+
+
+
+			add = new UIBarButtonItem (UIBarButtonSystemItem.Add, (s, e) => 
+			{
+				
+				var newPost = new UINavigationController (new NewFeedPostViewController());
+
+				newPost.View.Frame = new CGRect () { X = 10, Y = 15, Width = 300, Height=300};
+				NavigationController.PresentViewController (newPost, true, null);
+			});
+
+
+			NavigationItem.RightBarButtonItem = add;
+
+		
+			View.Add (table);
 		}
+		
 	}
 
+	public class NewFeedPostViewController :UIViewController
+	{
+		UIImagePickerController imagePicker;
+		UITextView comment;
+		UIBarButtonItem close;
 
+
+
+		public override void ViewDidLoad ()
+		{
+			base.ViewDidLoad ();
+
+
+
+			View.BackgroundColor = UIColor.White;
+
+
+
+
+			close = new UIBarButtonItem (UIBarButtonSystemItem.Cancel, (s, e) => {
+
+				this.DismissViewController (true, null);
+			});
+
+
+			comment = new UITextView (new RectangleF (20, 0, 270, 400));
+			comment.Font = UIFont.FromName (UIColorExtensions.CONTENT_FONT, 15);
+			comment.TintColor = UIColor.Black;
+			//comment.BackgroundColor = UIColor.Gray;
+			//comment.ReturnKeyType = UIReturnKeyType.Done;
+			comment.BecomeFirstResponder ();
+
+
+
+
+
+			NavigationController.NavigationBar.BarTintColor = UIColor.Clear.FromHexString (UIColorExtensions.NAV_BAR_COLOR, 1.0f);
+			NavigationController.NavigationBar.TintColor = UIColor.White;
+			NavigationController.NavigationBar.Translucent = true;
+			NavigationController.NavigationBar.TitleTextAttributes = new UIStringAttributes () {
+				ForegroundColor = UIColor.White
+			};
+
+
+			var image = new UIBarButtonItem (UIBarButtonSystemItem.Camera, (s, e) => {
+
+				imagePicker = new UIImagePickerController ();
+				imagePicker.SourceType = UIImagePickerControllerSourceType.PhotoLibrary;
+				imagePicker.MediaTypes = UIImagePickerController.AvailableMediaTypes (UIImagePickerControllerSourceType.PhotoLibrary);
+				imagePicker.FinishedPickingMedia += Handle_FinishedPickingMedia;
+				imagePicker.Canceled += Handle_Canceled;
+				NavigationController.PresentModalViewController (imagePicker, true);
+			});
+
+
+			var post = new UIBarButtonItem ("Post", UIBarButtonItemStyle.Done,  (s, e) => {
+
+
+			});
+			var icon = UIImage.FromBundle ("432920-200(1).png");
+			var barButton = new UIBarButtonItem (UIBarButtonSystemItem.Done, (sender, e) =>
+			// var barButton = new UIBarButtonItem ("Dismiss",UIBarButtonItemStyle.Plain, (sender, e) => 
+			//var barButton = new UIBarButtonItem (icon,UIBarButtonItemStyle.Plain, (sender, e) => 
+			{
+				comment.ResignFirstResponder ();
+			});
+			var toolbarItems = new UIBarButtonItem [] {image, new UIBarButtonItem (UIBarButtonSystemItem.FlexibleSpace), barButton};
+			UIToolbar toolbar = new UIToolbar () { Frame = new CGRect () { X = 0, Y = 0, Width = View.Frame.Size.Width, Height=50}};
+			toolbar.BarStyle = UIBarStyle.Default;
+			toolbar.Items = toolbarItems;
+			toolbar.SizeToFit ();
+			comment.InputAccessoryView = toolbar;
+
+
+
+			NavigationItem.Title = "Post to Feed";
+			NavigationItem.RightBarButtonItem = close;
+			NavigationItem.LeftBarButtonItem = post;
+
+			//this.SetToolbarItems(toolbarItems, true);
+			//NavigationController.ToolbarHidden = false;
+			View.Add (comment);
+		
+
+		
+
+
+
+		}
+
+
+		void Handle_Canceled (object sender, EventArgs e)
+		{
+			imagePicker.DismissModalViewController (true);
+		}
+
+		void Handle_FinishedPickingMedia (object sender, UIImagePickerMediaPickedEventArgs e)
+		{
+			// determine what was selected, video or image
+
+			bool isImage = false;
+			switch (e.Info [UIImagePickerController.MediaType].ToString ()) {
+			case "public.image":
+				Console.WriteLine ("Image selected");
+				isImage = true;
+				break;
+			case "public.video":
+				Console.WriteLine ("Video selected");
+				break;
+			}
+
+			// get common info (shared between images and video)
+			NSUrl referenceURL = e.Info [new NSString ("UIImagePickerControllerReferenceUrl")] as NSUrl;
+			if (referenceURL != null)
+				Console.WriteLine ("Url:" + referenceURL.ToString ());
+
+			// if it was an image, get the other image info
+			if (isImage) {
+				// get the original image
+				UIImage originalImage = e.Info [UIImagePickerController.OriginalImage] as UIImage;
+				if (originalImage != null) {
+					// do something with the image
+					Console.WriteLine ("got the original image");
+					MFTextAttachment attachImage = new MFTextAttachment ();
+					attachImage.Image = originalImage; // display
+					//attachImage.Bounds = new CGRect () {X=50, Y=90,Width = attachImage.Image.Size.Width, Height = attachImage.Image.Size.Height  };
+
+					var initialText = comment.AttributedText;
+					var newText = new NSMutableAttributedString (initialText);
+					newText.Append (NSAttributedString.CreateFrom (attachImage));
+					comment.AttributedText = newText;
+					comment.BecomeFirstResponder ();
+				}
+			} else { // if it's a video
+					 // get video url
+				NSUrl mediaURL = e.Info [UIImagePickerController.MediaURL] as NSUrl;
+				if (mediaURL != null) {
+					Console.WriteLine (mediaURL.ToString ());
+				}
+			}
+			// dismiss the picker
+			imagePicker.DismissModalViewController (true);
+		}
+
+	}
+
+	class MFTextAttachment:NSTextAttachment
+	{
+		public override CGRect GetAttachmentBounds (NSTextContainer textContainer, CGRect proposedLineFragment, CGPoint glyphPosition, nuint characterIndex)
+		{
+			nfloat width = proposedLineFragment.Size.Width;
+
+			var height = proposedLineFragment.Size.Height;
+			nfloat scalingFactor = 1.0f;
+
+			CGSize imageSize = this.Image.Size;
+			if (width < imageSize.Width)
+				scalingFactor = width / imageSize.Width;
+			CGRect rect = new CGRect () { X = 0, Y = 0, Width = imageSize.Width * scalingFactor, Height = imageSize.Height * scalingFactor};
+
+			return rect;
+		}
+	}
 	public class NewsFeedTableSource:UITableViewSource
 	{
 		List<FeedItem> tableItems;
@@ -102,3 +288,5 @@ namespace FavoriteMovies
 		}
 	}
 }
+
+		

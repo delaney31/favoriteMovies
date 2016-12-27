@@ -38,12 +38,7 @@ namespace FavoriteMovies
 
 			this.ViewControllerSelected += (sender, e) => 
 			{
-				((UINavigationController)SelectedViewController).NavigationBar.BarTintColor = UIColor.Clear.FromHexString (UIColorExtensions.NAV_BAR_COLOR, 1.0f);
-				((UINavigationController)SelectedViewController).NavigationBar.TintColor = UIColor.White;
-				((UINavigationController)SelectedViewController).NavigationBar.Translucent = true;
-				((UINavigationController)SelectedViewController).NavigationBar.TitleTextAttributes = new UIStringAttributes () {
-					ForegroundColor = UIColor.White
-				};
+				
 				// Take action based on the tab being selected
 				if (TabBar.SelectedItem.Title == "Home")
 					NavigationController.NavigationBar.Hidden = false;
