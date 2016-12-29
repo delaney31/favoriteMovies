@@ -52,6 +52,7 @@ namespace FavoriteMovies
 						item.Favorite = mov.Favorite;
 						item.HighResPosterPath = mov.HighResPosterPath;
 						item.OriginalLanguage = mov.OriginalLanguage;
+						item.OriginalId = mov.OriginalId;
 						item.Overview = mov.Overview;
 						item.Popularity = mov.Popularity;
 						item.PosterPath = mov.PosterPath;

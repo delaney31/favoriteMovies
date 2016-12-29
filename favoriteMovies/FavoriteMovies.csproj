@@ -195,6 +195,7 @@
     <Compile Include="NewsFeedViewController.cs" />
     <Compile Include="CustomControls\MDCard.cs" />
     <Compile Include="AzureUserService.cs" />
+    <Compile Include="CustomControls\userCard.cs" />
   </ItemGroup>
   <ItemGroup>
     <BundleResource Include="Resources\placeholder.png" />

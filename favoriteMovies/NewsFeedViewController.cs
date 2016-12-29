@@ -30,7 +30,7 @@ namespace FavoriteMovies
 			{
 				tableItems = MovieNewsFeed.GetFeedItems ();
 			});
-			TimeSpan ts = TimeSpan.FromMilliseconds (1000);
+			TimeSpan ts = TimeSpan.FromMilliseconds (3000);
 			task.Wait (ts);
 			if (!task.Wait (ts))
 				Console.WriteLine ("The timeout interval elapsed.");

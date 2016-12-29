@@ -557,7 +557,7 @@ namespace FavoriteMovies
 					returnImage= UIImage.FromBundle ("blank.png");
 				}
 			});
-			TimeSpan ts = TimeSpan.FromMilliseconds (1000);
+			TimeSpan ts = TimeSpan.FromMilliseconds (2000);
 			task.Wait (ts);
 
 			if (!task.Wait (ts))
