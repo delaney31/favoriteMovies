@@ -4,11 +4,11 @@ using UIKit;
 
 namespace FavoriteMovies
 {
-	public class userCard:MDCard
+	public class userCard : MDCard
 	{
 		UIImageView userImage;
 		[Export ("initWithStyle:reuseIdentifier:")]
-		public userCard (UITableViewCellStyle style, string cellId): base( style, cellId) 
+		public userCard (UITableViewCellStyle style, string cellId) : base (style, cellId)
 		{
 			cardView = new UIView ();
 			profileImage = new UIImageView ();
@@ -38,5 +38,6 @@ namespace FavoriteMovies
 			ContentView.AddSubviews (cardView);
 
 		}
+	}
 
 }

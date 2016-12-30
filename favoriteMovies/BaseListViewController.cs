@@ -25,6 +25,7 @@ namespace FavoriteMovies
 			this.movieDetail = movieDetail;
 			this.fromAddList = fromAddList;
 		}
+
 		public override void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
@@ -114,8 +115,8 @@ namespace FavoriteMovies
 
 						if (movieDetail != null)
 							DeleteMovie (movieDetail.id);
-
-						//DeleteAll ();
+						else
+						   DeleteAll ();
 						//if (Id != null)
 						//	DeleteAll (Id);
 						//else

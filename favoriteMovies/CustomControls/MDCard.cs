@@ -30,9 +30,9 @@ namespace FavoriteMovies
 
 			//likeButton.Frame = new CoreGraphics.CGRect () { X = 5, Y = 20, Width = 290, Height = 290 };
 
-			titleLabel.Frame = new CoreGraphics.CGRect () { X = 15, Y = 0, Width = 250, Height = 100 };
+			titleLabel.Frame = new CoreGraphics.CGRect () { X = 15, Y = -5, Width = 250, Height = 100 };
 			titleLabel.Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, UIColorExtensions.HEADER_FONT_SIZE);
-			titleLabel.Lines = 0;
+			titleLabel.Lines = 2;
 			titleLabel.TextAlignment = UITextAlignment.Left;
 
 			nameLabel.Frame = new CoreGraphics.CGRect () { X = 15, Y = 10, Width = 300, Height = 20 };

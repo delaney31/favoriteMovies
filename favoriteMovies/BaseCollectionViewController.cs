@@ -59,10 +59,10 @@ namespace FavoriteMovies
 				return;
 
 
-
 				var p = lpgr.LocationInView (CollectionView);
 
 				var indexPath = CollectionView.IndexPathForItemAtPoint (p);
+				var isCustomList = _items [indexPath.Row].id != null;
 
 				if (indexPath == null)
 					Console.WriteLine ("Could not find index path");
@@ -73,22 +73,25 @@ namespace FavoriteMovies
 					Console.WriteLine ("Selected button {0}", accepted ? "Accepted" : "Canceled");
 					if (accepted) 
 					{
-						BaseListViewController.DeleteMovie ((int)_items [indexPath.Row].id);
-
+						//if id is null then we are on a pre-defined list (i.e Now Playing) not a custom one so nothing in table to delete
+						if (isCustomList) 
+						   BaseListViewController.DeleteMovie ((int)_items [indexPath.Row].id);
+							//cell.RemoveFromSuperview ();
+						
 						_items.RemoveAt (indexPath.Row);
-
 						CollectionView.DeleteItems (new NSIndexPath [] { indexPath });
-
-						//cell.RemoveFromSuperview ();
 						CollectionView.ReloadData ();
+
 					}
 					if (_items.Count == 0) 
 					{
 						BaseListViewController.DeleteCustomList (customListId);
+					}
+					if (isCustomList) 
+					{
 						MainViewController.NewCustomListToRefresh = 0;
 						viewController.ViewWillAppear (true);
 					}
-
 				}
 
 		}
@@ -97,6 +100,8 @@ namespace FavoriteMovies
 		public override void ItemSelected (UICollectionView collectionView, NSIndexPath indexPath)
 		{
 			try {
+				NewsFeedTableSource.ShowTabBar (viewController.TabController);
+				viewController.NavController.SetNavigationBarHidden (false, true);
 				var row = _items [indexPath.Row];
 				var bounds = UIScreen.MainScreen.Bounds;
 				//// show the loading overlay on the UI thread using the correct orientation sizing
@@ -223,6 +228,8 @@ namespace FavoriteMovies
 		public override void ItemSelected (UICollectionView collectionView, NSIndexPath indexPath)
 		{
 			try {
+				NewsFeedTableSource.ShowTabBar (viewController.TabController);
+				viewController.NavController.SetNavigationBarHidden (false, true);
 				var row = _items [indexPath.Row];
 				//MainViewController.OldCustomListToRefresh = this.Row;
 				viewController.NavController.PushViewController (new MovieDetailViewController (row, true), true);

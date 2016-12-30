@@ -87,7 +87,7 @@ namespace FavoriteMovies
 				ItemSize = ItemSize
 				//SectionInset = new UIEdgeInsets (80, -40, 97, 127)
 			};
-
+			scrollView.WillEndDragging += ScrollView_WillEndDragging;;
 		}
 
 		public override bool ShouldAutorotate ()
@@ -111,6 +111,17 @@ namespace FavoriteMovies
 			return UIInterfaceOrientationMask.Portrait;
 		}
 
+		void ScrollView_WillEndDragging (object sender, WillEndDraggingEventArgs e)
+		{
+			if (e.Velocity.Y == 0) 
+			{
+				NewsFeedTableSource.ShowTabBar (TabController);
+				NavController.SetNavigationBarHidden (false, true);
+			} else {
+				NewsFeedTableSource.HideTabBar (TabController);
+				NavController.SetNavigationBarHidden (true, true);
+			}
+		}
 
 		void LoadMoreMovies ()
 		{
@@ -179,8 +190,7 @@ namespace FavoriteMovies
 				TextColor = UIColor.Clear.FromHexString (UIColorExtensions.NAV_BAR_COLOR),
 				//Frame = FavoriteLabelFrame,
 				BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha),
-				Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, UIColorExtensions.HEADER_FONT_SIZE),
-				Text = customLists [cnt].name
+				Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, UIColorExtensions.HEADER_FONT_SIZE)
 			};
 			customControllers [cnt] = new FavoritesViewController (new UICollectionViewFlowLayout () {
 				MinimumInteritemSpacing = MinimumInteritemSpacing, MinimumLineSpacing = MinimumLineSpacing,
@@ -190,7 +200,7 @@ namespace FavoriteMovies
 
 			customControllers [cnt].CollectionView.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha);
 			customControllers [cnt].CollectionView.RegisterClassForCell (typeof (MovieCell), FavoritesViewController.movieCellId);
-
+			customLabels [cnt].Text = customLists [cnt].name + " (" + customControllers [cnt].CollectionView.NumberOfItemsInSection (0) + ")";
 		}
 
 		void DeleteAllSubviews (UIScrollView view)
@@ -281,7 +291,7 @@ namespace FavoriteMovies
 			};
 			customControllers [customList].CollectionView.Frame = new CGRect () {
 				X = FavoriteControllerFrame.X,
-				Y = customLabels [customList].Frame.Y + 17,// FavoteControllerFrame.Y + (SpaceBetweenLabelsAndFrames * customList)
+				Y = customLabels [customList].Frame.Y + 19,// FavoteControllerFrame.Y + (SpaceBetweenLabelsAndFrames * customList)
 			    Height = FavoriteControllerFrame.Height,
 				Width = FavoriteControllerFrame.Width
 			};
@@ -327,7 +337,7 @@ namespace FavoriteMovies
 		public override void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
-			scrollView.Frame = new CGRect () { X = View.Frame.X, Y = View.Frame.Y, Width = View.Frame.Width, Height = View.Frame.Height- 44};
+			scrollView.Frame = new CGRect () { X = View.Frame.X, Y = View.Frame.Y, Width = View.Frame.Width, Height = View.Frame.Height};
 			//scrollView.PagingEnabled = true;
 
 			customLists = GetCustomLists ();

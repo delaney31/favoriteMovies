@@ -77,9 +77,6 @@ namespace FavoriteMovies
 
 			View.BackgroundColor = UIColor.White;
 
-
-
-
 			close = new UIBarButtonItem (UIBarButtonSystemItem.Cancel, (s, e) => {
 
 				this.DismissViewController (true, null);
@@ -92,10 +89,6 @@ namespace FavoriteMovies
 			//comment.BackgroundColor = UIColor.Gray;
 			//comment.ReturnKeyType = UIReturnKeyType.Done;
 			comment.BecomeFirstResponder ();
-
-
-
-
 
 			NavigationController.NavigationBar.BarTintColor = UIColor.Clear.FromHexString (UIColorExtensions.NAV_BAR_COLOR, 1.0f);
 			NavigationController.NavigationBar.TintColor = UIColor.White;
@@ -143,11 +136,7 @@ namespace FavoriteMovies
 			//this.SetToolbarItems(toolbarItems, true);
 			//NavigationController.ToolbarHidden = false;
 			View.Add (comment);
-		
-
-		
-
-
+	
 
 		}
 
@@ -228,13 +217,68 @@ namespace FavoriteMovies
 	{
 		List<FeedItem> tableItems;
 		NewsFeedViewController newsFeedViewController;
-
+		UINavigationBar nvBar;
 		public NewsFeedTableSource (List<FeedItem> tableItems, NewsFeedViewController newsFeedViewController)
 		{
 			this.tableItems = tableItems;
 			this.newsFeedViewController = newsFeedViewController;
+
+		}
+		public static void HideTabBar (UIViewController tab)
+		{
+			var screenRect = UIScreen.MainScreen.Bounds;
+			nfloat fHeight = screenRect.Height;
+			if (UIApplication.SharedApplication.StatusBarOrientation == UIInterfaceOrientation.LandscapeLeft
+			   || UIApplication.SharedApplication.StatusBarOrientation == UIInterfaceOrientation.LandscapeRight) {
+				fHeight = screenRect.Width;
+			}
+
+			UIView.BeginAnimations (null);
+			UIView.SetAnimationDuration (0.4);
+			foreach (UIView view in tab.View.Subviews) {
+				if (view is UITabBar) {
+					view.Frame = new CGRect (view.Frame.X, fHeight, view.Frame.Width, view.Frame.Height);
+				} else {
+					view.Frame = new CGRect (view.Frame.X, view.Frame.Y, view.Frame.Width, fHeight);
+					view.BackgroundColor = UIColor.Black;
+				}
+			}
+			UIView.CommitAnimations ();
 		}
 
+		public static void  ShowTabBar (UIViewController tab)
+		{
+			var screenRect = UIScreen.MainScreen.Bounds;
+			nfloat fHeight = screenRect.Height - 49f;
+			if (UIApplication.SharedApplication.StatusBarOrientation == UIInterfaceOrientation.LandscapeLeft
+			   || UIApplication.SharedApplication.StatusBarOrientation == UIInterfaceOrientation.LandscapeRight) {
+				fHeight = screenRect.Width - 49f;
+			}
+
+			UIView.BeginAnimations (null);
+			UIView.SetAnimationDuration (0.4);
+			foreach (UIView view in tab.View.Subviews) {
+				if (view is UITabBar) {
+					view.Frame = new CGRect (view.Frame.X, fHeight, view.Frame.Width, view.Frame.Height);
+				} else {
+					view.Frame = new CGRect (view.Frame.X, view.Frame.Y, view.Frame.Width, fHeight);
+				}
+			}
+			UIView.CommitAnimations ();
+		}
+
+		public override void WillEndDragging (UIScrollView scrollView, CGPoint velocity, ref CGPoint targetContentOffset)
+		{
+			if (velocity.Y == 0) 
+			{
+				ShowTabBar ((UIApplication.SharedApplication.Delegate as AppDelegate).rootViewController.TabController);
+				newsFeedViewController.NavigationController.SetNavigationBarHidden (false, true);
+			} else 
+			{
+				HideTabBar ((UIApplication.SharedApplication.Delegate as AppDelegate).rootViewController.TabController);
+				newsFeedViewController.NavigationController.SetNavigationBarHidden (true, true);
+			}
+		}
 		public override nint RowsInSection (UITableView tableview, nint section)
 		{
 			return tableItems.Count;
@@ -263,6 +307,9 @@ namespace FavoriteMovies
 			//this.View.AddSubview (webView);
 			newsFeedViewController.NavigationController.PushViewController (viewController, true);
 			Console.WriteLine (newsFeedViewController.NavigationController.ViewControllers.Length);
+
+			ShowTabBar ((UIApplication.SharedApplication.Delegate as AppDelegate).rootViewController.TabController);
+			newsFeedViewController.NavigationController.SetNavigationBarHidden (false, true);
 		}
 		public override UITableViewCell GetCell (UITableView tableView, NSIndexPath indexPath)
 		{

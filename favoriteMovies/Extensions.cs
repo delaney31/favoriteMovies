@@ -19,10 +19,11 @@ namespace FavoriteMovies
 		public const string TAB_BACKGROUND_COLOR = "#FFFFFF"; //white
 		public const string PROFILE_BACKGROUND_COLOR = "#4B5F82"; //light grey
 		//public const string TAB_BACKGROUND_COLOR = "#3B3B3B"; //dark grey
-		public const float HEADER_FONT_SIZE = 14f;
+		public const float HEADER_FONT_SIZE = 17f;
 		public const float CAST_FONT_SIZE = 13f;
 		public const string SQL_TABLE = "MovieEntries.db3";
 
+		public static UIImage profileImage = UIImage.FromBundle ("profile.png");
 		public static PointF Rotate (this PointF pt)
 		{
 			return new PointF (pt.Y, pt.X);
