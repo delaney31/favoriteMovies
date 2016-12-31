@@ -13,7 +13,7 @@ namespace FavoriteMovies
 			cardView = new UIView ();
 			profileImage = new UIImageView ();
 			userImage = new UIImageView ();
-			likeButton = new UIButton ();
+			likeButton = new UIImageView ();
 			descriptionLabel = new UILabel ();
 			nameLabel = new UILabel ();
 			titleLabel = new UILabel ();

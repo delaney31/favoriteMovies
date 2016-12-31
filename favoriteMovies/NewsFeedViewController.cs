@@ -290,7 +290,7 @@ namespace FavoriteMovies
 		public override nfloat GetHeightForRow (UITableView tableView, Foundation.NSIndexPath indexPath)
 		{
 			//return base.GetHeightForRow (tableView, indexPath);
-			return 300;
+			return 350;
 		}
 		public override void RowSelected (UITableView tableView, Foundation.NSIndexPath indexPath)
 		{
@@ -316,21 +316,31 @@ namespace FavoriteMovies
 			const string CellIdentifier = @"CardCell";
 			var cell = (MDCard)tableView.DequeueReusableCell (CellIdentifier);
 			if (cell == null) {
+
 				cell = new MDCard (UITableViewCellStyle.Default, CellIdentifier);
+
+			} else 
+			{
+				cell.likes = 0;
 			}
 			cell.profileImage.Image = MovieCell.GetImageUrl(tableItems [indexPath.Row].ImageLink);
-			var backGroundColor = MovieDetailViewController.averageColor (cell.profileImage.Image);
+			//var backGroundColor = MovieDetailViewController.averageColor (cell.profileImage.Image);
+
 			cell.titleLabel.Text = tableItems [indexPath.Row].Title;
-			cell.titleLabel.TextColor = MovieDetailViewController.IsDarkColor (backGroundColor) ? UIColor.White : UIColor.Black;
-
+			//cell.titleLabel.TextColor = MovieDetailViewController.IsDarkColor (backGroundColor) ? UIColor.White : UIColor.Black;
+			cell.titleLabel.TextColor = UIColor.Black;
 			cell.nameLabel.Text = tableItems [indexPath.Row].Creator;
-			cell.nameLabel.TextColor = MovieDetailViewController.IsDarkColor (backGroundColor) ? UIColor.White : UIColor.Black;
-
+			//cell.nameLabel.TextColor = MovieDetailViewController.IsDarkColor (backGroundColor) ? UIColor.White : UIColor.Black;
+			cell.nameLabel.TextColor = UIColor.Black;
 			cell.descriptionLabel.Text = tableItems [indexPath.Row].Description;
-			cell.descriptionLabel.TextColor = MovieDetailViewController.IsDarkColor (backGroundColor) ? UIColor.White : UIColor.Black;
-
-			cell.cardView.Frame = new CGRect () { X = 10, Y = 10, Width = 300, Height=290};
-			cell.cardView.BackgroundColor = backGroundColor;
+			//cell.descriptionLabel.TextColor = MovieDetailViewController.IsDarkColor (backGroundColor) ? UIColor.White : UIColor.Black;
+			cell.descriptionLabel.TextColor = UIColor.Black;
+			if (cell.likes > 0)
+				cell.likeLabel.Text = cell.likes == 1 ? cell.likes + " Like" : cell.likes + " Likes";
+			else
+				cell.likeLabel.Text = "";
+			cell.cardView.BackgroundColor = UIColor.White;
+			cell.BackgroundColor = UIColor.White;
 			return cell;
 		}
 	}
