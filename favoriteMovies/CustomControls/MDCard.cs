@@ -44,7 +44,15 @@ namespace FavoriteMovies
 			descriptionLabel.TextAlignment = UITextAlignment.Justified;
 			profileImage.Frame = new CoreGraphics.CGRect () { X = 5, Y = 140, Width = 289, Height = 140 };
 
+
+
+			likeButton.Frame = new CoreGraphics.CGRect () { X = 280, Y = 0, Width = 20, Height = 20 };
+			likeButton.ImageView.Image = UIImage.FromBundle ("like.png");
+			//likeButton.BackgroundColor = UIColor.White;
+
+
 			cardView.AddSubviews (profileImage, likeButton, descriptionLabel, nameLabel, titleLabel);
+			cardView.BringSubviewToFront (likeButton);
 			ContentView.AddSubviews ( cardView);
 
 		}

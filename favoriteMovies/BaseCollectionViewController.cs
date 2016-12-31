@@ -62,18 +62,19 @@ namespace FavoriteMovies
 				var p = lpgr.LocationInView (CollectionView);
 
 				var indexPath = CollectionView.IndexPathForItemAtPoint (p);
-				var isCustomList = _items [indexPath.Row].id != null;
+				
 
 				if (indexPath == null)
 					Console.WriteLine ("Could not find index path");
 				else {
 					
 					var customListId = _items [indexPath.Row].CustomListID;
+					var isCustomList = _items [indexPath.Row].CustomListID != null;
 					bool accepted = await ShowAlert ("Confirm", "Are you sure you want to delete this movie?");
 					Console.WriteLine ("Selected button {0}", accepted ? "Accepted" : "Canceled");
 					if (accepted) 
 					{
-						//if id is null then we are on a pre-defined list (i.e Now Playing) not a custom one so nothing in table to delete
+						//if customListId is null then we are on a pre-defined list (i.e Now Playing) not a custom one so nothing in table to delete
 						if (isCustomList) 
 						   BaseListViewController.DeleteMovie ((int)_items [indexPath.Row].id);
 							//cell.RemoveFromSuperview ();
