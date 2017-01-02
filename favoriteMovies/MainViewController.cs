@@ -69,7 +69,7 @@ namespace FavoriteMovies
 		static UILabel PlayingNowLabel;
 		static UILabel PopularLabel;
 		static UILabel MovieLatestLabel;
-		static UIScrollView scrollView = new UIScrollView ();
+
 
 
 		public MainViewController (ObservableCollection<Movie> topRated, ObservableCollection<Movie> nowPlaying, ObservableCollection<Movie> popular, ObservableCollection<Movie> movieLatest,int page)
@@ -87,7 +87,8 @@ namespace FavoriteMovies
 				ItemSize = ItemSize
 				//SectionInset = new UIEdgeInsets (80, -40, 97, 127)
 			};
-			scrollView.WillEndDragging += ScrollView_WillEndDragging;;
+			scrollView.WillEndDragging += ScrollView_WillEndDragging;
+
 		}
 
 		public override bool ShouldAutorotate ()
@@ -113,14 +114,21 @@ namespace FavoriteMovies
 
 		void ScrollView_WillEndDragging (object sender, WillEndDraggingEventArgs e)
 		{
-			if (e.Velocity.Y == 0) 
+			var targetPoint = e.TargetContentOffset;
+			var currentPoint = ((UIScrollView)sender).ContentOffset;
+
+
+    		if (targetPoint.Y > currentPoint.Y) 
+			{
+				NewsFeedTableSource.HideTabBar (TabController);
+				NavController.SetNavigationBarHidden (true, true);
+
+			} else 
 			{
 				NewsFeedTableSource.ShowTabBar (TabController);
 				NavController.SetNavigationBarHidden (false, true);
-			} else {
-				NewsFeedTableSource.HideTabBar (TabController);
-				NavController.SetNavigationBarHidden (true, true);
 			}
+				
 		}
 
 		void LoadMoreMovies ()
@@ -277,7 +285,7 @@ namespace FavoriteMovies
 			NewCustomListToRefresh = -1;
 
 			//For scrolling to work the scrollview Content size has to be bigger than the View.Frame.Height
-			scrollView.ContentSize = new CGSize (View.Frame.Width, MovieLatestController.CollectionView.Frame.Y + MovieLatestController.CollectionView.Frame.Height + SeparationBuffer);
+			scrollView.ContentSize = new CGSize (View.Frame.Width, MovieLatestController.CollectionView.Frame.Y + MovieLatestController.CollectionView.Frame.Height + SeparationBuffer+ 40);
 			scrollView.ContentOffset = new CGPoint (0, -scrollView.ContentInset.Top);
 
 		}

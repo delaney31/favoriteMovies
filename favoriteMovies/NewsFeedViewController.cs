@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Globalization;
-using System.Text;
 using System.Threading.Tasks;
 using CoreGraphics;
 using FavoriteMoviesPCL;
 using Foundation;
+using MovieFriends;
 using UIKit;
 
 namespace FavoriteMovies
@@ -23,11 +22,17 @@ namespace FavoriteMovies
 		UITableView table;
 		NewsFeedTableSource tableSource;
 		UIBarButtonItem add;
-		public override void ViewDidLoad ()
+		public AzurePostService postService;
+
+		public override async void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
-			var task = Task.Run (async () => 
-			{
+
+			postService = AzurePostService.DefaultService;
+			await postService.InitializeStoreAsync ();
+
+
+			var task = Task.Run (async () => {
 				tableItems = MovieNewsFeed.GetFeedItems ();
 			});
 			TimeSpan ts = TimeSpan.FromMilliseconds (3000);
@@ -43,37 +48,39 @@ namespace FavoriteMovies
 
 
 
-			add = new UIBarButtonItem (UIBarButtonSystemItem.Add, (s, e) => 
-			{
-				
-				var newPost = new UINavigationController (new NewFeedPostViewController());
+			add = new UIBarButtonItem (UIBarButtonSystemItem.Add, (s, e) => {
 
-				newPost.View.Frame = new CGRect () { X = 10, Y = 15, Width = 300, Height=300};
+				var newPost = new UINavigationController (new NewFeedPostViewController ());
+
+				newPost.View.Frame = new CGRect () { X = 10, Y = 15, Width = 300, Height = 300 };
 				NavigationController.PresentViewController (newPost, true, null);
 			});
 
 
 			NavigationItem.RightBarButtonItem = add;
 
-		
+
 			View.Add (table);
 		}
-		
+
+
 	}
 
-	public class NewFeedPostViewController :UIViewController
+	public class NewFeedPostViewController : UIViewController
 	{
 		UIImagePickerController imagePicker;
 		UITextView comment;
 		UIBarButtonItem close;
+		private AzurePostService postService;
 
 
 
-		public override void ViewDidLoad ()
+		public override async void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
 
-
+			postService = AzurePostService.DefaultService;
+			await postService.InitializeStoreAsync ();
 
 			View.BackgroundColor = UIColor.White;
 
@@ -109,7 +116,7 @@ namespace FavoriteMovies
 			});
 
 
-			var post = new UIBarButtonItem ("Post", UIBarButtonItemStyle.Done,  (s, e) => {
+			var post = new UIBarButtonItem ("Post", UIBarButtonItemStyle.Done, (s, e) => {
 
 
 			});
@@ -120,8 +127,8 @@ namespace FavoriteMovies
 			{
 				comment.ResignFirstResponder ();
 			});
-			var toolbarItems = new UIBarButtonItem [] {image, new UIBarButtonItem (UIBarButtonSystemItem.FlexibleSpace), barButton};
-			UIToolbar toolbar = new UIToolbar () { Frame = new CGRect () { X = 0, Y = 0, Width = View.Frame.Size.Width, Height=50}};
+			var toolbarItems = new UIBarButtonItem [] { image, new UIBarButtonItem (UIBarButtonSystemItem.FlexibleSpace), barButton };
+			UIToolbar toolbar = new UIToolbar () { Frame = new CGRect () { X = 0, Y = 0, Width = View.Frame.Size.Width, Height = 50 } };
 			toolbar.BarStyle = UIBarStyle.Default;
 			toolbar.Items = toolbarItems;
 			toolbar.SizeToFit ();
@@ -136,11 +143,15 @@ namespace FavoriteMovies
 			//this.SetToolbarItems(toolbarItems, true);
 			//NavigationController.ToolbarHidden = false;
 			View.Add (comment);
-	
+
 
 		}
 
+		private async Task RefreshAsync ()
+		{
+			
 
+		}
 		void Handle_Canceled (object sender, EventArgs e)
 		{
 			imagePicker.DismissModalViewController (true);
@@ -175,7 +186,7 @@ namespace FavoriteMovies
 					Console.WriteLine ("got the original image");
 					MFTextAttachment attachImage = new MFTextAttachment ();
 					attachImage.Image = originalImage; // display
-					//attachImage.Bounds = new CGRect () {X=50, Y=90,Width = attachImage.Image.Size.Width, Height = attachImage.Image.Size.Height  };
+													   //attachImage.Bounds = new CGRect () {X=50, Y=90,Width = attachImage.Image.Size.Width, Height = attachImage.Image.Size.Height  };
 
 					var initialText = comment.AttributedText;
 					var newText = new NSMutableAttributedString (initialText);
@@ -196,7 +207,7 @@ namespace FavoriteMovies
 
 	}
 
-	class MFTextAttachment:NSTextAttachment
+	class MFTextAttachment : NSTextAttachment
 	{
 		public override CGRect GetAttachmentBounds (NSTextContainer textContainer, CGRect proposedLineFragment, CGPoint glyphPosition, nuint characterIndex)
 		{
@@ -208,12 +219,12 @@ namespace FavoriteMovies
 			CGSize imageSize = this.Image.Size;
 			if (width < imageSize.Width)
 				scalingFactor = width / imageSize.Width;
-			CGRect rect = new CGRect () { X = 0, Y = 0, Width = imageSize.Width * scalingFactor, Height = imageSize.Height * scalingFactor};
+			CGRect rect = new CGRect () { X = 0, Y = 0, Width = imageSize.Width * scalingFactor, Height = imageSize.Height * scalingFactor };
 
 			return rect;
 		}
 	}
-	public class NewsFeedTableSource:UITableViewSource
+	public class NewsFeedTableSource : UITableViewSource
 	{
 		List<FeedItem> tableItems;
 		NewsFeedViewController newsFeedViewController;
@@ -246,7 +257,7 @@ namespace FavoriteMovies
 			UIView.CommitAnimations ();
 		}
 
-		public static void  ShowTabBar (UIViewController tab)
+		public static void ShowTabBar (UIViewController tab)
 		{
 			var screenRect = UIScreen.MainScreen.Bounds;
 			nfloat fHeight = screenRect.Height - 49f;
@@ -269,15 +280,19 @@ namespace FavoriteMovies
 
 		public override void WillEndDragging (UIScrollView scrollView, CGPoint velocity, ref CGPoint targetContentOffset)
 		{
-			if (velocity.Y == 0) 
-			{
-				ShowTabBar ((UIApplication.SharedApplication.Delegate as AppDelegate).rootViewController.TabController);
-				newsFeedViewController.NavigationController.SetNavigationBarHidden (false, true);
-			} else 
-			{
+			var targetPoint = targetContentOffset;
+			var currentPoint = scrollView.ContentOffset;
+
+
+			if (targetPoint.Y > currentPoint.Y) {
 				HideTabBar ((UIApplication.SharedApplication.Delegate as AppDelegate).rootViewController.TabController);
 				newsFeedViewController.NavigationController.SetNavigationBarHidden (true, true);
+
+			} else {
+				ShowTabBar ((UIApplication.SharedApplication.Delegate as AppDelegate).rootViewController.TabController);
+				newsFeedViewController.NavigationController.SetNavigationBarHidden (false, true);
 			}
+
 		}
 		public override nint RowsInSection (UITableView tableview, nint section)
 		{
@@ -302,7 +317,7 @@ namespace FavoriteMovies
 
 			webView.Frame = new CGRect (0, 0, (float)newsFeedViewController.View.Frame.Width, (float)newsFeedViewController.View.Frame.Height);
 			//webView.LoadHtmlString (sb.ToString (), null);
-			webView.LoadRequest (new NSUrlRequest (new NSUrl(tableItems [indexPath.Row].Link)));
+			webView.LoadRequest (new NSUrlRequest (new NSUrl (tableItems [indexPath.Row].Link)));
 			viewController.View.Add (webView);
 			//this.View.AddSubview (webView);
 			newsFeedViewController.NavigationController.PushViewController (viewController, true);
@@ -311,21 +326,56 @@ namespace FavoriteMovies
 			ShowTabBar ((UIApplication.SharedApplication.Delegate as AppDelegate).rootViewController.TabController);
 			newsFeedViewController.NavigationController.SetNavigationBarHidden (false, true);
 		}
+		async void  HandleAction (MDCard cell)
+		{
+			bool liked = false;
+			if (tableItems [(int)cell.Tag].like == "Like") {
+				liked = true;
+				tableItems [(int)cell.Tag].like = "Unlike";
+			} else {
+				tableItems [(int)cell.Tag].like = "Like";
+
+			}
+
+			cell.likeLabel.Text = tableItems [(int)cell.Tag].like;
+
+			if (liked)
+				tableItems [(int)cell.Tag].likes++;
+			else if (tableItems [(int)cell.Tag].likes > 0)
+				tableItems [(int)cell.Tag].likes--;
+
+			if (tableItems [(int)cell.Tag].likes > 0)
+				cell.numberLikes.Text = tableItems [(int)cell.Tag].likes == 1 ? tableItems [(int)cell.Tag].likes + " Like" : tableItems [(int)cell.Tag].likes + " Likes";
+			else
+				cell.numberLikes.Text = "";
+
+			var postItem = new Post ();
+			postItem.FeedId = tableItems [(int)cell.Tag].id.ToString();
+			postItem.Like = tableItems [(int)cell.Tag].like;
+			postItem.UserId = "1";
+
+			await newsFeedViewController.postService.InsertPostItemAsync (postItem);
+
+
+		}
+
 		public override UITableViewCell GetCell (UITableView tableView, NSIndexPath indexPath)
 		{
 			const string CellIdentifier = @"CardCell";
 			var cell = (MDCard)tableView.DequeueReusableCell (CellIdentifier);
-			if (cell == null) {
 
+			if (cell == null)
 				cell = new MDCard (UITableViewCellStyle.Default, CellIdentifier);
 
-			} else 
-			{
-				cell.likes = 0;
-			}
-			cell.profileImage.Image = MovieCell.GetImageUrl(tableItems [indexPath.Row].ImageLink);
-			//var backGroundColor = MovieDetailViewController.averageColor (cell.profileImage.Image);
+			cell.Tag = indexPath.Row;
+			var likepress = new UITapGestureRecognizer ();
+			likepress.AddTarget ((obj) => HandleAction (cell));
+			cell.likeButton.AddGestureRecognizer (likepress);
+			cell.likeButton.UserInteractionEnabled = true;
 
+			Console.WriteLine (tableItems [indexPath.Row].Title);
+			cell.profileImage.Image = MovieCell.GetImageUrl (tableItems [indexPath.Row].ImageLink);
+			//var backGroundColor = MovieDetailViewController.averageColor (cell.profileImage.Image);
 			cell.titleLabel.Text = tableItems [indexPath.Row].Title;
 			//cell.titleLabel.TextColor = MovieDetailViewController.IsDarkColor (backGroundColor) ? UIColor.White : UIColor.Black;
 			cell.titleLabel.TextColor = UIColor.Black;
@@ -335,15 +385,18 @@ namespace FavoriteMovies
 			cell.descriptionLabel.Text = tableItems [indexPath.Row].Description;
 			//cell.descriptionLabel.TextColor = MovieDetailViewController.IsDarkColor (backGroundColor) ? UIColor.White : UIColor.Black;
 			cell.descriptionLabel.TextColor = UIColor.Black;
-			if (cell.likes > 0)
-				cell.likeLabel.Text = cell.likes == 1 ? cell.likes + " Like" : cell.likes + " Likes";
-			else
-				cell.likeLabel.Text = "";
+			cell.likeLabel.Text = tableItems [indexPath.Row].like;
 			cell.cardView.BackgroundColor = UIColor.White;
 			cell.BackgroundColor = UIColor.White;
+			// My father is an English teacher
+			if (tableItems [(int)cell.Tag].likes > 0)
+				cell.numberLikes.Text = tableItems [(int)cell.Tag].likes == 1 ? tableItems [(int)cell.Tag].likes + " Like" : tableItems [(int)cell.Tag].likes + " Likes";
+			else
+				cell.numberLikes.Text = "";
+
+
 			return cell;
 		}
 	}
 }
 
-		

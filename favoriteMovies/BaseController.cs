@@ -11,7 +11,7 @@ namespace FavoriteMovies
 
 		protected const float BackGroundColorAlpha = 1.0f;
 		// provide access to the sidebar controller to all inheriting controllers
-
+		protected static UIScrollView scrollView = new UIScrollView ();
 		public SidebarNavigation.SidebarController SidebarController {
 			get {
 				//return (UIApplication.SharedApplication.Delegate as AppDelegate).NavController.SidebarController;

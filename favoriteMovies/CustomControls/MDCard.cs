@@ -1,5 +1,6 @@
 ﻿using System;
 using CoreGraphics;
+using FavoriteMoviesPCL;
 using Foundation;
 using UIKit;
 
@@ -11,71 +12,66 @@ namespace FavoriteMovies
 		public UILabel nameLabel;
 		public UILabel descriptionLabel;
 		public UILabel likeLabel;
-		public UIButton commentButton ;
+		UIButton commentButton ;
 		public UIImageView likeButton;
+		public UILabel numberLikes;
+
 
 
 		public UIView cardView;
 		public UIImageView profileImage;
 		public bool liked { get; private set; }
 		public int likes { get;set; }
-	
+		public bool reusable { get; private set; }
+		public string nonreusableTitle { get; set; }
+
 		[Export ("initWithStyle:reuseIdentifier:")]
 		public MDCard (UITableViewCellStyle style, string cellId): base( style, cellId) 
 		{
-			cardView = new UIView ();
+
+
+			reusable = true;
 			profileImage = new UIImageView ();
-			likeButton = new UIImageView ();
-			descriptionLabel = new UILabel ();
-			nameLabel = new UILabel ();
+			profileImage.Frame = new CGRect () { X = 5, Y = 140, Width = 289, Height = 140 };
+
 			titleLabel = new UILabel ();
-			likeLabel = new UILabel ();
 			titleLabel.Frame = new CoreGraphics.CGRect () { X = 15, Y = -5, Width = 250, Height = 100 };
 			titleLabel.Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, UIColorExtensions.HEADER_FONT_SIZE);
 			titleLabel.Lines = 2;
 			titleLabel.TextAlignment = UITextAlignment.Left;
 			liked = true;
+
+			nameLabel = new UILabel ();
 			nameLabel.Frame = new CoreGraphics.CGRect () { X = 15, Y = 10, Width = 300, Height = 20 };
 			nameLabel.Font = UIFont.FromName (UIColorExtensions.CONTENT_FONT, UIColorExtensions.CAST_FONT_SIZE);
 
+			descriptionLabel = new UILabel ();
 			descriptionLabel.Frame =new CoreGraphics.CGRect () { X = 15, Y = 50, Width = 250, Height = 100 };
 			descriptionLabel.Font = UIFont.FromName (UIColorExtensions.CONTENT_FONT, UIColorExtensions.CAST_FONT_SIZE);
 			descriptionLabel.Lines = 0;
 			descriptionLabel.TextAlignment = UITextAlignment.Justified;
-			profileImage.Frame = new CGRect () { X = 5, Y = 140, Width = 289, Height = 140 };
 
+
+			numberLikes = new UILabel ();
+			numberLikes.Frame = new CGRect(){ X = 230, Y = 302, Width = 50, Height = 20 };
+			numberLikes.Font = UIFont.FromName (UIColorExtensions.CONTENT_FONT, UIColorExtensions.CAST_FONT_SIZE);
 
 			likeLabel = new UILabel ();
-			likeButton.Frame = new CGRect () { X = 15, Y = 300, Width = 20, Height = 20 };
 			likeLabel.Frame = new CGRect () { X = 40, Y = 302, Width = 50, Height = 20 };
 			likeLabel.Font = UIFont.FromName (UIColorExtensions.CONTENT_FONT, UIColorExtensions.CAST_FONT_SIZE);
 
+
+			likeButton = new UIImageView ();
+			likeButton.Frame = new CGRect () { X = 15, Y = 300, Width = 20, Height = 20 };
 			likeButton.Image = UIImage.FromBundle ("like.png");
 
-			var likepress = new UITapGestureRecognizer (HandleAction);
-			likeButton.AddGestureRecognizer (likepress);
-			likeButton.UserInteractionEnabled = true;
 
-			cardView.AddSubviews (profileImage, likeButton, likeLabel,descriptionLabel, nameLabel, titleLabel);
+			cardView = new UIView ();
+			cardView.AddSubviews (profileImage, likeButton, likeLabel,descriptionLabel, nameLabel, titleLabel,numberLikes);
 			//cardView.BringSubviewToFront (likeButton);
 			ContentView.AddSubviews ( cardView);
 		}
 
-		void HandleAction ()
-		{
-
-			if (liked)
-				likes++;
-			else if(likes >0)
-				likes--;
-
-			liked = !liked;
-
-			if (likes > 0)
-				likeLabel.Text = likes == 1 ? likes + " Like" : likes + " Likes";
-			else
-				likeLabel.Text = "";
-		}
 
 		public override void LayoutSubviews ()
 		{

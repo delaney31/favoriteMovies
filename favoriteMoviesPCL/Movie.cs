@@ -64,6 +64,7 @@ namespace FavoriteMoviesPCL
 		public string Actor { get; set; }
 		public string ProfilePath { get; set; }
 	}
+
 	[Table ("FeedItem")]
 	public class FeedItem
 	{
@@ -77,13 +78,26 @@ namespace FavoriteMoviesPCL
 		public string Description { get; set; }
 		public string Content { get; set; }
 		public string ImageLink { get; set; }
-		public int Likes { get; set;}
+		public int likes { get; set;}
+		public string like { get; set; }
 		public int? CommentID { get; set; }
 		public string Image { get; set; }
 		//public Version version { get; set; }
 		public DateTime createdAt { get; set; }
 		public DateTime updatedAt { get; set; }
 		public bool deleted { get; set; }
+
+
+	}
+
+	[Table ("Post")]
+	public class Post
+	{
+		
+		public string Id { get; set; }
+		public string FeedId { get; set; }
+		public string UserId { get; set; }
+		public string Like { get; set; }
 
 	}
 	[Table ("Comments")]

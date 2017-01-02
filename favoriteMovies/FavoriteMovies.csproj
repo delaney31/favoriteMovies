@@ -36,7 +36,7 @@
     <OutputPath>bin\iPhone\Release</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CodesignKey>iPhone Developer</CodesignKey>
+    <CodesignKey>iPhone Distribution</CodesignKey>
     <MtouchUseSGen>true</MtouchUseSGen>
     <MtouchUseRefCounting>true</MtouchUseRefCounting>
     <MtouchFloat32>true</MtouchFloat32>
@@ -195,7 +195,7 @@
     <Compile Include="MovieNewsFeed.cs" />
     <Compile Include="NewsFeedViewController.cs" />
     <Compile Include="CustomControls\MDCard.cs" />
-    <Compile Include="AzureUserService.cs" />
+    <Compile Include="AzurePostService.cs" />
     <Compile Include="CustomControls\userCard.cs" />
   </ItemGroup>
   <ItemGroup>

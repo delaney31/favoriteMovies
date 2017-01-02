@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
+using System.Threading.Tasks;
 using System.Xml;
 using FavoriteMoviesPCL;
+using SQLite;
 
 namespace FavoriteMovies
 {
@@ -27,8 +30,9 @@ namespace FavoriteMovies
 				XmlNodeList itemNodes = xmlDocument.SelectNodes ("rss/channel/item");
 
 			
-
-				for (int i = 0; i < itemNodes.Count; i++) {
+				DeleteAllFeedItems ();
+				for (int i = 0; i < itemNodes.Count; i++) 
+				{
 					FeedItem feedItem = new FeedItem ();
 
 					if (itemNodes [i].SelectSingleNode ("title") != null) {
@@ -59,15 +63,90 @@ namespace FavoriteMovies
 					} else {
 						feedItem.Content = feedItem.Description;
 					}
+					feedItem.like = GetCloudLike (feedItem);
+
+					var id = InsertNewsFeed (feedItem);
+
+					feedItem.id = id;
 					feedItemsList.Add (feedItem);
+
 				}
+
 			} catch (Exception) {
 				throw;
 			}
 
 			return feedItemsList;
 		}
+		public static void DeleteAllFeedItems ()
+		{
+			var task = Task.Run (async () => {
+				try {
+					using (var db = new SQLite.SQLiteConnection (MovieService.Database)) {
+						// there is a sqllite bug here https://forums.xamarin.com/discussion/52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
 
-	}
+						db.Query<Movie> ("DELETE FROM [FeedItem]");
+
+					}
+				} catch (SQLite.SQLiteException e) {
+					//first time in no favorites yet.
+					Debug.Write (e.Message);
+				}
+			});
+			task.Wait ();
+		}
+		static int? InsertNewsFeed (FeedItem feedItem)
+		{
+			try {
+				
+				using (var db = new SQLiteConnection (MovieService.Database)) 
+				{
+					// there is a sqllite bug here https://forums.xamarin.com/discussion/
+					//52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
+					//var query = db.Table<CustomList> ();
+
+					//foreach (var list in feedItemsList) {
+
+						if (feedItem.Title != null) 
+						{
+							db.InsertOrReplace (feedItem, typeof (FeedItem));
+						}
+
+					string sql = "select last_insert_rowid()";
+					var scalarValue = db.ExecuteScalar<string> (sql);
+					int value = scalarValue == null ? 0 : Convert.ToInt32 (scalarValue);
+					return value;
+					//}
+				}
+
+			} catch (SQLiteException e) {
+				Debug.WriteLine (e.Message);
+
+				using (var conn = new SQLite.SQLiteConnection (MovieService.Database)) {
+					conn.CreateTable<FeedItem> (CreateFlags.ImplicitPK | CreateFlags.AutoIncPK);
+
+				}
+
+				using (var db = new SQLiteConnection (MovieService.Database)) 
+				{
+				//	foreach (var list in feedItemsList) {
+						if (feedItem.Title != null) {
+							db.InsertOrReplace (feedItem, typeof (FeedItem));
+						}
+				//	}
+
+					string sql = "select last_insert_rowid()";
+					var scalarValue = db.ExecuteScalar<string> (sql);
+					int value = scalarValue == null ? 0 : Convert.ToInt32 (scalarValue);
+					return value;
+				}
+			}
+
+		}
+		static string GetCloudLike (FeedItem feedItem)
+		{
+			return "Like";
+		}
+}
 }
 

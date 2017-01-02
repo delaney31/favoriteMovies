@@ -29,11 +29,11 @@ namespace MovieFriends
 
         private MobileServiceClient client;
 #if OFFLINE_SYNC_ENABLED
-        const string localDbPath    = "localstore.db";
+        const string localDbPath    =  Path.Combine (FileHelper.GetLocalStoragePath (), "MovieEntries.db3");
 
-        private IMobileServiceSyncTable<Posts> postTable;
+        private IMobileServiceSyncTable<Post> postTable;
 #else
-        private IMobileServiceTable<Posts> postTable;
+        private IMobileServiceTable<Post> postTable;
 #endif
 
         private AzurePostService ()
@@ -50,7 +50,7 @@ namespace MovieFriends
             // Create an MSTable instance to allow us to work with the TodoItem table
             postTable = client.GetSyncTable<Posts>();
 #else
-            postTable = client.GetTable<Posts>();
+            postTable = client.GetTable<Post>();
 #endif
         }
 
@@ -60,7 +60,7 @@ namespace MovieFriends
             }
         }
 
-        public List<Posts> Items { get; private set;}
+        public List<Post> Items { get; private set;}
 
         public async Task InitializeStoreAsync()
         {
@@ -94,7 +94,7 @@ namespace MovieFriends
 #endif
         }
 
-        public async Task<List<Posts>> RefreshDataAsync ()
+        public async Task<List<Post>> RefreshDataAsync ()
         {
             try {
 #if OFFLINE_SYNC_ENABLED
@@ -105,7 +105,7 @@ namespace MovieFriends
                 // This code refreshes the entries in the list view by querying the local TodoItems table.
                 // The query excludes completed TodoItems
 				Items = await postTable
-                        .Where (postItem => postItem.deleted == false).ToListAsync ();
+                        .Where (postItem => postItem.UserId == "1").ToListAsync ();
 
             } catch (MobileServiceInvalidOperationException e) {
                 Console.Error.WriteLine (@"ERROR {0}", e.Message);
@@ -115,9 +115,10 @@ namespace MovieFriends
             return Items;
         }
 
-		public async Task InsertUserAsync (Posts postItem)
+		public async Task InsertPostItemAsync (Post postItem)
         {
-            try {
+            try 
+			{
 				await postTable.InsertAsync (postItem);
 #if OFFLINE_SYNC_ENABLED
                 await SyncAsync(); // Send changes to the mobile app backend.
@@ -125,15 +126,17 @@ namespace MovieFriends
 
 				Items.Add (postItem);
 
-            } catch (MobileServiceInvalidOperationException e) {
+            } catch (MobileServiceInvalidOperationException e) 
+			{
                 Console.Error.WriteLine (@"ERROR {0}", e.Message);
             }
         }
 
-        public async Task CompleteItemAsync (Posts item)
+        public async Task CompleteItemAsync (Post item)
         {
-            try {
-                item.deleted = true;
+            try 
+			{
+                //item.deleted = true;
 				await postTable.UpdateAsync (item);
 #if OFFLINE_SYNC_ENABLED
                 await SyncAsync(); // Send changes to the mobile app backend.
@@ -141,7 +144,8 @@ namespace MovieFriends
 
                 Items.Remove (item);
 
-            } catch (MobileServiceInvalidOperationException e) {
+            } catch (MobileServiceInvalidOperationException e) 
+			{
                 Console.Error.WriteLine (@"ERROR {0}", e.Message);
             }
         }
