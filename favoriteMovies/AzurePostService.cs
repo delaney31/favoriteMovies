@@ -21,9 +21,9 @@ using Microsoft.WindowsAzure.MobileServices.Sync;         // offline sync
 
 namespace MovieFriends
 {
-    public class AzureUserService
+    public class AzurePostService
     {
-        static AzureUserService instance = new AzureUserService ();
+        static AzurePostService instance = new AzurePostService ();
 
         const string applicationURL = @"https://moviefriends.azurewebsites.net";
 
@@ -31,12 +31,12 @@ namespace MovieFriends
 #if OFFLINE_SYNC_ENABLED
         const string localDbPath    = "localstore.db";
 
-        private IMobileServiceSyncTable<User> todoTable;
+        private IMobileServiceSyncTable<Posts> postTable;
 #else
-        private IMobileServiceTable<User> userTable;
+        private IMobileServiceTable<Posts> postTable;
 #endif
 
-        private AzureUserService ()
+        private AzurePostService ()
         {
             CurrentPlatform.Init();
 
@@ -48,25 +48,25 @@ namespace MovieFriends
             InitializeStoreAsync().Wait();
 
             // Create an MSTable instance to allow us to work with the TodoItem table
-            todoTable = client.GetSyncTable<ToDoItem>();
+            postTable = client.GetSyncTable<Posts>();
 #else
-            userTable = client.GetTable<User>();
+            postTable = client.GetTable<Posts>();
 #endif
         }
 
-        public static AzureUserService DefaultService {
+        public static AzurePostService DefaultService {
             get {
                 return instance;
             }
         }
 
-        public List<User> Items { get; private set;}
+        public List<Posts> Items { get; private set;}
 
         public async Task InitializeStoreAsync()
         {
 #if OFFLINE_SYNC_ENABLED
             var store = new MobileServiceSQLiteStore(localDbPath);
-            store.DefineTable<ToDoItem>();
+            store.DefineTable<Posts>();
 
             // Uses the default conflict handler, which fails on conflict
             // To use a different conflict handler, pass a parameter to InitializeAsync.
@@ -83,7 +83,7 @@ namespace MovieFriends
                 await client.SyncContext.PushAsync();
 
                 if (pullData) {
-                    await todoTable.PullAsync("allTodoItems", todoTable.CreateQuery()); // query ID is used for incremental sync
+                    await postTable.PullAsync("allPostItems", postTable.CreateQuery()); // query ID is used for incremental sync
                 }
             }
 
@@ -94,18 +94,18 @@ namespace MovieFriends
 #endif
         }
 
-        public async Task<List<User>> RefreshDataAsync ()
+        public async Task<List<Posts>> RefreshDataAsync ()
         {
             try {
 #if OFFLINE_SYNC_ENABLED
                 // Update the local store
                 await SyncAsync(pullData: true);
 #endif
-
+				
                 // This code refreshes the entries in the list view by querying the local TodoItems table.
                 // The query excludes completed TodoItems
-				Items = await userTable
-                        .Where (todoItem => todoItem.deleted == false).ToListAsync ();
+				Items = await postTable
+                        .Where (postItem => postItem.deleted == false).ToListAsync ();
 
             } catch (MobileServiceInvalidOperationException e) {
                 Console.Error.WriteLine (@"ERROR {0}", e.Message);
@@ -115,26 +115,26 @@ namespace MovieFriends
             return Items;
         }
 
-		public async Task InsertUserAsync (User user)
+		public async Task InsertUserAsync (Posts postItem)
         {
             try {
-                await userTable.InsertAsync (user); // Insert a new TodoItem into the local database.
+				await postTable.InsertAsync (postItem);
 #if OFFLINE_SYNC_ENABLED
                 await SyncAsync(); // Send changes to the mobile app backend.
 #endif
 
-                Items.Add (user);
+				Items.Add (postItem);
 
             } catch (MobileServiceInvalidOperationException e) {
                 Console.Error.WriteLine (@"ERROR {0}", e.Message);
             }
         }
 
-        public async Task DeleteItemAsync (User item)
+        public async Task CompleteItemAsync (Posts item)
         {
             try {
                 item.deleted = true;
-                await userTable.UpdateAsync (item); // Update todo item in the local database
+				await postTable.UpdateAsync (item);
 #if OFFLINE_SYNC_ENABLED
                 await SyncAsync(); // Send changes to the mobile app backend.
 #endif
