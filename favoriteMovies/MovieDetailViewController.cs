@@ -146,45 +146,13 @@ namespace FavoriteMovies
 			Userstar3.Frame = new CGRect (223, 115, 20, 20);
 			Userstar4.Frame = new CGRect (243, 115, 20, 20);
 			Userstar5.Frame = new CGRect (263, 115, 20, 20);
-			Userstar1.BackgroundColor = backGroundColor;
-			Userstar2.BackgroundColor = backGroundColor;
-			Userstar3.BackgroundColor = backGroundColor;
-			Userstar4.BackgroundColor = backGroundColor;
-			Userstar5.BackgroundColor = backGroundColor;
 			Userstar1.Alpha = .2f;
 			Userstar2.Alpha = .2f;
 			Userstar3.Alpha = .2f;
 			Userstar4.Alpha = .2f;
 			Userstar5.Alpha = .2f;
 
-			switch (movieDetail.UserRating) 
-			{
-				case 1:
-				  	Userstar1.Alpha = 1f;
-				 	 break;
-				case 2:
-					Userstar1.Alpha = 1f;
-					Userstar2.Alpha = 1f;
-					break;
-				case 3:
-					Userstar1.Alpha = 1f;
-					Userstar2.Alpha = 1f;
-					Userstar3.Alpha = 1f;
-					break;
-				case 4:
-					Userstar1.Alpha = 1f;
-					Userstar2.Alpha = 1f;
-					Userstar3.Alpha = 1f;
-					Userstar4.Alpha = 1f;
-					break;
-				case 5:
-					Userstar1.Alpha = 1f;
-					Userstar2.Alpha = 1f;
-					Userstar3.Alpha = 1f;
-					Userstar4.Alpha = 1f;
-					Userstar5.Alpha = 1f;
-					break;
-			}
+
 			var AddStar1 = new UITapGestureRecognizer();
 			AddStar1.AddTarget (() => { AddStarAction (AddStar1); });
 			Userstar1.AddGestureRecognizer (AddStar1);
@@ -294,7 +262,34 @@ namespace FavoriteMovies
 		public override void ViewDidAppear (bool animated)
 		{
 			base.ViewDidAppear (animated);
-
+			switch (movieDetail.UserRating) 
+			{
+			case 1:
+				Userstar1.Alpha = 1f;
+				break;
+			case 2:
+				Userstar1.Alpha = 1f;
+				Userstar2.Alpha = 1f;
+				break;
+			case 3:
+				Userstar1.Alpha = 1f;
+				Userstar2.Alpha = 1f;
+				Userstar3.Alpha = 1f;
+				break;
+			case 4:
+				Userstar1.Alpha = 1f;
+				Userstar2.Alpha = 1f;
+				Userstar3.Alpha = 1f;
+				Userstar4.Alpha = 1f;
+				break;
+			case 5:
+				Userstar1.Alpha = 1f;
+				Userstar2.Alpha = 1f;
+				Userstar3.Alpha = 1f;
+				Userstar4.Alpha = 1f;
+				Userstar5.Alpha = 1f;
+				break;
+			}
 			if (similarMovies.Count > 0) 
 			{
 
@@ -461,7 +456,7 @@ namespace FavoriteMovies
 			try {
 				using (var db = new SQLite.SQLiteConnection (MovieService.Database)) {
 					// there is a sqllite bug here https://forums.xamarin.com/discussion/52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
-					DeleteAll (item.CustomListID, (int)item.id);
+					DeleteAll (item.CustomListID, (int)item.OriginalId);
 
 					db.Insert (item, typeof (Movie));
 

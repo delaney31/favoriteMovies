@@ -49,7 +49,7 @@ namespace FavoriteMovies
 				TimeSpan ts = TimeSpan.FromMilliseconds (4000);
 				task.Wait (ts);
 				if (!task.Wait (ts))
-					Console.WriteLine ("The timeout interval elapsed.");
+					Console.WriteLine ("The timeout interval elapsed in RootViewController.");
 			} catch (Exception e) {
 				Debug.WriteLine (e.Message);
 
@@ -77,7 +77,7 @@ namespace FavoriteMovies
 			};
 
 			var mainView = new MainViewController (TopRated, NowPlaying, Popular, MovieLatest, Page);
-			mainView.Title = "Home";
+			mainView.Title = "Movies";
 			mainView.TabBarItem.SetFinishedImages(UIImage.FromBundle ("home-7.png"),UIImage.FromBundle ("home-7.png"));
 
 
@@ -95,7 +95,7 @@ namespace FavoriteMovies
 			Console.WriteLine (uinc2.ViewControllers.Length);
 
 			var tab3 = new UIViewController ();
-			tab3.Title = "Messaging";
+			tab3.Title = "Friends";
 			tab3.View.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 			tab3.TabBarItem.SetFinishedImages (UIImage.FromBundle ("message-7.png"), UIImage.FromBundle ("message-7.png"));
 
@@ -122,7 +122,7 @@ namespace FavoriteMovies
 			};
 
 			var tabs = new UIViewController [] {
-				mainView, uinc2, uinc3, uinc4};
+				mainView, uinc3,uinc2, uinc4};
 			TabController = new MovieTabBarController ();
 
 

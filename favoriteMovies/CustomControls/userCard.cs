@@ -13,7 +13,7 @@ namespace FavoriteMovies
 			cardView = new UIView ();
 			profileImage = new UIImageView ();
 			userImage = new UIImageView ();
-			likeButton = new UIImageView ();
+			//likeButton = new UIImageView ();
 			descriptionLabel = new UILabel ();
 			nameLabel = new UILabel ();
 			titleLabel = new UILabel ();
@@ -34,7 +34,7 @@ namespace FavoriteMovies
 			descriptionLabel.Lines = 0;
 			descriptionLabel.TextAlignment = UITextAlignment.Justified;
 
-			cardView.AddSubviews (profileImage, likeButton, descriptionLabel, nameLabel, titleLabel);
+			cardView.AddSubviews (profileImage, descriptionLabel, nameLabel, titleLabel);
 			ContentView.AddSubviews (cardView);
 
 		}

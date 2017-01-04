@@ -28,7 +28,21 @@ namespace FavoriteMovies
 		{
 			return new PointF (pt.Y, pt.X);
 		}
+		public static UIImage WithColor (this UIImage image, UIColor color)
+		{
+			UIGraphics.BeginImageContextWithOptions (image.Size, false, image.CurrentScale);
+			var context = UIGraphics.GetCurrentContext ();
+			context.TranslateCTM (0, image.Size.Height);
+			context.ScaleCTM (1.0f, -1.0f);
+			context.SetBlendMode (CGBlendMode.Normal);
+			var rect = new CGRect (0, 0, image.Size.Width, image.Size.Height);
+			context.ClipToMask (rect, image.CGImage);
+			color.SetFill ();
+			context.FillRect (rect);
 
+			var newImage = UIGraphics.GetImageFromCurrentImageContext ();
+			return newImage;
+		}
 		public static PointF Center (this RectangleF  rect)
 		{
 			return new PointF (

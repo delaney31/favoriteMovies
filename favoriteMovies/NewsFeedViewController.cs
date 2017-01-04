@@ -13,12 +13,8 @@ namespace FavoriteMovies
 
 	public class NewsFeedViewController : UIViewController
 	{
-		void HandleAction ()
-		{
 
-		}
-
-		List<FeedItem> tableItems = new List<FeedItem> ();
+		List<MDCard> tableItems = new List<MDCard> ();
 		UITableView table;
 		NewsFeedTableSource tableSource;
 		UIBarButtonItem add;
@@ -32,13 +28,20 @@ namespace FavoriteMovies
 			await postService.InitializeStoreAsync ();
 
 
-			var task = Task.Run (async () => {
-				tableItems = MovieNewsFeed.GetFeedItems ();
-			});
-			TimeSpan ts = TimeSpan.FromMilliseconds (3000);
-			task.Wait (ts);
-			if (!task.Wait (ts))
-				Console.WriteLine ("The timeout interval elapsed.");
+			//var task = Task.Run (async () => {
+			//	tableItems = MovieNewsFeed.GetMDCardItems ();
+			//});
+
+
+			//new System.Threading.Thread (new System.Threading.ThreadStart (() => {
+			//	InvokeOnMainThread (() => {
+					tableItems = MovieNewsFeed.GetMDCardItems ();
+			//	});
+			//})).Start();
+			//TimeSpan ts = TimeSpan.FromMilliseconds (10000);
+			//task.Wait (ts);
+		//	if (!task.Wait (ts))
+		//		Console.WriteLine ("The timeout interval elapsed in NewsFeedViewController.");
 
 			table = new UITableView (View.Bounds);
 			table.AutoresizingMask = UIViewAutoresizing.All;
@@ -147,11 +150,7 @@ namespace FavoriteMovies
 
 		}
 
-		private async Task RefreshAsync ()
-		{
-			
 
-		}
 		void Handle_Canceled (object sender, EventArgs e)
 		{
 			imagePicker.DismissModalViewController (true);
@@ -226,10 +225,10 @@ namespace FavoriteMovies
 	}
 	public class NewsFeedTableSource : UITableViewSource
 	{
-		List<FeedItem> tableItems;
+		readonly List<MDCard> tableItems;
 		NewsFeedViewController newsFeedViewController;
-		UINavigationBar nvBar;
-		public NewsFeedTableSource (List<FeedItem> tableItems, NewsFeedViewController newsFeedViewController)
+
+		public NewsFeedTableSource (List<MDCard> tableItems, NewsFeedViewController newsFeedViewController)
 		{
 			this.tableItems = tableItems;
 			this.newsFeedViewController = newsFeedViewController;
@@ -287,7 +286,9 @@ namespace FavoriteMovies
 			if (targetPoint.Y > currentPoint.Y) {
 				HideTabBar ((UIApplication.SharedApplication.Delegate as AppDelegate).rootViewController.TabController);
 				newsFeedViewController.NavigationController.SetNavigationBarHidden (true, true);
-
+				var statusView = new UIView () { Frame = UIApplication.SharedApplication.StatusBarFrame };
+				statusView.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.NAV_BAR_COLOR, 1.0f);
+				newsFeedViewController.View.Add (statusView);
 			} else {
 				ShowTabBar ((UIApplication.SharedApplication.Delegate as AppDelegate).rootViewController.TabController);
 				newsFeedViewController.NavigationController.SetNavigationBarHidden (false, true);
@@ -329,15 +330,16 @@ namespace FavoriteMovies
 		async void  HandleAction (MDCard cell)
 		{
 			bool liked = false;
-			if (tableItems [(int)cell.Tag].like == "Like") {
+
+			if (tableItems [(int)cell.Tag].likeLabel.Text == "Like") {
 				liked = true;
-				tableItems [(int)cell.Tag].like = "Unlike";
+				tableItems [(int)cell.Tag].likeLabel.Text = "Unlike";
 			} else {
-				tableItems [(int)cell.Tag].like = "Like";
+				tableItems [(int)cell.Tag].likeLabel.Text = "Like";
 
 			}
 
-			cell.likeLabel.Text = tableItems [(int)cell.Tag].like;
+			cell.likeLabel.Text = tableItems [(int)cell.Tag].likeLabel.Text;
 
 			if (liked)
 				tableItems [(int)cell.Tag].likes++;
@@ -351,50 +353,59 @@ namespace FavoriteMovies
 
 			var postItem = new Post ();
 			postItem.FeedId = tableItems [(int)cell.Tag].id.ToString();
-			postItem.Like = tableItems [(int)cell.Tag].like;
+			postItem.Like = tableItems [(int)cell.Tag].likeLabel.Text;
 			postItem.UserId = "1";
 
 			await newsFeedViewController.postService.InsertPostItemAsync (postItem);
 
+			//cell.likeButton.Image = tableItems [(int)cell.Tag].like == "Unlike" ? UIImage.FromBundle ("unlike.png") : cell.likeButton.Image = UIImage.FromBundle ("like.png");
 
 		}
 
+
 		public override UITableViewCell GetCell (UITableView tableView, NSIndexPath indexPath)
 		{
-			const string CellIdentifier = @"CardCell";
-			var cell = (MDCard)tableView.DequeueReusableCell (CellIdentifier);
+			//const string CellIdentifier = @"CardCell";
+			//var cell = (MDCard)tableView.DequeueReusableCell (CellIdentifier);
+			var cell = tableItems [indexPath.Row];
+			//if (cell == null) 
+			//{
+			//	cell = new MDCard (UITableViewCellStyle.Default, CellIdentifier);
 
-			if (cell == null)
-				cell = new MDCard (UITableViewCellStyle.Default, CellIdentifier);
-
+			//}
 			cell.Tag = indexPath.Row;
 			var likepress = new UITapGestureRecognizer ();
 			likepress.AddTarget ((obj) => HandleAction (cell));
-			cell.likeButton.AddGestureRecognizer (likepress);
-			cell.likeButton.UserInteractionEnabled = true;
+			cell.likeLabel.AddGestureRecognizer (likepress);
+			cell.likeLabel.UserInteractionEnabled = true;
 
-			Console.WriteLine (tableItems [indexPath.Row].Title);
-			cell.profileImage.Image = MovieCell.GetImageUrl (tableItems [indexPath.Row].ImageLink);
-			//var backGroundColor = MovieDetailViewController.averageColor (cell.profileImage.Image);
-			cell.titleLabel.Text = tableItems [indexPath.Row].Title;
-			//cell.titleLabel.TextColor = MovieDetailViewController.IsDarkColor (backGroundColor) ? UIColor.White : UIColor.Black;
-			cell.titleLabel.TextColor = UIColor.Black;
+
+			//Console.WriteLine (tableItems [indexPath.Row].Title);
+			//cell.profileImage.Image = MovieCell.GetImageUrl (tableItems [indexPath.Row].ImageLink);
+			var backGroundColor = MovieDetailViewController.averageColor (cell.profileImage.Image);
+			//cell.titleLabel.Text = tableItems [indexPath.Row].Title;
+			cell.titleLabel.TextColor = MovieDetailViewController.IsDarkColor (backGroundColor) ? UIColor.White : UIColor.Black;
+			//cell.titleLabel.TextColor = UIColor.Black;
 			cell.nameLabel.Text = tableItems [indexPath.Row].Creator;
-			//cell.nameLabel.TextColor = MovieDetailViewController.IsDarkColor (backGroundColor) ? UIColor.White : UIColor.Black;
-			cell.nameLabel.TextColor = UIColor.Black;
-			cell.descriptionLabel.Text = tableItems [indexPath.Row].Description;
-			//cell.descriptionLabel.TextColor = MovieDetailViewController.IsDarkColor (backGroundColor) ? UIColor.White : UIColor.Black;
-			cell.descriptionLabel.TextColor = UIColor.Black;
-			cell.likeLabel.Text = tableItems [indexPath.Row].like;
-			cell.cardView.BackgroundColor = UIColor.White;
+			cell.nameLabel.TextColor = MovieDetailViewController.IsDarkColor (backGroundColor) ? UIColor.White : UIColor.Black;
+			//cell.nameLabel.TextColor = UIColor.Black;
+			//cell.descriptionLabel.Text = tableItems [indexPath.Row].Description;
+			cell.descriptionLabel.TextColor = MovieDetailViewController.IsDarkColor (backGroundColor) ? UIColor.White : UIColor.Black;
+			//cell.descriptionLabel.TextColor = UIColor.Black;
+			//cell.likeLabel.Text = tableItems [indexPath.Row].like;
+			cell.cardView.BackgroundColor = backGroundColor;
 			cell.BackgroundColor = UIColor.White;
 			// My father is an English teacher
 			if (tableItems [(int)cell.Tag].likes > 0)
 				cell.numberLikes.Text = tableItems [(int)cell.Tag].likes == 1 ? tableItems [(int)cell.Tag].likes + " Like" : tableItems [(int)cell.Tag].likes + " Likes";
 			else
 				cell.numberLikes.Text = "";
+			cell.likeLabel.BackgroundColor = backGroundColor;
+			//cell.likeButton.BackgroundColor = backGroundColor;
+			cell.likeLabel.TextColor = MovieDetailViewController.IsDarkColor (backGroundColor) ? UIColor.White : UIColor.Black;
+			cell.numberLikes.TextColor = MovieDetailViewController.IsDarkColor (backGroundColor) ? UIColor.White : UIColor.Black;
 
-
+			//cell.likeButton.Image= cell.likeButton.Image.WithColor(MovieDetailViewController.IsDarkColor (backGroundColor) ? UIColor.White : UIColor.Black).ImageWithRenderingMode (UIImageRenderingMode.AlwaysOriginal);
 			return cell;
 		}
 	}

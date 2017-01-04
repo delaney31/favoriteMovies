@@ -122,11 +122,14 @@ namespace FavoriteMovies
 			{
 				NewsFeedTableSource.HideTabBar (TabController);
 				NavController.SetNavigationBarHidden (true, true);
-
+				var statusView = new UIView () { Frame = UIApplication.SharedApplication.StatusBarFrame };
+				statusView.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.NAV_BAR_COLOR, 1.0f);
+				View.Add (statusView);
 			} else 
 			{
 				NewsFeedTableSource.ShowTabBar (TabController);
 				NavController.SetNavigationBarHidden (false, true);
+				UIApplication.SharedApplication.SetStatusBarHidden (false, true);
 			}
 				
 		}
@@ -146,6 +149,10 @@ namespace FavoriteMovies
 		public override void ViewDidAppear (bool animated)
 		{
 			base.ViewDidAppear (animated);
+
+			NewsFeedTableSource.ShowTabBar (TabController);
+			TabController.NavigationController.NavigationBar.Hidden = false;
+			UIApplication.SharedApplication.SetStatusBarHidden (false, true);
 
 			//searchResultsController.TableView.ContentInset = new UIEdgeInsets (80, 0, 0, 0);
 			//HACK until i find out why when you open a movie details and come back the view.height changes.
@@ -170,9 +177,6 @@ namespace FavoriteMovies
 		{
 			base.ViewWillAppear (animated);
 			SidebarController.Disabled = false;
-
-			//this fixes problem when coming out of full screen after watching a trailer
-			NavController.NavigationBar.Frame = new CGRect () { X = 0, Y = 20, Width = 320, Height = 44 };
 			//DeleteAllSubviews (scrollView);
 
 
@@ -345,9 +349,10 @@ namespace FavoriteMovies
 		public override void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
-			scrollView.Frame = new CGRect () { X = View.Frame.X, Y = View.Frame.Y, Width = View.Frame.Width, Height = View.Frame.Height};
+
 			//scrollView.PagingEnabled = true;
 
+			scrollView.Frame = new CGRect () { X = View.Frame.X, Y = View.Frame.Y, Width = View.Frame.Width, Height = View.Frame.Height };
 			customLists = GetCustomLists ();
 
 			customLabels = new UILabel [customLists.Count];
@@ -455,7 +460,7 @@ namespace FavoriteMovies
 			searchController.SearchBar.WeakDelegate = searchResultsController;
 
 			((UITextField)searchController.SearchBar.ValueForKey (new NSString ("_searchField"))).TextColor = UIColor.White;
-			((UITextField)searchController.SearchBar.ValueForKey (new NSString ("_searchField"))).Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, UIColorExtensions.HEADER_FONT_SIZE);
+			((UITextField)searchController.SearchBar.ValueForKey (new NSString ("_searchField"))).Font = UIFont.FromName (UIColorExtensions.CONTENT_FONT, UIColorExtensions.CAST_FONT_SIZE);
 			((UITextField)searchController.SearchBar.ValueForKey (new NSString ("_searchField"))).BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.NAV_BAR_COLOR, BackGroundColorAlpha);
 
 			//the search bar is contained in the navigation bar, so it should be visible
@@ -579,7 +584,7 @@ namespace FavoriteMovies
 			task.Wait (ts);
 
 			if (!task.Wait (ts))
-				Console.WriteLine ("The timeout interval elapsed.");
+				Console.WriteLine ("The timeout interval elapsed in GetImage.");
 			return returnImage;
 
 

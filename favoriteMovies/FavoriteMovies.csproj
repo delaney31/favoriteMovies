@@ -232,6 +232,9 @@
     <BundleResource Include="Resources\432920-200.png" />
     <BundleResource Include="Resources\432920-200 %281%29.png" />
     <BundleResource Include="Resources\like.png" />
+    <BundleResource Include="Resources\unlike.png" />
+    <BundleResource Include="Resources\IMG_2848.png" />
+    <BundleResource Include="Resources\imageedit_1_9121618535.png" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\favoriteMoviesPCL\favoriteMoviesPCL.csproj">

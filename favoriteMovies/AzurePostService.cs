@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.WindowsAzure.MobileServices;
 using FavoriteMoviesPCL;
+using FavoriteMovies;
 
 #if OFFLINE_SYNC_ENABLED
 using Microsoft.WindowsAzure.MobileServices.SQLiteStore;  // offline sync
@@ -101,11 +102,15 @@ namespace MovieFriends
                 // Update the local store
                 await SyncAsync(pullData: true);
 #endif
-				
+
+
+
                 // This code refreshes the entries in the list view by querying the local TodoItems table.
                 // The query excludes completed TodoItems
 				Items = await postTable
                         .Where (postItem => postItem.UserId == "1").ToListAsync ();
+
+
 
             } catch (MobileServiceInvalidOperationException e) {
                 Console.Error.WriteLine (@"ERROR {0}", e.Message);
@@ -119,19 +124,28 @@ namespace MovieFriends
         {
             try 
 			{
+				
 				await postTable.InsertAsync (postItem);
+
+
 #if OFFLINE_SYNC_ENABLED
                 await SyncAsync(); // Send changes to the mobile app backend.
 #endif
 
-				Items.Add (postItem);
+				//Items.Add (postItem);
 
             } catch (MobileServiceInvalidOperationException e) 
 			{
                 Console.Error.WriteLine (@"ERROR {0}", e.Message);
             }
         }
-
+		public async Task<List<Post>> GetCloudLike (FeedItem feedItem)
+		{
+			List<Post> items = await postTable
+				.Where (postItem => postItem.UserId == "1" && postItem.FeedId== feedItem.id.ToString())
+				.ToListAsync ();
+			return items;
+		}
         public async Task CompleteItemAsync (Post item)
         {
             try 

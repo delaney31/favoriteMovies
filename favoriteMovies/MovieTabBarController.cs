@@ -31,6 +31,7 @@ namespace FavoriteMovies
 
 		}
 
+
 		public override void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
@@ -44,8 +45,8 @@ namespace FavoriteMovies
 					NavigationController.NavigationBar.Hidden = false;
 				else
 					NavigationController.NavigationBar.Hidden  = true;
-					
-
+		
+			
 			};
 		}
 	}
