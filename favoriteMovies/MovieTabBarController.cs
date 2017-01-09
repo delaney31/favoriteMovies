@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using CoreGraphics;
 using FavoriteMoviesPCL;
 using Foundation;
@@ -41,7 +42,8 @@ namespace FavoriteMovies
 			{
 				
 				// Take action based on the tab being selected
-				if (TabBar.SelectedItem.Title == "Home")
+				//Important fact** NavigationalController is only available for the selectedViewController!!
+				if (TabBar.SelectedItem.Title == "Movies")
 					NavigationController.NavigationBar.Hidden = false;
 				else
 					NavigationController.NavigationBar.Hidden  = true;
@@ -107,8 +109,6 @@ namespace FavoriteMovies
 			MovieItems = new ObservableCollection<Movie> ();
 
 		}
-
-
 		public override nint RowsInSection (UITableView tableView, nint section)
 		{
 			return MovieItems.Count;
@@ -121,11 +121,12 @@ namespace FavoriteMovies
 			if (cell == null) {
 				cell = new UITableViewCell (UITableViewCellStyle.Subtitle, movieItemCellId);
 			}
-			if (MovieItems.Count > indexPath.Row) {
+			if (MovieItems.Count > indexPath.Row) 
+			{
 				cell.TextLabel.Text = MovieItems [indexPath.Row].name;
-				cell.TextLabel.Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, UIColorExtensions.HEADER_FONT_SIZE);
+				cell.TextLabel.Font = UIFont.FromName (ColorExtensions.TITLE_FONT, ColorExtensions.HEADER_FONT_SIZE);
 				cell.DetailTextLabel.Text = MovieItems [indexPath.Row].Overview;
-				cell.ImageView.Image = MovieCell.GetImage (MovieItems [indexPath.Row].PosterPath); // don't use for Value2
+				cell.ImageView.Image =  MovieCell.GetImage (MovieItems [indexPath.Row].PosterPath); // don't use for Value2
 			}
 			return cell;
 		}

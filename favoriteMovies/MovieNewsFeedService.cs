@@ -12,7 +12,7 @@ using UIKit;
 
 namespace FavoriteMovies
 {
-	internal static class MovieNewsFeed
+	internal static class MovieNewsFeedService
 	{
 		static string url = "http://movieweb.com/rss/movie-news/";
 
@@ -81,11 +81,13 @@ namespace FavoriteMovies
 			return feedItemsList;
 		}
 
-		internal static List<MDCard> GetMDCardItems ()
+		internal async static Task<List<MDCard>> GetMDCardItems ()
 		{
 			List<MDCard> feedItemsList = new List<MDCard> ();
-
-			try {
+			AzureTablesService postService = AzureTablesService.DefaultService;
+			await postService.InitializeStoreAsync ();
+			try 
+			{
 				WebRequest webRequest = WebRequest.Create (url);
 				WebResponse webResponse = webRequest.GetResponse ();
 				Stream stream = webResponse.GetResponseStream ();
@@ -96,11 +98,11 @@ namespace FavoriteMovies
 				nsmgr.AddNamespace ("content", xmlDocument.DocumentElement.GetNamespaceOfPrefix ("content"));
 				XmlNodeList itemNodes = xmlDocument.SelectNodes ("rss/channel/item");
 
-
 				DeleteAllFeedItems ();
-				for (int i = 0; i < itemNodes.Count; i++) {
-					MDCard feedItem = new MDCard (UITableViewCellStyle.Default, @"CardCell");
-					FeedItem feed = new FeedItem ();
+				for (int i = 0; i < itemNodes.Count; i++) 
+				{
+					var feedItem = new MDCard (UITableViewCellStyle.Default, @"CardCell");
+					var feed = new FeedItem ();
 
 					if (itemNodes [i].SelectSingleNode ("title") != null) {
 						feedItem.titleLabel.Text = itemNodes [i].SelectSingleNode ("title").InnerText;
@@ -140,24 +142,47 @@ namespace FavoriteMovies
 						feed.Content = feedItem.Description;
 					}
 
-					var id = InsertNewsFeed (feed);
 
-					feed.id = id;
+					//UIApplication.SharedApplication.InvokeOnMainThread (new Action (() => {
+					var result = await postService.GetCloudLike (feed.Title);
 
-					feedItem.likeLabel.Text = "Like";//AzurePostService.DefaultService.GetCloudLike (feed).Result [0].Like;
+					if (result.Count > 0) 
+					{
+						feedItem.likeLabel.Text = result [0].Like;
+						feedItem.likes = result [0].Likes;
+						feedItem.id = result [0].Id;
+					} else
+						feedItem.likeLabel.Text = "Like";
 
 					feedItemsList.Add (feedItem);
 
 				}
 
-
-			} catch (Exception e) {
-				throw;
+			} catch (Exception e) 
+			{
+				Console.WriteLine (@"Error{0}", e.Message + " No internet connection");
+				await ShowAlert ("Limited Internet", "Your internet connection is down. Some items will not be available.", "Ok");
 			}
 
 			return feedItemsList;
 
 		}
+
+		// Displays a UIAlertView and returns the index of the button pressed.
+		public static Task<int> ShowAlert (string title, string message, params string [] buttons)
+		{
+			var tcs = new TaskCompletionSource<int> ();
+			var alert = new UIAlertView {
+				Title = title,
+				Message = message
+			};
+			foreach (var button in buttons)
+				alert.AddButton (button);
+			alert.Clicked += (s, e) => tcs.TrySetResult ((int)e.ButtonIndex);
+			alert.Show ();
+			return tcs.Task;
+		}
+
 		public static void DeleteAllFeedItems ()
 		{
 			var task = Task.Run (async () => {
@@ -224,6 +249,6 @@ namespace FavoriteMovies
 
 		}
 
-}
+	}
 }
 

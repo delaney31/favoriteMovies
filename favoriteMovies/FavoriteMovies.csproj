@@ -79,7 +79,7 @@
     <DefineConstants>DEBUG;ENABLE_TEST_CLOUD;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CodesignKey>iPhone Developer</CodesignKey>
+    <CodesignKey>iPhone Developer: TIMOTHY DELANEY (LP695RTGQ3)</CodesignKey>
     <DeviceSpecificBuild>true</DeviceSpecificBuild>
     <MtouchDebug>true</MtouchDebug>
     <MtouchFastDev>true</MtouchFastDev>
@@ -93,7 +93,7 @@
     <MtouchHttpClientHandler>HttpClientHandler</MtouchHttpClientHandler>
     <MtouchTlsProvider>Default</MtouchTlsProvider>
     <PlatformTarget>x86</PlatformTarget>
-    <CodesignProvision></CodesignProvision>
+    <CodesignProvision>3a48e344-15c4-44ef-9627-1ab461eb8927</CodesignProvision>
     <MtouchSdkVersion></MtouchSdkVersion>
     <MtouchExtraArgs>-v -v -v -v</MtouchExtraArgs>
   </PropertyGroup>
@@ -146,6 +146,9 @@
     <Reference Include="Xamarin.Azure.NotificationHubs.iOS">
       <HintPath>..\packages\Xamarin.Azure.NotificationHubs.iOS.1.2.5.2\lib\Xamarin.iOS10\Xamarin.Azure.NotificationHubs.iOS.dll</HintPath>
     </Reference>
+    <Reference Include="Xamarin.Controls.LoginScreen.iOS">
+      <HintPath>..\Components\loginscreen-1.4.1\lib\ios-unified\Xamarin.Controls.LoginScreen.iOS.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Contents.json" />
@@ -169,11 +172,9 @@
     <Compile Include="MainViewController.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="BaseCollectionViewController.cs" />
-    <Compile Include="FileHelper.cs" />
     <Compile Include="ContentController.cs" />
     <Compile Include="BaseController.cs" />
     <Compile Include="RootViewController.cs" />
-    <Compile Include="NavController.cs" />
     <Compile Include="NavController.Designer.cs" />
     <Compile Include="MenuController.cs" />
     <Compile Include="ContentController.Designer.cs" />
@@ -187,16 +188,23 @@
     <Compile Include="TableItem.cs" />
     <Compile Include="TableSourceTest.cs" />
     <Compile Include="MovieDetailViewController.cs" />
+    <Compile Include="NavController.cs" />
     <Compile Include="LoadingOverLay.cs" />
     <Compile Include="SideMenuController.cs" />
     <Compile Include="MovieListViewContoller.cs" />
     <Compile Include="BaseListViewController.cs" />
     <Compile Include="MovieTabBarController.cs" />
-    <Compile Include="MovieNewsFeed.cs" />
+    <Compile Include="MovieNewsFeedService.cs" />
     <Compile Include="NewsFeedViewController.cs" />
     <Compile Include="CustomControls\MDCard.cs" />
-    <Compile Include="AzurePostService.cs" />
+    <Compile Include="AzureTablesService.cs" />
     <Compile Include="CustomControls\userCard.cs" />
+    <Compile Include="SignupProfileViewController.cs" />
+    <Compile Include="CredentialsProvider.cs" />
+    <Compile Include="FileHelper.cs" />
+    <Compile Include="MovieChatViewController.cs" />
+    <Compile Include="Constants.cs" />
+    <Compile Include="MessageFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <BundleResource Include="Resources\placeholder.png" />
@@ -256,6 +264,10 @@
     </XamarinComponentReference>
     <XamarinComponentReference Include="azure-messaging">
       <Version>1.2.5.2</Version>
+      <Visible>False</Visible>
+    </XamarinComponentReference>
+    <XamarinComponentReference Include="loginscreen">
+      <Version>1.4.1</Version>
       <Visible>False</Visible>
     </XamarinComponentReference>
   </ItemGroup>

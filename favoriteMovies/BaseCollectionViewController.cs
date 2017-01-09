@@ -19,7 +19,8 @@ namespace FavoriteMovies
 		ObservableCollection<Movie> _items { get; set; }
 		public float FontSize { get; set; }
 		public SizeF ImageViewSize { get; set; }
-		BaseController viewController;
+
+		readonly BaseController viewController;
 
 		protected BaseCollectionViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies, BaseController vc) : base (layout)
 		{

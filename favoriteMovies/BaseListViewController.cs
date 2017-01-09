@@ -113,10 +113,11 @@ namespace FavoriteMovies
 						//52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
 						//var query = db.Table<CustomList> ();
 
-						if (movieDetail != null)
-							DeleteMovie (movieDetail.id);
-						else
-						   DeleteAll ();
+						if (movieDetail != null) 
+						{
+							//DeleteMovie (movieDetail.id);
+						} else
+							DeleteAll ();
 						//if (Id != null)
 						//	DeleteAll (Id);
 						//else
@@ -148,7 +149,7 @@ namespace FavoriteMovies
 								else
 									movieDetail.CustomListID = value;
 
-
+								movieDetail.id = null;
 								db.Insert (movieDetail, typeof (Movie));
 							}
 						}
@@ -670,7 +671,7 @@ namespace FavoriteMovies
 					cell.AccessoryView = switchView;
 				}
 				cell.TextLabel.Text = tableItems [indexPath.Row].name;
-				cell.TextLabel.Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, UIColorExtensions.HEADER_FONT_SIZE);
+				cell.TextLabel.Font = UIFont.FromName (ColorExtensions.TITLE_FONT, ColorExtensions.HEADER_FONT_SIZE);
 
 				
 				return cell;

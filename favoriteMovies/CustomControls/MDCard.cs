@@ -32,7 +32,7 @@ namespace FavoriteMovies
 		public string Creator { get; internal set; }
 		public string Category { get; internal set; }
 		public string Content { get; internal set; }
-		public int? id { get; internal set; }
+		public string id { get; internal set; }
 
 
 
@@ -50,29 +50,29 @@ namespace FavoriteMovies
 
 			titleLabel = new UILabel ();
 			titleLabel.Frame = new CoreGraphics.CGRect () { X = 15, Y = -5, Width = 250, Height = 100 };
-			titleLabel.Font = UIFont.FromName (UIColorExtensions.TITLE_FONT, UIColorExtensions.HEADER_FONT_SIZE);
+			titleLabel.Font = UIFont.FromName (ColorExtensions.TITLE_FONT, ColorExtensions.HEADER_FONT_SIZE);
 			titleLabel.Lines = 2;
 			titleLabel.TextAlignment = UITextAlignment.Left;
 			liked = true;
 
 			nameLabel = new UILabel ();
 			nameLabel.Frame = new CGRect () { X = 15, Y = 10, Width = 300, Height = 20 };
-			nameLabel.Font = UIFont.FromName (UIColorExtensions.CONTENT_FONT, UIColorExtensions.CAST_FONT_SIZE);
+			nameLabel.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, ColorExtensions.CAST_FONT_SIZE);
 
 			descriptionLabel = new UILabel ();
 			descriptionLabel.Frame = new CGRect () { X = 15, Y = 50, Width = 250, Height = 100 };
-			descriptionLabel.Font = UIFont.FromName (UIColorExtensions.CONTENT_FONT, UIColorExtensions.CAST_FONT_SIZE);
+			descriptionLabel.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, ColorExtensions.CAST_FONT_SIZE);
 			descriptionLabel.Lines = 0;
 			descriptionLabel.TextAlignment = UITextAlignment.Justified;
 
 
 			numberLikes = new UILabel ();
 			numberLikes.Frame = new CGRect () { X = 230, Y = 295, Width = 50, Height = 20 };
-			numberLikes.Font = UIFont.FromName (UIColorExtensions.CONTENT_FONT, UIColorExtensions.HEADER_FONT_SIZE);
+			numberLikes.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, ColorExtensions.HEADER_FONT_SIZE);
 
 			likeLabel = new UILabel ();
 			likeLabel.Frame = new CGRect () { X = 28, Y = 295, Width = 70, Height = 20 };
-			likeLabel.Font = UIFont.FromName (UIColorExtensions.CONTENT_FONT, UIColorExtensions.HEADER_FONT_SIZE);
+			likeLabel.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, ColorExtensions.HEADER_FONT_SIZE);
 
 
 			//likeButton = new UIImageView ();
@@ -100,12 +100,12 @@ namespace FavoriteMovies
 
 		}
 
-		public async override void Draw (CGRect rect)
+		public override void Draw (CGRect rect)
 		{
-			await cardSetup ();
-			await imageSetup ();
+			cardSetup ();
+			imageSetup ();
 		}
-		async Task cardSetup ()
+		void cardSetup ()
 		{
 			this.cardView.Alpha = 1;
 			this.cardView.Frame = new CGRect () { X = 10, Y = 20, Width = 300, Height = 325 };
@@ -127,7 +127,7 @@ namespace FavoriteMovies
 			//BackgroundColor = MovieDetailViewController.averageColor (profileImage.Image);
 		}
 
-		async Task imageSetup ()
+		void imageSetup ()
 		{
 			//profileImage.Layer.CornerRadius = profileImage.Frame.Size.Width / 2;
 			profileImage.ClipsToBounds = true;

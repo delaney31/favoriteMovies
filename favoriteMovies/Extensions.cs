@@ -2,11 +2,12 @@ using System;
 using System.Drawing;
 using CoreGraphics;
 using FavoriteMoviesPCL;
+using JSQMessagesViewController;
 using UIKit;
 
 namespace FavoriteMovies
 {
-	public static class UIColorExtensions
+	public static class ColorExtensions
 	{	
 		public const string TITLE = "Movie Explorer";
 		public const string NAV_BAR_COLOR ="#3B5998";//facebook blue
@@ -68,6 +69,16 @@ namespace FavoriteMovies
 				return false;} 
 		}
 
+		public static void addDemoMessages (this MovieChatViewController controller)
+		{
+			for (var num = 0; num < 10; num++ ) 
+			{
+				var sender = num==0?"Server":controller.SenderId;
+				var messageContent = "Message  nr" + num;
+				var message = Message.Create (sender, sender, messageContent);
+				//controller.messages
+			}
+		}
 		public static UIColor FromHexString (this UIColor color, string hexValue, float alpha = 1.0f)
 		{
 			var colorString = hexValue.Replace ("#", "");

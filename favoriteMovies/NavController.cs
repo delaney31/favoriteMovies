@@ -69,7 +69,7 @@ namespace FavoriteMovies
 		public CRNavigationBar (IntPtr handle) : base (handle)
 		{
 			Console.WriteLine ("Loading navbars");
-			SetBarTintColor (UIColor.Clear.FromHexString (UIColorExtensions.NAV_BAR_COLOR, BackGroundColorAlpha));
+			SetBarTintColor (UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, BackGroundColorAlpha));
 		}
 		public CRNavigationBar ()
 		{

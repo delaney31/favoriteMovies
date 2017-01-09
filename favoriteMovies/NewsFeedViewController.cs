@@ -18,30 +18,16 @@ namespace FavoriteMovies
 		UITableView table;
 		NewsFeedTableSource tableSource;
 		UIBarButtonItem add;
-		public AzurePostService postService;
+		public AzureTablesService postService;
 
 		public override async void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
 
-			postService = AzurePostService.DefaultService;
+			postService = AzureTablesService.DefaultService;
 			await postService.InitializeStoreAsync ();
 
-
-			//var task = Task.Run (async () => {
-			//	tableItems = MovieNewsFeed.GetMDCardItems ();
-			//});
-
-
-			//new System.Threading.Thread (new System.Threading.ThreadStart (() => {
-			//	InvokeOnMainThread (() => {
-					tableItems = MovieNewsFeed.GetMDCardItems ();
-			//	});
-			//})).Start();
-			//TimeSpan ts = TimeSpan.FromMilliseconds (10000);
-			//task.Wait (ts);
-		//	if (!task.Wait (ts))
-		//		Console.WriteLine ("The timeout interval elapsed in NewsFeedViewController.");
+			tableItems = await MovieNewsFeedService.GetMDCardItems ();
 
 			table = new UITableView (View.Bounds);
 			table.AutoresizingMask = UIViewAutoresizing.All;
@@ -74,16 +60,12 @@ namespace FavoriteMovies
 		UIImagePickerController imagePicker;
 		UITextView comment;
 		UIBarButtonItem close;
-		private AzurePostService postService;
 
 
 
 		public override async void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
-
-			postService = AzurePostService.DefaultService;
-			await postService.InitializeStoreAsync ();
 
 			View.BackgroundColor = UIColor.White;
 
@@ -94,13 +76,13 @@ namespace FavoriteMovies
 
 
 			comment = new UITextView (new RectangleF (20, 0, 270, 400));
-			comment.Font = UIFont.FromName (UIColorExtensions.CONTENT_FONT, 15);
+			comment.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, 15);
 			comment.TintColor = UIColor.Black;
 			//comment.BackgroundColor = UIColor.Gray;
 			//comment.ReturnKeyType = UIReturnKeyType.Done;
 			comment.BecomeFirstResponder ();
 
-			NavigationController.NavigationBar.BarTintColor = UIColor.Clear.FromHexString (UIColorExtensions.NAV_BAR_COLOR, 1.0f);
+			NavigationController.NavigationBar.BarTintColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f);
 			NavigationController.NavigationBar.TintColor = UIColor.White;
 			NavigationController.NavigationBar.Translucent = true;
 			NavigationController.NavigationBar.TitleTextAttributes = new UIStringAttributes () {
@@ -123,7 +105,7 @@ namespace FavoriteMovies
 
 
 			});
-			var icon = UIImage.FromBundle ("432920-200(1).png");
+
 			var barButton = new UIBarButtonItem (UIBarButtonSystemItem.Done, (sender, e) =>
 			// var barButton = new UIBarButtonItem ("Dismiss",UIBarButtonItemStyle.Plain, (sender, e) => 
 			//var barButton = new UIBarButtonItem (icon,UIBarButtonItemStyle.Plain, (sender, e) => 
@@ -143,8 +125,6 @@ namespace FavoriteMovies
 			NavigationItem.RightBarButtonItem = close;
 			NavigationItem.LeftBarButtonItem = post;
 
-			//this.SetToolbarItems(toolbarItems, true);
-			//NavigationController.ToolbarHidden = false;
 			View.Add (comment);
 
 
@@ -172,7 +152,7 @@ namespace FavoriteMovies
 			}
 
 			// get common info (shared between images and video)
-			NSUrl referenceURL = e.Info [new NSString ("UIImagePickerControllerReferenceUrl")] as NSUrl;
+			var referenceURL = e.Info [new NSString ("UIImagePickerControllerReferenceUrl")] as NSUrl;
 			if (referenceURL != null)
 				Console.WriteLine ("Url:" + referenceURL.ToString ());
 
@@ -195,7 +175,7 @@ namespace FavoriteMovies
 				}
 			} else { // if it's a video
 					 // get video url
-				NSUrl mediaURL = e.Info [UIImagePickerController.MediaURL] as NSUrl;
+				var mediaURL = e.Info [UIImagePickerController.MediaURL] as NSUrl;
 				if (mediaURL != null) {
 					Console.WriteLine (mediaURL.ToString ());
 				}
@@ -218,7 +198,7 @@ namespace FavoriteMovies
 			CGSize imageSize = this.Image.Size;
 			if (width < imageSize.Width)
 				scalingFactor = width / imageSize.Width;
-			CGRect rect = new CGRect () { X = 0, Y = 0, Width = imageSize.Width * scalingFactor, Height = imageSize.Height * scalingFactor };
+			var rect = new CGRect () { X = 0, Y = 0, Width = imageSize.Width * scalingFactor, Height = imageSize.Height * scalingFactor };
 
 			return rect;
 		}
@@ -287,7 +267,7 @@ namespace FavoriteMovies
 				HideTabBar ((UIApplication.SharedApplication.Delegate as AppDelegate).rootViewController.TabController);
 				newsFeedViewController.NavigationController.SetNavigationBarHidden (true, true);
 				var statusView = new UIView () { Frame = UIApplication.SharedApplication.StatusBarFrame };
-				statusView.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.NAV_BAR_COLOR, 1.0f);
+				statusView.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f);
 				newsFeedViewController.View.Add (statusView);
 			} else {
 				ShowTabBar ((UIApplication.SharedApplication.Delegate as AppDelegate).rootViewController.TabController);
@@ -351,12 +331,13 @@ namespace FavoriteMovies
 			else
 				cell.numberLikes.Text = "";
 
-			var postItem = new Post ();
-			postItem.FeedId = tableItems [(int)cell.Tag].id.ToString();
+			var postItem = new PostItem ();
+			postItem.Id = tableItems [(int)cell.Tag].id;
+			postItem.Title = tableItems [(int)cell.Tag].titleLabel.Text;
 			postItem.Like = tableItems [(int)cell.Tag].likeLabel.Text;
 			postItem.UserId = "1";
-
-			await newsFeedViewController.postService.InsertPostItemAsync (postItem);
+			postItem.Likes = tableItems [(int)cell.Tag].likes;
+			await newsFeedViewController.postService.RefreshDataAsync (postItem);
 
 			//cell.likeButton.Image = tableItems [(int)cell.Tag].like == "Unlike" ? UIImage.FromBundle ("unlike.png") : cell.likeButton.Image = UIImage.FromBundle ("like.png");
 

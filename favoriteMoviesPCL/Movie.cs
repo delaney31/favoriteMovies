@@ -102,15 +102,13 @@ namespace FavoriteMoviesPCL
 		public bool Complete { get; set; }
 	}
 
-	public class Post
+	public class PostItem
 	{		
 		public string Id { get; set; }
-		[JsonProperty(PropertyName ="feedid")]
-		public string FeedId { get; set; }
-		[JsonProperty (PropertyName = "userid")]
+		public string Title { get; set; }
 		public string UserId { get; set; }
-		[JsonProperty (PropertyName = "like")]
 		public string Like { get; set; }
+		public int Likes { get; set; }
 
 	}
 	[Table ("Comments")]
@@ -146,19 +144,21 @@ namespace FavoriteMoviesPCL
 	{
 		[PrimaryKey, AutoIncrement]
 		public int? id { get; set; }
-		public string lastname { get; set;}
-		public string firstname { get; set;}
 		public string email { get; set;}
 		public string profilepic { get; set;}
 		public string username { get; set;}
-		public string city { get; set; }
-		public string state { get; set;}
-		public string country { get; set;}
 		public string password { get; set;}
-		//public Version version { get; set; }
-		public DateTime createdAt { get; set; }
-		public DateTime updatedAt { get; set; }
-		public bool deleted { get; set; }
+
+	}
+
+	public class UserCloud
+
+	{
+		public string Id { get; set;}
+		public string email { get; set;}
+		public string profilepic { get; set;}
+		public string username { get; set; }
+	
 
 	}
 }

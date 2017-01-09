@@ -65,13 +65,15 @@ namespace FavoriteMovies
 		{
 			base.ViewDidLoad ();
 
-			NavigationItem.SetRightBarButtonItem (
-				new UIBarButtonItem (UIImage.FromBundle ("threelines")
-					, UIBarButtonItemStyle.Plain
-					, (sender, args) => {
-						SidebarController.ToggleMenu ();
 
-					}), true);
+				NavigationItem.SetRightBarButtonItem (
+					new UIBarButtonItem (UIImage.FromBundle ("threelines")
+						, UIBarButtonItemStyle.Plain
+						, (sender, args) => {
+							SidebarController.ToggleMenu ();
+
+						}), true);
+
 		}
 	}
 }
