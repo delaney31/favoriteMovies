@@ -101,16 +101,16 @@ namespace FavoriteMovies
 				SidebarController.CloseMenu();
 			};
 
-			UIImageView friendsImage = new UIImageView () { Image = UIImage.FromBundle ("1481444239_Myspace.png") };
+			UIImageView friendsImage = new UIImageView () { Image = UIImage.FromBundle ("1481444239_AddFriends") };
 			friendsImage.Frame = new RectangleF (40, 355, 40, 40);
 			var connectionsButton = new UIButton (UIButtonType.System);
 			connectionsButton.Frame = new RectangleF (90, 370, 230, 20);
-			connectionsButton.SetTitle ("Friends", UIControlState.Normal);
+			connectionsButton.SetTitle ("Add", UIControlState.Normal);
 			connectionsButton.SetTitleColor (UIColor.White, UIControlState.Normal);
 			connectionsButton.HorizontalAlignment = UIControlContentHorizontalAlignment.Left;
 			connectionsButton.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, 18);
 			connectionsButton.TouchUpInside += (sender, e) => {
-				//NavController.PushViewController(new ContentController(), false);
+				NavController.PushViewController(new UserCloudListViewController(), false);
 				//NavController.PushViewController (new MovieListPickerViewController (null, false), false);
 				//SidebarController.ChangeContentView (new MovieListPickerViewController (null, true));
 				SidebarController.CloseMenu ();

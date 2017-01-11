@@ -205,6 +205,8 @@
     <Compile Include="MovieChatViewController.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="MessageFactory.cs" />
+    <Compile Include="BaseBasicListViewController.cs" />
+    <Compile Include="UserCloudListViewController.cs" />
   </ItemGroup>
   <ItemGroup>
     <BundleResource Include="Resources\placeholder.png" />

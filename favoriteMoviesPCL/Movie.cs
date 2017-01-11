@@ -124,18 +124,15 @@ namespace FavoriteMoviesPCL
 		public bool deleted { get; set; }
 	}
 
-	[Table ("UserFriends")]
+
 	public class UserFriends
 	{
-		[PrimaryKey, AutoIncrement]
-		public int? id { get; set; }
-		public int? CustomListID { get; set; }
-		public int? friendid { get; set;}
-		public int? userid { get; set;}
-		//public Version version { get; set; }
-		public DateTime createdAt { get; set; }
-		public DateTime updatedAt { get; set; }
-		public bool deleted { get; set; }
+		
+		public string Id { get; set; }
+		public string CustomListID { get; set; }
+		public string friendid { get; set;}
+		public string userid { get; set;}
+
 	}
 
 	[Table ("User")]
@@ -158,6 +155,7 @@ namespace FavoriteMoviesPCL
 		public string email { get; set;}
 		public string profilepic { get; set;}
 		public string username { get; set; }
+		public string DisplayName { get; set; }
 	
 
 	}

@@ -40,12 +40,15 @@ namespace FavoriteMovies
 
 			this.ViewControllerSelected += (sender, e) => 
 			{
-				
+
 				// Take action based on the tab being selected
 				//Important fact** NavigationalController is only available for the selectedViewController!!
 				if (TabBar.SelectedItem.Title == "Movies")
 					NavigationController.NavigationBar.Hidden = false;
+				else if (TabBar.SelectedItem.Title == "Chat")
+					NavigationController.PushViewController (new MovieChatViewController (),true);
 				else
+					
 					NavigationController.NavigationBar.Hidden  = true;
 		
 			

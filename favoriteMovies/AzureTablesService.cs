@@ -29,9 +29,11 @@ namespace MovieFriends
 		static readonly string localDbPath = MovieService.Database;
 		private IMobileServiceSyncTable<PostItem> postTable;
 		private IMobileServiceSyncTable<UserCloud> userTable;
+		private IMobileServiceSyncTable<UserFriends> ufTable;
 #else
         private IMobileServiceTable<PostItem> postTable;
 		private IMobileServiceTable<UserCloud> userTable;
+		private IMobileServiceTable<UserFriends> ufTable;
 #endif
 
 		private AzureTablesService ()
@@ -44,9 +46,11 @@ namespace MovieFriends
 			// Create an MSTable instance to allow us to work with the TodoItem table
 			postTable = client.GetSyncTable<PostItem> ();
 			userTable = client.GetSyncTable<UserCloud> ();
+			ufTable = client.GetSyncTable<UserFriends>();
 #else
             postTable = client.GetTable<PostItem>();
 			userTable = client.GetTable<UserCloud> ();
+			ufTable = client.GetTable<UserFriends> ();
 #endif
 		}
 
@@ -56,13 +60,13 @@ namespace MovieFriends
 			}
 		}
 
-
 		public async Task InitializeStoreAsync ()
 		{
 #if OFFLINE_SYNC_ENABLED
 			var store = new MobileServiceSQLiteStore (MovieService.Database);
 			store.DefineTable<PostItem> ();
 			store.DefineTable<UserCloud> ();
+			store.DefineTable<UserFriends>();
 
 			// Uses the default conflict handler, which fails on conflict
 			// To use a different conflict handler, pass a parameter to InitializeAsync.
@@ -78,7 +82,8 @@ namespace MovieFriends
 			try {
 				await client.SyncContext.PushAsync ();
 
-				if (pullData) {
+				if (pullData) 
+				{
 					await postTable.PullAsync ("allPostItems", postTable.CreateQuery ()); // query ID is used for incremental sync
 				}
 			} catch (MobileServiceInvalidOperationException e) {
@@ -92,8 +97,25 @@ namespace MovieFriends
 			try {
 				await client.SyncContext.PushAsync ();
 
-				if (pullData) {
+				if (pullData) 
+				{
 					await userTable.PullAsync ("allUserItems", userTable.CreateQuery ()); // query ID is used for incremental sync
+				}
+			} catch (MobileServiceInvalidOperationException e) {
+				Console.Error.WriteLine (@"Sync Failed: {0}", e.Message);
+			}
+#endif
+		}
+		public async Task UserFriendsSyncAsync (bool pullData = false)
+		{
+#if OFFLINE_SYNC_ENABLED
+			try {
+				await client.SyncContext.PushAsync ();
+
+				if (pullData) 
+				{
+					await ufTable.PullAsync ("allUserItems", ufTable.CreateQuery ()); // query ID is used for incremental sync
+
 				}
 			} catch (MobileServiceInvalidOperationException e) {
 				Console.Error.WriteLine (@"Sync Failed: {0}", e.Message);
@@ -137,6 +159,24 @@ namespace MovieFriends
 
 			}
 		}
+
+		public async Task RefreshDataAsync (UserFriends postItem)
+		{
+			try {
+#if OFFLINE_SYNC_ENABLED
+				// Update the local store
+				await UserFriendsSyncAsync (pullData: true);
+#endif
+				if (postItem.Id != null)
+					await DeleteItemAsync (postItem);
+				await InsertUserFriendAsync (postItem);
+				Console.WriteLine ("Saved to the cloud!");
+
+			} catch (MobileServiceInvalidOperationException e) {
+				Console.Error.WriteLine (@"ERROR {0}", e.Message);
+
+			}
+		}
 		public async Task InsertUserAsync (UserCloud user)
 		{
 			try {
@@ -146,6 +186,21 @@ namespace MovieFriends
 
 #if OFFLINE_SYNC_ENABLED
 				await UserSyncAsync (); // Send changes to the mobile app backend.
+#endif
+
+			} catch (MobileServiceInvalidOperationException e) {
+				Console.Error.WriteLine (@"ERROR {0}", e.Message);
+			}
+		}
+		public async Task InsertUserFriendAsync (UserFriends user)
+		{
+			try {
+
+				await ufTable.InsertAsync (user);
+
+
+#if OFFLINE_SYNC_ENABLED
+				await UserFriendsSyncAsync (); // Send changes to the mobile app backend.
 #endif
 
 			} catch (MobileServiceInvalidOperationException e) {
@@ -185,6 +240,21 @@ namespace MovieFriends
 
 
 		}
+
+		public async Task<List<UserCloud>> GetUserCloud ()
+		{
+			try {
+
+				List<UserCloud> items = await userTable.ToListAsync ();
+				return new List<UserCloud> (items);
+
+			} catch (MobileServiceInvalidOperationException e) {
+				Console.Error.WriteLine (@"ERROR {0}", e.Message);
+				return null;
+			}
+
+
+		}
 		public async Task DeleteItemAsync (UserCloud item)
 		{
 			try {
@@ -200,7 +270,21 @@ namespace MovieFriends
 				Console.Error.WriteLine (@"ERROR {0}", e.Message);
 			}
 		}
+		public async Task DeleteItemAsync (UserFriends item)
+		{
+			try {
+				//item.deleted = true;
+				await ufTable.DeleteAsync (item);
+#if OFFLINE_SYNC_ENABLED
+				await UserFriendsSyncAsync (); // Send changes to the mobile app backend.
+#endif
 
+				// Items.Remove (item);
+
+			} catch (MobileServiceInvalidOperationException e) {
+				Console.Error.WriteLine (@"ERROR {0}", e.Message);
+			}
+		}
 		public async Task DeleteItemAsync (PostItem item)
 		{
 			try {

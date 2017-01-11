@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using FavoriteMoviesPCL;
 using Foundation;
 using JSQMessagesViewController;
@@ -9,84 +10,124 @@ namespace FavoriteMovies
 {
 	public class MovieChatViewController:MessagesViewController
 	{
-		MessagesBubbleImage outgoingBubbleImageData;
-		MessagesBubbleImage incomingBubbleImageData;
+		MessagesBubbleImage outgoingBubbleImageData,incomingBubbleImageData;
 		List<Message> messages = new List<Message> ();
-
-		User sender = new User { id = 1234, username = "Your Name Here" };
-		User friend = new User { id = 12345, username = "Tom Anderson" };
+		UserCloud sender = new UserCloud { Id = "1234", DisplayName = "Tim" };
+		UserCloud friend = new UserCloud { Id = "12345", DisplayName = "Tom Anderson" };
 
 		MessageFactory messageFactory = new MessageFactory ();
+	
 		public override void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
 
+			//Title = "Xamarin Chat";
+
 			// You must set your senderId and display name
-			SenderId = "123";
-			SenderDisplayName = sender.username;
+			SenderId = sender.Id;
+			SenderDisplayName = sender.DisplayName;
 
 			// These MessagesBubbleImages will be used in the GetMessageBubbleImageData override
 			var bubbleFactory = new MessagesBubbleImageFactory ();
 			outgoingBubbleImageData = bubbleFactory.CreateOutgoingMessagesBubbleImage (UIColorExtensions.MessageBubbleLightGrayColor);
 			incomingBubbleImageData = bubbleFactory.CreateIncomingMessagesBubbleImage (UIColorExtensions.MessageBubbleBlueColor);
 
+			// Remove the AccessoryButton as we will not be sending pics
+			InputToolbar.ContentView.LeftBarButtonItem = null;
+
 			// Remove the Avatars
 			CollectionView.CollectionViewLayout.IncomingAvatarViewSize = CoreGraphics.CGSize.Empty;
 			CollectionView.CollectionViewLayout.OutgoingAvatarViewSize = CoreGraphics.CGSize.Empty;
+
+			// Load some messagees to start
+			messages.Add (new Message (sender.Id, sender.DisplayName, NSDate.DistantPast, "Hi There"));
+			messages.Add (new Message (friend.Id, friend.DisplayName, NSDate.DistantPast, "I'm sorry, my responses are limited. You must ask the right questions."));
 		}
 
-		//To specify the number of total cells to display override IUICollectionViewDataSource.GetItemsCount`. 
+		public override UICollectionViewCell GetCell (UICollectionView collectionView, NSIndexPath indexPath)
+		{
+			//NewsFeedTableSource.HideTabBar ((UIApplication.SharedApplication.Delegate as AppDelegate).rootViewController.TabController);
+		
+				var cell = base.GetCell (collectionView, indexPath) as MessagesCollectionViewCell;
+			try {
+				if (cell == null) 
+				{
+					cell = new MessagesCollectionViewCell ();
+
+				}
+				// Override GetCell to make modifications to the cell
+				// In this case darken the text for the sender
+				var message = messages [indexPath.Row];
+				if (message.SenderId == SenderId)
+					cell.TextView.TextColor = UIColor.Black;
+			} catch (Exception e) 
+			{
+				Console.WriteLine (e.Message);
+			}
+			return cell;
+		}
 
 		public override nint GetItemsCount (UICollectionView collectionView, nint section)
 		{
-			return 2;
+			return messages.Count;
 		}
-
-		//To populate the view with messages, the message data that corresponds to the specified item at indexPath must be returned from IMessagesCollectionViewDataSource.GetMessageData.
 
 		public override IMessageData GetMessageData (MessagesCollectionView collectionView, NSIndexPath indexPath)
 		{
-			if (indexPath.Row == 0)
-				return Message.Create ("123", "Me", "Ping");
-
-			return Message.Create ("456", "You", "Pong");
+			return messages [indexPath.Row];
 		}
-
-		//The IMessagesCollectionViewDataSource.GetMessageBubbleImageData method asks the data source for the message bubble image data that corresponds to the specified message data item at indexPath in the view. 
 
 		public override IMessageBubbleImageDataSource GetMessageBubbleImageData (MessagesCollectionView collectionView, NSIndexPath indexPath)
 		{
-			if (indexPath.Row == 0)
+			var message = messages [indexPath.Row];
+			if (message.SenderId == SenderId)
 				return outgoingBubbleImageData;
-
 			return incomingBubbleImageData;
-		}
 
-		//Although the example does not display avatars, it is required to implement IMessagesCollectionViewDataSource.GetAvatarImageData.Simply return null. 
+		}
 
 		public override IMessageAvatarImageDataSource GetAvatarImageData (MessagesCollectionView collectionView, NSIndexPath indexPath)
 		{
 			return null;
 		}
 
-		//At this point the sample will run displaying the two messages, however the text for the sender is white on a light background.To change text color override IUICollectionViewDataSource.GetCell and call the base class to get the MessagesCollectionViewCell.Then change the TextView.TextColor to Black. 
-
-		public override UICollectionViewCell GetCell (UICollectionView collectionView, NSIndexPath indexPath)
+		public override async void PressedSendButton (UIButton button, string text, string senderId, string senderDisplayName, NSDate date)
 		{
-			var cell = base.GetCell (collectionView, indexPath) as MessagesCollectionViewCell;
+			SystemSoundPlayer.PlayMessageSentSound ();
 
-			// Override GetCell to make modifications to the cell
-			// In this case darken the text for the sender
-			if (indexPath.Row == 0)
-				cell.TextView.TextColor = UIColor.Black;
+			var message = new Message (SenderId, SenderDisplayName, NSDate.Now, text);
+			messages.Add (message);
 
-			return cell;
+			FinishSendingMessage (true);
+
+			await Task.Delay (500);
+
+			await SimulateDelayedMessageReceived ();
 		}
 
-		public void ReloadMessagesView ()
+		async Task SimulateDelayedMessageReceived ()
 		{
-			this.CollectionView.ReloadData ();
+			ShowTypingIndicator = true;
+
+			ScrollToBottom (true);
+
+			var delay = System.Threading.Tasks.Task.Delay (1500);
+			var message = await messageFactory.CreateMessageAsync (friend);
+			await delay;
+
+			messages.Add (message);
+
+			ScrollToBottom (true);
+
+			SystemSoundPlayer.PlayMessageReceivedSound ();
+
+			FinishReceivingMessage (true);
 		}
+
+		//public void ReloadMessagesView ()
+		//{
+		//	this.CollectionView.ReloadData ();
+		//}
 
 	}
 
