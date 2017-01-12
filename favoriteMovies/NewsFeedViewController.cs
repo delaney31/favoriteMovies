@@ -121,7 +121,7 @@ namespace FavoriteMovies
 
 
 
-			NavigationItem.Title = "Post to Feed";
+			NavigationItem.Title = "Meme Generator";
 			NavigationItem.RightBarButtonItem = close;
 			NavigationItem.LeftBarButtonItem = post;
 
