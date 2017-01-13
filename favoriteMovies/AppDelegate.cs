@@ -23,8 +23,7 @@ namespace FavoriteMovies
 			set;
 		}
 
-		public string CurrentUser { get; set; }
-		public string CurrentEmail { get; set; }
+
 		public override bool FinishedLaunching (UIApplication application, NSDictionary launchOptions)
 		{
 			// Override point for customization after application launch.

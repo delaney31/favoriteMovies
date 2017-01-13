@@ -153,7 +153,7 @@ namespace FavoriteMovies
 		public override void ViewDidAppear (bool animated)
 		{
 			base.ViewDidAppear (animated);
-			needLogin = (UIApplication.SharedApplication.Delegate as AppDelegate).CurrentUser==null?true:false;
+			needLogin = ColorExtensions.CurrentUser == null;
 			if (needLogin) {
 				LoginScreenControl<CredentialsProvider>.Activate (this);
 				needLogin = false;
@@ -192,8 +192,13 @@ namespace FavoriteMovies
 						var query = db.Query<User> ("SELECT * FROM [User]");
 						if (query.Count > 0) {
 							returnValue = query [0].username;
-							(UIApplication.SharedApplication.Delegate as AppDelegate).CurrentUser = query [0].username;
-							(UIApplication.SharedApplication.Delegate as AppDelegate).CurrentEmail = query [0].email;
+							var currentUser = new UserCloud ();
+
+							currentUser.username = query [0].username;
+							currentUser.email = query [0].email;
+							currentUser.Id = query [0].Id;
+
+							ColorExtensions.CurrentUser = currentUser;
 						}
 						//favoriteViewController.CollectionView.ReloadData ();
 					} catch (SQLiteException e) {

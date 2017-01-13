@@ -17,8 +17,8 @@ namespace FavoriteMovies
 		public SideMenuController() : base(null, null)
 		{
 			//signUpImage = UIImage.FromBundle ("124817-matte-white-square-icon-business-signature1.png");
-			//signUpImage = UIImage.FromBundle ("profile.png");
 			signUpImage = UIImage.FromBundle ("1481507483_compose.png");
+
 		}
 
 		void HandleAction ()
@@ -29,14 +29,18 @@ namespace FavoriteMovies
 			imagePicker.FinishedPickingMedia += Handle_FinishedPickingMedia;
 			imagePicker.Canceled += Handle_Canceled;
 			NavController.PresentModalViewController (imagePicker, true);
-		}
-		public override void ViewDidLoad()
-		{
-			base.ViewDidLoad();
-			View.BackgroundColor =  UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f);
 
-			userProfileImage = new UIImageView();
+		}
+		public override async void ViewDidLoad ()
+		{
+			base.ViewDidLoad ();
+			View.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f);
+
+			userProfileImage = new UIImageView ();
 			userProfileImage.Image = signUpImage;
+			signUpImage = await BlobUpload.getProfileImage ();
+			if (signUpImage !=null)
+			  userProfileImage.Image = signUpImage;
 			userProfileImage.BackgroundColor = UIColor.Clear;
 			userProfileImage.Frame = new RectangleF (55, 55, 100, 100);
 			userProfileImage.ContentMode = UIViewContentMode.ScaleAspectFill;
@@ -46,16 +50,16 @@ namespace FavoriteMovies
 
 			var profileImageTapGestureRecognizer = new UITapGestureRecognizer ();
 			userProfileImage.UserInteractionEnabled = true;
-			profileImageTapGestureRecognizer.AddTarget (() => { HandleAction(); });
+			profileImageTapGestureRecognizer.AddTarget (() => { HandleAction (); });
 			userProfileImage.AddGestureRecognizer (profileImageTapGestureRecognizer);
 
-			title = new UIButton(new RectangleF(10, 200, 192, 20));
+			title = new UIButton (new RectangleF (10, 200, 192, 20));
 			title.Font = UIFont.FromName (ColorExtensions.TITLE_FONT, 20);
 			////title.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.NAV_BAR_COLOR, 1.0f);
 			title.HorizontalAlignment = UIControlContentHorizontalAlignment.Center;
 			//title.Font = UIFont.FromName (UIColorExtensions.CONTENT_FONT, 15);
 			title.SetTitleColor (UIColor.White, UIControlState.Normal);
-			title.SetTitle ((UIApplication.SharedApplication.Delegate as AppDelegate).CurrentUser, UIControlState.Normal);
+			title.SetTitle (ColorExtensions.CurrentUser.username, UIControlState.Normal);
 			//title.Lines = 2;
 			title.TouchUpInside += (sender, e) => {
 				NavController.PopToRootViewController (false);
@@ -67,29 +71,29 @@ namespace FavoriteMovies
 			location.HorizontalAlignment = UIControlContentHorizontalAlignment.Center;
 			//title.Font = UIFont.FromName (UIColorExtensions.CONTENT_FONT, 15);
 			location.SetTitleColor (UIColor.White, UIControlState.Normal);
-			location.SetTitle ((UIApplication.SharedApplication.Delegate as AppDelegate).CurrentEmail, UIControlState.Normal);
+			location.SetTitle (ColorExtensions.CurrentUser.email, UIControlState.Normal);
 			//title.Lines = 2;
 			location.TouchUpInside += (sender, e) => {
 				NavController.PopToRootViewController (false);
 				SidebarController.CloseMenu ();
 			};
-			UIImageView profileImage = new UIImageView () { Image = UIImage.FromBundle ("1481450570_05-myhouse.png")};
+			UIImageView profileImage = new UIImageView () { Image = UIImage.FromBundle ("1481450570_05-myhouse.png") };
 			profileImage.Frame = new RectangleF (50, 275, 25, 30);
-			var introButton = new UIButton(UIButtonType.System);
-			introButton.Frame = new RectangleF(90, 282, 230, 20);
-			introButton.SetTitle("Movies", UIControlState.Normal);
+			var introButton = new UIButton (UIButtonType.System);
+			introButton.Frame = new RectangleF (90, 282, 230, 20);
+			introButton.SetTitle ("Movies", UIControlState.Normal);
 			introButton.SetTitleColor (UIColor.White, UIControlState.Normal);
 			introButton.HorizontalAlignment = UIControlContentHorizontalAlignment.Left;
 			introButton.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, 18);
 			introButton.TouchUpInside += (sender, e) => {
-				NavController.PopToRootViewController(false);
-				SidebarController.CloseMenu();
+				NavController.PopToRootViewController (false);
+				SidebarController.CloseMenu ();
 			};
 			UIImageView customImage = new UIImageView () { Image = UIImage.FromBundle ("1481443482_document.png") };
 			customImage.Frame = new RectangleF (40, 315, 40, 40);
-			var contentButton = new UIButton(UIButtonType.System);
-			contentButton.Frame = new RectangleF(90, 330, 230, 20);
-			contentButton.SetTitle("Share", UIControlState.Normal);
+			var contentButton = new UIButton (UIButtonType.System);
+			contentButton.Frame = new RectangleF (90, 330, 230, 20);
+			contentButton.SetTitle ("Share", UIControlState.Normal);
 			contentButton.SetTitleColor (UIColor.White, UIControlState.Normal);
 			contentButton.HorizontalAlignment = UIControlContentHorizontalAlignment.Left;
 			contentButton.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, 18);
@@ -98,7 +102,7 @@ namespace FavoriteMovies
 				//NavController.PushViewController(new ContentController(), false);
 				NavController.PushViewController (new MovieListPickerViewController (null, false), false);
 				//SidebarController.ChangeContentView (new MovieListPickerViewController (null, true));
-				SidebarController.CloseMenu();
+				SidebarController.CloseMenu ();
 			};
 
 			UIImageView friendsImage = new UIImageView () { Image = UIImage.FromBundle ("1481444239_AddFriends") };
@@ -110,7 +114,7 @@ namespace FavoriteMovies
 			connectionsButton.HorizontalAlignment = UIControlContentHorizontalAlignment.Left;
 			connectionsButton.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, 18);
 			connectionsButton.TouchUpInside += (sender, e) => {
-				NavController.PushViewController(new UserCloudListViewController(), false);
+				NavController.PushViewController (new UserCloudListViewController (), false);
 				//NavController.PushViewController (new MovieListPickerViewController (null, false), false);
 				//SidebarController.ChangeContentView (new MovieListPickerViewController (null, true));
 				SidebarController.CloseMenu ();
@@ -152,17 +156,17 @@ namespace FavoriteMovies
 			showTipsButton.HorizontalAlignment = UIControlContentHorizontalAlignment.Left;
 			showTipsButton.SetTitleColor (UIColor.White, UIControlState.Normal);
 			showTipsButton.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, 18);
-			showTipsButton.TouchUpInside += (sender, e) => 
-			{
+			showTipsButton.TouchUpInside += (sender, e) => {
 				//NavController.PushViewController(new ContentController(), false);
 				//NavController.PushViewController (new MovieListPickerViewController (null, false), false);
 				//SidebarController.ChangeContentView (new MovieListPickerViewController (null, true));
 				SidebarController.CloseMenu ();
 			};
-
+			UIImageView logOut = new UIImageView () { Image = UIImage.FromBundle ("ic_exit_to_app_3x.png") };
+			logOut.Frame = new RectangleF (50, 482, 30, 30);
 			var logoutButton = new UIButton (UIButtonType.System);
 			logoutButton.Frame = new RectangleF (90, 490, 230, 20);
-			logoutButton.SetTitle ("Logout", UIControlState.Normal);
+			logoutButton.SetTitle ("Sign Out", UIControlState.Normal);
 			logoutButton.HorizontalAlignment = UIControlContentHorizontalAlignment.Left;
 			logoutButton.SetTitleColor (UIColor.White, UIControlState.Normal);
 			logoutButton.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, 18);
@@ -173,11 +177,11 @@ namespace FavoriteMovies
 				LoginScreenControl<CredentialsProvider>.Activate (this);
 			};
 
-			View.Add(title);
+			View.Add (title);
 			View.Add (location);
-			View.Add(introButton);
-			View.Add(contentButton);
-			View.Add(connectionsButton);
+			View.Add (introButton);
+			View.Add (contentButton);
+			View.Add (connectionsButton);
 			View.Add (SettingsButton);
 			//View.Add (AddFriendsButton);
 			View.Add (profileImage);
@@ -189,6 +193,7 @@ namespace FavoriteMovies
 			View.Add (showTipsImage);
 			View.Add (showTipsButton);
 			View.Add (logoutButton);
+			View.Add (logOut);
 
 		}
 		void Handle_Canceled (object sender, EventArgs e)
@@ -196,7 +201,7 @@ namespace FavoriteMovies
 			imagePicker.DismissModalViewController (true);
 		}
 
-		void Handle_FinishedPickingMedia (object sender, UIImagePickerMediaPickedEventArgs e)
+		async void Handle_FinishedPickingMedia (object sender, UIImagePickerMediaPickedEventArgs e)
 		{
 			// determine what was selected, video or image
 
@@ -232,11 +237,22 @@ namespace FavoriteMovies
 					Console.WriteLine (mediaURL.ToString ());
 				}
 			}
+			var byteArray = ConvertImageToByteArray (userProfileImage.Image);
+			await BlobUpload.createContainerAndUpload (byteArray);
 			// dismiss the picker
 			imagePicker.DismissModalViewController (true);
 		}
 
-	}
+		byte[] ConvertImageToByteArray (UIImage image)
+		{
+			byte [] byteArray;
+			using (NSData imageData = image.AsPNG ()) {
+				byteArray = new Byte [imageData.Length];
+				System.Runtime.InteropServices.Marshal.Copy (imageData.Bytes, byteArray, 0, Convert.ToInt32 (imageData.Length));
+			}
+			return byteArray;
+		}
+}
 
 
 }

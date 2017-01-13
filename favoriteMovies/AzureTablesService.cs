@@ -24,7 +24,7 @@ namespace MovieFriends
 	{
 		static AzureTablesService instance = new AzureTablesService ();
 		const string applicationURL = @"https://moviefriends.azurewebsites.net";
-		private MobileServiceClient client;
+		public MobileServiceClient client;
 #if OFFLINE_SYNC_ENABLED
 		static readonly string localDbPath = MovieService.Database;
 		private IMobileServiceSyncTable<PostItem> postTable;
@@ -149,7 +149,7 @@ namespace MovieFriends
 				// Update the local store
 				await UserSyncAsync (pullData: true);
 #endif
-				if (postItem.Id != null)
+				//if (postItem.Id != null)
 					await DeleteItemAsync (postItem);
 				await InsertUserAsync (postItem);
 				Console.WriteLine ("Saved to the cloud!");
@@ -180,7 +180,6 @@ namespace MovieFriends
 		public async Task InsertUserAsync (UserCloud user)
 		{
 			try {
-
 				await userTable.InsertAsync (user);
 
 
