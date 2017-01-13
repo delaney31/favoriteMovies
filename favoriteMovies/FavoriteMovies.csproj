@@ -236,6 +236,7 @@
     <Compile Include="MessageFactory.cs" />
     <Compile Include="BaseBasicListViewController.cs" />
     <Compile Include="UserCloudListViewController.cs" />
+    <Compile Include="BlobUpload.cs" />
   </ItemGroup>
   <ItemGroup>
     <BundleResource Include="Resources\placeholder.png" />
@@ -274,6 +275,8 @@
     <BundleResource Include="Resources\unlike.png" />
     <BundleResource Include="Resources\IMG_2848.png" />
     <BundleResource Include="Resources\imageedit_1_9121618535.png" />
+    <BundleResource Include="Resources\logout-512.png" />
+    <BundleResource Include="Resources\ic_exit_to_app_3x.png" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\favoriteMoviesPCL\favoriteMoviesPCL.csproj">

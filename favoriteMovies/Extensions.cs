@@ -8,10 +8,10 @@ using UIKit;
 namespace FavoriteMovies
 {
 	public static class ColorExtensions
-	{	
+	{
 		public const string TITLE = "Movie Explorer";
-		public const string NAV_BAR_COLOR ="#3B5998";//facebook blue
-		//public const string NAV_BAR_COLOR ="#323232";
+		public const string NAV_BAR_COLOR = "#3B5998";//facebook blue
+													  //public const string NAV_BAR_COLOR ="#323232";
 		public const string TITLE_COLOR = "#DE9A2D";
 		public const string TITLE_FONT = "AppleSDGothicNeo-Bold";
 		public const string CONTENT_FONT = "AppleSDGothicNeo-Regular";
@@ -19,7 +19,7 @@ namespace FavoriteMovies
 		//public const string TAB_BACKGROUND_COLOR = "#555555"; //grey
 		public const string TAB_BACKGROUND_COLOR = "#FFFFFF"; //white
 		public const string PROFILE_BACKGROUND_COLOR = "#4B5F82"; //light grey
-		//public const string TAB_BACKGROUND_COLOR = "#3B3B3B"; //dark grey
+																  //public const string TAB_BACKGROUND_COLOR = "#3B3B3B"; //dark grey
 		public const float HEADER_FONT_SIZE = 17f;
 		public const float CAST_FONT_SIZE = 13f;
 		public const string SQL_TABLE = "MovieEntries.db3";
@@ -29,6 +29,7 @@ namespace FavoriteMovies
 		{
 			return new PointF (pt.Y, pt.X);
 		}
+		public static UserCloud CurrentUser {get;set;}
 		public static UIImage WithColor (this UIImage image, UIColor color)
 		{
 			UIGraphics.BeginImageContextWithOptions (image.Size, false, image.CurrentScale);

@@ -139,8 +139,7 @@ namespace FavoriteMoviesPCL
 	public class User
 
 	{
-		[PrimaryKey, AutoIncrement]
-		public int? id { get; set; }
+		public string Id { get; set; }
 		public string email { get; set;}
 		public string profilepic { get; set;}
 		public string username { get; set;}

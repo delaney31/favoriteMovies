@@ -44,8 +44,8 @@ namespace FavoriteMovies
 				}
 			});
 			MainViewController.getUser ();
-			SideMenuController.title.SetTitle ((UIApplication.SharedApplication.Delegate as AppDelegate).CurrentUser, UIControlState.Normal);
-			SideMenuController.location.SetTitle ((UIApplication.SharedApplication.Delegate as AppDelegate).CurrentEmail, UIControlState.Normal);
+			SideMenuController.title.SetTitle (ColorExtensions.CurrentUser.username, UIControlState.Normal);
+			SideMenuController.location.SetTitle (ColorExtensions.CurrentUser.email, UIControlState.Normal);
 
 
 
@@ -70,12 +70,19 @@ namespace FavoriteMovies
 				} else 
 				{
 					await postService.InitializeStoreAsync ();
-					var user = new User () { email = email, password = password, username = userName };
-					await AddUserAsync (user);
+
 					var userCloud = new UserCloud () { email = email, username = userName };
+					//insert email and username in cloud
 					await postService.InsertUserAsync (userCloud);
+					ColorExtensions.CurrentUser = userCloud;
+
+					var user = new User () { email = email, password = password, username = userName, Id= userCloud.Id };
+					//inset username and password locally
+					await AddUserAsync (user);
 
 					successCallback ();
+
+
 				}
 			});
 
@@ -130,7 +137,7 @@ namespace FavoriteMovies
 				}
 		
 		}
-		async Task<int> AddUserAsync (User user)
+		async Task AddUserAsync (User user)
 		{
 			try {
 
@@ -139,10 +146,8 @@ namespace FavoriteMovies
 					await DeleteAll ();	
 					db.InsertOrReplace (user, typeof (User));
 
-					string sql = "select last_insert_rowid()";
-					var scalarValue = db.ExecuteScalar<string> (sql);
-					int value = scalarValue == null ? 0 : Convert.ToInt32 (scalarValue);
-					return value;
+
+
 
 				}
 
@@ -150,7 +155,7 @@ namespace FavoriteMovies
 				Debug.WriteLine (e.Message);
 
 				using (var conn = new SQLite.SQLiteConnection (MovieService.Database)) {
-					conn.CreateTable<User> (CreateFlags.ImplicitPK | CreateFlags.AutoIncPK);
+					conn.CreateTable<User> ();
 
 				}
 
@@ -158,10 +163,7 @@ namespace FavoriteMovies
 					
 					db.InsertOrReplace (user, typeof (User));
 				
-					string sql = "select last_insert_rowid()";
-					var scalarValue = db.ExecuteScalar<string> (sql);
-					int value = scalarValue == null ? 0 : Convert.ToInt32 (scalarValue);
-					return value;
+
 				}
 			}
 
