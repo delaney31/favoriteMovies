@@ -153,7 +153,7 @@ namespace FavoriteMovies
 		public override void ViewDidAppear (bool animated)
 		{
 			base.ViewDidAppear (animated);
-			needLogin = ColorExtensions.CurrentUser == null;
+			needLogin = ColorExtensions.CurrentUser.username == null;
 			if (needLogin) {
 				LoginScreenControl<CredentialsProvider>.Activate (this);
 				needLogin = false;
@@ -190,19 +190,39 @@ namespace FavoriteMovies
 					try {
 						// there is a sqllite bug here https://forums.xamarin.com/discussion/52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
 						var query = db.Query<User> ("SELECT * FROM [User]");
+						var currentUser = new UserCloud ();
 						if (query.Count > 0) {
 							returnValue = query [0].username;
-							var currentUser = new UserCloud ();
+
 
 							currentUser.username = query [0].username;
 							currentUser.email = query [0].email;
 							currentUser.Id = query [0].Id;
 
-							ColorExtensions.CurrentUser = currentUser;
+
 						}
+						ColorExtensions.CurrentUser = currentUser;
 						//favoriteViewController.CollectionView.ReloadData ();
 					} catch (SQLiteException e) {
 						Debug.WriteLine (e.Message);
+						using (var conn = new SQLite.SQLiteConnection (MovieService.Database)) {
+							conn.CreateTable<User> ();
+							var query = db.Query<User> ("SELECT * FROM [User]");
+							var currentUser = new UserCloud ();
+							if (query.Count > 0) {
+								returnValue = query [0].username;
+
+
+								currentUser.username = query [0].username;
+								currentUser.email = query [0].email;
+								currentUser.Id = query [0].Id;
+
+
+							}
+							ColorExtensions.CurrentUser = currentUser;
+						}
+
+
 
 					}
 				});

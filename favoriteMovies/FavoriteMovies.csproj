@@ -1,4 +1,4 @@
-﻿<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">iPhoneSimulator</Platform>
@@ -51,7 +51,7 @@
     <MtouchUseLlvm>true</MtouchUseLlvm>
     <MtouchProfiling>false</MtouchProfiling>
     <MtouchSdkVersion></MtouchSdkVersion>
-    <CodesignProvision>d81ab1d1-a7d2-4dbb-a532-ceb211eadd22</CodesignProvision>
+    <CodesignProvision>7e93d927-97d0-4b14-9f95-0eb9cb7e693f</CodesignProvision>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
     <DebugType></DebugType>
@@ -93,7 +93,7 @@
     <MtouchHttpClientHandler>HttpClientHandler</MtouchHttpClientHandler>
     <MtouchTlsProvider>Default</MtouchTlsProvider>
     <PlatformTarget>x86</PlatformTarget>
-    <CodesignProvision></CodesignProvision>
+    <CodesignProvision>425af6af-367e-4a4b-b9b6-6f3bd39163a9</CodesignProvision>
     <MtouchSdkVersion></MtouchSdkVersion>
     <MtouchExtraArgs>-v -v -v -v</MtouchExtraArgs>
   </PropertyGroup>
