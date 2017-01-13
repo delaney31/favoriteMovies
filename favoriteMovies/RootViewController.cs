@@ -142,13 +142,13 @@ namespace FavoriteMovies
 			}
 
 
-
+			UIApplication.SharedApplication.NetworkActivityIndicatorVisible = true;
 			SidebarController = new SidebarController (this,NavController , new SideMenuController ());
 			SidebarController.MenuWidth = 220;
 			SidebarController.MenuLocation = SidebarController.MenuLocations.Right;
 			SidebarController.ReopenOnRotate = false;
 			SidebarController.HasShadowing = true;
-
+			UIApplication.SharedApplication.NetworkActivityIndicatorVisible = false;
 			NavController.PushViewController (TabController, true);
 
 

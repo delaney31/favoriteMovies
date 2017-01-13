@@ -133,20 +133,7 @@ namespace FavoriteMovies
 				//SidebarController.ChangeContentView (new MovieListPickerViewController (null, true));
 				SidebarController.CloseMenu ();
 			};
-			//UIImageView addFriendsImage = new UIImageView () { Image = UIImage.FromBundle ("1481444239_AddFriends.png") };
-			//addFriendsImage.Frame = new RectangleF (40, 445, 40, 40);
-			//var AddFriendsButton = new UIButton (UIButtonType.System);
-			//AddFriendsButton.Frame = new RectangleF (90, 460, 230, 20);
-			//AddFriendsButton.SetTitle ("Invite", UIControlState.Normal);
-			//AddFriendsButton.HorizontalAlignment = UIControlContentHorizontalAlignment.Left;
-			//AddFriendsButton.SetTitleColor (UIColor.White, UIControlState.Normal);
-			//AddFriendsButton.Font = UIFont.FromName (UIColorExtensions.CONTENT_FONT, 18);
-			//AddFriendsButton.TouchUpInside += (sender, e) => {
-			//	//NavController.PushViewController(new ContentController(), false);
-			//	//NavController.PushViewController (new MovieListPickerViewController (null, false), false);
-			//	//SidebarController.ChangeContentView (new MovieListPickerViewController (null, true));
-			//	SidebarController.CloseMenu ();
-			//};
+
 
 			UIImageView showTipsImage = new UIImageView () { Image = UIImage.FromBundle ("tips.png") };
 			showTipsImage.Frame = new RectangleF (40, 435, 40, 40);
@@ -237,13 +224,18 @@ namespace FavoriteMovies
 					Console.WriteLine (mediaURL.ToString ());
 				}
 			}
-			var byteArray = ConvertImageToByteArray (userProfileImage.Image);
-			await BlobUpload.createContainerAndUpload (byteArray);
 			// dismiss the picker
-			imagePicker.DismissModalViewController (true);
+			imagePicker.DismissViewController (true,UpdateImage);
+
 		}
 
-		byte[] ConvertImageToByteArray (UIImage image)
+		async void UpdateImage ()
+		{
+			var byteArray = ConvertImageToByteArray (userProfileImage.Image);
+			await BlobUpload.createContainerAndUpload (byteArray);
+		}
+
+		byte [] ConvertImageToByteArray (UIImage image)
 		{
 			byte [] byteArray;
 			using (NSData imageData = image.AsPNG ()) {
