@@ -237,6 +237,8 @@
     <Compile Include="BaseBasicListViewController.cs" />
     <Compile Include="UserCloudListViewController.cs" />
     <Compile Include="BlobUpload.cs" />
+    <Compile Include="MovieFriendsBaseViewController.cs" />
+    <Compile Include="MovieFriendsViewController.cs" />
   </ItemGroup>
   <ItemGroup>
     <BundleResource Include="Resources\placeholder.png" />

@@ -10,8 +10,10 @@ namespace FavoriteMovies
 	public static class ColorExtensions
 	{
 		public const string TITLE = "Movie Explorer";
+		public const string containerName = "moviefriend";
 		public const string NAV_BAR_COLOR = "#3B5998";//facebook blue
 													  //public const string NAV_BAR_COLOR ="#323232";
+		public const string AZURE_STORAGE_CONNECTION_STRING = "SharedAccessSignature=sv=2015-12-11&ss=bt&srt=sco&sp=rwdlacup&st=2017-01-13T01%3A11%3A00Z&se=2450-01-14T01%3A11%3A00Z&sig=f6ik2E%2BjiJX5eCBMMQnEffnXDGVhGTVt9oMVM9dqhPk%3D;BlobEndpoint=https://moviefriends.blob.core.windows.net/;TableEndpoint=https://moviefriends.table.core.windows.net";
 		public const string TITLE_COLOR = "#DE9A2D";
 		public const string TITLE_FONT = "AppleSDGothicNeo-Bold";
 		public const string CONTENT_FONT = "AppleSDGothicNeo-Regular";

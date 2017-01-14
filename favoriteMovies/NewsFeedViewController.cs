@@ -18,12 +18,19 @@ namespace FavoriteMovies
 		UITableView table;
 		NewsFeedTableSource tableSource;
 		UIBarButtonItem add;
+		UILabel loading;
 		public AzureTablesService postService;
 
+		public NewsFeedViewController ()
+		{
+			loading = new UILabel () { Frame = new CoreGraphics.CGRect () { X = 115, Y = 155, Width = 100, Height = 100 } };
+			loading.Text = "Loading...";
+
+		}
 		public override async void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
-
+			View.Add (loading);
 			postService = AzureTablesService.DefaultService;
 			await postService.InitializeStoreAsync ();
 
@@ -35,7 +42,7 @@ namespace FavoriteMovies
 			table.Source = tableSource;
 			table.AllowsSelectionDuringEditing = true;
 
-
+			NavigationItem.Title = "Add Movie Meme";
 
 			add = new UIBarButtonItem (UIBarButtonSystemItem.Add, (s, e) => {
 
@@ -48,8 +55,9 @@ namespace FavoriteMovies
 
 			NavigationItem.RightBarButtonItem = add;
 
-
+			loading.RemoveFromSuperview ();
 			View.Add (table);
+
 		}
 
 

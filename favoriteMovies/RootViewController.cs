@@ -94,7 +94,7 @@ namespace FavoriteMovies
 			};
 			Console.WriteLine (uinc2.ViewControllers.Length);
 
-			var tab3 = new UIViewController ();
+			var tab3 = new MovieFriendsViewController ();
 			tab3.Title = "Chat";
 			tab3.View.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 			tab3.TabBarItem.SetFinishedImages (UIImage.FromBundle ("message-7.png"), UIImage.FromBundle ("message-7.png"));

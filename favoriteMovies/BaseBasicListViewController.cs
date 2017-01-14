@@ -4,7 +4,7 @@ using UIKit;
 
 namespace FavoriteMovies
 {
-	public class BaseBasicListViewController: BaseController
+	public class BaseBasicListViewController: UIViewController
 	{
 		protected UITableView tableView;
 

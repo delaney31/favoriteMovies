@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using Contacts;
 using FavoriteMoviesPCL;
 using Foundation;
 using MovieFriends;
@@ -10,16 +12,16 @@ namespace FavoriteMovies
 {
 	public class UserCloudListViewController:BaseBasicListViewController
 	{
-		List<UserCloud> tableItems;
+		List<CNContact> tableItems;
 		public override void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
 
-			var cloudItems = Task.Run (async () => {
+			var contacts = Task.Run (async () => {
 				
-				tableItems = await GetUserCloudListAsync ();
+				tableItems = GetUserContactsAsync ();
 			});
-			cloudItems.Wait ();
+			contacts.Wait ();
 
 			tableSource = new UserCloudTableSource (tableItems, this);
 			tableView.Source = tableSource;
@@ -28,25 +30,44 @@ namespace FavoriteMovies
 
 		}
 
-		async Task<List<UserCloud>> GetUserCloudListAsync ()
+		List<CNContact> GetUserContactsAsync ()
 		{
-			AzureTablesService userFriendsService = AzureTablesService.DefaultService;
-			await userFriendsService.InitializeStoreAsync ();
+			// Create predicate to locate requested contact
+			//var predicate = CNContact.GetPredicateForContacts(null);
+
+			// Define fields to be searched
+			var fetchKeys = new NSString [] { CNContactKey.GivenName, CNContactKey.FamilyName, CNContactKey.EmailAddresses,CNContactKey.ImageDataAvailable, CNContactKey.ThumbnailImageData };
 
 
-			var retList = await userFriendsService.GetUserCloud();
-			return retList;
+			var store = new CNContactStore ();
+			NSError error;
+			CNContainer [] containers= store.GetContainers (null, out error) ;
+			List<CNContact> result = new List<CNContact> ();
+			foreach (var container in containers) 
+			{
+				var fetchPredicate = CNContact.GetPredicateForContactsInContainer (container.Identifier);
+
+				var containerResults = store.GetUnifiedContacts (fetchPredicate, fetchKeys, out error);
+				foreach (var contact in containerResults) 
+				{
+					result.Add (contact);
+				}
+
+			}
+
+			return result.ToList ();
+
 		}
 }
 
 
 	public class UserCloudTableSource : UITableViewSource
 	{
-		List<UserCloud> listItems;
+		List<CNContact> listItems;
 		UserCloudListViewController controller;
 		const string cellIdentifier = "UserCloudCells";
 
-		public UserCloudTableSource (List<UserCloud> items, UserCloudListViewController cont)
+		public UserCloudTableSource (List<CNContact> items, UserCloudListViewController cont)
 		{
 			this.listItems = items;
 			this.controller = cont;
@@ -55,19 +76,33 @@ namespace FavoriteMovies
 
 		public override UITableViewCell GetCell (UITableView tableView, NSIndexPath indexPath)
 		{
-			// request a recycled cell to save memory
-			UITableViewCell cell = tableView.DequeueReusableCell (cellIdentifier);
+			var cellStyle = UITableViewCellStyle.Value1;
+			UITableViewCell cell = new UITableViewCell (cellStyle, cellIdentifier);
 
+			var switchView = (UISwitch)cell.AccessoryView;
+			if (switchView == null) {
+				switchView = new UISwitch ();
+				switchView.AddTarget ((sender, e) => {
+					if (((UISwitch)sender).On)
+						//tableItems [indexPath.Row].shared = true;
+						switchView.On = true;
+					else
+						switchView.On = false;
+						//tableItems [indexPath.Row].shared = false;
+					//Owner.UpdateCustomAndMovieList (((CustomList)tableItems [indexPath.Row]).id, false, tableItems);
 
-			var cellStyle = UITableViewCellStyle.Default;
-
-			// if there are no cells to reuse, create a new one
-			if (cell == null) {
-				cell = new UITableViewCell (cellStyle, cellIdentifier);
-
+				}, UIControlEvent.ValueChanged);
 			}
-			cell.TextLabel.Text = listItems [indexPath.Row].username;
+
+			cell.AccessoryView = switchView;
+			var name = listItems [indexPath.Row].GivenName + " " +listItems [indexPath.Row].FamilyName ;
+			cell.TextLabel.Text = name;
 			cell.TextLabel.Font = UIFont.FromName (ColorExtensions.TITLE_FONT, ColorExtensions.HEADER_FONT_SIZE);
+			var profileImage = UIImage.FromBundle ("1481507483_compose.png"); //default image
+			cell.ImageView.Image = profileImage;
+			if (listItems [indexPath.Row].ImageDataAvailable)
+				
+				cell.ImageView.Image = UIImage.LoadFromData (listItems [indexPath.Row].ThumbnailImageData);
 
 			return cell;
 		}

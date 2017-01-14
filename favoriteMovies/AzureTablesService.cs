@@ -29,11 +29,12 @@ namespace MovieFriends
 		static readonly string localDbPath = MovieService.Database;
 		private IMobileServiceSyncTable<PostItem> postTable;
 		private IMobileServiceSyncTable<UserCloud> userTable;
-		private IMobileServiceSyncTable<UserFriends> ufTable;
+		private IMobileServiceSyncTable<UserFriendsCloud> ufTable;
 #else
         private IMobileServiceTable<PostItem> postTable;
 		private IMobileServiceTable<UserCloud> userTable;
-		private IMobileServiceTable<UserFriends> ufTable;
+		private IMobileServiceTable<UserFriendsCloud> ufTable;
+
 #endif
 
 		private AzureTablesService ()
@@ -50,7 +51,7 @@ namespace MovieFriends
 #else
             postTable = client.GetTable<PostItem>();
 			userTable = client.GetTable<UserCloud> ();
-			ufTable = client.GetTable<UserFriends> ();
+			ufTable = client.GetTable<UserFriendsCloud> ();
 #endif
 		}
 
@@ -160,16 +161,16 @@ namespace MovieFriends
 			}
 		}
 
-		public async Task RefreshDataAsync (UserFriends postItem)
+		public async Task RefreshDataAsync (UserFriendsCloud userFriend)
 		{
 			try {
 #if OFFLINE_SYNC_ENABLED
 				// Update the local store
 				await UserFriendsSyncAsync (pullData: true);
 #endif
-				if (postItem.Id != null)
-					await DeleteItemAsync (postItem);
-				await InsertUserFriendAsync (postItem);
+				if (userFriend.id != null)
+					await DeleteItemAsync (userFriend);
+				await InsertUserFriendAsync (userFriend);
 				Console.WriteLine ("Saved to the cloud!");
 
 			} catch (MobileServiceInvalidOperationException e) {
@@ -191,7 +192,7 @@ namespace MovieFriends
 				Console.Error.WriteLine (@"ERROR {0}", e.Message);
 			}
 		}
-		public async Task InsertUserFriendAsync (UserFriends user)
+		public async Task InsertUserFriendAsync (UserFriendsCloud user)
 		{
 			try {
 
@@ -222,6 +223,38 @@ namespace MovieFriends
 			}
 		}
 
+		internal async Task<List<UserFriendsCloud>> GetUserFriends (string userid)
+		{
+			try {
+
+				List<UserFriendsCloud> items = await ufTable
+					.Where (item => item.userid == userid)
+				  .ToListAsync ();
+
+				return new List<UserFriendsCloud> (items);
+
+			} catch (MobileServiceInvalidOperationException e) {
+				Console.Error.WriteLine (@"ERROR {0}", e.Message);
+				return null;
+			}
+
+		}
+		internal async Task<List<UserFriendsCloud>> GetSearchUserFriends (string search)
+		{
+			try {
+
+				List<UserFriendsCloud> items = await ufTable
+					.Where (item => item.friendusername == search)
+				  .ToListAsync ();
+
+				return new List<UserFriendsCloud> (items);
+
+			} catch (MobileServiceInvalidOperationException e) {
+				Console.Error.WriteLine (@"ERROR {0}", e.Message);
+				return null;
+			}
+
+		}
 		public async Task<List<PostItem>> GetCloudLike (string title)
 		{
 			try {
@@ -269,7 +302,7 @@ namespace MovieFriends
 				Console.Error.WriteLine (@"ERROR {0}", e.Message);
 			}
 		}
-		public async Task DeleteItemAsync (UserFriends item)
+		public async Task DeleteItemAsync (UserFriendsCloud item)
 		{
 			try {
 				//item.deleted = true;
@@ -299,6 +332,7 @@ namespace MovieFriends
 				Console.Error.WriteLine (@"ERROR {0}", e.Message);
 			}
 		}
-	}
+
+}
 }
 

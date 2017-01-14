@@ -14,11 +14,15 @@ namespace FavoriteMovies
 		public static UIButton title;
 		public static UIButton location;
 		public static UIImage signUpImage;
+		UILabel loading;
+
 		public SideMenuController() : base(null, null)
 		{
 			//signUpImage = UIImage.FromBundle ("124817-matte-white-square-icon-business-signature1.png");
 			signUpImage = UIImage.FromBundle ("1481507483_compose.png");
-
+			loading = new UILabel () { Frame = new CoreGraphics.CGRect () { X = 55, Y = 55, Width = 100, Height = 100 } };
+			loading.Text = "Loading..";
+			loading.TextColor = UIColor.White;
 		}
 
 		void HandleAction ()
@@ -35,10 +39,11 @@ namespace FavoriteMovies
 		{
 			base.ViewDidLoad ();
 			View.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f);
+			View.Add (loading);
 
 			userProfileImage = new UIImageView ();
 			userProfileImage.Image = signUpImage;
-			signUpImage = await BlobUpload.getProfileImage ();
+			signUpImage = await BlobUpload.getProfileImage (ColorExtensions.CurrentUser.Id);
 			if (signUpImage !=null)
 			  userProfileImage.Image = signUpImage;
 			userProfileImage.BackgroundColor = UIColor.Clear;
@@ -115,6 +120,7 @@ namespace FavoriteMovies
 			connectionsButton.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, 18);
 			connectionsButton.TouchUpInside += (sender, e) => {
 				NavController.PushViewController (new UserCloudListViewController (), false);
+			//	NavController.PresentViewController (new UserCloudListViewController (), true, null);
 				//NavController.PushViewController (new MovieListPickerViewController (null, false), false);
 				//SidebarController.ChangeContentView (new MovieListPickerViewController (null, true));
 				SidebarController.CloseMenu ();
@@ -181,6 +187,7 @@ namespace FavoriteMovies
 			View.Add (showTipsButton);
 			View.Add (logoutButton);
 			View.Add (logOut);
+			loading.RemoveFromSuperview ();
 
 		}
 		void Handle_Canceled (object sender, EventArgs e)
@@ -232,6 +239,7 @@ namespace FavoriteMovies
 		async void UpdateImage ()
 		{
 			var byteArray = ConvertImageToByteArray (userProfileImage.Image);
+			await BlobUpload.DeleteBlob ();
 			await BlobUpload.createContainerAndUpload (byteArray);
 		}
 
