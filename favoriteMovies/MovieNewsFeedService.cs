@@ -161,15 +161,15 @@ namespace FavoriteMovies
 			} catch (Exception e) 
 			{
 				Console.WriteLine (@"Error{0}", e.Message + " No internet connection");
-				await ShowAlert ("Limited Internet", "Your internet connection is down. Some items will not be available.", "Ok");
+				 ShowAlert ("Limited Internet", "Your internet connection is down. Some items will not be available.", "Ok");
 			}
 
 			return feedItemsList;
 
 		}
 
-		// Displays a UIAlertView and returns the index of the button pressed.
-		public static Task<int> ShowAlert (string title, string message, params string [] buttons)
+
+		static void  ShowAlert (string title, string message, params string [] buttons)
 		{
 			var tcs = new TaskCompletionSource<int> ();
 			var alert = new UIAlertView {
@@ -180,7 +180,7 @@ namespace FavoriteMovies
 				alert.AddButton (button);
 			alert.Clicked += (s, e) => tcs.TrySetResult ((int)e.ButtonIndex);
 			alert.Show ();
-			return tcs.Task;
+			//return tcs.Task;
 		}
 
 		public static void DeleteAllFeedItems ()

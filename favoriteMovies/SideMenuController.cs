@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Drawing;
+using System.Threading.Tasks;
 using Foundation;
 using LoginScreen;
 using UIKit;
@@ -35,28 +37,34 @@ namespace FavoriteMovies
 			NavController.PresentModalViewController (imagePicker, true);
 
 		}
-		public override async void ViewDidLoad ()
+		public override async void ViewDidAppear (bool animated)
 		{
-			base.ViewDidLoad ();
-			View.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f);
-			View.Add (loading);
-
+			base.ViewDidAppear (animated);
 			userProfileImage = new UIImageView ();
 			userProfileImage.Image = signUpImage;
-			signUpImage = await BlobUpload.getProfileImage (ColorExtensions.CurrentUser.Id);
-			if (signUpImage !=null)
-			  userProfileImage.Image = signUpImage;
+			if (ColorExtensions.CurrentUser.Id != null)
+				signUpImage = await BlobUpload.getProfileImage (ColorExtensions.CurrentUser.Id);
+			if (signUpImage != null)
+				userProfileImage.Image = signUpImage;
 			userProfileImage.BackgroundColor = UIColor.Clear;
-			userProfileImage.Frame = new RectangleF (55, 55, 100, 100);
+			userProfileImage.Frame = new RectangleF (40, 40, 150, 150);
 			userProfileImage.ContentMode = UIViewContentMode.ScaleAspectFill;
 			//userProfileImage.Layer.BorderWidth = 2;
-			userProfileImage.Layer.CornerRadius = userProfileImage.Frame.Size.Width / 2;
+			userProfileImage.Layer.CornerRadius = userProfileImage.Frame.Size.Width / 3;
 			userProfileImage.Layer.MasksToBounds = true;
 
 			var profileImageTapGestureRecognizer = new UITapGestureRecognizer ();
 			userProfileImage.UserInteractionEnabled = true;
 			profileImageTapGestureRecognizer.AddTarget (() => { HandleAction (); });
 			userProfileImage.AddGestureRecognizer (profileImageTapGestureRecognizer);
+			View.Add (userProfileImage);
+		}
+		public override void ViewDidLoad ()
+		{
+			base.ViewDidLoad ();
+			View.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f);
+			View.Add (loading);
+
 
 			title = new UIButton (new RectangleF (10, 200, 192, 20));
 			title.Font = UIFont.FromName (ColorExtensions.TITLE_FONT, 20);
@@ -182,7 +190,7 @@ namespace FavoriteMovies
 			View.Add (friendsImage);
 			View.Add (settingsImage);
 			//View.Add (addFriendsImage);
-			View.Add (userProfileImage);
+
 			View.Add (showTipsImage);
 			View.Add (showTipsButton);
 			View.Add (logoutButton);
@@ -195,10 +203,10 @@ namespace FavoriteMovies
 			imagePicker.DismissModalViewController (true);
 		}
 
-		async void Handle_FinishedPickingMedia (object sender, UIImagePickerMediaPickedEventArgs e)
+		 void Handle_FinishedPickingMedia (object sender, UIImagePickerMediaPickedEventArgs e)
 		{
 			// determine what was selected, video or image
-
+			UIImage originalImage = new UIImage();
 			bool isImage = false;
 			switch (e.Info [UIImagePickerController.MediaType].ToString ()) {
 			case "public.image":
@@ -218,7 +226,7 @@ namespace FavoriteMovies
 			// if it was an image, get the other image info
 			if (isImage) {
 				// get the original image
-				UIImage originalImage = e.Info [UIImagePickerController.OriginalImage] as UIImage;
+				originalImage = e.Info [UIImagePickerController.OriginalImage] as UIImage;
 				if (originalImage != null) {
 					// do something with the image
 					userProfileImage.Image = originalImage;
@@ -231,16 +239,48 @@ namespace FavoriteMovies
 					Console.WriteLine (mediaURL.ToString ());
 				}
 			}
+
+			try {
+
+
+				var task = Task.Run (async () => {
+					var byteArray = ConvertImageToByteArray (ColorExtensions.MaxResizeImage(originalImage,150f,150f));
+
+					await BlobUpload.createContainerAndUpload (byteArray);
+				});
+				TimeSpan ts = TimeSpan.FromMilliseconds (4000);
+				task.Wait (ts);
+				if (!task.Wait (ts))
+					Console.WriteLine ("The timeout interval elapsed uploading Profile image.");
+			} catch (Exception f) {
+				Debug.WriteLine (f.Message);
+
+			}
+
 			// dismiss the picker
-			imagePicker.DismissViewController (true,UpdateImage);
+			imagePicker.DismissViewController (true, null);
 
 		}
 
-		async void UpdateImage ()
+		 void UpdateImage (UIImage image)
 		{
-			var byteArray = ConvertImageToByteArray (userProfileImage.Image);
-			await BlobUpload.DeleteBlob ();
-			await BlobUpload.createContainerAndUpload (byteArray);
+			try {
+				
+
+				var task = Task.Run (async () => {
+					var byteArray = ConvertImageToByteArray (userProfileImage.Image);
+
+					await BlobUpload.createContainerAndUpload (byteArray);
+				});
+				TimeSpan ts = TimeSpan.FromMilliseconds (3000);
+				task.Wait (ts);
+				if (!task.Wait (ts))
+					Console.WriteLine ("The timeout interval elapsed uploading Profile image.");
+			} catch (Exception e) {
+				Debug.WriteLine (e.Message);
+
+			}
+
 		}
 
 		byte [] ConvertImageToByteArray (UIImage image)

@@ -8,7 +8,6 @@ using System.Web;
 using CoreGraphics;
 using FavoriteMoviesPCL;
 using Foundation;
-using MonoTouch.Dialog;
 using SidebarNavigation;
 using SQLite;
 using UIKit;
@@ -33,9 +32,9 @@ namespace FavoriteMovies
 		static int DefaultYPositionNowPlayingLabel = 270;
 		static int DefaultYPositionPopularLabel = 530;
 		static int DefaultYPositionMovieLatestLabel = 790;
-		public static int NewCustomListToRefresh =-1;
+		public static int NewCustomListToRefresh = -1;
 		//public static int OldCustomListToRefresh;
-		static CGSize ItemSize = new CGSize (153,205);
+		static CGSize ItemSize = new CGSize (153, 205);
 		static CGRect FavoriteLabelFrame = new CGRect (7, 10, 180, 20);
 		static CGRect TopRatedLabelFrame = new CGRect (7, 205, 180, 20);
 		static CGRect NowPlayingLabelFrame = new CGRect (7, 400, 180, 20);
@@ -76,12 +75,13 @@ namespace FavoriteMovies
 		private bool needLogin = true;
 
 
-		public MainViewController (ObservableCollection<Movie> topRated, ObservableCollection<Movie> nowPlaying, ObservableCollection<Movie> popular, ObservableCollection<Movie> movieLatest,int page)
+		//	public MainViewController (ObservableCollection<Movie> topRated, ObservableCollection<Movie> nowPlaying, ObservableCollection<Movie> popular, ObservableCollection<Movie> movieLatest,int page)
+		public MainViewController ()
 		{
-			this.topRated = topRated;
-			this.nowPlaying = nowPlaying;
-			this.popular = popular;
-			this.MovieLatest = movieLatest;
+			//this.topRated = topRated;
+			//this.nowPlaying = nowPlaying;
+			//this.popular = popular;
+			//this.MovieLatest = movieLatest;
 			//this.TvNowAiring = TVNowAiring;
 			flowLayout = new UICollectionViewFlowLayout () {
 				HeaderReferenceSize = HeaderReferenceSize,
@@ -122,20 +122,18 @@ namespace FavoriteMovies
 			var currentPoint = ((UIScrollView)sender).ContentOffset;
 
 
-    		if (targetPoint.Y > currentPoint.Y) 
-			{
+			if (targetPoint.Y > currentPoint.Y) {
 				NewsFeedTableSource.HideTabBar (TabController);
 				NavController.SetNavigationBarHidden (true, true);
 				var statusView = new UIView () { Frame = UIApplication.SharedApplication.StatusBarFrame };
 				statusView.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f);
 				View.Add (statusView);
-			} else 
-			{
+			} else {
 				NewsFeedTableSource.ShowTabBar (TabController);
 				NavController.SetNavigationBarHidden (false, true);
 				UIApplication.SharedApplication.SetStatusBarHidden (false, true);
 			}
-				
+
 		}
 
 		void LoadMoreMovies ()
@@ -153,6 +151,7 @@ namespace FavoriteMovies
 		public override void ViewDidAppear (bool animated)
 		{
 			base.ViewDidAppear (animated);
+
 			needLogin = ColorExtensions.CurrentUser.username == null;
 			if (needLogin) {
 				LoginScreenControl<CredentialsProvider>.Activate (this);
@@ -164,21 +163,21 @@ namespace FavoriteMovies
 
 			//searchResultsController.TableView.ContentInset = new UIEdgeInsets (80, 0, 0, 0);
 			//HACK until i find out why when you open a movie details and come back the view.height changes.
-			if (View.Frame.Height == 504) 
-			{
-		
+			if (View.Frame.Height == 504) {
+
 				//if (customLists.Count > 0) {
-					//scrollView.ContentSize = new CGSize (View.Frame.Width, 898 + 50);
-			//		scrollView.ContentSize = new CGSize (View.Frame.Width, View.Frame.Height);
-			//		scrollView.ContentOffset = new CGPoint (0, -scrollView.ContentInset.Top);
-			//	} else {
-					//scrollView.ContentSize = new CGSize (View.Frame.Width, 733 + 50);
-					scrollView.ContentSize = new CGSize (View.Frame.Width, View.Frame.Height);
-					//scrollView.ContentOffset = new CGPoint (0, -scrollView.ContentInset.Top);
-			//	}
+				//scrollView.ContentSize = new CGSize (View.Frame.Width, 898 + 50);
+				//		scrollView.ContentSize = new CGSize (View.Frame.Width, View.Frame.Height);
+				//		scrollView.ContentOffset = new CGPoint (0, -scrollView.ContentInset.Top);
+				//	} else {
+				//scrollView.ContentSize = new CGSize (View.Frame.Width, 733 + 50);
+				scrollView.ContentSize = new CGSize (View.Frame.Width, View.Frame.Height);
+				//scrollView.ContentOffset = new CGPoint (0, -scrollView.ContentInset.Top);
+				//	}
 			}
 			////*****this fixes a problem with the uitableview adding space at the top after each selection*****
 			//Debug.Write (searchResultsController.TableView.ContentInset);
+			// adding label views to View. 
 
 		}
 
@@ -232,29 +231,21 @@ namespace FavoriteMovies
 		}
 
 
-		
+
 
 		public override void ViewWillAppear (bool animated)
 		{
 			base.ViewWillAppear (animated);
+
+			LoadCollectionViewControllers ();
 			SidebarController.Disabled = false;
 			//DeleteAllSubviews (scrollView);
 
 
 			if (NewCustomListToRefresh != -1)
-				  FavoritesDisplay ();
+				FavoritesDisplay ();
+			LoadViews ();
 
-			// adding label views to View. 
-			scrollView.AddSubview (topRatedController.CollectionView);
-			scrollView.AddSubview (nowPlayingController.CollectionView);
-			scrollView.AddSubview (popularController.CollectionView);
-			scrollView.AddSubview (MovieLatestController.CollectionView);
-			scrollView.AddSubview (PlayingNowLabel);
-			scrollView.AddSubview (PopularLabel);
-			scrollView.AddSubview (MovieLatestLabel);
-			scrollView.AddSubview (TopRatedLabel);
-			View.AddSubview (scrollView);
-			((UITextField)searchController.SearchBar.ValueForKey (new NSString ("_searchField"))).ResignFirstResponder ();
 		}
 
 		void UpdateCustomListMovies (int cnt)
@@ -269,7 +260,7 @@ namespace FavoriteMovies
 				MinimumInteritemSpacing = MinimumInteritemSpacing, MinimumLineSpacing = MinimumLineSpacing,
 				HeaderReferenceSize = HeaderReferenceSize, ItemSize = ItemSize,
 				ScrollDirection = UICollectionViewScrollDirection.Horizontal
-			},new ObservableCollection<Movie>(GetMovieList (customLists [cnt]).Reverse ()),this);
+			}, new ObservableCollection<Movie> (GetMovieList (customLists [cnt]).Reverse ()), this);
 
 			customControllers [cnt].CollectionView.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha);
 			customControllers [cnt].CollectionView.RegisterClassForCell (typeof (MovieCell), FavoritesViewController.movieCellId);
@@ -278,8 +269,7 @@ namespace FavoriteMovies
 
 		void DeleteAllSubviews (UIScrollView view)
 		{
-			foreach(UIView subview in view.Subviews)
-			{
+			foreach (UIView subview in view.Subviews) {
 				subview.RemoveFromSuperview ();
 			}
 
@@ -354,17 +344,17 @@ namespace FavoriteMovies
 		{
 			customLabels [customList].Frame = new CGRect () {
 				X = FavoriteLabelFrame.X,
-				Y = FavoriteLabelFrame.Y + (SpaceBetweenLabelsAndFrames * customList) + SpaceBetweenContainers   ,
+				Y = FavoriteLabelFrame.Y + (SpaceBetweenLabelsAndFrames * customList) + SpaceBetweenContainers,
 				Height = FavoriteLabelFrame.Height, Width = FavoriteLabelFrame.Width
 			};
 			customControllers [customList].CollectionView.Frame = new CGRect () {
 				X = FavoriteControllerFrame.X,
 				Y = customLabels [customList].Frame.Y + 19,// FavoteControllerFrame.Y + (SpaceBetweenLabelsAndFrames * customList)
-			    Height = FavoriteControllerFrame.Height,
+				Height = FavoriteControllerFrame.Height,
 				Width = FavoriteControllerFrame.Width
 			};
-			scrollView.Add(customLabels [customList]);
-			scrollView.Add(customControllers [customList].CollectionView);
+			scrollView.Add (customLabels [customList]);
+			scrollView.Add (customControllers [customList].CollectionView);
 		}
 
 		ObservableCollection<Movie> GetMovieList (CustomList customList)
@@ -401,15 +391,43 @@ namespace FavoriteMovies
 			}
 			return returnList;
 		}
-
-		public override void ViewDidLoad ()
+		public static int RandomNumber (int min, int max)
 		{
-			base.ViewDidLoad ();
+			Random random = new Random (); return random.Next (min, max);
+
+		}
+
+		void GetCollectionData ()
+		{
+			int Page;
+
+
+			try {
+				Page = RandomNumber (1, 50);
+
+				var task = Task.Run (async () => {
+					this.topRated = await MovieService.GetMoviesAsync (MovieService.MovieType.NowPlaying, 1);
+					this.nowPlaying = await MovieService.GetMoviesAsync (MovieService.MovieType.TopRated, Page);
+					this.popular = await MovieService.GetMoviesAsync (MovieService.MovieType.Popular, Page);
+					this.MovieLatest = await MovieService.GetMoviesAsync (MovieService.MovieType.Upcoming, Page);
+					//TVNowAiring = await MovieService.GetMoviesAsync (MovieService.MovieType.TVLatest, Page);
+				});
+				//	TimeSpan ts = TimeSpan.FromMilliseconds (2000);
+				task.Wait ();
+				//if (!task.Wait (ts))
+				//	Console.WriteLine ("The timeout interval elapsed in RootViewController.");
+			} catch (Exception e) {
+				Debug.WriteLine (e.Message);
+
+			}
+		}
+		void LoadCollectionViewControllers ()
+		{
 
 			//scrollView.PagingEnabled = true;
 
 			scrollView.Frame = new CGRect () { X = View.Frame.X, Y = View.Frame.Y, Width = View.Frame.Width, Height = View.Frame.Height };
-			customLists =  GetCustomLists ();
+			customLists = GetCustomLists ();
 
 			customLabels = new UILabel [customLists.Count];
 			customControllers = new FavoritesViewController [customLists.Count];
@@ -445,32 +463,20 @@ namespace FavoriteMovies
 			TopRatedLabel.Layer.ZPosition = LabelZPosition;
 			PlayingNowLabel.Layer.ZPosition = LabelZPosition;
 			PopularLabel.Layer.ZPosition = LabelZPosition;
-			topRatedController = new TopRatedCollectionViewController (new UICollectionViewFlowLayout () {
-				MinimumInteritemSpacing = MinimumInteritemSpacing, MinimumLineSpacing = MinimumLineSpacing,
-				HeaderReferenceSize = HeaderReferenceSize, ItemSize = ItemSize,
-				ScrollDirection = UICollectionViewScrollDirection.Horizontal
-			}, topRated, this);
+
+
+			topRatedController = new TopRatedCollectionViewController (flowLayout, topRated, this);
 			topRatedController.CollectionView.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha);
 			topRatedController.CollectionView.RegisterClassForCell (typeof (MovieCell), TopRatedCollectionViewController.movieCellId);
 
 
-			View.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha);
-
-			nowPlayingController = new NowPlayingCollectionViewController (new UICollectionViewFlowLayout () {
-				MinimumInteritemSpacing = MinimumInteritemSpacing, MinimumLineSpacing = MinimumLineSpacing,
-				HeaderReferenceSize = HeaderReferenceSize, ItemSize = ItemSize,
-				ScrollDirection = UICollectionViewScrollDirection.Horizontal
-			}, nowPlaying, this);
+			nowPlayingController = new NowPlayingCollectionViewController (flowLayout, nowPlaying, this);
 			nowPlayingController.CollectionView.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha);
 			nowPlayingController.CollectionView.RegisterClassForCell (typeof (MovieCell), NowPlayingCollectionViewController.movieCellId);
 
 
 
-			popularController = new PopularCollectionViewController (new UICollectionViewFlowLayout () {
-				MinimumInteritemSpacing = MinimumInteritemSpacing, MinimumLineSpacing = MinimumLineSpacing,
-				HeaderReferenceSize = HeaderReferenceSize, ItemSize = ItemSize,
-				ScrollDirection = UICollectionViewScrollDirection.Horizontal
-			}, popular, this);
+			popularController = new PopularCollectionViewController (flowLayout, popular, this);
 			popularController.CollectionView.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha);
 			popularController.CollectionView.RegisterClassForCell (typeof (MovieCell), PopularCollectionViewController.movieCellId);
 
@@ -488,7 +494,28 @@ namespace FavoriteMovies
 			} else {
 				UpdateCustomListMovies (NewCustomListToRefresh);
 			}
+
+			View.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha);
 			FavoritesDisplay ();
+		}
+		void LoadViews ()
+		{
+			scrollView.AddSubview (topRatedController.CollectionView);
+			scrollView.AddSubview (nowPlayingController.CollectionView);
+			scrollView.AddSubview (popularController.CollectionView);
+			scrollView.AddSubview (MovieLatestController.CollectionView);
+			scrollView.AddSubview (PlayingNowLabel);
+			scrollView.AddSubview (PopularLabel);
+			scrollView.AddSubview (MovieLatestLabel);
+			scrollView.AddSubview (TopRatedLabel);
+			View.AddSubview (scrollView);
+			((UITextField)searchController.SearchBar.ValueForKey (new NSString ("_searchField"))).ResignFirstResponder ();
+		}
+		public override void ViewDidLoad ()
+		{
+			base.ViewDidLoad ();
+
+			GetCollectionData ();
 
 			// Creates an instance of a custom View Controller that holds the results
 			searchResultsController = new SearchResultsViewController ();
@@ -536,9 +563,8 @@ namespace FavoriteMovies
 		{
 
 			var result = new ObservableCollection<CustomList> ();
-			using (var db = new SQLiteConnection (MovieService.Database)) 
-			{
-				var task =Task.Run (() => {
+			using (var db = new SQLiteConnection (MovieService.Database)) {
+				var task = Task.Run (() => {
 					try {
 						// there is a sqllite bug here https://forums.xamarin.com/discussion/52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
 						var query = db.Query<CustomList> ("SELECT * FROM [CustomList] ORDER BY [Order]");
@@ -582,7 +608,7 @@ namespace FavoriteMovies
 				ContentView.Layer.BorderWidth = 1.0f;
 				ContentView.Layer.BorderColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f).CGColor;
 				ContentView.AddSubview (ImageView);
-			} catch (Exception ex) {Debug.Write (ex.Message); }
+			} catch (Exception ex) { Debug.Write (ex.Message); }
 
 		}
 
@@ -592,7 +618,11 @@ namespace FavoriteMovies
 		{
 
 			try {
-				ImageView.Image = GetImage (element.PosterPath);
+				//	ImageView.Image = GetImage (element.PosterPath);
+				ImageView.SetImage (
+					url: new NSUrl ("http://db.tt/ayAqtbFy"),
+					placeholder: UIImage.FromBundle ("placeholder.png")
+				);
 				if (ColorExtensions.MovieIsFavorite (element.id.ToString ())) {
 					ContentView.Layer.BorderColor = UIColor.Orange.CGColor;
 
@@ -607,35 +637,36 @@ namespace FavoriteMovies
 		public static UIImage GetImageUrl (string posterPath)
 		{
 			var returnImage = UIImage.FromBundle ("blank.png");
-			var task =Task.Run (async () => 
-			{
-				if (posterPath != null) 
-				{
+			var task = Task.Run (async () => {
+				if (posterPath != null) {
 					var uri = new Uri (posterPath);
 					using (var imgUrl = new NSUrl (HttpUtility.UrlPathEncode (uri.AbsoluteUri))) {
 						using (var data = NSData.FromUrl (imgUrl)) {
-							returnImage= (UIImage.LoadFromData (data));
+							returnImage = (ColorExtensions.MaxResizeImage (UIImage.LoadFromData (data), 289f, 140f));
+							//returnImage= (UIImage.LoadFromData (data));
 						}
 					}
 				}
 			});
-			TimeSpan ts = TimeSpan.FromMilliseconds (1000);
-			task.Wait (ts);
+			//TimeSpan ts = TimeSpan.FromMilliseconds (500);
+			task.Wait ();
 
-			if (!task.Wait (ts))
-				Console.WriteLine ("The timeout interval elapsed in GetImageURL.");
+			//if (!task.Wait (ts))
+			//	Console.WriteLine ("The timeout interval elapsed in GetImageURL.");
 			return returnImage;
 
 		}
-		public static  UIImage GetImage (string posterPath)
+		public static UIImage GetImage (string posterPath)
 		{
 			var returnImage = UIImage.FromBundle ("blank.png");
 			var task = Task.Run (async () => {
-			if (posterPath != null) {
+				if (posterPath != null) {
 					var uri = new Uri (posterPath);
 					using (var imgUrl = new NSUrl (baseUrl + uri.AbsoluteUri.Substring (8))) {
 						using (var data = NSData.FromUrl (imgUrl)) {
+							//returnImage = (ColorExtensions.MaxResizeImage(UIImage.LoadFromData (data),153f,205f));
 							returnImage = (UIImage.LoadFromData (data));
+
 						}
 					}
 				}

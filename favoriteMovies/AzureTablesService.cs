@@ -233,9 +233,9 @@ namespace MovieFriends
 
 				return new List<UserFriendsCloud> (items);
 
-			} catch (MobileServiceInvalidOperationException e) {
+			} catch (Exception e) {
 				Console.Error.WriteLine (@"ERROR {0}", e.Message);
-				return null;
+				return new List<UserFriendsCloud> ();
 			}
 
 		}
@@ -251,7 +251,7 @@ namespace MovieFriends
 
 			} catch (MobileServiceInvalidOperationException e) {
 				Console.Error.WriteLine (@"ERROR {0}", e.Message);
-				return null;
+				return new List<UserFriendsCloud> ();
 			}
 
 		}
@@ -267,7 +267,7 @@ namespace MovieFriends
 
 			} catch (MobileServiceInvalidOperationException e) {
 				Console.Error.WriteLine (@"ERROR {0}", e.Message);
-				return null;
+				return new List<PostItem> ();
 			}
 
 
@@ -282,7 +282,7 @@ namespace MovieFriends
 
 			} catch (MobileServiceInvalidOperationException e) {
 				Console.Error.WriteLine (@"ERROR {0}", e.Message);
-				return null;
+				return new List<UserCloud> ();
 			}
 
 

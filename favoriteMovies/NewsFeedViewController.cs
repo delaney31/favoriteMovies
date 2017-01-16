@@ -39,6 +39,7 @@ namespace FavoriteMovies
 			table = new UITableView (View.Bounds);
 			table.AutoresizingMask = UIViewAutoresizing.All;
 			tableSource = new NewsFeedTableSource (tableItems, this);
+
 			table.Source = tableSource;
 			table.AllowsSelectionDuringEditing = true;
 

@@ -20,40 +20,40 @@ namespace FavoriteMovies
 		public NavController NavController { get; private set; }
 		//// the tab controller
 		public MovieTabBarController TabController { get; private set; }
-		ObservableCollection<Movie> NowPlaying = new ObservableCollection<Movie>();
-		ObservableCollection<Movie> TopRated = new ObservableCollection<Movie>();
-		ObservableCollection<Movie> Popular = new ObservableCollection<Movie>();
-		ObservableCollection<Movie> MovieLatest = new ObservableCollection<Movie>();
+		//ObservableCollection<Movie> NowPlaying = new ObservableCollection<Movie>();
+		//ObservableCollection<Movie> TopRated = new ObservableCollection<Movie>();
+		//ObservableCollection<Movie> Popular = new ObservableCollection<Movie>();
+		//ObservableCollection<Movie> MovieLatest = new ObservableCollection<Movie>();
 
-		int Page;
+		//int Page;
 
-		public static int RandomNumber (int min, int max)
-		{
-			Random random = new Random (); return random.Next (min, max);
+		//public static int RandomNumber (int min, int max)
+		//{
+		//	Random random = new Random (); return random.Next (min, max);
 
-		}
+		//}
 
 		public RootViewController ()
 		{
 			
-			try {
-				Page = RandomNumber (1, 50);
+			//try {
+			//	Page = RandomNumber (1, 50);
 
-				var task = Task.Run (async () => {
-					NowPlaying = await MovieService.GetMoviesAsync (MovieService.MovieType.NowPlaying, 1);
-					TopRated = await MovieService.GetMoviesAsync (MovieService.MovieType.TopRated, Page);
-					Popular = await MovieService.GetMoviesAsync (MovieService.MovieType.Popular, Page);
-					MovieLatest = await MovieService.GetMoviesAsync (MovieService.MovieType.Upcoming, Page);
-					//TVNowAiring = await MovieService.GetMoviesAsync (MovieService.MovieType.TVLatest, Page);
-				});
-				TimeSpan ts = TimeSpan.FromMilliseconds (4000);
-				task.Wait (ts);
-				if (!task.Wait (ts))
-					Console.WriteLine ("The timeout interval elapsed in RootViewController.");
-			} catch (Exception e) {
-				Debug.WriteLine (e.Message);
+			//	var task = Task.Run (async () => {
+			//		NowPlaying = await MovieService.GetMoviesAsync (MovieService.MovieType.NowPlaying, 1);
+			//		TopRated = await MovieService.GetMoviesAsync (MovieService.MovieType.TopRated, Page);
+			//		Popular = await MovieService.GetMoviesAsync (MovieService.MovieType.Popular, Page);
+			//		MovieLatest = await MovieService.GetMoviesAsync (MovieService.MovieType.Upcoming, Page);
+			//		//TVNowAiring = await MovieService.GetMoviesAsync (MovieService.MovieType.TVLatest, Page);
+			//	});
+			//	TimeSpan ts = TimeSpan.FromMilliseconds (4000);
+			//	task.Wait (ts);
+			//	if (!task.Wait (ts))
+			//		Console.WriteLine ("The timeout interval elapsed in RootViewController.");
+			//} catch (Exception e) {
+			//	Debug.WriteLine (e.Message);
 
-			}
+			//}
 		}
 		public override bool ShouldAutorotate ()
 		{
@@ -76,7 +76,8 @@ namespace FavoriteMovies
 				ForegroundColor = UIColor.White
 			};
 
-			var mainView = new MainViewController (TopRated, NowPlaying, Popular, MovieLatest, Page);
+			//var mainView = new MainViewController (TopRated, NowPlaying, Popular, MovieLatest, Page);
+			var mainView = new MainViewController ();
 			mainView.Title = "Movies";
 			mainView.TabBarItem.SetFinishedImages(UIImage.FromBundle ("home-7.png"),UIImage.FromBundle ("home-7.png"));
 
