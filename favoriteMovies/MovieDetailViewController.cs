@@ -16,18 +16,18 @@ namespace FavoriteMovies
 {
 	public class MovieDetailViewController : BaseController
 	{
-		
+
 		UILabel dateOpenView = new UILabel ();
-		UILabel descReview= new UILabel ();
-		UILabel descriptView =new UILabel ();
-		UILabel movieTitle =new UILabel ();
+		UILabel descReview = new UILabel ();
+		UILabel descriptView = new UILabel ();
+		UILabel movieTitle = new UILabel ();
 		UIButton addReviewButt = new UIButton ();
 		UIImageView posterImage = new UIImageView ();
 		UIButton saveFavoriteButt = new UIButton ();
 		UIImageView IMDB = new UIImageView ();
 		UILabel voteResultText = new UILabel ();
 		UILabel userResultText = new UILabel ();
-
+		int previousPlace;
 		/// <summary>
 		/// This is the view controller for the movie details page. In addition it allows you to save and clear favorite movies
 		/// </summary>
@@ -58,32 +58,28 @@ namespace FavoriteMovies
 		bool canReview;
 		string youtubeMovieId = "";
 		UIColor backGroundColor;
-		public MovieDetailViewController (Movie movie, bool canReview) 
+		public MovieDetailViewController (Movie movie, bool canReview)
 		{
 			movieDetail = movie;
 			this.canReview = canReview;
 
-			moviePlay = new UIImageView () { UserInteractionEnabled = true};
-			Userstar1 = new UIImageView (){ UserInteractionEnabled = true };
-			Userstar2 = new UIImageView (){ UserInteractionEnabled = true };
-			Userstar3 = new UIImageView (){ UserInteractionEnabled = true };
-			Userstar4 = new UIImageView (){ UserInteractionEnabled = true };
-			Userstar5 = new UIImageView (){ UserInteractionEnabled = true };
+			moviePlay = new UIImageView () { UserInteractionEnabled = true };
+			Userstar1 = new UIImageView () { UserInteractionEnabled = true };
+			Userstar2 = new UIImageView () { UserInteractionEnabled = true };
+			Userstar3 = new UIImageView () { UserInteractionEnabled = true };
+			Userstar4 = new UIImageView () { UserInteractionEnabled = true };
+			Userstar5 = new UIImageView () { UserInteractionEnabled = true };
 			IMDB = new UIImageView ();
-				
+
 			moviePlay.Image = UIImage.FromBundle ("download.png");
-			Userstar1.Image = UIImage.FromBundle ("star.png");
-			Userstar2.Image = UIImage.FromBundle ("star.png");
-			Userstar3.Image = UIImage.FromBundle ("star.png");
-			Userstar4.Image = UIImage.FromBundle ("star.png");
-			Userstar5.Image = UIImage.FromBundle ("star.png");
+
 			IMDB.Image = UIImage.FromBundle ("imdb.png");
 
 		}
 
 		void Initialize ()
 		{
-			var imDbUrl = "http://api.themoviedb.org/3/movie/" + movieDetail.OriginalId+ "/videos?api_key=" + MovieService._apiKey;
+			var imDbUrl = "http://api.themoviedb.org/3/movie/" + movieDetail.OriginalId + "/videos?api_key=" + MovieService._apiKey;
 
 
 			var UTubeMovidId = Task.Run (async () => {
@@ -139,7 +135,11 @@ namespace FavoriteMovies
 			dateOpenView.Text = "Release Date: " + movieDetail.ReleaseDate.Value.ToString ("MM/dd/yyyy",
 				  CultureInfo.InvariantCulture);
 			dateOpenView.Frame = new CGRect (183, 70, 135, 20);
-
+			Userstar1.Image = IsDarkColor (backGroundColor) ? UIImage.FromBundle ("star.png") : UIImage.FromBundle ("stardark.png");
+			Userstar2.Image = IsDarkColor (backGroundColor) ? UIImage.FromBundle ("star.png") : UIImage.FromBundle ("stardark.png");
+			Userstar3.Image = IsDarkColor (backGroundColor) ? UIImage.FromBundle ("star.png") : UIImage.FromBundle ("stardark.png");
+			Userstar4.Image = IsDarkColor (backGroundColor) ? UIImage.FromBundle ("star.png") : UIImage.FromBundle ("stardark.png");
+			Userstar5.Image = IsDarkColor (backGroundColor) ? UIImage.FromBundle ("star.png") : UIImage.FromBundle ("stardark.png");
 			Userstar1.Frame = new CGRect (183, 115, 20, 20);
 			Userstar2.Frame = new CGRect (203, 115, 20, 20);
 			Userstar3.Frame = new CGRect (223, 115, 20, 20);
@@ -179,26 +179,26 @@ namespace FavoriteMovies
 				break;
 			}
 			var AddStar1 = new UITapGestureRecognizer ();
-			AddStar1.AddTarget (() => { AddStarAction (AddStar1); });
+			AddStar1.AddTarget (() => { AddStarAction (AddStar1, 1); });
 			Userstar1.AddGestureRecognizer (AddStar1);
 
 			var AddStar2 = new UITapGestureRecognizer ();
-			AddStar2.AddTarget (() => { AddStarAction (AddStar2); });
+			AddStar2.AddTarget (() => { AddStarAction (AddStar2, 2); });
 			Userstar2.AddGestureRecognizer (AddStar2);
 
 			var AddStar3 = new UITapGestureRecognizer ();
-			AddStar3.AddTarget (() => { AddStarAction (AddStar3); });
+			AddStar3.AddTarget (() => { AddStarAction (AddStar3, 3); });
 			Userstar3.AddGestureRecognizer (AddStar3);
 
 			var AddStar4 = new UITapGestureRecognizer ();
-			AddStar4.AddTarget (() => { AddStarAction (AddStar4); });
+			AddStar4.AddTarget (() => { AddStarAction (AddStar4, 4); });
 			Userstar4.AddGestureRecognizer (AddStar4);
 
 			var AddStar5 = new UITapGestureRecognizer ();
-			AddStar5.AddTarget (() => { AddStarAction (AddStar5); });
+			AddStar5.AddTarget (() => { AddStarAction (AddStar5, 5); });
 			Userstar5.AddGestureRecognizer (AddStar5);
 
-			userResultText.Text = "Your Rating: " + Convert.ToInt32 (movieDetail.UserRating) + " of 5";
+			userResultText.Text = "Your Rating: " + Convert.ToInt32 (movieDetail.UserRating) + " of 5 Stars";
 			userResultText.BackgroundColor = backGroundColor;
 			userResultText.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, ColorExtensions.CAST_FONT_SIZE);
 			userResultText.TextColor = IsDarkColor (backGroundColor) ? UIColor.White : UIColor.Black;
@@ -254,19 +254,54 @@ namespace FavoriteMovies
 
 		}
 
-		void AddStarAction (UIGestureRecognizer gesture)
+		void AddStarAction (UIGestureRecognizer gesture, int place)
 		{
-			if (gesture.View.Alpha > .2f) {
-				gesture.View.Alpha = .2f;
-				movieDetail.UserRating--;
-			} else 
+			if (place == 1 && Math.Round(Userstar2.Alpha,1) == .2 && Math.Round(Userstar3.Alpha,1) == .2 && Math.Round(Userstar4.Alpha,1) == .2 && Math.Round(Userstar5.Alpha,1) == .2 && Math.Round(Userstar1.Alpha,1) == 1) 
 			{
-				gesture.View.Alpha = 1f;
-				movieDetail.UserRating++;
+				Userstar1.Alpha = .2f;
+				movieDetail.UserRating = 0;
+				userResultText.Text = "Not Rated.";
+				return;
 			}
-					
-			userResultText.Text = "Your Rating: " + Convert.ToInt32 (movieDetail.UserRating) + " Stars";
 
+			Userstar1.Alpha = .2f;
+			Userstar2.Alpha = .2f;
+			Userstar3.Alpha = .2f;
+			Userstar4.Alpha = .2f;
+			Userstar5.Alpha = .2f;
+
+
+			switch (place) 
+			{
+				case 1:
+				    
+					Userstar1.Alpha = 1f;
+					break;
+				case 2:
+					Userstar1.Alpha = 1f;
+					Userstar2.Alpha = 1f;
+					break;
+				case 3:
+					Userstar1.Alpha = 1f;
+					Userstar2.Alpha = 1f;
+					Userstar3.Alpha = 1f;
+					break;
+				case 4:
+					Userstar1.Alpha = 1f;
+					Userstar2.Alpha = 1f;
+					Userstar3.Alpha = 1f;
+					Userstar4.Alpha = 1f;
+					break;
+				case 5:
+					Userstar1.Alpha = 1f;
+					Userstar2.Alpha = 1f;
+					Userstar3.Alpha = 1f;
+					Userstar4.Alpha = 1f;
+					Userstar5.Alpha = 1f;
+					break;
+			}
+			movieDetail.UserRating = place;
+			userResultText.Text = "Your Rating: " + Convert.ToInt32 (movieDetail.UserRating) + " of 5 Stars";
 		}
 
 		string GetUserName ()

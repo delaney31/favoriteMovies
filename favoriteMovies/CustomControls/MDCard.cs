@@ -112,11 +112,11 @@ namespace FavoriteMovies
 			//this.ContentView.Frame =  new CGRect(){new UIEdgeInsets (10, 10, 10, 10);
 
 			this.cardView.Layer.MasksToBounds = false;
-			this.cardView.Layer.CornerRadius = 20f;
+			this.cardView.Layer.CornerRadius = 10f;
 			//this.cardView.Layer.CornerRadius = 1;
 			this.cardView.Layer.ShadowOffset = new CoreGraphics.CGSize (-.2f, .2f);
 			//this.cardView.Layer.ShadowRadius = 
-			this.cardView.Layer.ShadowRadius = 20f;
+			this.cardView.Layer.ShadowRadius = 10f;
 			this.cardView.Layer.ShadowOpacity = 0.2f;
 
 			UIBezierPath path = UIBezierPath.FromRect (cardView.Bounds);

@@ -19,6 +19,7 @@ namespace FavoriteMovies
 			tableView.AllowsSelectionDuringEditing = true;
 
 
+
 		}
 
 

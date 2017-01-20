@@ -12,16 +12,14 @@ namespace FavoriteMovies
 {
 	public class UserCloudListViewController:BaseBasicListViewController
 	{
-		List<CNContact> tableItems;
-		public override void ViewDidLoad ()
+		List<ContactCard> tableItems;
+		const string cellIdentifier = "UserCloudCells";
+		public override  void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
 
-			var contacts = Task.Run (async () => {
-				
-				tableItems = GetUserContactsAsync ();
-			});
-			contacts.Wait ();
+			tableItems = GetUserContactsAsync ();
+
 
 			tableSource = new UserCloudTableSource (tableItems, this);
 			tableView.Source = tableSource;
@@ -30,7 +28,7 @@ namespace FavoriteMovies
 
 		}
 
-		List<CNContact> GetUserContactsAsync ()
+		List<ContactCard> GetUserContactsAsync ()
 		{
 			// Create predicate to locate requested contact
 			//var predicate = CNContact.GetPredicateForContacts(null);
@@ -42,7 +40,7 @@ namespace FavoriteMovies
 			var store = new CNContactStore ();
 			NSError error;
 			CNContainer [] containers= store.GetContainers (null, out error) ;
-			List<CNContact> result = new List<CNContact> ();
+			List<ContactCard> result = new List<ContactCard> ();
 			foreach (var container in containers) 
 			{
 				var fetchPredicate = CNContact.GetPredicateForContactsInContainer (container.Identifier);
@@ -50,7 +48,13 @@ namespace FavoriteMovies
 				var containerResults = store.GetUnifiedContacts (fetchPredicate, fetchKeys, out error);
 				foreach (var contact in containerResults) 
 				{
-					result.Add (contact);
+					var conCard = new ContactCard (UITableViewCellStyle.Default,cellIdentifier);
+					conCard.nameLabel.Text = contact.GivenName + " " + contact.FamilyName;
+					if(contact.ImageDataAvailable)
+					   conCard.profileImage.Image = UIImage.LoadFromData(contact.ThumbnailImageData);
+					else
+					   conCard.profileImage.Image = UIImage.FromBundle ("1481507483_compose.png"); //default image
+					result.Add (conCard);
 				}
 
 			}
@@ -63,11 +67,11 @@ namespace FavoriteMovies
 
 	public class UserCloudTableSource : UITableViewSource
 	{
-		List<CNContact> listItems;
+		List<ContactCard> listItems;
 		UserCloudListViewController controller;
-		const string cellIdentifier = "UserCloudCells";
 
-		public UserCloudTableSource (List<CNContact> items, UserCloudListViewController cont)
+
+		public UserCloudTableSource (List<ContactCard> items, UserCloudListViewController cont)
 		{
 			this.listItems = items;
 			this.controller = cont;
@@ -76,9 +80,8 @@ namespace FavoriteMovies
 
 		public override UITableViewCell GetCell (UITableView tableView, NSIndexPath indexPath)
 		{
-			var cellStyle = UITableViewCellStyle.Value1;
-			UITableViewCell cell = new UITableViewCell (cellStyle, cellIdentifier);
-
+			
+			var cell = listItems [indexPath.Row];
 			var switchView = (UISwitch)cell.AccessoryView;
 			if (switchView == null) {
 				switchView = new UISwitch ();
@@ -95,15 +98,6 @@ namespace FavoriteMovies
 			}
 
 			cell.AccessoryView = switchView;
-			var name = listItems [indexPath.Row].GivenName + " " +listItems [indexPath.Row].FamilyName ;
-			cell.TextLabel.Text = name;
-			cell.TextLabel.Font = UIFont.FromName (ColorExtensions.TITLE_FONT, ColorExtensions.HEADER_FONT_SIZE);
-			var profileImage = UIImage.FromBundle ("1481507483_compose.png"); //default image
-			cell.ImageView.Image = profileImage;
-			if (listItems [indexPath.Row].ImageDataAvailable)
-				
-				cell.ImageView.Image = UIImage.LoadFromData (listItems [indexPath.Row].ThumbnailImageData);
-
 			return cell;
 		}
 

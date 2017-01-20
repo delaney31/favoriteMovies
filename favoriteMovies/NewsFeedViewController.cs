@@ -43,18 +43,18 @@ namespace FavoriteMovies
 			table.Source = tableSource;
 			table.AllowsSelectionDuringEditing = true;
 
-			NavigationItem.Title = "Add Movie Meme";
+		//	NavigationItem.Title = "Add Movie Meme";
 
-			add = new UIBarButtonItem (UIBarButtonSystemItem.Add, (s, e) => {
+			//add = new UIBarButtonItem (UIBarButtonSystemItem.Add, (s, e) => {
 
-				var newPost = new UINavigationController (new NewFeedPostViewController ());
+			//	var newPost = new UINavigationController (new NewFeedPostViewController ());
 
-				newPost.View.Frame = new CGRect () { X = 10, Y = 15, Width = 300, Height = 300 };
-				NavigationController.PresentViewController (newPost, true, null);
-			});
+			//	newPost.View.Frame = new CGRect () { X = 10, Y = 15, Width = 300, Height = 300 };
+			//	NavigationController.PresentViewController (newPost, true, null);
+			//});
 
 
-			NavigationItem.RightBarButtonItem = add;
+		//	NavigationItem.RightBarButtonItem = add;
 
 			loading.RemoveFromSuperview ();
 			View.Add (table);
@@ -358,11 +358,7 @@ namespace FavoriteMovies
 			//const string CellIdentifier = @"CardCell";
 			//var cell = (MDCard)tableView.DequeueReusableCell (CellIdentifier);
 			var cell = tableItems [indexPath.Row];
-			//if (cell == null) 
-			//{
-			//	cell = new MDCard (UITableViewCellStyle.Default, CellIdentifier);
 
-			//}
 			cell.Tag = indexPath.Row;
 			var likepress = new UITapGestureRecognizer ();
 			likepress.AddTarget ((obj) => HandleAction (cell));

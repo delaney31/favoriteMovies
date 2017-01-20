@@ -222,6 +222,7 @@ namespace FavoriteMovies
 			} catch (SQLite.SQLiteException e) {
 				//first time in no favorites yet.
 				Debug.Write (e.Message);
+				throw;
 			}
 
 		}
@@ -237,6 +238,7 @@ namespace FavoriteMovies
 
 			} catch (SQLite.SQLiteException s) {
 				Debug.Write (s.Message);
+				throw;
 			}
 		}
 		public static void DeleteMovie (int? id)
@@ -252,6 +254,7 @@ namespace FavoriteMovies
 			} catch (SQLite.SQLiteException e) {
 				//first time in no favorites yet.
 				Debug.Write (e.Message);
+				throw;
 			}
 
 		}
@@ -269,6 +272,7 @@ namespace FavoriteMovies
 			} catch (SQLite.SQLiteException e) {
 				//first time in no favorites yet.
 				Debug.Write (e.Message);
+				throw;
 			}
 
 		}
@@ -353,6 +357,7 @@ namespace FavoriteMovies
 				} catch (SQLite.SQLiteException e) {
 					//first time in no favorites yet.
 					Debug.Write (e.Message);
+					throw;
 				}
 			});
 			task.Wait ();
@@ -547,24 +552,30 @@ namespace FavoriteMovies
 							var cancelAction = UIAlertAction.Create ("Cancel", UIAlertActionStyle.Cancel, alertAction => {
 								Console.WriteLine ("Cancel was Pressed");
 							});
-							var okayAction = UIAlertAction.Create ("Okay", UIAlertActionStyle.Default, alertAction => {
+							var okayAction = UIAlertAction.Create ("Okay", UIAlertActionStyle.Default, alertAction => 
+							{
 								Console.WriteLine ("The user entered '{0}'", textInputAlertController.TextFields [0].Text);
-								if (ValueUnique (textInputAlertController.TextFields [0].Text)) {
-									ArrangeCustomList (false);
-									var listItem = new CustomList ();
-									listItem.order = 0;
-									listItem.name = textInputAlertController.TextFields [0].Text;
-									tableItems.Insert (0, listItem);
-									tableView.EndUpdates (); // applies the changes
-									tableView.ReloadData ();
-									ArrangeCustomList (true);
-									var item = tableItems [(int)indexPath.Row] as CustomList;
-									if (item is CustomList) {
-										Owner.UpdateCustomAndMovieList (((CustomList)tableItems [(int)tableView.NumberOfRowsInSection (0) - 1]).id, false, tableItems);
-									} else {
-										Owner.UpdateCustomAndMovieList (((Movie)tableItems [(int)tableView.NumberOfRowsInSection (0) - 1]).id, true, tableItems);
+								if (ValueUnique (textInputAlertController.TextFields [0].Text)) 
+								{
+									if (textInputAlertController.TextFields [0].Text.Length > 0) {
+										ArrangeCustomList (false);
+										var listItem = new CustomList ();
+										listItem.order = 0;
+										listItem.name = textInputAlertController.TextFields [0].Text;
+										tableItems.Insert (0, listItem);
+										tableView.EndUpdates (); // applies the changes
+										tableView.ReloadData ();
+										ArrangeCustomList (true);
+										var item = tableItems [(int)indexPath.Row] as CustomList;
+										if (item is CustomList) {
+											Owner.UpdateCustomAndMovieList (((CustomList)tableItems [(int)tableView.NumberOfRowsInSection (0) - 1]).id, false, tableItems);
+										} else {
+											Owner.UpdateCustomAndMovieList (((Movie)tableItems [(int)tableView.NumberOfRowsInSection (0) - 1]).id, true, tableItems);
+										}
 									}
-								} else {
+								} 
+								else 
+								{
 									new UIAlertView ("Duplicate!"
 									, "List already exist", null, "OK", null).Show ();
 								}
@@ -598,7 +609,7 @@ namespace FavoriteMovies
 					tableView.DeselectRow (indexPath, true);
 				} catch (Exception ex) 
 				{
-					Debug.Write (ex.Message);
+					throw;
 				}
 			}
 

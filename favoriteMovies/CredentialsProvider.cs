@@ -73,15 +73,19 @@ namespace FavoriteMovies
 
 					var userCloud = new UserCloud () { email = email, username = userName };
 					//insert email and username in cloud
-					await postService.InsertUserAsync (userCloud);
-					ColorExtensions.CurrentUser = userCloud;
+					var unique = await postService.InsertUserAsync (userCloud);
+					if (!unique)
+						failCallback (new LoginScreenFaultDetails { UserNameErrorMessage = "This username already exits." });
+					else 
+					{
+						ColorExtensions.CurrentUser = userCloud;
 
-					var user = new User () { email = email, password = password, username = userName, Id= userCloud.Id };
-					//inset username and password locally
-					await AddUserAsync (user);
+						var user = new User () { email = email, password = password, username = userName, Id = userCloud.Id };
+						//inset username and password locally
+						await AddUserAsync (user);
 
-					successCallback ();
-
+						successCallback ();
+					}
 
 				}
 			});

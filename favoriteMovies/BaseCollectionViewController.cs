@@ -59,43 +59,44 @@ namespace FavoriteMovies
 			if (lpgr.State != UIGestureRecognizerState.Ended)
 				return;
 
-
+			try {
 				var p = lpgr.LocationInView (CollectionView);
 
 				var indexPath = CollectionView.IndexPathForItemAtPoint (p);
-				
+
 
 				if (indexPath == null)
 					Console.WriteLine ("Could not find index path");
 				else {
-					
+
 					var customListId = _items [indexPath.Row].CustomListID;
 					var isCustomList = _items [indexPath.Row].CustomListID != null;
 					bool accepted = await ShowAlert ("Confirm", "Are you sure you want to delete this movie?");
 					Console.WriteLine ("Selected button {0}", accepted ? "Accepted" : "Canceled");
-					if (accepted) 
-					{
+					if (accepted) {
 						//if customListId is null then we are on a pre-defined list (i.e Now Playing) not a custom one so nothing in table to delete
-						if (isCustomList) 
-						   BaseListViewController.DeleteMovie ((int)_items [indexPath.Row].id);
-							//cell.RemoveFromSuperview ();
+						if (isCustomList)
+							BaseListViewController.DeleteMovie ((int)_items [indexPath.Row].id);
 						
 						_items.RemoveAt (indexPath.Row);
-						CollectionView.DeleteItems (new NSIndexPath [] { indexPath });
+						//CollectionView.DeleteItems (new NSIndexPath [] { indexPath });
+
 						CollectionView.ReloadData ();
 
 					}
-					if (_items.Count == 0) 
-					{
+					if (_items.Count == 0) {
 						BaseListViewController.DeleteCustomList (customListId);
 					}
-					if (isCustomList) 
-					{
+					if (isCustomList) {
 						MainViewController.NewCustomListToRefresh = 0;
 						viewController.ViewWillAppear (true);
 					}
 				}
-
+			} catch (Exception ex) 
+			{
+				throw;
+				Debug.WriteLine (ex.Message);
+			}
 		}
 
 
@@ -114,7 +115,9 @@ namespace FavoriteMovies
 				//this.ParentViewController.NavigationController.PushViewController(new MovieDetailViewController (row, false), true);
 
 				//loadingOverlay.Hide ();
-			} catch (Exception e) {
+			} catch (Exception e) 
+			{
+				throw;
 				Debug.WriteLine (e.Message);
 			}
 		}
@@ -141,7 +144,9 @@ namespace FavoriteMovies
 				var row = _items [indexPath.Row];
 				cell.UpdateRow (row);
 				return cell;
-			} catch (Exception e) {
+			} catch (Exception e) 
+			{
+				throw;
 				Debug.WriteLine (e.Message);
 
 			}
@@ -178,9 +183,11 @@ namespace FavoriteMovies
 				var row = _items [indexPath.Row];
 				cell.UpdateRow (row);
 				return cell;
-			} catch (Exception e) {
+			} catch (Exception e) 
+			{
 				Debug.WriteLine (e.Message);
 				Console.WriteLine (e.Message);
+				throw;
 			}
 			return cell;
 		}
@@ -222,8 +229,11 @@ namespace FavoriteMovies
 				var row = _items [indexPath.Row];
 				cell.UpdateRow (row);
 				return cell;
-			} catch (Exception e) {
+			} catch (Exception e) 
+			{
+				
 				Debug.WriteLine (e.Message);
+				throw;
 			}
 			return cell;
 		}
@@ -237,7 +247,9 @@ namespace FavoriteMovies
 				viewController.NavController.PushViewController (new MovieDetailViewController (row, true), true);
 
 			} catch (Exception e) {
+				
 				Debug.WriteLine (e.Message);
+				throw;
 			}
 		}
 	}
@@ -264,6 +276,7 @@ namespace FavoriteMovies
 				return cell;
 			} catch (Exception e) {
 				Debug.WriteLine (e.Message);
+				throw;
 
 			}
 			return cell;
@@ -293,6 +306,7 @@ namespace FavoriteMovies
 				return cell;
 			} catch (Exception e) {
 				Debug.WriteLine (e.Message);
+				throw;
 
 			}
 			return cell;

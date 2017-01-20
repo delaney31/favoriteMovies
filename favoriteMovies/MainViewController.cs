@@ -70,7 +70,7 @@ namespace FavoriteMovies
 		static UILabel PlayingNowLabel;
 		static UILabel PopularLabel;
 		static UILabel MovieLatestLabel;
-		AzureTablesService azureService;
+
 
 		private bool needLogin = true;
 
@@ -78,11 +78,7 @@ namespace FavoriteMovies
 		//	public MainViewController (ObservableCollection<Movie> topRated, ObservableCollection<Movie> nowPlaying, ObservableCollection<Movie> popular, ObservableCollection<Movie> movieLatest,int page)
 		public MainViewController ()
 		{
-			//this.topRated = topRated;
-			//this.nowPlaying = nowPlaying;
-			//this.popular = popular;
-			//this.MovieLatest = movieLatest;
-			//this.TvNowAiring = TVNowAiring;
+			
 			flowLayout = new UICollectionViewFlowLayout () {
 				HeaderReferenceSize = HeaderReferenceSize,
 				ScrollDirection = UICollectionViewScrollDirection.Horizontal,
@@ -91,8 +87,8 @@ namespace FavoriteMovies
 				ItemSize = ItemSize
 				//SectionInset = new UIEdgeInsets (80, -40, 97, 127)
 			};
-			//scrollView.WillEndDragging += ScrollView_WillEndDragging;
-			azureService = AzureTablesService.DefaultService;
+
+
 		}
 
 		public override bool ShouldAutorotate ()
@@ -165,15 +161,8 @@ namespace FavoriteMovies
 			//HACK until i find out why when you open a movie details and come back the view.height changes.
 			if (View.Frame.Height == 504) {
 
-				//if (customLists.Count > 0) {
-				//scrollView.ContentSize = new CGSize (View.Frame.Width, 898 + 50);
-				//		scrollView.ContentSize = new CGSize (View.Frame.Width, View.Frame.Height);
-				//		scrollView.ContentOffset = new CGPoint (0, -scrollView.ContentInset.Top);
-				//	} else {
-				//scrollView.ContentSize = new CGSize (View.Frame.Width, 733 + 50);
 				scrollView.ContentSize = new CGSize (View.Frame.Width, View.Frame.Height);
-				//scrollView.ContentOffset = new CGPoint (0, -scrollView.ContentInset.Top);
-				//	}
+
 			}
 			////*****this fixes a problem with the uitableview adding space at the top after each selection*****
 			//Debug.Write (searchResultsController.TableView.ContentInset);
@@ -237,12 +226,10 @@ namespace FavoriteMovies
 		{
 			base.ViewWillAppear (animated);
 
-			LoadCollectionViewControllers ();
+
 			SidebarController.Disabled = false;
-			//DeleteAllSubviews (scrollView);
 
-
-			if (NewCustomListToRefresh != -1)
+			if (NewCustomListToRefresh != -1)// - 1 means nothing has changed and i don't have to refresh lists
 				FavoritesDisplay ();
 			LoadViews ();
 
@@ -388,6 +375,7 @@ namespace FavoriteMovies
 				}
 			} catch (SQLite.SQLiteException e) {
 				Debug.Write (e.Message);
+				throw;
 			}
 			return returnList;
 		}
@@ -412,12 +400,13 @@ namespace FavoriteMovies
 					this.MovieLatest = await MovieService.GetMoviesAsync (MovieService.MovieType.Upcoming, Page);
 					//TVNowAiring = await MovieService.GetMoviesAsync (MovieService.MovieType.TVLatest, Page);
 				});
-				//	TimeSpan ts = TimeSpan.FromMilliseconds (2000);
-				task.Wait ();
-				//if (!task.Wait (ts))
-				//	Console.WriteLine ("The timeout interval elapsed in RootViewController.");
+					TimeSpan ts = TimeSpan.FromMilliseconds (2000);
+				task.Wait (ts);
+				if (!task.Wait (ts))
+					Console.WriteLine ("The timeout interval elapsed in RootViewController.");
 			} catch (Exception e) {
 				Debug.WriteLine (e.Message);
+				throw;
 
 			}
 		}
@@ -431,8 +420,6 @@ namespace FavoriteMovies
 
 			customLabels = new UILabel [customLists.Count];
 			customControllers = new FavoritesViewController [customLists.Count];
-
-
 
 			TopRatedLabel = new UILabel () {
 				TextColor = UIColor.Black, Frame = TopRatedLabelFrame,
@@ -509,14 +496,14 @@ namespace FavoriteMovies
 			scrollView.AddSubview (MovieLatestLabel);
 			scrollView.AddSubview (TopRatedLabel);
 			View.AddSubview (scrollView);
-			((UITextField)searchController.SearchBar.ValueForKey (new NSString ("_searchField"))).ResignFirstResponder ();
+
 		}
 		public override void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
 
 			GetCollectionData ();
-
+			LoadCollectionViewControllers ();
 			// Creates an instance of a custom View Controller that holds the results
 			searchResultsController = new SearchResultsViewController ();
 
@@ -545,7 +532,7 @@ namespace FavoriteMovies
 			((UITextField)searchController.SearchBar.ValueForKey (new NSString ("_searchField"))).TextColor = UIColor.White;
 			((UITextField)searchController.SearchBar.ValueForKey (new NSString ("_searchField"))).Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, ColorExtensions.CAST_FONT_SIZE);
 			((UITextField)searchController.SearchBar.ValueForKey (new NSString ("_searchField"))).BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, BackGroundColorAlpha);
-
+			((UITextField)searchController.SearchBar.ValueForKey (new NSString ("_searchField"))).ResignFirstResponder ();
 			//the search bar is contained in the navigation bar, so it should be visible
 			searchController.HidesNavigationBarDuringPresentation = false;
 
@@ -580,6 +567,7 @@ namespace FavoriteMovies
 						//favoriteViewController.CollectionView.ReloadData ();
 					} catch (SQLiteException e) {
 						Debug.WriteLine (e.Message);
+						//throw;
 					}
 				});
 				task.Wait ();
@@ -608,7 +596,7 @@ namespace FavoriteMovies
 				ContentView.Layer.BorderWidth = 1.0f;
 				ContentView.Layer.BorderColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f).CGColor;
 				ContentView.AddSubview (ImageView);
-			} catch (Exception ex) { Debug.Write (ex.Message); }
+			} catch (Exception ex) { Debug.Write (ex.Message); throw; }
 
 		}
 
@@ -618,11 +606,11 @@ namespace FavoriteMovies
 		{
 
 			try {
-				//	ImageView.Image = GetImage (element.PosterPath);
-				ImageView.SetImage (
-					url: new NSUrl ("http://db.tt/ayAqtbFy"),
-					placeholder: UIImage.FromBundle ("placeholder.png")
-				);
+					ImageView.Image = GetImage (element.PosterPath);
+				//ImageView.SetImage (
+				//	url: new NSUrl ("http://db.tt/ayAqtbFy"),
+				//	placeholder: UIImage.FromBundle ("placeholder.png")
+				//);
 				if (ColorExtensions.MovieIsFavorite (element.id.ToString ())) {
 					ContentView.Layer.BorderColor = UIColor.Orange.CGColor;
 
@@ -632,6 +620,7 @@ namespace FavoriteMovies
 			} catch (SQLite.SQLiteException ex) {
 				//no favorites yet
 				Debug.Write (ex.Message);
+				throw;
 			}
 		}
 		public static UIImage GetImageUrl (string posterPath)
@@ -671,8 +660,8 @@ namespace FavoriteMovies
 					}
 				}
 			});
-			TimeSpan ts = TimeSpan.FromMilliseconds (1000);
-			task.Wait (ts);
+		//	TimeSpan ts = TimeSpan.FromMilliseconds (1000);
+			task.Wait ();
 
 			//if (!task.Wait (ts))
 			//	Console.WriteLine ("The timeout interval elapsed in GetImage.");

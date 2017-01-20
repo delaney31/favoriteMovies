@@ -12,6 +12,9 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.WindowsAzure.MobileServices;
 using FavoriteMoviesPCL;
+using System.Collections;
+using System.Linq;
+
 
 #if OFFLINE_SYNC_ENABLED
 using Microsoft.WindowsAzure.MobileServices.SQLiteStore;  // offline sync
@@ -79,6 +82,7 @@ namespace MovieFriends
 
 		public async Task PostSyncAsync (bool pullData = false)
 		{
+
 #if OFFLINE_SYNC_ENABLED
 			try {
 				await client.SyncContext.PushAsync ();
@@ -178,11 +182,14 @@ namespace MovieFriends
 
 			}
 		}
-		public async Task InsertUserAsync (UserCloud user)
+		public async Task<bool> InsertUserAsync (UserCloud user)
 		{
 			try {
+				var exists = await userTable.Where (item => item.username.ToLower() == user.username.ToLower()).ToListAsync ();
+				if (exists.Count > 0)
+					return false;
 				await userTable.InsertAsync (user);
-
+				return true;
 
 #if OFFLINE_SYNC_ENABLED
 				await UserSyncAsync (); // Send changes to the mobile app backend.
@@ -190,6 +197,7 @@ namespace MovieFriends
 
 			} catch (MobileServiceInvalidOperationException e) {
 				Console.Error.WriteLine (@"ERROR {0}", e.Message);
+				return false;
 			}
 		}
 		public async Task InsertUserFriendAsync (UserFriendsCloud user)
@@ -273,16 +281,32 @@ namespace MovieFriends
 
 		}
 
-		public async Task<List<UserCloud>> GetUserCloud ()
+		public async Task<List<UserFriend>> GetUserCloud ()
 		{
-			try {
-
-				List<UserCloud> items = await userTable.ToListAsync ();
-				return new List<UserCloud> (items);
-
+			try 
+			{
+				List<UserFriend> items = new List<UserFriend>();
+				var userFriends = await ufTable.ToListAsync ();
+				var users = await userTable.ToListAsync ();
+				foreach (var user in users) 
+				{
+					var userFriend = new UserFriend ();
+					userFriend.email = user.email;
+					userFriend.Id = user.Id;
+					userFriend.username = user.username;
+					foreach (var uf in userFriends) 
+					{
+						if (uf.friendid == user.Id)
+							userFriend.Friend = true;
+					}
+					items.Add (userFriend);
+						
+				}
+				return new List<UserFriend>(items);
+					
 			} catch (MobileServiceInvalidOperationException e) {
 				Console.Error.WriteLine (@"ERROR {0}", e.Message);
-				return new List<UserCloud> ();
+				return new List<UserFriend> ();
 			}
 
 

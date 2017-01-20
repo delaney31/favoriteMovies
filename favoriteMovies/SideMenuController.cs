@@ -42,6 +42,7 @@ namespace FavoriteMovies
 			base.ViewDidAppear (animated);
 			userProfileImage = new UIImageView ();
 			userProfileImage.Image = signUpImage;
+
 			if (ColorExtensions.CurrentUser.Id != null)
 				signUpImage = await BlobUpload.getProfileImage (ColorExtensions.CurrentUser.Id);
 			if (signUpImage != null)
@@ -122,7 +123,7 @@ namespace FavoriteMovies
 			friendsImage.Frame = new RectangleF (40, 355, 40, 40);
 			var connectionsButton = new UIButton (UIButtonType.System);
 			connectionsButton.Frame = new RectangleF (90, 370, 230, 20);
-			connectionsButton.SetTitle ("Add", UIControlState.Normal);
+			connectionsButton.SetTitle ("Invite", UIControlState.Normal);
 			connectionsButton.SetTitleColor (UIColor.White, UIControlState.Normal);
 			connectionsButton.HorizontalAlignment = UIControlContentHorizontalAlignment.Left;
 			connectionsButton.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, 18);
@@ -248,7 +249,7 @@ namespace FavoriteMovies
 
 					await BlobUpload.createContainerAndUpload (byteArray);
 				});
-				TimeSpan ts = TimeSpan.FromMilliseconds (4000);
+				TimeSpan ts = TimeSpan.FromMilliseconds (500);
 				task.Wait (ts);
 				if (!task.Wait (ts))
 					Console.WriteLine ("The timeout interval elapsed uploading Profile image.");

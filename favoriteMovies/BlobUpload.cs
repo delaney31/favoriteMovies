@@ -69,7 +69,6 @@ namespace FavoriteMovies
 
 				byte [] target = new byte [blockBlob.Properties.Length];
 
-
 				await blockBlob.DownloadToByteArrayAsync (target, 0);
 
 				var data = NSData.FromArray (target);

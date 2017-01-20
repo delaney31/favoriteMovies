@@ -188,7 +188,18 @@ namespace FavoriteMoviesPCL
 		public string profilepic { get; set;}
 		public string username { get; set; }
 		public string DisplayName { get; set; }
+
 	
+	}
+
+	public class UserFriend
+
+	{
+		public string Id { get; set; }
+		public string email { get; set; }
+		public string username { get; set; }
+		public bool Friend { get; set; }
+
 	}
 }
 
