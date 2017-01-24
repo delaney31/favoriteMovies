@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using CoreGraphics;
 using FavoriteMoviesPCL;
 using Foundation;
+using MovieFriends;
 using UIKit;
 
 namespace FavoriteMovies
@@ -41,7 +42,7 @@ namespace FavoriteMovies
 
 
 		}
-		public Task<bool> ShowAlert (string title, string message)
+		public static Task<bool> ShowAlert (string title, string message)
 		{
 			var tcs = new TaskCompletionSource<bool> ();
 
@@ -58,7 +59,8 @@ namespace FavoriteMovies
 		{
 			if (lpgr.State != UIGestureRecognizerState.Ended)
 				return;
-
+			AzureTablesService postService = AzureTablesService.DefaultService;
+			await postService.InitializeStoreAsync ();
 			try {
 				var p = lpgr.LocationInView (CollectionView);
 
@@ -75,13 +77,17 @@ namespace FavoriteMovies
 					Console.WriteLine ("Selected button {0}", accepted ? "Accepted" : "Canceled");
 					if (accepted) {
 						//if customListId is null then we are on a pre-defined list (i.e Now Playing) not a custom one so nothing in table to delete
-						if (isCustomList)
+						if (isCustomList) 
+						{
 							BaseListViewController.DeleteMovie ((int)_items [indexPath.Row].id);
+
+						}
 						
 						_items.RemoveAt (indexPath.Row);
 						//CollectionView.DeleteItems (new NSIndexPath [] { indexPath });
-
+						
 						CollectionView.ReloadData ();
+					
 
 					}
 					if (_items.Count == 0) {
@@ -91,11 +97,13 @@ namespace FavoriteMovies
 						MainViewController.NewCustomListToRefresh = 0;
 						viewController.ViewWillAppear (true);
 					}
+					await postService.DeleteMovieItemAsync (_items [indexPath.Row]);
 				}
 			} catch (Exception ex) 
 			{
-				throw;
+				
 				Debug.WriteLine (ex.Message);
+				//throw;
 			}
 		}
 
@@ -117,8 +125,8 @@ namespace FavoriteMovies
 				//loadingOverlay.Hide ();
 			} catch (Exception e) 
 			{
-				throw;
 				Debug.WriteLine (e.Message);
+				throw;
 			}
 		}
 
@@ -146,7 +154,6 @@ namespace FavoriteMovies
 				return cell;
 			} catch (Exception e) 
 			{
-				throw;
 				Debug.WriteLine (e.Message);
 
 			}
@@ -182,12 +189,10 @@ namespace FavoriteMovies
 
 				var row = _items [indexPath.Row];
 				cell.UpdateRow (row);
-				return cell;
 			} catch (Exception e) 
 			{
 				Debug.WriteLine (e.Message);
-				Console.WriteLine (e.Message);
-				throw;
+
 			}
 			return cell;
 		}

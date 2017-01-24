@@ -181,6 +181,15 @@
     <Reference Include="Microsoft.Rest.ClientRuntime.Azure">
       <HintPath>..\packages\Microsoft.Rest.ClientRuntime.Azure.3.3.4\lib\netstandard1.5\Microsoft.Rest.ClientRuntime.Azure.dll</HintPath>
     </Reference>
+    <Reference Include="ToastIOS">
+      <HintPath>..\Components\ToastIOS-1.6\lib\ios-unified\ToastIOS.dll</HintPath>
+    </Reference>
+    <Reference Include="Plugin.Messaging.Abstractions">
+      <HintPath>..\packages\Xam.Plugins.Messaging.3.2.1\lib\Xamarin.iOS10\Plugin.Messaging.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Plugin.Messaging">
+      <HintPath>..\packages\Xam.Plugins.Messaging.3.2.1\lib\Xamarin.iOS10\Plugin.Messaging.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Contents.json" />
@@ -296,6 +305,12 @@
     <BundleResource Include="Resources\ic_star_border.png" />
     <BundleResource Include="Resources\ic_stars.png" />
     <BundleResource Include="Resources\stardark.png" />
+    <BundleResource Include="Resources\ic_indeterminate_check_box.png" />
+    <BundleResource Include="Resources\ic_plus_one.png" />
+    <BundleResource Include="Resources\ic_delete.png" />
+    <BundleResource Include="Resources\ic_remove_circle.png" />
+    <BundleResource Include="Resources\ic_remove_circle_outline.png" />
+    <BundleResource Include="Resources\ic_person_remove.png" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\favoriteMoviesPCL\favoriteMoviesPCL.csproj">
@@ -321,6 +336,14 @@
     </XamarinComponentReference>
     <XamarinComponentReference Include="loginscreen">
       <Version>1.4.1</Version>
+      <Visible>False</Visible>
+    </XamarinComponentReference>
+    <XamarinComponentReference Include="ToastIOS">
+      <Version>1.6</Version>
+      <Visible>False</Visible>
+    </XamarinComponentReference>
+    <XamarinComponentReference Include="Xam.Plugins.Messaging">
+      <Version>3.2.1.0</Version>
       <Visible>False</Visible>
     </XamarinComponentReference>
   </ItemGroup>

@@ -51,7 +51,7 @@ namespace FavoriteMovies
 			userProfileImage.Frame = new RectangleF (40, 40, 150, 150);
 			userProfileImage.ContentMode = UIViewContentMode.ScaleAspectFill;
 			//userProfileImage.Layer.BorderWidth = 2;
-			userProfileImage.Layer.CornerRadius = userProfileImage.Frame.Size.Width / 3;
+			userProfileImage.Layer.CornerRadius = userProfileImage.Frame.Size.Width / 2;
 			userProfileImage.Layer.MasksToBounds = true;
 
 			var profileImageTapGestureRecognizer = new UITapGestureRecognizer ();

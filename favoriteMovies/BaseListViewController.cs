@@ -2,11 +2,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using FavoriteMovies;
 using FavoriteMoviesPCL;
 using Foundation;
+using MovieFriends;
 using SQLite;
 using UIKit;
 
@@ -20,6 +22,7 @@ namespace FavoriteMovies
 		protected UITableView table;
 		protected UIBarButtonItem edit, done, add;
 		protected TableSource<ICustomList> tableSource;
+
 		public BaseListViewController (Movie movieDetail, bool fromAddList)
 		{
 			this.movieDetail = movieDetail;
@@ -32,11 +35,10 @@ namespace FavoriteMovies
 			tableItems = GetMovieList ();
 			table = new UITableView (View.Bounds);
 			table.AutoresizingMask = UIViewAutoresizing.All;
-			tableSource = new TableSource<ICustomList>(tableItems, this);
+			tableSource = new TableSource<ICustomList> (tableItems, this);
 			table.Source = tableSource;
 			table.AllowsSelectionDuringEditing = true;
 			NavigationItem.Title = "Movie List";
-
 			if (!fromAddList) {
 				done = new UIBarButtonItem (UIBarButtonSystemItem.Done, (s, e) => {
 					table.SetEditing (false, true);
@@ -101,60 +103,89 @@ namespace FavoriteMovies
 
 		}
 
-
 		public void UpdateCustomAndMovieList (int? Id, bool upDateMovieDetail, List<ICustomList> tableItems)
 		{
-			var task = Task.Run (async () => 
-			{
+			var task = Task.Run (async () => {
+				CustomListCloud custlistCloud = new CustomListCloud ();
+				MovieCloud movieCloud = new MovieCloud ();
+
 				try {
 
-					using (var db = new SQLiteConnection (MovieService.Database)) {
-						// there is a sqllite bug here https://forums.xamarin.com/discussion/
-						//52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
-						//var query = db.Table<CustomList> ();
-
-						if (movieDetail != null) 
+				using (var db = new SQLiteConnection (MovieService.Database)) 
+					{
+						AzureTablesService postService = AzureTablesService.DefaultService;
+						await postService.InitializeStoreAsync ();
+						if (Id != null) 
 						{
-							//DeleteMovie (movieDetail.id);
-						} else
-							DeleteAll ();
-						//if (Id != null)
-						//	DeleteAll (Id);
-						//else
-
-
-						for (var list = 0; list < tableItems.Count; list++) {
-
-							if (tableItems [list].name != "add new") {
+							if (movieDetail != null) //first customlist
+							{
+								if (MovieAlreadyOnList (movieDetail.HighResPosterPath, Id)) // dont add the same item twice
+									return;
+							}
+						}
+						DeleteAll ();
+						//await postService.DeleteAll (ColorExtensions.CurrentUser.Id);
+						for (var list = 0; list < tableItems.Count; list++) 
+						{
+							if (tableItems [list].name != "add new") 
+							{
 								var item = tableItems [list] as CustomList;
-								if (item != null)
-									db.InsertOrReplace (tableItems [list], typeof (CustomList));
-								else 
+								if (item != null) 
 								{
-									
+									db.InsertOrReplace (tableItems [list], typeof (CustomList));
+
+									custlistCloud.Name = tableItems [list].name;
+									custlistCloud.order = tableItems [list].order;
+									custlistCloud.shared = tableItems [list].shared;
+									custlistCloud.UserId = ColorExtensions.CurrentUser.Id;
+									await postService.InsertCustomListAsync (custlistCloud);
+								} else
+								{
 									db.Insert (tableItems [list], typeof (Movie));
 								}
-
 							}
 
-							if (movieDetail != null && (tableItems [list].id == Id)) {
-
+							if (movieDetail != null && (tableItems [list].id == Id)) 
+							{
 								//get id of last inserted row
 								string sql = "select last_insert_rowid()";
 								var scalarValue = db.ExecuteScalar<string> (sql);
 								int value = scalarValue == null ? 0 : Convert.ToInt32 (scalarValue);
 
-								if (Id > 0)
+								if (Id > 0) 
+								{
 									movieDetail.CustomListID = Id;
-								else
+
+								} else 
+									
+								{
 									movieDetail.CustomListID = value;
+								}
 
 								movieDetail.id = null;
 								db.Insert (movieDetail, typeof (Movie));
+
+								movieCloud.Adult = movieDetail.Adult;
+								movieCloud.BackdropPath = movieDetail.BackdropPath;
+								movieCloud.Favorite = movieDetail.Favorite;
+								movieCloud.HighResPosterPath = movieDetail.HighResPosterPath;
+								movieCloud.name = movieDetail.name;
+								movieCloud.OriginalId = movieDetail.OriginalId.ToString();
+								movieCloud.OriginalTitle = movieDetail.OriginalTitle;
+								movieCloud.OriginalLanguage = movieDetail.OriginalLanguage;
+								movieCloud.Overview = movieDetail.Overview;
+								movieCloud.Popularity = movieDetail.Popularity;
+								movieCloud.PosterPath = movieDetail.PosterPath;
+								movieCloud.ReleaseDate = movieDetail.ReleaseDate.Value.ToString ("MM/dd/yyyy",CultureInfo.InvariantCulture);
+								movieCloud.UserRating = movieDetail.UserRating.ToString();
+								movieCloud.Video = movieDetail.Video;
+								movieCloud.VoteAverage = movieDetail.VoteAverage.ToString();
+								movieCloud.VoteCount = movieDetail.VoteCount.ToString();
+
+
+								await postService.InsertMovieAsync (movieCloud, custlistCloud);
 							}
 						}
-
-
 					}
 
 				} catch (SQLiteException e) {
@@ -166,20 +197,31 @@ namespace FavoriteMovies
 					}
 					;
 					using (var db = new SQLiteConnection (MovieService.Database)) {
-						if (movieDetail != null)
-							DeleteMovie (movieDetail.id);
+						//var query = db.Table<CustomList> ();
+						AzureTablesService postService = AzureTablesService.DefaultService;
+						await postService.InitializeStoreAsync ();
+						foreach (var item in tableItems) 
+						{
+							if (movieDetail.CustomListID == item.id)
+								return;
+						}
 
-						//DeleteAll ();
-
+						DeleteAll ();
+						await postService.DeleteAll (ColorExtensions.CurrentUser.Id);
 						for (var list = 0; list < tableItems.Count; list++) {
 
 							if (tableItems [list].name != "add new") {
 								var item = tableItems [list] as CustomList;
-								if (item != null)
-									db.Insert (tableItems [list], typeof (CustomList));
-								else 
+								if (item != null) 
 								{
-									
+									db.Insert (tableItems [list], typeof (CustomList));
+									custlistCloud.Name = tableItems [list].name;
+									custlistCloud.order = tableItems [list].order;
+									custlistCloud.shared = tableItems [list].shared;
+									custlistCloud.UserId = ColorExtensions.CurrentUser.Id;
+									await postService.InsertCustomListAsync (custlistCloud);
+								} else {
+
 									db.Insert (tableItems [list], typeof (Movie));
 								}
 							}
@@ -198,6 +240,24 @@ namespace FavoriteMovies
 
 
 								db.Insert (movieDetail, typeof (Movie));
+								movieCloud.Adult = movieDetail.Adult;
+								movieCloud.BackdropPath = movieDetail.BackdropPath;
+								movieCloud.Favorite = movieDetail.Favorite;
+								movieCloud.HighResPosterPath = movieDetail.HighResPosterPath;
+								movieCloud.name = movieDetail.name;
+								movieCloud.OriginalId = movieDetail.OriginalId.ToString ();
+								movieCloud.OriginalTitle = movieDetail.OriginalTitle;
+								movieCloud.OriginalLanguage = movieDetail.OriginalLanguage;
+								movieCloud.Overview = movieDetail.Overview;
+								movieCloud.Popularity = movieDetail.Popularity;
+								movieCloud.PosterPath = movieDetail.PosterPath;
+								movieCloud.ReleaseDate = movieDetail.ReleaseDate.Value.ToString ("MM/dd/yyyy", CultureInfo.InvariantCulture);
+								movieCloud.UserRating = movieDetail.UserRating.ToString ();
+								movieCloud.Video = movieDetail.Video;
+								movieCloud.VoteAverage = movieDetail.VoteAverage.ToString ();
+								movieCloud.VoteCount = movieDetail.VoteCount.ToString ();
+
+								await postService.InsertMovieAsync (movieCloud, custlistCloud);
 							}
 						}
 
@@ -208,7 +268,7 @@ namespace FavoriteMovies
 			task.Wait ();                     
 		}
 
-		
+
 		public static void DeleteCustomList (int? CustomId)
 		{
 
@@ -241,6 +301,25 @@ namespace FavoriteMovies
 				throw;
 			}
 		}
+
+		public static bool MovieAlreadyOnList (string highresPath, int? customList)
+		{
+			
+			try {
+				using (var db = new SQLite.SQLiteConnection (MovieService.Database)) {
+					// there is a sqllite bug here https://forums.xamarin.com/discussion/52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
+					var movie = db.Query<Movie> ("SELECT * FROM [Movie] WHERE [HighResPosterPath] = '" + highresPath + "'"  + " AND [CustomListID] =" + customList  );
+					if (movie.Count > 0)
+						return true;
+
+				}
+			} catch (SQLite.SQLiteException e) {
+				//first time in no favorites yet.
+				Debug.Write (e.Message);
+				throw;
+			}
+			return false;
+		}
 		public static void DeleteMovie (int? id)
 		{
 
@@ -258,6 +337,7 @@ namespace FavoriteMovies
 			}
 
 		}
+
 		public static void DeleteMoviesInCustomList (int? CustomId)
 		{
 
@@ -415,40 +495,40 @@ namespace FavoriteMovies
 			}
 			public void WillBeginTableEditing (UITableView tableView)
 			{
-			try {
-				tableView.BeginUpdates ();
-				// insert the 'ADD NEW' row at the end of table display
-				tableView.InsertRows (new NSIndexPath [] {
-			NSIndexPath.FromRowSection (tableView.NumberOfRowsInSection (0), 0)
-		}, UITableViewRowAnimation.Fade);
-				// create a new item and add it to our underlying data (it is not intended to be permanent)
-				//if(tableItems.Equals(typeof(List<CustomList>)))
-					tableItems.Add (new CustomList () { name = "add new" });
-				//else
-				//	tableItems.Add (new Movie () { Name = "add new" });
-				tableView.EndUpdates (); // applies the changes
-			} catch (Exception ex) { Debug.Write (ex.Message);}
+				try {
+					tableView.BeginUpdates ();
+					// insert the 'ADD NEW' row at the end of table display
+					tableView.InsertRows (new NSIndexPath [] 
+					{
+						NSIndexPath.FromRowSection (tableView.NumberOfRowsInSection (0), 0)
+					}, UITableViewRowAnimation.Fade);
+					// create a new item and add it to our underlying data (it is not intended to be permanent)
+					//if(tableItems.Equals(typeof(List<CustomList>)))
+						tableItems.Add (new CustomList () { name = "add new" });
+					//else
+					//	tableItems.Add (new Movie () { Name = "add new" });
+					tableView.EndUpdates (); // applies the changes
+				} catch (Exception ex) { Debug.Write (ex.Message);}
 			}
 			public void DidFinishTableEditing (UITableView tableView)
 			{
-				tableView.BeginUpdates ();
-				// remove our 'ADD NEW' row from the underlying data
-				tableItems.RemoveAt ((int)tableView.NumberOfRowsInSection (0) - 1); // zero based :)
-																					// remove the row from the table display
-				tableView.DeleteRows (new NSIndexPath [] { NSIndexPath.FromRowSection (tableView.NumberOfRowsInSection (0) - 1, 0) }, UITableViewRowAnimation.Fade);
-				tableView.EndUpdates (); // applies the changes
-				if (tableView.NumberOfRowsInSection (0) > 0) 
-				{
-					var item = tableItems [(int)tableView.NumberOfRowsInSection (0) - 1] as CustomList;
-					if (item is CustomList) 
-					{
-						Owner.UpdateCustomAndMovieList (((CustomList)tableItems [(int)tableView.NumberOfRowsInSection (0) - 1]).id, false, tableItems);
-					} else 
-					{
-						Owner.UpdateCustomAndMovieList (((Movie)tableItems [(int)tableView.NumberOfRowsInSection (0) - 1]).CustomListID, true, tableItems);
-			 		}
-				} else
-					BaseListViewController.DeleteAll ();
+				try {
+					tableView.BeginUpdates ();
+					// remove our 'ADD NEW' row from the underlying data
+					tableItems.RemoveAt ((int)tableView.NumberOfRowsInSection (0) - 1); // zero based :)
+																						// remove the row from the table display
+					tableView.DeleteRows (new NSIndexPath [] { NSIndexPath.FromRowSection (tableView.NumberOfRowsInSection (0) - 1, 0) }, UITableViewRowAnimation.Fade);
+					tableView.EndUpdates (); // applies the changes
+					if (tableView.NumberOfRowsInSection (0) > 0) {
+						var item = tableItems [(int)tableView.NumberOfRowsInSection (0) - 1] as CustomList;
+						if (item is CustomList) {
+							Owner.UpdateCustomAndMovieList (((CustomList)tableItems [(int)tableView.NumberOfRowsInSection (0) - 1]).id, false, tableItems);
+						} else {
+							Owner.UpdateCustomAndMovieList (((Movie)tableItems [(int)tableView.NumberOfRowsInSection (0) - 1]).CustomListID, true, tableItems);
+						}
+					} else
+						BaseListViewController.DeleteAll ();
+				}catch (Exception ex) { Debug.Write (ex.Message); }
 			}
 
 			public override NSIndexPath CustomizeMoveTarget (UITableView tableView, NSIndexPath sourceIndexPath, NSIndexPath proposedIndexPath)
@@ -609,7 +689,8 @@ namespace FavoriteMovies
 					tableView.DeselectRow (indexPath, true);
 				} catch (Exception ex) 
 				{
-					throw;
+					Console.WriteLine (ex.Message);
+					//throw;
 				}
 			}
 

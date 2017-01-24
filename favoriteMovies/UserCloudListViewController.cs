@@ -50,6 +50,7 @@ namespace FavoriteMovies
 				{
 					var conCard = new ContactCard (UITableViewCellStyle.Default,cellIdentifier);
 					conCard.nameLabel.Text = contact.GivenName + " " + contact.FamilyName;
+
 					if(contact.ImageDataAvailable)
 					   conCard.profileImage.Image = UIImage.LoadFromData(contact.ThumbnailImageData);
 					else

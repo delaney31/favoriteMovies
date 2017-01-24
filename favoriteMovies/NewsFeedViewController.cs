@@ -31,8 +31,8 @@ namespace FavoriteMovies
 		{
 			base.ViewDidLoad ();
 			View.Add (loading);
-			postService = AzureTablesService.DefaultService;
-			await postService.InitializeStoreAsync ();
+			//postService = AzureTablesService.DefaultService;
+			//await postService.InitializeStoreAsync ();
 
 			tableItems = await MovieNewsFeedService.GetMDCardItems ();
 
@@ -72,7 +72,7 @@ namespace FavoriteMovies
 
 
 
-		public override async void ViewDidLoad ()
+		public override void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
 

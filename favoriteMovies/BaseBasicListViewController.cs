@@ -6,7 +6,7 @@ namespace FavoriteMovies
 {
 	public class BaseBasicListViewController: UIViewController
 	{
-		protected UITableView tableView;
+		public UITableView tableView;
 
 		protected UITableViewSource tableSource;
 

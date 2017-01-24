@@ -6,6 +6,7 @@ using CoreGraphics;
 using FavoriteMoviesPCL;
 using Foundation;
 using MovieFriends;
+using ToastIOS;
 using UIKit;
 
 namespace FavoriteMovies
@@ -13,35 +14,24 @@ namespace FavoriteMovies
 	public class ConnectViewController:BaseBasicListViewController
 	{
 		List<ContactCard> tableItems;
+
 		const string cellIdentifier = "UserCloudCells";
-		AzureTablesService postService = AzureTablesService.DefaultService;
+		public AzureTablesService postService = AzureTablesService.DefaultService;
 
-		public ConnectViewController ()
-		{
-
-			InvokeOnMainThread (async () => {
-				tableItems = await GetUserContactsAsync ();
-				tableSource = new ConnectCloudTableSource (tableItems, this);
-				tableView.Source = tableSource;
-				tableView.TableHeaderView = new UIView () { Frame = new CoreGraphics.CGRect () { X = 0.0f, Y = 0.0f, Width = View.Layer.Frame.Width, Height = 20f } };
-				Add (tableView);
-			});
-
-			//var task = Task.Run (async () => 
-			//{
-			//	await postService.InitializeStoreAsync ();
-				
-
-		//	});
-		//	task.Wait ();
-		}
-		public override  void ViewDidLoad ()
+		public override async void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
-			//await postService.InitializeStoreAsync ();
-			//tableItems = await GetUserContactsAsync ();
 
+			//InvokeOnMainThread (async () => {
+			tableItems = await GetUserContactsAsync ();
+			tableSource = new ConnectCloudTableSource (tableItems, this, true);
+			tableView.Source = tableSource;
+			tableView.TableHeaderView = new UIView () {
+				Frame = new CGRect () { X = 0.0f, Y = 0.0f, Width = View.Layer.Frame.Width, Height = 20f }
+			};
 
+			View.Add (tableView);
+			//});
 
 		}
 
@@ -51,15 +41,18 @@ namespace FavoriteMovies
 
 
 		}
+
 		public override void ViewDidAppear (bool animated)
 		{
 			base.ViewDidAppear (animated);
+
+
+
 		}
 
 		async Task<List<ContactCard>> GetUserContactsAsync ()
 		{
 			var watch = System.Diagnostics.Stopwatch.StartNew ();
-
 
 			const string cellId = "UserContacts";
 			List<ContactCard> results = new List<ContactCard> ();
@@ -73,79 +66,108 @@ namespace FavoriteMovies
 					result.nameLabel.Text = user.username;
 					result.connection = user.Friend;
 					result.id = user.Id;
+					result.moviesInCommon = await postService.MoviesInCommon (ColorExtensions.CurrentUser.Id, user.Id);
 					results.Add (result);
+
 				}
 
 			}
 			watch.Stop ();
 			Console.WriteLine("ViewWillAppear Method took " + watch.ElapsedMilliseconds + " milli seconds");
-
-			return results.ToList ();
+			return results.OrderByDescending (x => x.moviesInCommon).ToList() ;
 
 		}
 	}
-
 
 	public class ConnectCloudTableSource : UITableViewSource
 	{
 		public List<ContactCard> listItems;
 		ConnectViewController controller;
-
-		//Your invitation to .... is on its way!!
-		public ConnectCloudTableSource (List<ContactCard> items, ConnectViewController cont)
+		public ConnectCloudTableSource (List<ContactCard> items, ConnectViewController cont, bool updateProfiles)
 		{
 			this.listItems = items;
 			this.controller = cont;
-			updateImages ();
+			if(updateProfiles)
+			   updateImages ();
 		}
 		public async void updateImages ()
 		{
-			InvokeOnMainThread (async () => {
-				foreach (var user in listItems) {
-
-					user.profileImage.Image = ColorExtensions.ResizeImage (await BlobUpload.getProfileImage (user.id), 50, 50);
-
-				}
-				 
+			InvokeOnMainThread (async () => 
+			{
+				foreach (var user in listItems) 
+				{
+					user.profileImage.Image =await BlobUpload.getProfileImage (user.id, 150, 150);
+				} 
 			});
 		}
 		public override UITableViewCell GetCell (UITableView tableView, NSIndexPath indexPath)
 		{
-
 			var cell = listItems [indexPath.Row];
-
-			var switchView = cell.AccessoryView;
-			CGRect frame = new CGRect();
-			if (switchView == null) 
+			if (cell.connection)
+				cell.addRemove.Image = UIImage.FromBundle ("ic_person_remove.png");
+			else
+				cell.addRemove.Image = UIImage.FromBundle ("ic_person_add.png");
+			
+			if (!cell.connection) 
 			{
-				switchView = new UIButton (UIButtonType.ContactAdd);
-				frame = switchView.Frame;
-				if (cell.connection) 
+				var tapGesture = new UITapGestureRecognizer ();
+				tapGesture.AddTarget (() =>
 				{
-					switchView = new UIImageView () { UserInteractionEnabled = true };
-					switchView.Frame = frame;
-					((UIImageView)switchView).Image = UIImage.FromBundle ("Q4ZWS.png");
-				}
-		
-				if (switchView is UIButton) 
-				{
-					((UIButton)switchView).AddTarget ((sender, e) => 
+					bool inserted= false;
+					var userfriend = new UserFriendsCloud ();
+					userfriend.userid = ColorExtensions.CurrentUser.Id;
+					userfriend.friendid = cell.id;
+					userfriend.friendusername = cell.nameLabel.Text;
+					InvokeOnMainThread (async () => 
 					{
-
-					}, UIControlEvent.ValueChanged);
-				} else 
-				{
-					var tapGesture = new UITapGestureRecognizer ();
-					tapGesture.AddTarget(() =>
-					{
-						
+						inserted = await controller.postService.InsertUserFriendAsync (userfriend);
+						if (inserted) {
+							listItems [indexPath.Row].connection = true;
+							controller.tableView.ReloadData ();
+							Toast.MakeText (cell.nameLabel.Text + " is now your Movie Friend.")
+							.SetUseShadow (true)
+							.SetGravity (ToastGravity.Center)
+							.SetCornerRadius (10)
+							.SetDuration (3000)
+							.Show (ToastType.Info);
+						}
 					});
-					((UIImageView)switchView).AddGestureRecognizer (tapGesture);
-
-				}
+				});
+				cell.AddGestureRecognizer (tapGesture);
+			} else 
+			{
+				var tapGesture = new UITapGestureRecognizer ();
+				tapGesture.AddTarget(() =>
+				{
+					var userfriend = new UserFriendsCloud ();
+					userfriend.userid = ColorExtensions.CurrentUser.Id;
+					userfriend.friendid = cell.id;
+					userfriend.friendusername = cell.nameLabel.Text;
+					bool deleted = false;
+					InvokeOnMainThread (async () => 
+					{
+						bool accepted = await BaseCollectionViewController.ShowAlert ("Confirm", "Are you sure you want to remove this friend?");
+					    Console.WriteLine ("Selected button {0}", accepted ? "Accepted" : "Canceled");
+						if (accepted) 
+						{
+							deleted = await controller.postService.DeleteItemAsync (userfriend);
+							if (deleted) 
+							{
+								listItems [indexPath.Row].connection = false;
+								controller.tableView.ReloadData ();
+								 Toast.MakeText (cell.nameLabel.Text + " is no longer your Movie Friend.")
+								.SetUseShadow (true)
+								.SetGravity (ToastGravity.Center)
+								.SetCornerRadius (10)
+								.SetDuration (3000)
+								.Show (ToastType.Info);
+							}
+						}
+					});
+				});
+				cell.AddGestureRecognizer (tapGesture);
 			}
 
-			cell.AccessoryView = switchView;
 			return cell;
 		}
 

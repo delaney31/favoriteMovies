@@ -83,7 +83,7 @@ namespace FavoriteMovies
 
 
 			var tab2 = new NewsFeedViewController ();
-			tab2.Title = "Hot";
+			tab2.Title = "Now";
 			tab2.View.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 			tab2.TabBarItem.SetFinishedImages (UIImage.FromBundle ("ic_whatshot.png"), UIImage.FromBundle ("ic_whatshot.png"));
 			var uinc2 = new UINavigationController (tab2);

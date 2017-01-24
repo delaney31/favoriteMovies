@@ -48,6 +48,39 @@ namespace FavoriteMovies
 			// Delete
 			await blockBlob.DeleteIfExistsAsync ();
 		}
+		public static async Task<UIImage> getProfileImage (string userid, float width, float height)
+		{
+			try {
+				// Retrieve storage account from connection string.
+				CloudStorageAccount storageAccount = CloudStorageAccount.Parse (ColorExtensions.AZURE_STORAGE_CONNECTION_STRING);
+				// Create the blob client.
+				CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient ();
+
+				// Retrieve reference to a previously created container.
+				CloudBlobContainer container = blobClient.GetContainerReference (ColorExtensions.containerName);
+
+				// Create the container if it doesn't already exist.
+				await container.CreateIfNotExistsAsync ();
+
+				// Retrieve reference to a blob named "myblob".
+				CloudBlockBlob blockBlob = container.GetBlockBlobReference (userid);
+
+				await blockBlob.FetchAttributesAsync ();
+
+				byte [] target = new byte [blockBlob.Properties.Length];
+
+				await blockBlob.DownloadToByteArrayAsync (target, 0);
+
+				var data = NSData.FromArray (target);
+				if (UIImage.LoadFromData (data) == null)
+					return ColorExtensions.ResizeImage (UIImage.FromBundle ("1481507483_compose.png"), width, height);
+				return ColorExtensions.ResizeImage (UIImage.LoadFromData (data), width, height);
+			} catch (Exception ex) {
+				Console.Write (ex.Message);
+				return null;
+			}
+
+		}
 		public static async Task<UIImage> getProfileImage (string userid)
 		{
 			try {
@@ -72,6 +105,7 @@ namespace FavoriteMovies
 				await blockBlob.DownloadToByteArrayAsync (target, 0);
 
 				var data = NSData.FromArray (target);
+
 				return UIImage.LoadFromData (data);
 			} catch (Exception ex)
 			{

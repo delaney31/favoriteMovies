@@ -59,35 +59,25 @@ namespace FavoriteMoviesPCL
 		public int userid { get; set;}
 	}
 
-	public class CustomListClound
+	public class CustomListCloud
 	{
 		public string Id { get; set; }
 		public string Name { get; set; }
 		public string UserId { get; set; }
+		public int order { get; set; }
+		public bool shared { get; set; }
 
 	}
-	public class MovieCloud
+	public class MovieCloud:Movie
 	{
-		public string id { get; set; }
-		public string name { get; set; }
-		public string HighResPosterPath { get; set; }
-		public string PosterPath { get; set; }
+		public string id { get; set; }		
 		public string OriginalId { get; set; }
 		public string CustomListID { get; set; }
-		public string Overview { get; set; }
 		public string VoteCount { get; set; }
 		public string ReleaseDate { get; set; }
 		public string VoteAverage { get; set; }
-		public bool Favorite { get; set; }
-		public bool Adult { get; set; }
-		public string OriginalTitle { get; set; }
-		public string OriginalLanguage { get; set; }
-		public string BackdropPath { get; set; }
-		public string Popularity { get; set; }
-		public bool Video { get; set; }
-		public string UserReview { get; set; }
 		public string UserRating { get; set; }
-		public string order { get; set; }
+
 
 	}
 

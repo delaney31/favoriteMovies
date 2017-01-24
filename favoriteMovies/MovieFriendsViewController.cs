@@ -21,7 +21,7 @@ namespace FavoriteMovies
 		async Task<List<UserFriendsCloud>> GetMovieFriends ()
 		{
 			AzureTablesService userFriendsService = AzureTablesService.DefaultService;
-			await userFriendsService.InitializeStoreAsync ();
+		//	await userFriendsService.InitializeStoreAsync ();
 
 			var retList = await userFriendsService.GetUserFriends (ColorExtensions.CurrentUser.Id);
 			return retList;

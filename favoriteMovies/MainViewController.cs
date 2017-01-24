@@ -323,7 +323,7 @@ namespace FavoriteMovies
 
 			//For scrolling to work the scrollview Content size has to be bigger than the View.Frame.Height
 			scrollView.ContentSize = new CGSize (View.Frame.Width, MovieLatestController.CollectionView.Frame.Y + MovieLatestController.CollectionView.Frame.Height + SeparationBuffer + 40);
-			//scrollView.ContentOffset = new CGPoint (0, -scrollView.ContentInset.Top);
+			scrollView.ContentOffset = new CGPoint (0, -scrollView.ContentInset.Top);
 
 		}
 

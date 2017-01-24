@@ -180,7 +180,7 @@ namespace FavoriteMovies
 				alert.AddButton (button);
 			alert.Clicked += (s, e) => tcs.TrySetResult ((int)e.ButtonIndex);
 			alert.Show ();
-			//return tcs.Task;
+
 		}
 
 		public static void DeleteAllFeedItems ()

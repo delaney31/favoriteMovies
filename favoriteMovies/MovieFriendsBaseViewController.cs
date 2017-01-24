@@ -154,7 +154,7 @@ namespace FavoriteMovies
 				var profileImage = UIImage.FromBundle ("1481507483_compose.png"); //default image
 				cell.ImageView.Image = profileImage;
 				Task.Run (async () => {
-					profileImage = await BlobUpload.getProfileImage (userFriends [indexPath.Row].friendid);
+					profileImage = await BlobUpload.getProfileImage (userFriends [indexPath.Row].friendid, 50,50);
 				});
 				if (profileImage != null)
 					cell.ImageView.Image = profileImage;
@@ -215,7 +215,7 @@ namespace FavoriteMovies
 			var profileImage = UIImage.FromBundle ("1481507483_compose.png"); //default image
 			cell.ImageView.Image = profileImage;
 			Task.Run (async () => {
-				profileImage = await BlobUpload.getProfileImage (userFriends [indexPath.Row].friendid);
+				profileImage = await BlobUpload.getProfileImage (userFriends [indexPath.Row].friendid,50,50);
 			});
 			if(profileImage !=null)
 			   cell.ImageView.Image = profileImage;
