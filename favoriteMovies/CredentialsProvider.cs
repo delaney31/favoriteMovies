@@ -1,9 +1,13 @@
 ﻿
 using System;
 using System.Diagnostics;
+using System.IO;
+using System.Net;
 using System.Threading.Tasks;
 using System.Timers;
+using System.Xml;
 using FavoriteMoviesPCL;
+using Geolocator.Plugin;
 using LoginScreen;
 using MovieFriends;
 using SQLite;
@@ -43,35 +47,47 @@ namespace FavoriteMovies
 					successCallback ();
 				}
 			});
+
+		}
+		public void successCallBack ()
+		{
 			MainViewController.getUser ();
 			SideMenuController.title.SetTitle (ColorExtensions.CurrentUser.username, UIControlState.Normal);
-			SideMenuController.location.SetTitle (ColorExtensions.CurrentUser.email, UIControlState.Normal);
+			SideMenuController.location.SetTitle (ColorExtensions.CurrentUser.City + ", " + ColorExtensions.CurrentUser.State + " " + ColorExtensions.CurrentUser.Country, UIControlState.Normal);
 
-
-
-
-			// Otherwise
-			// failCallback(new LoginScreenFaultDetails {
-			// 	CommonErrorMessage = "Some error message relative to whole form",
-			// 	UserNameErrorMessage = "Some error message relative to user name form field",
-			// 	PasswordErrorMessage = "Some error message relative to password form field"
-			// });
 		}
-
 		public void Register (string email, string userName, string password, Action successCallback, Action<LoginScreenFaultDetails> failCallback)
 		{
-			// Do some operations to register user
-
-
+			
 			// If registration was successfully completed
-			DelayInvoke (async () => {
+			DelayInvoke (async () => 
+			{
 				if (password.Length < 4) {
 					failCallback (new LoginScreenFaultDetails { PasswordErrorMessage = "Password must be at least 4 chars." });
 				} else 
 				{
 					await postService.InitializeStoreAsync ();
+					var locator = CrossGeolocator.Current;
+					locator.DesiredAccuracy = 50;
+					var position = await locator.GetPositionAsync (timeoutMilliseconds: 10000);
 
-					var userCloud = new UserCloud () { email = email, username = userName };
+					Console.WriteLine ("Position Status: {0}", position.Timestamp);
+					Console.WriteLine ("Position Latitude: {0}", position.Latitude);
+					Console.WriteLine ("Position Longitude: {0}", position.Longitude);
+
+					var url = String.Format ("http://api.geonames.org/findNearbyPostalCodes?lat={0}&lng={1}&username=delaney31", position.Latitude, position.Longitude);
+					WebRequest webRequest = WebRequest.Create (url);
+					WebResponse webResponse = webRequest.GetResponse ();
+					Stream stream = webResponse.GetResponseStream ();
+					XmlDocument xmlDocument = new XmlDocument ();
+					xmlDocument.Load (stream);
+
+					var CityName = xmlDocument.SelectNodes ("geonames") [0].SelectSingleNode ("code").SelectSingleNode ("name").InnerText;
+					var State = xmlDocument.SelectNodes ("geonames") [0].SelectSingleNode ("code").SelectSingleNode ("adminCode1").InnerText;
+					var Country = xmlDocument.SelectNodes ("geonames") [0].SelectSingleNode ("code").SelectSingleNode ("countryCode").InnerText;
+					var zip = xmlDocument.SelectNodes ("geonames") [0].SelectSingleNode ("code").SelectSingleNode ("postalcode").InnerText;
+
+					var userCloud = new UserCloud () { email = email, username = userName, City = CityName, State = State, Country = Country, Zip= zip };
 					//insert email and username in cloud
 					var unique = await postService.InsertUserAsync (userCloud);
 					if (!unique)
@@ -79,11 +95,9 @@ namespace FavoriteMovies
 					else 
 					{
 						ColorExtensions.CurrentUser = userCloud;
-
-						var user = new User () { email = email, password = password, username = userName, Id = userCloud.Id };
+						var user = new User () { email = email, password = password, username = userName, Id = userCloud.Id, City= CityName, Country= Country, State = State, Zip=zip };
 						//inset username and password locally
 						await AddUserAsync (user);
-
 						successCallback ();
 					}
 

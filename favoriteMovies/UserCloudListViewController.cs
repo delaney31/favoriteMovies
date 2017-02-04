@@ -14,11 +14,11 @@ namespace FavoriteMovies
 	{
 		List<ContactCard> tableItems;
 		const string cellIdentifier = "UserCloudCells";
-		public override  void ViewDidLoad ()
+		public override async void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
 
-			tableItems = GetUserContactsAsync ();
+			tableItems = await GetUserContactsAsync ();
 
 
 			tableSource = new UserCloudTableSource (tableItems, this);
@@ -28,11 +28,8 @@ namespace FavoriteMovies
 
 		}
 
-		List<ContactCard> GetUserContactsAsync ()
+		async Task<List<ContactCard>> GetUserContactsAsync ()
 		{
-			// Create predicate to locate requested contact
-			//var predicate = CNContact.GetPredicateForContacts(null);
-
 			// Define fields to be searched
 			var fetchKeys = new NSString [] { CNContactKey.GivenName, CNContactKey.FamilyName, CNContactKey.EmailAddresses,CNContactKey.ImageDataAvailable, CNContactKey.ThumbnailImageData };
 
@@ -69,13 +66,10 @@ namespace FavoriteMovies
 	public class UserCloudTableSource : UITableViewSource
 	{
 		List<ContactCard> listItems;
-		UserCloudListViewController controller;
-
 
 		public UserCloudTableSource (List<ContactCard> items, UserCloudListViewController cont)
 		{
 			this.listItems = items;
-			this.controller = cont;
 
 		}
 

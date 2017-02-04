@@ -16,6 +16,8 @@ using System.Collections;
 using System.Linq;
 using FavoriteMovies;
 using System.Globalization;
+using UIKit;
+using BigTed;
 
 
 #if OFFLINE_SYNC_ENABLED
@@ -171,6 +173,62 @@ namespace MovieFriends
 			}
 #endif
 		}
+		public async Task<List<CustomListCloud>> GetCustomList (string userId)
+		{
+			try {
+
+				var customList =
+					from custom in await clTable.Where (item => item.UserId == userId && item.shared == true).ToListAsync ()
+					select new CustomListCloud {
+						Id = custom.Id, Name = custom.Name, order = custom.order, shared = custom.shared
+					};
+
+				return new List<CustomListCloud> (customList);
+
+			} catch (Exception e) {
+				Console.Error.WriteLine (@"ERROR {0}", e.Message);
+				return new List<CustomListCloud> ();
+			}
+		}
+		public async Task<List<MovieCloud>> GetCustomListMovies (string customListId)
+		{
+			try {
+
+				var movieList =
+					from movies in await mfTable.Where (item => item.CustomListID == customListId).ToListAsync ()
+					select new MovieCloud { id = movies.id, name = movies.name,
+					BackdropPath = movies.BackdropPath, CustomListID = movies.CustomListID,
+					Favorite = movies.Favorite, HighResPosterPath = movies.HighResPosterPath,
+					OriginalLanguage = movies.OriginalLanguage, Overview = movies.Overview,
+					Popularity = movies.Popularity, PosterPath = movies.PosterPath, ReleaseDate = movies.ReleaseDate,
+					VoteAverage = movies.VoteAverage, UserReview = movies.UserReview, UserRating = movies.UserRating,
+					OriginalId = movies.OriginalId, order= movies.order};
+				
+				return new List<MovieCloud> (movieList);
+
+			} catch (Exception e) {
+				Console.Error.WriteLine (@"ERROR {0}", e.Message);
+				return new List<MovieCloud> ();
+			}
+		}
+		public async Task<List<CustomListCloud>> GetUserFriendsLists (string userid)
+		{
+			try 
+			{
+				var customLists =
+					from friends in await ufTable.Where (item => item.userid == userid).ToListAsync ()
+					join customlist in await clTable.ToListAsync () on friends.userid equals customlist.UserId
+					//join movies in await mfTable.ToListAsync () on customlist.Id equals movies.CustomListID
+					where customlist.shared == true
+					select new CustomListCloud{ Id = customlist.Id, Name= customlist.Name, order = customlist.order, shared= customlist.shared };
+
+				return new List<CustomListCloud> (customLists);
+
+			} catch (Exception e) {
+				Console.Error.WriteLine (@"ERROR {0}", e.Message);
+				return new List<CustomListCloud> ();
+			}
+		}
 		public async Task RefreshDataAsync (PostItem postItem)
 		{
 			try {
@@ -260,27 +318,36 @@ namespace MovieFriends
 
 		}
 
-		public async Task<int> MoviesInCommon (string user1, string user2)
+		public async Task<int> MoviesInCommon (UserCloud user1, UserCloud user2)
 		{
 			int inCommon = 0;
 
 			try {
+
+
+				if (user2.username == "delaney51")
+					Console.WriteLine (user2.username);
 				
 				var user2Movies =
-					from movie in await mfTable.ToListAsync ()
-					join customlist in await clTable.ToListAsync () on movie.CustomListID equals customlist.Id
-					join moviesUser2 in await mfTable.ToListAsync () on customlist.UserId equals user2                       
-					select moviesUser2.name;
+					from movies in await mfTable.ToListAsync ()
+					join customlist in await clTable.ToListAsync () on movies.CustomListID equals customlist.Id
+					//where customlist.UserId == user2.Id
+					select new { movies.HighResPosterPath, movies.CustomListID,customlist.UserId };
 
 				var userMovies =
 					from movies in await mfTable.ToListAsync ()
 					join customlist in await clTable.ToListAsync () on movies.CustomListID equals customlist.Id
-					join moviesUser1 in await mfTable.ToListAsync () on customlist.UserId equals user1
-					where user2Movies.ToList().Contains (movies.name)                
-					select new {movies.name, customlist.UserId};
+					where customlist.UserId==user1.Id           
+					select new {movies.HighResPosterPath};
 				
-
-				inCommon = userMovies.Distinct().Count ();
+				var common = from list1 in userMovies
+							 join list2 in user2Movies
+								  on list1.HighResPosterPath equals list2.HighResPosterPath
+							 select new 
+							 {
+								 list1.HighResPosterPath
+							 };
+				inCommon = common.Distinct().Count ();
 
 			} catch (Exception ex) 
 			{
@@ -301,39 +368,55 @@ namespace MovieFriends
 				Console.Error.WriteLine (@"ERROR {0}", e.Message);
 			}
 		}
-		public async Task UpdatedShared (CustomListCloud list, bool shared)
+		public async Task UpdatedShared (CustomListCloud list)
 		{
 			try {
-				list.shared = shared;
+				await clTable.DeleteAsync (list);
 				await clTable.UpdateAsync (list);
 			} catch (Exception e) {
 				Console.Error.WriteLine (@"ERROR {0}", e.Message);
 			}
 		}
-		public async Task<bool> InsertMovieAsync (MovieCloud movie, CustomListCloud list)
+		public async Task<bool> InsertMovieAsync (MovieCloud movie, string id)
 		{
 			bool retValue = false;
 			try {
-
-				var customList = await clTable.Where (item => item.Name.ToLower () == list.Name.ToLower ()).Where (item => item.UserId == list.UserId).ToListAsync ();
-				if (customList.Count > 0) {
-					movie.CustomListID = customList [0].Id;
+				
+				//var customList = await clTable.Where (item => item.Name.ToLower () == list.Name.ToLower ()).Where (item => item.UserId == list.UserId).ToListAsync ();
+				//if (customList.Count > 0) {
+					movie.CustomListID = id;
 					await mfTable.InsertAsync (movie);
 					retValue = true;
-				} else
-					retValue = false;
 
 
 #if OFFLINE_SYNC_ENABLED
 				await MovieSyncAsync (); // Send changes to the mobile app backend.
 #endif
 
-			} catch (MobileServiceInvalidOperationException e) {
+			} catch (Exception e) {
 				Console.Error.WriteLine (@"ERROR {0}", e.Message);
 				return false;
 			}
 			return retValue;
+
+
 		}
+
+		internal async Task DeleteItemAsync (string name, string currentUserId)
+		{
+			//onetime cleanup
+			foreach (var item in await clTable.ToListAsync()) 
+			{
+				var orphan = await mfTable.Where (x => x.CustomListID == item.Id).ToListAsync ();
+				if (orphan.Count () == 0)
+					await clTable.DeleteAsync (item);
+			}
+			var list = await clTable.Where (x => x.Name == name && x.UserId == currentUserId).ToListAsync();
+			if (list.Count () > 0)
+				await clTable.DeleteAsync (list [0]);
+
+		}
+
 		public async Task<bool> InsertCustomListAsync (CustomListCloud list)
 		{
 			try {
@@ -346,7 +429,7 @@ namespace MovieFriends
 				await CustomListSyncAsync (); // Send changes to the mobile app backend.
 #endif
 
-			} catch (MobileServiceInvalidOperationException e) {
+			} catch (Exception e) {
 				Console.Error.WriteLine (@"ERROR {0}", e.Message);
 				return false;
 			}
@@ -363,7 +446,7 @@ namespace MovieFriends
 				await PostSyncAsync (); // Send changes to the mobile app backend.
 #endif
 
-			} catch (MobileServiceInvalidOperationException e) {
+			} catch (Exception e) {
 				Console.Error.WriteLine (@"ERROR {0}", e.Message);
 			}
 		}
@@ -418,41 +501,52 @@ namespace MovieFriends
 
 		}
 
-		public async Task<List<UserFriend>> GetUserCloud ()
+		public async Task<List<UserCloud>> GetUserCloud ()
 		{
+			
 			try {
-				List<UserFriend> items = new List<UserFriend> ();
-				var userFriends = await ufTable.ToListAsync ();
-				var users = await userTable.ToListAsync ();
-				foreach (var user in users) {
-					var userFriend = new UserFriend ();
-					userFriend.email = user.email;
-					userFriend.Id = user.Id;
-					userFriend.username = user.username;
-					foreach (var uf in userFriends) {
-						if (user.Id == uf.friendid && uf.userid == ColorExtensions.CurrentUser.Id)
-							userFriend.Friend = true;
-					}
-					if (user.Id != ColorExtensions.CurrentUser.Id)
-						items.Add (userFriend);
+				
+				var friends = await ufTable.ToListAsync ();
 
-				}
-				return new List<UserFriend> (items);
+				var userfriends =
+					from u in await userTable.ToListAsync ()                        
+					let friend = friends.Count (x => x.friendid == u.Id && x.userid == ColorExtensions.CurrentUser.Id) >0
+					select new UserCloud ()
+					{ 
+						username = u.username, 
+						State = u.State,
+						City = u.City,
+						Country = u.Country,
+						connection = friend,
+						Id= u.Id
+					};
 
-			} catch (MobileServiceInvalidOperationException e) {
+
+				return userfriends.Take(50).ToList ();
+
+
+
+			} catch (Exception e) {
 				Console.Error.WriteLine (@"ERROR {0}", e.Message);
-				return new List<UserFriend> ();
+				return new List<UserCloud> ();
 			}
 
 
 		}
-		public async Task DeleteMovieItemAsync (Movie movie)
+		public async Task DeleteMovieItemAsync (Movie movie, string customListName)
 		{
 			try 
 			{
-				var items = await mfTable.Where (item => item.name == movie.name && item.ReleaseDate == movie.ReleaseDate.Value.ToString ("MM/dd/yyyy", CultureInfo.InvariantCulture)).ToListAsync();
+				var customListId =  await clTable.Where (x => x.Name == customListName && x.UserId == ColorExtensions.CurrentUser.Id).ToListAsync();
 
-				await mfTable.DeleteAsync (items.FirstOrDefault ());
+				var items = await mfTable.Where (item => item.CustomListID == customListId.FirstOrDefault().Id && item.name == movie.name && item.ReleaseDate == movie.ReleaseDate.Value.ToString ("MM/dd/yyyy", CultureInfo.InvariantCulture)).ToListAsync();
+
+				if (items.Count > 0)
+					foreach (var item in items) 
+					{
+					   await mfTable.DeleteAsync (item);
+					}
+
 
 #if OFFLINE_SYNC_ENABLED
 				await UserSyncAsync (); // Send changes to the mobile app backend.
@@ -460,7 +554,7 @@ namespace MovieFriends
 
 				// Items.Remove (item);
 
-			} catch (MobileServiceInvalidOperationException e) {
+			} catch (Exception e) {
 				Console.Error.WriteLine (@"ERROR {0}", e.Message);
 
 
@@ -479,7 +573,7 @@ namespace MovieFriends
 
 				// Items.Remove (item);
 
-			} catch (MobileServiceInvalidOperationException e) {
+			} catch (Exception e) {
 				Console.Error.WriteLine (@"ERROR {0}", e.Message);
 				return false;
 
@@ -502,7 +596,7 @@ namespace MovieFriends
 
 				// Items.Remove (item);
 
-			} catch (MobileServiceInvalidOperationException e) {
+			} catch (Exception e) {
 				Console.Error.WriteLine (@"ERROR {0}", e.Message);
 				return false;
 
@@ -520,7 +614,7 @@ namespace MovieFriends
 
 				// Items.Remove (item);
 
-			} catch (MobileServiceInvalidOperationException e) {
+			} catch (Exception e) {
 				Console.Error.WriteLine (@"ERROR {0}", e.Message);
 				return false;
 			}

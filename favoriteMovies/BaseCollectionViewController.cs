@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Threading.Tasks;
+using BigTed;
 using CoreGraphics;
 using FavoriteMoviesPCL;
 using Foundation;
@@ -59,6 +60,7 @@ namespace FavoriteMovies
 		{
 			if (lpgr.State != UIGestureRecognizerState.Ended)
 				return;
+			BTProgressHUD.Show ();
 			AzureTablesService postService = AzureTablesService.DefaultService;
 			await postService.InitializeStoreAsync ();
 			try {
@@ -75,29 +77,36 @@ namespace FavoriteMovies
 					var isCustomList = _items [indexPath.Row].CustomListID != null;
 					bool accepted = await ShowAlert ("Confirm", "Are you sure you want to delete this movie?");
 					Console.WriteLine ("Selected button {0}", accepted ? "Accepted" : "Canceled");
-					if (accepted) {
+					var item = _items [indexPath.Row];
+					if (accepted) 
+					{
+						_items.RemoveAt (indexPath.Row);
+						CollectionView.ReloadData ();
 						//if customListId is null then we are on a pre-defined list (i.e Now Playing) not a custom one so nothing in table to delete
 						if (isCustomList) 
 						{
-							BaseListViewController.DeleteMovie ((int)_items [indexPath.Row].id);
+							BaseListViewController.DeleteMovie ((int)item.id);
 
 						}
+						await postService.DeleteMovieItemAsync (item,BaseListViewController.GetCustomListName(item.CustomListID));
+
 						
-						_items.RemoveAt (indexPath.Row);
-						//CollectionView.DeleteItems (new NSIndexPath [] { indexPath });
-						
-						CollectionView.ReloadData ();
-					
 
 					}
-					if (_items.Count == 0) {
+
+					if (_items.Count == 0) 
+					{
+						await postService.DeleteItemAsync (item.name, ColorExtensions.CurrentUser.Id);
 						BaseListViewController.DeleteCustomList (customListId);
+
 					}
-					if (isCustomList) {
-						MainViewController.NewCustomListToRefresh = 0;
+					;
+					if (isCustomList) 
+					{
+						MainViewController.NewCustomListToRefresh = 1;
 						viewController.ViewWillAppear (true);
 					}
-					await postService.DeleteMovieItemAsync (_items [indexPath.Row]);
+					BTProgressHUD.Dismiss ();
 				}
 			} catch (Exception ex) 
 			{
@@ -111,6 +120,7 @@ namespace FavoriteMovies
 		public override void ItemSelected (UICollectionView collectionView, NSIndexPath indexPath)
 		{
 			try {
+				BTProgressHUD.Show ();
 				NewsFeedTableSource.ShowTabBar (viewController.TabController);
 				viewController.NavController.SetNavigationBarHidden (false, true);
 				var row = _items [indexPath.Row];
@@ -118,6 +128,7 @@ namespace FavoriteMovies
 				//// show the loading overlay on the UI thread using the correct orientation sizing
 				//loadingOverlay = new LoadingOverlay (bounds);
 				//View.Add (loadingOverlay);
+
 				viewController.NavController.PushViewController (new MovieDetailViewController (row, false), true);
 				viewController.ViewDidAppear (true);
 				//this.ParentViewController.NavigationController.PushViewController(new MovieDetailViewController (row, false), true);
@@ -245,6 +256,7 @@ namespace FavoriteMovies
 		public override void ItemSelected (UICollectionView collectionView, NSIndexPath indexPath)
 		{
 			try {
+				BTProgressHUD.Show ();
 				NewsFeedTableSource.ShowTabBar (viewController.TabController);
 				viewController.NavController.SetNavigationBarHidden (false, true);
 				var row = _items [indexPath.Row];
@@ -281,7 +293,7 @@ namespace FavoriteMovies
 				return cell;
 			} catch (Exception e) {
 				Debug.WriteLine (e.Message);
-				throw;
+				//throw;
 
 			}
 			return cell;

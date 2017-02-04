@@ -8,6 +8,10 @@ using System.Collections.ObjectModel;
 using FavoriteMoviesPCL;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using Geolocator.Plugin;
+using System.Net;
+using System.IO;
+using System.Xml;
 
 namespace FavoriteMovies
 {
@@ -71,7 +75,7 @@ namespace FavoriteMovies
 			NavController = new NavController ();
 			NavController.NavigationBar.BarTintColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f);
 			NavController.NavigationBar.TintColor = UIColor.White;
-			NavController.NavigationBar.Translucent = true;
+			//NavController.NavigationBar.Translucent = true;
 			NavController.NavigationBar.TitleTextAttributes = new UIStringAttributes () {
 				ForegroundColor = UIColor.White
 			};
@@ -89,7 +93,7 @@ namespace FavoriteMovies
 			var uinc2 = new UINavigationController (tab2);
 			uinc2.NavigationBar.BarTintColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f);
 			uinc2.NavigationBar.TintColor = UIColor.White;
-			uinc2.NavigationBar.Translucent = true;
+			//uinc2.NavigationBar.Translucent = true;
 			uinc2.NavigationBar.TitleTextAttributes = new UIStringAttributes () {
 				ForegroundColor = UIColor.White
 			};
@@ -119,7 +123,7 @@ namespace FavoriteMovies
 		
 			uinc4.NavigationBar.BarTintColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f);
 			uinc4.NavigationBar.TintColor = UIColor.White;
-			uinc4.NavigationBar.Translucent = true;
+			//uinc4.NavigationBar.Translucent = true;
 			uinc4.NavigationBar.TitleTextAttributes = new UIStringAttributes () {
 				ForegroundColor = UIColor.White
 			};
@@ -128,9 +132,6 @@ namespace FavoriteMovies
 			tab5.Title = "Connect";
 			tab5.View.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 			tab5.TabBarItem.SetFinishedImages (UIImage.FromBundle ("ic_person_add.png"),UIImage.FromBundle ("ic_person_add.png"));
-
-			//tab4.TabBarItem = new UITabBarItem (UITabBarSystemItem.Contacts,0);
-			//	tab4.TabBarItem.SetFinishedImages ();
 
 
 			var uinc5 = new UINavigationController (tab5);
@@ -157,20 +158,21 @@ namespace FavoriteMovies
 			try 
 			{
 				TabController.SetViewControllers (tabs, true);
+				TabController.SelectedViewController = mainView; 
 			} catch (Exception ex) 
 			{
 				Debug.Write (ex.Message);
 			}
+			NavController.PushViewController (TabController, true);
 
-
-			UIApplication.SharedApplication.NetworkActivityIndicatorVisible = true;
-			SidebarController = new SidebarController (this,NavController , new SideMenuController ());
+			SidebarController = new SidebarController (this, NavController, new SideMenuController ());
 			SidebarController.MenuWidth = 220;
 			SidebarController.MenuLocation = SidebarController.MenuLocations.Right;
 			SidebarController.ReopenOnRotate = false;
 			SidebarController.HasShadowing = true;
-			UIApplication.SharedApplication.NetworkActivityIndicatorVisible = false;
-			NavController.PushViewController (TabController, true);
+
+	
+
 
 
 		}

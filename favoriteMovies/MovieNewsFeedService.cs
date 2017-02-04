@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using System.Xml;
 using FavoriteMoviesPCL;
 using MovieFriends;
+using SDWebImage;
 using SQLite;
 using UIKit;
 
@@ -86,8 +89,7 @@ namespace FavoriteMovies
 			List<MDCard> feedItemsList = new List<MDCard> ();
 			AzureTablesService postService = AzureTablesService.DefaultService;
 			await postService.InitializeStoreAsync ();
-			try 
-			{
+			try {
 				WebRequest webRequest = WebRequest.Create (url);
 				WebResponse webResponse = webRequest.GetResponse ();
 				Stream stream = webResponse.GetResponseStream ();
@@ -99,8 +101,23 @@ namespace FavoriteMovies
 				XmlNodeList itemNodes = xmlDocument.SelectNodes ("rss/channel/item");
 
 				DeleteAllFeedItems ();
-				for (int i = 0; i < itemNodes.Count; i++) 
-				{
+
+
+				//HNKCacheFormat format = (HNKCacheFormat)HNKCache.SharedCache ().Formats ["thumbnail"];
+				//if (format == null) {
+				//	format = new HNKCacheFormat ("thumbnail") {
+				//		Size = new SizeF (320, 240),
+				//		ScaleMode = HNKScaleMode.AspectFill,
+				//		CompressionQuality = 0.5f,
+				//		DiskCapacity = 1 * 1024 * 1024,
+				//		PreloadPolicy = HNKPreloadPolicy.LastSession
+				//	};
+				//}
+
+				//if (format == null) {
+
+
+				for (int i = 0; i < itemNodes.Count; i++) {
 					var feedItem = new MDCard (UITableViewCellStyle.Default, @"CardCell");
 					var feed = new FeedItem ();
 
@@ -115,7 +132,16 @@ namespace FavoriteMovies
 					}
 					if (itemNodes [i].SelectSingleNode ("link") != null) {
 						//feedItem.Link = itemNodes [i].SelectSingleNode ("link").InnerText;
-						feedItem.profileImage.Image = MovieCell.GetImageUrl (itemNodes [i].SelectSingleNode ("enclosure").Attributes ["url"].Value);
+						//feedItem.profileImage.SetCacheFormat (new HNKCacheFormat ("thumbnail") 
+						//{
+						//	Size = new SizeF (320, 240),
+						//	ScaleMode = HNKScaleMode.AspectFill,
+						//	CompressionQuality = 0.5f,
+						//	DiskCapacity = 1 * 1024 * 1024,
+						//	PreloadPolicy = HNKPreloadPolicy.LastSession
+						//});
+
+						feedItem.profileImage.SetImage (MovieCell.GetImageUrl (itemNodes [i].SelectSingleNode ("enclosure").Attributes ["url"].Value));
 						feed.ImageLink = itemNodes [i].SelectSingleNode ("enclosure").Attributes ["url"].Value;
 					}
 					if (itemNodes [i].SelectSingleNode ("pubDate") != null) {
@@ -143,12 +169,10 @@ namespace FavoriteMovies
 					}
 
 
-					//UIApplication.SharedApplication.InvokeOnMainThread (new Action (() => {
 					var result = await postService.GetCloudLike (feed.Title);
 
-					if (result.Count > 0) 
-					{
-						feedItem.likeLabel.Text = result [0].Like;
+					if (result.Count > 0) {
+						feedItem.likeLabel.Text = result.Where (x => x.UserId == ColorExtensions.CurrentUser.Id).Count () > 0 ? "Unlike" : "Like";
 						feedItem.likes = result [0].Likes;
 						feedItem.id = result [0].Id;
 					} else
@@ -158,10 +182,12 @@ namespace FavoriteMovies
 
 				}
 
+			} catch (WebException e) {
+				Console.WriteLine (@"Error{0}", e.Message + " No internet connection");
+				ShowAlert ("Limited Internet", "Your internet connection is down. Some items will not be available.", "Ok");
 			} catch (Exception e) 
 			{
-				Console.WriteLine (@"Error{0}", e.Message + " No internet connection");
-				 ShowAlert ("Limited Internet", "Your internet connection is down. Some items will not be available.", "Ok");
+				Console.WriteLine (@"Error{0}", e.Message);
 			}
 
 			return feedItemsList;

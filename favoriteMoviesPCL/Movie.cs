@@ -57,6 +57,7 @@ namespace FavoriteMoviesPCL
 		public DateTime updatedAt { get; set;}
 		public bool deleted { get; set;}
 		public int userid { get; set;}
+		public string cloudId { get; set; }
 	}
 
 	public class CustomListCloud
@@ -70,13 +71,13 @@ namespace FavoriteMoviesPCL
 	}
 	public class MovieCloud:Movie
 	{
-		public string id { get; set; }		
-		public string OriginalId { get; set; }
-		public string CustomListID { get; set; }
-		public string VoteCount { get; set; }
-		public string ReleaseDate { get; set; }
-		public string VoteAverage { get; set; }
-		public string UserRating { get; set; }
+	    public new string id { get; set; }		
+		public new string OriginalId { get; set; }
+		public new string CustomListID { get; set; }
+		public new string VoteCount { get; set; }
+		public new string ReleaseDate { get; set; }
+		public new string VoteAverage { get; set; }
+		public new string UserRating { get; set; }
 
 
 	}
@@ -167,7 +168,10 @@ namespace FavoriteMoviesPCL
 		public string profilepic { get; set;}
 		public string username { get; set;}
 		public string password { get; set;}
-
+		public string City { get; set; }
+		public string State { get; set; }
+		public string Zip { get; set; }
+		public string Country { get; set; }
 	}
 
 	public class UserCloud
@@ -178,8 +182,12 @@ namespace FavoriteMoviesPCL
 		public string profilepic { get; set;}
 		public string username { get; set; }
 		public string DisplayName { get; set; }
+		public string City { get; set; }
+		public string State { get; set; }
+		public string Zip { get; set; }
+		public string Country { get; set; }
+		public bool connection { get; set; }
 
-	
 	}
 
 	public class UserFriend

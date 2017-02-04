@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
@@ -13,6 +12,8 @@ using SQLite;
 using UIKit;
 using LoginScreen;
 using MovieFriends;
+using SDWebImage;
+using BigTed;
 
 namespace FavoriteMovies
 {/// <summary>
@@ -34,7 +35,8 @@ namespace FavoriteMovies
 		static int DefaultYPositionMovieLatestLabel = 790;
 		public static int NewCustomListToRefresh = -1;
 		//public static int OldCustomListToRefresh;
-		static CGSize ItemSize = new CGSize (153, 205);
+		//static CGSize ItemSize = new CGSize (153, 205);
+		static CGSize ItemSize = new CGSize (133, 185);
 		static CGRect FavoriteLabelFrame = new CGRect (7, 10, 180, 20);
 		static CGRect TopRatedLabelFrame = new CGRect (7, 205, 180, 20);
 		static CGRect NowPlayingLabelFrame = new CGRect (7, 400, 180, 20);
@@ -70,7 +72,8 @@ namespace FavoriteMovies
 		static UILabel PlayingNowLabel;
 		static UILabel PopularLabel;
 		static UILabel MovieLatestLabel;
-
+		//static UIView horizontalLine = new UIView();
+		static UIImageView velvetRopes = new UIImageView ();
 
 		private bool needLogin = true;
 
@@ -78,7 +81,7 @@ namespace FavoriteMovies
 		//	public MainViewController (ObservableCollection<Movie> topRated, ObservableCollection<Movie> nowPlaying, ObservableCollection<Movie> popular, ObservableCollection<Movie> movieLatest,int page)
 		public MainViewController ()
 		{
-			
+
 			flowLayout = new UICollectionViewFlowLayout () {
 				HeaderReferenceSize = HeaderReferenceSize,
 				ScrollDirection = UICollectionViewScrollDirection.Horizontal,
@@ -112,39 +115,27 @@ namespace FavoriteMovies
 			return UIInterfaceOrientationMask.Portrait;
 		}
 
-		void ScrollView_WillEndDragging (object sender, WillEndDraggingEventArgs e)
-		{
-			var targetPoint = e.TargetContentOffset;
-			var currentPoint = ((UIScrollView)sender).ContentOffset;
+		//void ScrollView_WillEndDragging (object sender, WillEndDraggingEventArgs e)
+		//{
+		//	var targetPoint = e.TargetContentOffset;
+		//	var currentPoint = ((UIScrollView)sender).ContentOffset;
 
 
-			if (targetPoint.Y > currentPoint.Y) {
-				NewsFeedTableSource.HideTabBar (TabController);
-				NavController.SetNavigationBarHidden (true, true);
-				var statusView = new UIView () { Frame = UIApplication.SharedApplication.StatusBarFrame };
-				statusView.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f);
-				View.Add (statusView);
-			} else {
-				NewsFeedTableSource.ShowTabBar (TabController);
-				NavController.SetNavigationBarHidden (false, true);
-				UIApplication.SharedApplication.SetStatusBarHidden (false, true);
-			}
+		//	if (targetPoint.Y > currentPoint.Y) {
+		//		NewsFeedTableSource.HideTabBar (TabController);
+		//		NavController.SetNavigationBarHidden (true, true);
+		//		var statusView = new UIView () { Frame = UIApplication.SharedApplication.StatusBarFrame };
+		//		statusView.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f);
+		//		View.Add (statusView);
+		//	} else {
+		//		NewsFeedTableSource.ShowTabBar (TabController);
+		//		NavController.SetNavigationBarHidden (false, true);
+		//		UIApplication.SharedApplication.SetStatusBarHidden (false, true);
+		//	}
 
-		}
+		//}
 
-		void LoadMoreMovies ()
-		{
-			if (MovieService.TotalPagesNowPlaying > 0) {
-				List<Task> Tasks = new List<Task> ();
-				for (var x = 1; x < MovieService.TotalPagesNowPlaying; x++) {
-					Tasks.Add (Task.Run (async () => nowPlaying = new ObservableCollection<Movie>
-										 (nowPlaying.Concat (await MovieService.GetMoviesAsync
-															 (MovieService.MovieType.NowPlaying, x)))));
-				}
-				Task.WhenAll (Tasks);
-			}
-		}
-		public override void ViewDidAppear (bool animated)
+		public  override void  ViewDidAppear (bool animated)
 		{
 			base.ViewDidAppear (animated);
 
@@ -153,7 +144,7 @@ namespace FavoriteMovies
 				LoginScreenControl<CredentialsProvider>.Activate (this);
 				needLogin = false;
 			}
-			NewsFeedTableSource.ShowTabBar (TabController);
+			//NewsFeedTableSource.ShowTabBar (TabController);
 			TabController.NavigationController.NavigationBar.Hidden = false;
 			UIApplication.SharedApplication.SetStatusBarHidden (false, true);
 
@@ -164,6 +155,7 @@ namespace FavoriteMovies
 				scrollView.ContentSize = new CGSize (View.Frame.Width, View.Frame.Height);
 
 			}
+
 			////*****this fixes a problem with the uitableview adding space at the top after each selection*****
 			//Debug.Write (searchResultsController.TableView.ContentInset);
 			// adding label views to View. 
@@ -181,11 +173,13 @@ namespace FavoriteMovies
 						var currentUser = new UserCloud ();
 						if (query.Count > 0) {
 							returnValue = query [0].username;
-
-
 							currentUser.username = query [0].username;
 							currentUser.email = query [0].email;
 							currentUser.Id = query [0].Id;
+							currentUser.City = query [0].City;
+							currentUser.State = query [0].State;
+							currentUser.Country = query [0].Country;
+							currentUser.Zip = query [0].Zip;
 
 
 						}
@@ -199,18 +193,18 @@ namespace FavoriteMovies
 							var currentUser = new UserCloud ();
 							if (query.Count > 0) {
 								returnValue = query [0].username;
-
-
 								currentUser.username = query [0].username;
 								currentUser.email = query [0].email;
 								currentUser.Id = query [0].Id;
+								currentUser.City = query [0].City;
+								currentUser.State = query [0].State;
+								currentUser.Country = query [0].Country;
+								currentUser.Zip = query [0].Zip;
 
 
 							}
 							ColorExtensions.CurrentUser = currentUser;
 						}
-
-
 
 					}
 				});
@@ -219,17 +213,23 @@ namespace FavoriteMovies
 			return returnValue;
 		}
 
-
-
-
-		public override void ViewWillAppear (bool animated)
+		public async override void ViewWillAppear (bool animated)
 		{
 			base.ViewWillAppear (animated);
 
+			if (NewCustomListToRefresh == -1) 
+			{
+				BTProgressHUD.Show ();
+			    GetCollectionData ();
+				LoadCollectionViewControllers ();
+				FavoritesDisplay ();
+				NewCustomListToRefresh = 0;
+				BTProgressHUD.Dismiss ();
+			}
 
 			SidebarController.Disabled = false;
 
-			if (NewCustomListToRefresh != -1)// - 1 means nothing has changed and i don't have to refresh lists
+			if (NewCustomListToRefresh > 0)// 0 means nothing has changed and i don't have to refresh lists
 				FavoritesDisplay ();
 			LoadViews ();
 
@@ -237,21 +237,26 @@ namespace FavoriteMovies
 
 		void UpdateCustomListMovies (int cnt)
 		{
+			var watch = System.Diagnostics.Stopwatch.StartNew ();
 			customLabels [cnt] = new UILabel () {
 				TextColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR),
 				//Frame = FavoriteLabelFrame,
 				BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha),
-				Font = UIFont.FromName (ColorExtensions.TITLE_FONT, ColorExtensions.HEADER_FONT_SIZE)
+				Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, ColorExtensions.HEADER_FONT_SIZE)
 			};
 			customControllers [cnt] = new FavoritesViewController (new UICollectionViewFlowLayout () {
 				MinimumInteritemSpacing = MinimumInteritemSpacing, MinimumLineSpacing = MinimumLineSpacing,
 				HeaderReferenceSize = HeaderReferenceSize, ItemSize = ItemSize,
 				ScrollDirection = UICollectionViewScrollDirection.Horizontal
-			}, new ObservableCollection<Movie> (GetMovieList (customLists [cnt]).Reverse ()), this);
+			}, new ObservableCollection<Movie> ((GetMovieList (customLists [cnt])).Reverse ()), this);
 
 			customControllers [cnt].CollectionView.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha);
 			customControllers [cnt].CollectionView.RegisterClassForCell (typeof (MovieCell), FavoritesViewController.movieCellId);
 			customLabels [cnt].Text = customLists [cnt].name + " (" + customControllers [cnt].CollectionView.NumberOfItemsInSection (0) + ")";
+			UpdateCustomListsPosition (cnt);
+			watch.Stop ();
+			Console.WriteLine ("UpdateCustomListMovies Method took " + watch.ElapsedMilliseconds / 1000.0 + "seconds");
+
 		}
 
 		void DeleteAllSubviews (UIScrollView view)
@@ -264,10 +269,13 @@ namespace FavoriteMovies
 
 		void FavoritesDisplay ()
 		{
+			var watch = System.Diagnostics.Stopwatch.StartNew ();
 			DeleteAllSubviews (scrollView);
-
+			//horizontalLine.Frame = new CGRect ();
+			velvetRopes.Frame = new CGRect ();
 			customLists = GetCustomLists ();
-			if (customLists.Count == 0) {
+			if (customLists.Count == 0) 
+			{
 				TopRatedLabel.Frame = new CGRect (TopRatedLabel.Frame.X, DefaultYPositionTopRatedLabel, TopRatedLabel.Frame.Width, TopRatedLabel.Frame.Height);
 				topRatedController.CollectionView.Frame = new CGRect (TopRatedControllerFrame.X, DefaultYPositionTopRatedController, TopRatedControllerFrame.Width, TopRatedControllerFrame.Height);
 
@@ -284,59 +292,87 @@ namespace FavoriteMovies
 				//scrollView.ContentSize = new CGSize (320, View.Frame.Height + 155);
 				//scrollView.ContentOffset = new CGPoint (0, -scrollView.ContentInset.Top);
 
-			} else {
+			} 
+			else 
+			{
 				/// <summary>
 				/// A new list was added(0) or this is the first time through (-1)
 				/// </summary>
 				/// <param name="customList">Custom list.</param>
-				if (NewCustomListToRefresh == 0 || NewCustomListToRefresh == -1) {
+						if (NewCustomListToRefresh == 1 || NewCustomListToRefresh == -1) 
+						{
 
 
-					customLabels = new UILabel [customLists.Count];
-					customControllers = new FavoritesViewController [customLists.Count];
-					for (var cnt = 0; cnt < customLists.Count; cnt++) {
+							customLabels = new UILabel [customLists.Count];
+							customControllers = new FavoritesViewController [customLists.Count];
+							for (var cnt = 0; cnt < customLists.Count; cnt++) 
+							{
 
-						UpdateCustomListMovies (cnt);
-						UpdateCustomListsPosition (cnt);
+								UpdateCustomListMovies (cnt);
 
-					}
-					TopRatedLabel.Frame = new CGRect () { X = TopRatedLabelFrame.X, Y = TopRatedLabelFrame.Y + (SpaceBetweenLabelsAndFrames * (customLists.Count - 1) + SpaceBetweenContainers + SeparationBuffer + SpaceBetweenListTypes), Height = TopRatedLabelFrame.Height, Width = TopRatedLabelFrame.Width };
-					topRatedController.CollectionView.Frame = new CGRect () { X = TopRatedControllerFrame.X, Y = TopRatedLabel.Frame.Y + SeparationBuffer, Height = TopRatedControllerFrame.Height, Width = TopRatedControllerFrame.Width };
+							}
 
-					PlayingNowLabel.Frame = new CGRect () { X = NowPlayingLabelFrame.X, Y = topRatedController.CollectionView.Frame.Y + topRatedController.CollectionView.Frame.Height + SpaceBetweenContainers, Height = NowPlayingLabelFrame.Height, Width = NowPlayingLabelFrame.Width };
-					nowPlayingController.CollectionView.Frame = new CGRect () { X = NowPlayingControllerFrame.X, Y = PlayingNowLabel.Frame.Y + SeparationBuffer, Height = NowPlayingControllerFrame.Height, Width = NowPlayingControllerFrame.Width }; ;
+							TopRatedLabel.Frame = new CGRect () { X = TopRatedLabelFrame.X, Y = TopRatedLabelFrame.Y + (SpaceBetweenLabelsAndFrames * (customLists.Count - 1) + SpaceBetweenContainers + SeparationBuffer + SpaceBetweenListTypes), Height = TopRatedLabelFrame.Height, Width = TopRatedLabelFrame.Width };
+							topRatedController.CollectionView.Frame = new CGRect () { X = TopRatedControllerFrame.X, Y = TopRatedLabel.Frame.Y + SeparationBuffer, Height = TopRatedControllerFrame.Height, Width = TopRatedControllerFrame.Width };
 
-					PopularLabel.Frame = new CGRect () { X = PopularLabelFrame.X, Y = nowPlayingController.CollectionView.Frame.Y + nowPlayingController.CollectionView.Frame.Height + SpaceBetweenContainers, Height = PopularLabelFrame.Height, Width = PopularLabelFrame.Width };
-					popularController.CollectionView.Frame = new CGRect () { X = PopularControllerFrame.X, Y = PopularLabel.Frame.Y + SeparationBuffer, Height = PopularControllerFrame.Height, Width = PopularControllerFrame.Width };
+							PlayingNowLabel.Frame = new CGRect () { X = NowPlayingLabelFrame.X, Y = topRatedController.CollectionView.Frame.Y + topRatedController.CollectionView.Frame.Height + SpaceBetweenContainers, Height = NowPlayingLabelFrame.Height, Width = NowPlayingLabelFrame.Width };
+							nowPlayingController.CollectionView.Frame = new CGRect () { X = NowPlayingControllerFrame.X, Y = PlayingNowLabel.Frame.Y + SeparationBuffer, Height = NowPlayingControllerFrame.Height, Width = NowPlayingControllerFrame.Width }; ;
 
-					MovieLatestLabel.Frame = new CGRect () { X = MovieLatestLabelFrame.X, Y = popularController.CollectionView.Frame.Y + popularController.CollectionView.Frame.Height + SpaceBetweenContainers, Height = MovieLatestLabelFrame.Height, Width = MovieLatestLabelFrame.Width };
-					MovieLatestController.CollectionView.Frame = new CGRect () { X = MovieLatestControllerFrame.X, Y = MovieLatestLabel.Frame.Y + SeparationBuffer, Height = MovieLatestControllerFrame.Height, Width = MovieLatestControllerFrame.Width };
+							PopularLabel.Frame = new CGRect () { X = PopularLabelFrame.X, Y = nowPlayingController.CollectionView.Frame.Y + nowPlayingController.CollectionView.Frame.Height + SpaceBetweenContainers, Height = PopularLabelFrame.Height, Width = PopularLabelFrame.Width };
+							popularController.CollectionView.Frame = new CGRect () { X = PopularControllerFrame.X, Y = PopularLabel.Frame.Y + SeparationBuffer, Height = PopularControllerFrame.Height, Width = PopularControllerFrame.Width };
+
+							MovieLatestLabel.Frame = new CGRect () { X = MovieLatestLabelFrame.X, Y = popularController.CollectionView.Frame.Y + popularController.CollectionView.Frame.Height + SpaceBetweenContainers, Height = MovieLatestLabelFrame.Height, Width = MovieLatestLabelFrame.Width };
+							MovieLatestController.CollectionView.Frame = new CGRect () { X = MovieLatestControllerFrame.X, Y = MovieLatestLabel.Frame.Y + SeparationBuffer, Height = MovieLatestControllerFrame.Height, Width = MovieLatestControllerFrame.Width };
 
 
-				} else {
-					UpdateCustomListMovies (NewCustomListToRefresh);
-					UpdateCustomListsPosition (NewCustomListToRefresh);
-				}
+						} else 
+						{
+							 UpdateCustomListMovies (NewCustomListToRefresh);
+							  
+						}
+
+						velvetRopes.Image = UIImage.FromBundle ("Divider_large_red_large.png");
+						velvetRopes.Frame =new CGRect () { X = 0, Y = TopRatedLabelFrame.Y + (SpaceBetweenLabelsAndFrames * (customLists.Count - 1) + SpaceBetweenContainers + SeparationBuffer + SpaceBetweenListTypes) - 40, Width =View.Bounds.Width, Height = 20};
+						//velvetRopes.ContentMode = UIViewContentMode.ScaleAspectFit;
+						//velvetRopes.ContentMode = UIViewContentMode.Center;
+					//horizontalLine.Frame = new CGRect () { X = 0, Y = TopRatedLabelFrame.Y + (SpaceBetweenLabelsAndFrames * (customLists.Count - 1) + SpaceBetweenContainers + SeparationBuffer + SpaceBetweenListTypes) - 30, Width = View.Bounds.Size.Width, Height = 2f };
+					//horizontalLine.BackgroundColor = UIColor.Clear.FromHexString ("#150ab2");
+					//horizontalLine.AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleTopMargin | UIViewAutoresizing.FlexibleBottomMargin;
+
 
 			}
-			NewCustomListToRefresh = -1;
+			NewCustomListToRefresh = 0;
 
 			//For scrolling to work the scrollview Content size has to be bigger than the View.Frame.Height
-			scrollView.ContentSize = new CGSize (View.Frame.Width, MovieLatestController.CollectionView.Frame.Y + MovieLatestController.CollectionView.Frame.Height + SeparationBuffer + 40);
+			scrollView.ContentSize = new CGSize (View.Frame.Width, MovieLatestController.CollectionView.Frame.Y + MovieLatestController.CollectionView.Frame.Height+ SpaceBetweenContainers + SeparationBuffer);
 			scrollView.ContentOffset = new CGPoint (0, -scrollView.ContentInset.Top);
+			watch.Stop ();
+			Console.WriteLine ("GetFavorites Method took " + watch.ElapsedMilliseconds / 1000.0 + "seconds");
 
 		}
 
-		void UpdateCustomListsPosition (int customList)
+		 void UpdateCustomListsPosition (int customList)
 		{
-			customLabels [customList].Frame = new CGRect () {
-				X = FavoriteLabelFrame.X,
-				Y = FavoriteLabelFrame.Y + (SpaceBetweenLabelsAndFrames * customList) + SpaceBetweenContainers,
-				Height = FavoriteLabelFrame.Height, Width = FavoriteLabelFrame.Width
-			};
+			if (customList == 0) 
+			{
+				customLabels [customList].Frame = new CGRect () {
+					X = FavoriteLabelFrame.X,
+					Y = FavoriteLabelFrame.Y,
+					Height = FavoriteLabelFrame.Height, Width = FavoriteLabelFrame.Width
+				};
+			}
+			else
+				
+			{
+				customLabels [customList].Frame = new CGRect () {
+					X = FavoriteLabelFrame.X,
+					Y = FavoriteLabelFrame.Y + (SpaceBetweenLabelsAndFrames * customList) + 10,
+					Height = FavoriteLabelFrame.Height, Width = FavoriteLabelFrame.Width
+				};
+			}
 			customControllers [customList].CollectionView.Frame = new CGRect () {
 				X = FavoriteControllerFrame.X,
-				Y = customLabels [customList].Frame.Y + 19,// FavoteControllerFrame.Y + (SpaceBetweenLabelsAndFrames * customList)
+				Y = customLabels [customList].Frame.Y + SeparationBuffer,// FavoteControllerFrame.Y + (SpaceBetweenLabelsAndFrames * customList)
 				Height = FavoriteControllerFrame.Height,
 				Width = FavoriteControllerFrame.Width
 			};
@@ -344,34 +380,53 @@ namespace FavoriteMovies
 			scrollView.Add (customControllers [customList].CollectionView);
 		}
 
-		ObservableCollection<Movie> GetMovieList (CustomList customList)
+		 ObservableCollection<Movie> GetMovieList (CustomList customList)
 		{
+			AzureTablesService postService = AzureTablesService.DefaultService;
 			var returnList = new ObservableCollection<Movie> ();
 			try {
-				using (var db = new SQLite.SQLiteConnection (MovieService.Database)) {
-					// there is a sqllite bug here https://forums.xamarin.com/discussion/52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
-					var query = db.Query<Movie> ("SELECT * FROM [Movie] WHERE [CustomListID] = " + customList.id);
+				var watch = System.Diagnostics.Stopwatch.StartNew ();
+				using (var db = new SQLite.SQLiteConnection (MovieService.Database)) 
+				{
+					var task = Task.Run (() => {
+						// there is a sqllite bug here https://forums.xamarin.com/discussion/52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
+						if (customList.id != null) {
+							var query = db.Query<Movie> ("SELECT * FROM [Movie] WHERE [CustomListID] = " + customList.id);
 
-					foreach (var movie in query) {
-						var item = new Movie ();
-						item.id = movie.id;
-						item.name = movie.name;
-						item.BackdropPath = movie.BackdropPath;
-						item.CustomListID = movie.CustomListID;
-						item.Favorite = movie.Favorite;
-						item.HighResPosterPath = movie.HighResPosterPath;
-						item.OriginalLanguage = movie.OriginalLanguage;
-						item.Overview = movie.Overview;
-						item.Popularity = movie.Popularity;
-						item.PosterPath = movie.PosterPath;
-						item.ReleaseDate = movie.ReleaseDate;
-						item.VoteAverage = movie.VoteAverage;
-						item.UserReview = movie.UserReview;
-						item.UserRating = movie.UserRating;
-						item.OriginalId = movie.OriginalId;
-						item.order = movie.order;
-						returnList.Add (item);
-					}
+							foreach (var movie in query) {
+								var item = new Movie ();
+								item.id = movie.id;
+								item.name = movie.name;
+								item.BackdropPath = movie.BackdropPath;
+								item.CustomListID = movie.CustomListID;
+								item.Favorite = movie.Favorite;
+								item.HighResPosterPath = movie.HighResPosterPath;
+								item.OriginalLanguage = movie.OriginalLanguage;
+								item.Overview = movie.Overview;
+								item.Popularity = movie.Popularity;
+								item.PosterPath = movie.PosterPath;
+								item.ReleaseDate = movie.ReleaseDate;
+								item.VoteAverage = movie.VoteAverage;
+								item.UserReview = movie.UserReview;
+								item.UserRating = movie.UserRating;
+								item.OriginalId = movie.OriginalId;
+								item.order = movie.order;
+								returnList.Add (item);
+							}
+						}
+						//if (customList.cloudId != null) {
+						//	//get movies cloud
+						//	var movies = await postService.GetCustomListMovies (customList.cloudId);
+						//	foreach (var movie in movies) {
+						//		returnList.Add (movie);
+						//	}
+						//}
+					});
+					task.Wait();
+
+					watch.Stop ();
+					Console.WriteLine ("GetMovieList Method took " + watch.ElapsedMilliseconds / 1000.0 + "seconds");
+
 				}
 			} catch (SQLite.SQLiteException e) {
 				Debug.Write (e.Message);
@@ -385,28 +440,30 @@ namespace FavoriteMovies
 
 		}
 
-		void GetCollectionData ()
+		 void GetCollectionData ()
 		{
 			int Page;
+			try 
+			{
 
+				var watch = System.Diagnostics.Stopwatch.StartNew ();
+				Page = RandomNumber (1, 5);
 
-			try {
-				Page = RandomNumber (1, 50);
-
-				var task = Task.Run (async () => {
-					this.topRated = await MovieService.GetMoviesAsync (MovieService.MovieType.NowPlaying, 1);
-					this.nowPlaying = await MovieService.GetMoviesAsync (MovieService.MovieType.TopRated, Page);
-					this.popular = await MovieService.GetMoviesAsync (MovieService.MovieType.Popular, Page);
-					this.MovieLatest = await MovieService.GetMoviesAsync (MovieService.MovieType.Upcoming, Page);
+				 Task.Run (async() => {
+					this.topRated = await  MovieService.GetMoviesAsync (MovieService.MovieType.TopRated, Page);
+					this.nowPlaying =  await MovieService.GetMoviesAsync (MovieService.MovieType.NowPlaying, Page);
+					this.popular =  await MovieService.GetMoviesAsync (MovieService.MovieType.Popular, Page);
+					this.MovieLatest =  await MovieService.GetMoviesAsync (MovieService.MovieType.Upcoming, Page);
 					//TVNowAiring = await MovieService.GetMoviesAsync (MovieService.MovieType.TVLatest, Page);
-				});
-					TimeSpan ts = TimeSpan.FromMilliseconds (2000);
-				task.Wait (ts);
-				if (!task.Wait (ts))
-					Console.WriteLine ("The timeout interval elapsed in RootViewController.");
+				}).Wait();
+				//TimeSpan ts = TimeSpan.FromMilliseconds (4000);
+				watch.Stop ();
+				Console.WriteLine ("GetCollectionData Method took " + watch.ElapsedMilliseconds / 1000.0 + "seconds");
+
+				//	Console.WriteLine ("The timeout interval elapsed in GetCollectionData.");
 			} catch (Exception e) {
 				Debug.WriteLine (e.Message);
-				throw;
+					throw;
 
 			}
 		}
@@ -414,7 +471,7 @@ namespace FavoriteMovies
 		{
 
 			//scrollView.PagingEnabled = true;
-
+			var watch = System.Diagnostics.Stopwatch.StartNew ();
 			scrollView.Frame = new CGRect () { X = View.Frame.X, Y = View.Frame.Y, Width = View.Frame.Width, Height = View.Frame.Height };
 			customLists = GetCustomLists ();
 
@@ -424,27 +481,27 @@ namespace FavoriteMovies
 			TopRatedLabel = new UILabel () {
 				TextColor = UIColor.Black, Frame = TopRatedLabelFrame,
 				BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha),
-				Font = UIFont.FromName (ColorExtensions.TITLE_FONT, ColorExtensions.HEADER_FONT_SIZE),
+				Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, ColorExtensions.HEADER_FONT_SIZE),
 				Text = TopRated
 			};
 
 			PlayingNowLabel = new UILabel () {
 				TextColor = UIColor.Black, Frame = NowPlayingLabelFrame,
 				BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha),
-				Font = UIFont.FromName (ColorExtensions.TITLE_FONT, ColorExtensions.HEADER_FONT_SIZE),
+				Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, ColorExtensions.HEADER_FONT_SIZE),
 				Text = NowPlaying
 			};
 			PopularLabel = new UILabel () {
 				TextColor = UIColor.Black, Frame = PopularLabelFrame,
 				BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha),
-				Font = UIFont.FromName (ColorExtensions.TITLE_FONT, ColorExtensions.HEADER_FONT_SIZE),
+				Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, ColorExtensions.HEADER_FONT_SIZE),
 				Text = Popular
 			};
 
 			MovieLatestLabel = new UILabel () {
 				TextColor = UIColor.Black, Frame = MovieLatestLabelFrame,
 				BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha),
-				Font = UIFont.FromName (ColorExtensions.TITLE_FONT, ColorExtensions.HEADER_FONT_SIZE),
+				Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, ColorExtensions.HEADER_FONT_SIZE),
 				Text = LatestMovies
 			};
 			TopRatedLabel.Layer.ZPosition = LabelZPosition;
@@ -473,17 +530,20 @@ namespace FavoriteMovies
 			MovieLatestController.CollectionView.RegisterClassForCell (typeof (MovieCell), MovieLatestViewController.movieCellId);
 
 
-			if (NewCustomListToRefresh == 0 || NewCustomListToRefresh == -1) {
+			if (NewCustomListToRefresh == 1 || NewCustomListToRefresh == -1) {
 				for (var cnt = 0; cnt < customLists.Count; cnt++) {
-					UpdateCustomListMovies (cnt);
+					 UpdateCustomListMovies (cnt);
 				}
 
 			} else {
-				UpdateCustomListMovies (NewCustomListToRefresh);
+				 UpdateCustomListMovies (NewCustomListToRefresh);
 			}
 
 			View.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha);
-			FavoritesDisplay ();
+
+			watch.Stop ();
+			Console.WriteLine ("LoadCollectionViewControllers Method took " + watch.ElapsedMilliseconds / 1000.0 + "seconds");
+
 		}
 		void LoadViews ()
 		{
@@ -495,15 +555,22 @@ namespace FavoriteMovies
 			scrollView.AddSubview (PopularLabel);
 			scrollView.AddSubview (MovieLatestLabel);
 			scrollView.AddSubview (TopRatedLabel);
+			//scrollView.AddSubview (horizontalLine);
+			scrollView.AddSubview (velvetRopes);
 			View.AddSubview (scrollView);
 
 		}
-		public override void ViewDidLoad ()
+		public override void ViewDidDisappear (bool animated)
+		{
+			base.ViewDidDisappear (animated);
+
+		}
+		public override  void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
 
-			GetCollectionData ();
-			LoadCollectionViewControllers ();
+
+
 			// Creates an instance of a custom View Controller that holds the results
 			searchResultsController = new SearchResultsViewController ();
 
@@ -546,31 +613,42 @@ namespace FavoriteMovies
 
 
 
-		ObservableCollection<CustomList> GetCustomLists ()
+		 ObservableCollection<CustomList> GetCustomLists ()
 		{
+			AzureTablesService postService = AzureTablesService.DefaultService;
 
 			var result = new ObservableCollection<CustomList> ();
-			using (var db = new SQLiteConnection (MovieService.Database)) {
-				var task = Task.Run (() => {
+			using (var db = new SQLiteConnection (MovieService.Database)) 
+			{
+				Task.Run (async () => {
 					try {
 						// there is a sqllite bug here https://forums.xamarin.com/discussion/52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
 						var query = db.Query<CustomList> ("SELECT * FROM [CustomList] ORDER BY [Order]");
 						//var query = db.Table<CustomList> ();
-						foreach (var list in query) {
+						foreach (var list in query) 
+						{
 							var item = new CustomList ();
 							item.id = list.id;
 							item.name = list.name;
 							result.Add (item);
 						}
-
-
+						//get cloud lists
+						//var cloudList = await postService.GetUserFriendsLists (ColorExtensions.CurrentUser.Id);
+						//foreach (var list in cloudList) 
+						//{
+						//	var item = new CustomList ();
+						//	item.cloudId = list.Id;
+						//	item.name = list.Name;
+						//	result.Add (item);
+						//}
 						//favoriteViewController.CollectionView.ReloadData ();
-					} catch (SQLiteException e) {
+					} catch (SQLiteException e) 
+					{
 						Debug.WriteLine (e.Message);
 						//throw;
 					}
-				});
-				task.Wait ();
+				}).WithNetworkIndicator ().Wait();
+
 			}
 			return result;
 		}
@@ -604,67 +682,59 @@ namespace FavoriteMovies
 		//public UILabel LabelView { get; private set; }
 		public void UpdateRow (Movie element)
 		{
+		try 
+			{
+				if (element.HighResPosterPath != null) 
+				{
+					var uri = new Uri (element.HighResPosterPath);
+					var imgUrl = new NSUrl (baseUrl + uri.AbsoluteUri.Substring (8));
+					ImageView.SetImage (imgUrl,UIImage.FromBundle ("blank.png"));	
 
-			try {
-					ImageView.Image = GetImage (element.PosterPath);
-				//ImageView.SetImage (
-				//	url: new NSUrl ("http://db.tt/ayAqtbFy"),
-				//	placeholder: UIImage.FromBundle ("placeholder.png")
-				//);
-				if (ColorExtensions.MovieIsFavorite (element.id.ToString ())) {
+				}
+				if (ColorExtensions.MovieIsFavorite (element.id.ToString ())) 
+				{
 					ContentView.Layer.BorderColor = UIColor.Orange.CGColor;
-
+					ContentView.Layer.BorderWidth = 2.0f;
 				} else {
 					ContentView.Layer.BorderColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f).CGColor;
 				}
-			} catch (SQLite.SQLiteException ex) {
+			} catch (SQLite.SQLiteException ex) 
+			{
 				//no favorites yet
 				Debug.Write (ex.Message);
-				throw;
+				//throw;
 			}
 		}
-		public static UIImage GetImageUrl (string posterPath)
+		public static Uri GetImageUrl (string posterPath)
 		{
-			var returnImage = UIImage.FromBundle ("blank.png");
-			var task = Task.Run (async () => {
-				if (posterPath != null) {
-					var uri = new Uri (posterPath);
-					using (var imgUrl = new NSUrl (HttpUtility.UrlPathEncode (uri.AbsoluteUri))) {
-						using (var data = NSData.FromUrl (imgUrl)) {
-							returnImage = (ColorExtensions.MaxResizeImage (UIImage.LoadFromData (data), 289f, 140f));
-							//returnImage= (UIImage.LoadFromData (data));
-						}
-					}
-				}
-			});
-			//TimeSpan ts = TimeSpan.FromMilliseconds (500);
-			task.Wait ();
+			
+			var returnImage = new Uri (posterPath);
 
-			//if (!task.Wait (ts))
-			//	Console.WriteLine ("The timeout interval elapsed in GetImageURL.");
+			if (posterPath != null) {
+				var uri = new Uri (posterPath);
+				using (var imgUrl = new NSUrl (HttpUtility.UrlPathEncode (uri.AbsoluteUri))) 
+				{
+					returnImage = imgUrl;
+
+				}
+			}
 			return returnImage;
 
 		}
-		public static UIImage GetImage (string posterPath)
+
+		public static Uri GetImage (string posterPath)
 		{
-			var returnImage = UIImage.FromBundle ("blank.png");
-			var task = Task.Run (async () => {
-				if (posterPath != null) {
-					var uri = new Uri (posterPath);
-					using (var imgUrl = new NSUrl (baseUrl + uri.AbsoluteUri.Substring (8))) {
-						using (var data = NSData.FromUrl (imgUrl)) {
-							//returnImage = (ColorExtensions.MaxResizeImage(UIImage.LoadFromData (data),153f,205f));
-							returnImage = (UIImage.LoadFromData (data));
+			
+			var returnImage = new Uri (posterPath);
 
-						}
-					}
+			if (posterPath != null) {
+				var uri = new Uri (posterPath);
+				using (var imgUrl = new NSUrl (baseUrl + uri.AbsoluteUri.Substring (8))) {
+					returnImage = imgUrl;
+
 				}
-			});
-		//	TimeSpan ts = TimeSpan.FromMilliseconds (1000);
-			task.Wait ();
+			}
 
-			//if (!task.Wait (ts))
-			//	Console.WriteLine ("The timeout interval elapsed in GetImage.");
 			return returnImage;
 
 

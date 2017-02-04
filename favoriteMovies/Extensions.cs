@@ -1,6 +1,8 @@
 using System;
 using System.Diagnostics;
 using System.Drawing;
+using System.Threading;
+using System.Threading.Tasks;
 using Accelerate;
 using CoreGraphics;
 using FavoriteMoviesPCL;
@@ -9,6 +11,53 @@ using UIKit;
 
 namespace FavoriteMovies
 {
+	public static class NetworkIndicator
+	{
+		static int _counter;
+
+		public static void EnterActivity ()
+		{
+			Interlocked.Increment (ref _counter);
+			RefreshIndicator ();
+		}
+
+		public static void LeaveActivity ()
+		{
+			Interlocked.Decrement (ref _counter);
+			RefreshIndicator ();
+		}
+
+		public static void AttachToTask (Task task)
+		{
+			if (task.IsCanceled || task.IsCanceled || task.IsFaulted)
+				return;
+
+			EnterActivity ();
+			task.ContinueWith (t => {
+				LeaveActivity ();
+			});
+		}
+
+		static void RefreshIndicator ()
+		{
+			UIApplication.SharedApplication.NetworkActivityIndicatorVisible =
+				(_counter > 0);
+		}
+	}
+	public static class TaskExtensions
+	{
+		public static Task WithNetworkIndicator (this Task task)
+		{
+			NetworkIndicator.AttachToTask (task);
+			return task;
+		}
+
+		public static Task<TResult> WithNetworkIndicator<TResult> (this Task<TResult> task)
+		{
+			NetworkIndicator.AttachToTask (task);
+			return task;
+		}
+	}
 	public static class ColorExtensions
 	{
 		public const string TITLE = "Movie Explorer";

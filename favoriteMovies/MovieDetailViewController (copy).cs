@@ -29,7 +29,7 @@ namespace FavoriteMovies
 		UIImageView IMDB = new UIImageView ();
 		UILabel voteResultText = new UILabel ();
 		UILabel userResultText = new UILabel ();
-
+		int previousPlace;
 		/// <summary>
 		/// This is the view controller for the movie details page. In addition it allows you to save and clear favorite movies
 		/// </summary>

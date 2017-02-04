@@ -42,10 +42,10 @@ namespace FavoriteMovies
 			profileImage.Layer.MasksToBounds = true;
 			nameLabel.Frame = new CoreGraphics.CGRect () { X = 60, Y = 0, Width = ContentView.Bounds.Width - 63, Height = 30 };
 			descriptionLabel.Frame = new CoreGraphics.CGRect () { X = 60, Y = 17, Width = ContentView.Bounds.Width - 50, Height = 30 };
-			if(moviesInCommon>0)
-			   descriptionLabel.Text = "You have " + moviesInCommon + " movie" + (moviesInCommon > 1 ?"s":"") + " in common";
-			addRemove.Frame = new CoreGraphics.CGRect () { X = 160, Y = 40, Width = ContentView.Bounds.Width - 63, Height = ContentView.Bounds.Height - 80 };
-			addRemove.ContentMode = UIViewContentMode.ScaleAspectFit;
+			//if(moviesInCommon>0)
+			   descriptionLabel.Text = "You have " + moviesInCommon + " movie" + (moviesInCommon==0||moviesInCommon > 1 ?"s":"") + " in common";
+			addRemove.Frame = new CoreGraphics.CGRect () { X = 215, Y = 12, Width = 100, Height = 20 };
+			addRemove.ContentMode = UIViewContentMode.ScaleAspectFit	;
 			addRemove.Layer.CornerRadius = profileImage.Frame.Size.Width / 2;
 			addRemove.Layer.MasksToBounds = true;
 

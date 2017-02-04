@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using CoreGraphics;
 using FavoriteMoviesPCL;
 using Foundation;
+using SDWebImage;
 using UIKit;
 
 namespace FavoriteMovies
@@ -22,13 +23,12 @@ namespace FavoriteMovies
 		public override void ViewDidAppear (bool animated)
 		{
 			base.ViewDidAppear (animated);
-		//	searchResultsController.TableView.ContentInset = new UIEdgeInsets (80, 0, 0, 0);
+		
 		}
 		public override void ViewWillAppear (bool animated)
 		{
 			base.ViewWillAppear (animated);
 
-		//	((UITextField)searchController.SearchBar.ValueForKey (new NSString ("_searchField"))).ResignFirstResponder ();
 
 		}
 
@@ -114,19 +114,28 @@ namespace FavoriteMovies
 
 		public override UITableViewCell GetCell (UITableView tableView, NSIndexPath indexPath)
 		{
+			
 			var cell = tableView.DequeueReusableCell (movieItemCellId);
 
 			if (cell == null) {
 				cell = new UITableViewCell (UITableViewCellStyle.Subtitle, movieItemCellId);
 			}
-			if (MovieItems.Count > indexPath.Row) 
+			try {
+				if (MovieItems.Count > indexPath.Row) 
+				{
+					cell.TextLabel.Text = MovieItems [indexPath.Row].name;
+					cell.TextLabel.Font = UIFont.FromName (ColorExtensions.TITLE_FONT, ColorExtensions.HEADER_FONT_SIZE);
+					cell.DetailTextLabel.Text = MovieItems [indexPath.Row].Overview;
+					if(MovieItems [indexPath.Row].PosterPath!=null)
+					   cell.ImageView.SetImage (MovieCell.GetImage (MovieItems [indexPath.Row].PosterPath)); // don't use for Value2
+
+				}
+			} catch (Exception e) 
 			{
-				cell.TextLabel.Text = MovieItems [indexPath.Row].name;
-				cell.TextLabel.Font = UIFont.FromName (ColorExtensions.TITLE_FONT, ColorExtensions.HEADER_FONT_SIZE);
-				cell.DetailTextLabel.Text = MovieItems [indexPath.Row].Overview;
-				cell.ImageView.Image =  MovieCell.GetImage (MovieItems [indexPath.Row].PosterPath); // don't use for Value2
+				Debug.WriteLine (e.Message);
 			}
 			return cell;
+
 		}
 
 		public override void RowSelected (UITableView tableView, NSIndexPath indexPath)

@@ -86,7 +86,55 @@ namespace FavoriteMoviesPCL
 			return newMovie;
 
 		}
+		public static async Task<ObservableCollection<Movie>> GetMoviesAsyncString (MovieType type, int page = 1, string movieId = "")
+		{
+			var client = new HttpClient ();
 
+			string Url = "";
+
+			switch (type) {
+
+			case MovieType.TopRated:
+				Url = _baseUrl + "movie/top_rated?api_key=" + _apiKey + _pageString + page;
+				break;
+			case MovieType.NowPlaying:
+				Url = _baseUrl + "movie/now_playing?api_key=" + _apiKey + _pageString + page;
+				break;
+			case MovieType.Popular:
+				Url = _baseUrl + "movie/popular?api_key=" + _apiKey + _pageString + page;
+				break;
+			case MovieType.Similar:
+				Url = _baseUrl + "movie/" + movieId + "/similar?api_key=" + _apiKey + _pageString + page;
+				break;
+			case MovieType.Upcoming:
+				Url = _baseUrl + "movie/upcoming?api_key=" + _apiKey + "&language=en-US";
+				break;
+			case MovieType.TVLatest:
+				Url = _baseUrl + "tv/airing_today?api_key=" + _apiKey + "&language=en-US";
+				break;
+
+			}
+
+			HttpResponseMessage result = await client.GetAsync (Url, CancellationToken.None);
+
+			if (result.IsSuccessStatusCode) {
+				try {
+					string content = await result.Content.ReadAsStringAsync ();
+					JObject jresponse = JObject.Parse (content);
+					var jarray = jresponse ["total_pages"];
+					MovieList = GetJsonData (content);
+					//return a ObservableCollection to fill a list of movies
+					return MovieList;
+
+				} catch (Exception ex) {
+					//Model Error
+					Debug.WriteLine (ex);
+
+				}
+			}
+			//Server Error or no internet connection.
+			return null;
+		}
 		//GET movies from service
 		public static async Task<ObservableCollection<Movie>> GetMoviesAsync (MovieType type, int page = 1, int movieId = 0)
 		{
@@ -223,16 +271,16 @@ namespace FavoriteMoviesPCL
 				foreach (var jObj in jarray) {
 					var newMovie = new Movie ();
 					newMovie.name = (string)jObj ["title"];
-					newMovie.PosterPath = (jObj ["poster_path"] == null) ? "" : (string)jObj ["poster_path"];
-					newMovie.HighResPosterPath = (jObj ["poster_path"] == null) ? "" : (string)jObj ["poster_path"];
+					newMovie.PosterPath =(string) jObj ["poster_path"];//(jObj ["poster_path"] == null) ? "" : (string)jObj ["poster_path"];
+					newMovie.HighResPosterPath = (string)jObj ["poster_path"];// (jObj ["poster_path"] == null) ? "" : (string)jObj ["poster_path"];
 					newMovie.OriginalId= (int)jObj ["id"];
 					newMovie.id = null;
 					newMovie.Overview = (string)jObj ["overview"];
 					newMovie.VoteCount = (double)jObj ["vote_count"];
 					newMovie.ReleaseDate = (DateTime?)jObj ["release_date"];
 					newMovie.VoteAverage = (float)jObj ["vote_average"];
-					newMovie.Adult = (jObj ["adult"] == null) ? false : (bool)jObj ["adult"];
-					newMovie.BackdropPath = (jObj ["backdrop_path"] == null) ? "" : (string)jObj ["backdrop_path"];
+					newMovie.Adult = (bool)jObj ["adult"];//(jObj ["adult"] == null) ? false : (bool)jObj ["adult"];
+					newMovie.BackdropPath = (string)jObj ["backdrop_path"];//(jObj ["backdrop_path"] == null) ? "" : (string)jObj ["backdrop_path"];
 					//newMovie.genre_ids = jObj ["genre_ids"].ToObject<List<string>>();
 					movieList.Add (newMovie);
 				}

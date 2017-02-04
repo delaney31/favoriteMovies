@@ -25,6 +25,7 @@ namespace FavoriteMovies
 		{
 			loading = new UILabel () { Frame = new CoreGraphics.CGRect () { X = 115, Y = 155, Width = 100, Height = 100 } };
 			loading.Text = "Loading...";
+			postService = AzureTablesService.DefaultService;
 
 		}
 		public override async void ViewDidLoad ()
@@ -32,7 +33,7 @@ namespace FavoriteMovies
 			base.ViewDidLoad ();
 			View.Add (loading);
 			//postService = AzureTablesService.DefaultService;
-			//await postService.InitializeStoreAsync ();
+			await postService.InitializeStoreAsync ();
 
 			tableItems = await MovieNewsFeedService.GetMDCardItems ();
 
@@ -135,10 +136,7 @@ namespace FavoriteMovies
 			NavigationItem.LeftBarButtonItem = post;
 
 			View.Add (comment);
-
-
 		}
-
 
 		void Handle_Canceled (object sender, EventArgs e)
 		{
@@ -169,7 +167,8 @@ namespace FavoriteMovies
 			if (isImage) {
 				// get the original image
 				UIImage originalImage = e.Info [UIImagePickerController.OriginalImage] as UIImage;
-				if (originalImage != null) {
+				if (originalImage != null) 
+				{
 					// do something with the image
 					Console.WriteLine ("got the original image");
 					MFTextAttachment attachImage = new MFTextAttachment ();
@@ -182,7 +181,8 @@ namespace FavoriteMovies
 					comment.AttributedText = newText;
 					comment.BecomeFirstResponder ();
 				}
-			} else { // if it's a video
+			} else 
+				{ // if it's a video
 					 // get video url
 				var mediaURL = e.Info [UIImagePickerController.MediaURL] as NSUrl;
 				if (mediaURL != null) {
@@ -344,7 +344,7 @@ namespace FavoriteMovies
 			postItem.Id = tableItems [(int)cell.Tag].id;
 			postItem.Title = tableItems [(int)cell.Tag].titleLabel.Text;
 			postItem.Like = tableItems [(int)cell.Tag].likeLabel.Text;
-			postItem.UserId = "1";
+			postItem.UserId = ColorExtensions.CurrentUser.Id;
 			postItem.Likes = tableItems [(int)cell.Tag].likes;
 			await newsFeedViewController.postService.RefreshDataAsync (postItem);
 

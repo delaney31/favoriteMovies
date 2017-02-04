@@ -13,7 +13,7 @@ namespace FavoriteMovies
 		public LoadingOverlay (CGRect frame) : base (frame)
 		{
 			// configurable bits
-			BackgroundColor = UIColor.Black;
+			BackgroundColor = UIColor.White;
 			Alpha = 0.75f;
 			AutoresizingMask = UIViewAutoresizing.All;
 

@@ -68,11 +68,11 @@ namespace FavoriteMovies
 
 			numberLikes = new UILabel ();
 			numberLikes.Frame = new CGRect () { X = 230, Y = 295, Width = 50, Height = 20 };
-			numberLikes.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, ColorExtensions.HEADER_FONT_SIZE);
+			numberLikes.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, ColorExtensions.CAST_FONT_SIZE);
 
 			likeLabel = new UILabel ();
 			likeLabel.Frame = new CGRect () { X = 28, Y = 295, Width = 70, Height = 20 };
-			likeLabel.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, ColorExtensions.HEADER_FONT_SIZE);
+			likeLabel.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, ColorExtensions.CAST_FONT_SIZE);
 
 
 			//likeButton = new UIImageView ();
