@@ -1,0 +1,6 @@
+﻿namespace MovieFriends
+{
+	class clTable
+	{
+	}
+}

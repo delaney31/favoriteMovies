@@ -22,9 +22,9 @@ namespace FavoriteMovies
 
 
 			tableSource = new UserCloudTableSource (tableItems, this);
-			tableView.Source = tableSource;
+			table.Source = tableSource;
 			NavigationItem.Title = "Add Friends";
-			Add (tableView);
+			Add (table);
 
 		}
 
@@ -32,31 +32,33 @@ namespace FavoriteMovies
 		{
 			// Define fields to be searched
 			var fetchKeys = new NSString [] { CNContactKey.GivenName, CNContactKey.FamilyName, CNContactKey.EmailAddresses,CNContactKey.ImageDataAvailable, CNContactKey.ThumbnailImageData };
-
-
-			var store = new CNContactStore ();
-			NSError error;
-			CNContainer [] containers= store.GetContainers (null, out error) ;
 			List<ContactCard> result = new List<ContactCard> ();
-			foreach (var container in containers) 
-			{
-				var fetchPredicate = CNContact.GetPredicateForContactsInContainer (container.Identifier);
+			try {
+				var store = new CNContactStore ();
+				NSError error;
+				CNContainer [] containers = store.GetContainers (null, out error);
 
-				var containerResults = store.GetUnifiedContacts (fetchPredicate, fetchKeys, out error);
-				foreach (var contact in containerResults) 
-				{
-					var conCard = new ContactCard (UITableViewCellStyle.Default,cellIdentifier);
-					conCard.nameLabel.Text = contact.GivenName + " " + contact.FamilyName;
+				foreach (var container in containers) {
+					var fetchPredicate = CNContact.GetPredicateForContactsInContainer (container.Identifier);
 
-					if(contact.ImageDataAvailable)
-					   conCard.profileImage.Image = UIImage.LoadFromData(contact.ThumbnailImageData);
-					else
-					   conCard.profileImage.Image = UIImage.FromBundle ("1481507483_compose.png"); //default image
-					result.Add (conCard);
+					var containerResults = store.GetUnifiedContacts (fetchPredicate, fetchKeys, out error);
+					foreach (var contact in containerResults) {
+						var conCard = new ContactCard (UITableViewCellStyle.Default, cellIdentifier);
+						conCard.nameLabel.Text = contact.GivenName + " " + contact.FamilyName;
+
+						if (contact.ImageDataAvailable)
+							conCard.profileImage.Image = UIImage.LoadFromData (contact.ThumbnailImageData);
+						else
+							conCard.profileImage.Image = UIImage.FromBundle ("1481507483_compose.png"); //default image
+						result.Add (conCard);
+					}
+
 				}
-
+			} catch (Exception ex)
+			{
+				Console.WriteLine (ex.Message);
+				return null;
 			}
-
 			return result.ToList ();
 
 		}

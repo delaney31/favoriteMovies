@@ -43,19 +43,17 @@ namespace FavoriteMovies
 				if (password!=await GetPassword(userName)) 
 				{
 					failCallback (new LoginScreenFaultDetails { PasswordErrorMessage = "Password incorrect." });
-				} else {
-					successCallback ();
+				} else 
+				{
+					MainViewController.getUser ();
+					SideMenuController.title.SetTitle (ColorExtensions.CurrentUser.username, UIControlState.Normal);
+					SideMenuController.location.SetTitle (ColorExtensions.CurrentUser.City + ", " + ColorExtensions.CurrentUser.State + " " + ColorExtensions.CurrentUser.Country, UIControlState.Normal);
+
 				}
 			});
 
 		}
-		public void successCallBack ()
-		{
-			MainViewController.getUser ();
-			SideMenuController.title.SetTitle (ColorExtensions.CurrentUser.username, UIControlState.Normal);
-			SideMenuController.location.SetTitle (ColorExtensions.CurrentUser.City + ", " + ColorExtensions.CurrentUser.State + " " + ColorExtensions.CurrentUser.Country, UIControlState.Normal);
 
-		}
 		public void Register (string email, string userName, string password, Action successCallback, Action<LoginScreenFaultDetails> failCallback)
 		{
 			

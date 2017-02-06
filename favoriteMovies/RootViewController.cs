@@ -87,7 +87,7 @@ namespace FavoriteMovies
 
 
 			var tab2 = new NewsFeedViewController ();
-			tab2.Title = "Now";
+			tab2.Title = "News";
 			tab2.View.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 			tab2.TabBarItem.SetFinishedImages (UIImage.FromBundle ("ic_whatshot.png"), UIImage.FromBundle ("ic_whatshot.png"));
 			var uinc2 = new UINavigationController (tab2);
@@ -100,9 +100,9 @@ namespace FavoriteMovies
 			Console.WriteLine (uinc2.ViewControllers.Length);
 
 			var tab3 = new UIViewController ();
-			tab3.Title = "Memes";
+			tab3.Title = "Notifications";
 			tab3.View.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
-			tab3.TabBarItem.SetFinishedImages (UIImage.FromBundle ("ic_photo.png"), UIImage.FromBundle ("ic_photo.png"));
+			tab3.TabBarItem.SetFinishedImages (UIImage.FromBundle ("ic_notifications.png"), UIImage.FromBundle ("ic_notifications.png"));
 
 
 			var uinc3 = new UINavigationController (tab3);

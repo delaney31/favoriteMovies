@@ -630,6 +630,7 @@ namespace FavoriteMovies
 							var item = new CustomList ();
 							item.id = list.id;
 							item.name = list.name;
+							item.cloudId = list.cloudId;
 							result.Add (item);
 						}
 						//get cloud lists

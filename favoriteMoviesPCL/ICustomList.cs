@@ -6,5 +6,6 @@
 		string name { get; set; }
 		int order { get; set; }
 		bool shared { get; set; }
+		string cloudId { get; set; }
 	}
 }

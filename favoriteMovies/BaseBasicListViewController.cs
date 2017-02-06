@@ -4,11 +4,11 @@ using UIKit;
 
 namespace FavoriteMovies
 {
-	public class BaseBasicListViewController: UIViewController
+	public class BaseBasicListViewController: MovieFriendsBaseViewController
 	{
-		public UITableView tableView;
+		//public UITableView tableView;
 		protected LoadingOverlay loadPop;
-		protected UITableViewSource tableSource;
+
 		public SidebarNavigation.SidebarController SidebarController {
 			get {
 				//return (UIApplication.SharedApplication.Delegate as AppDelegate).NavController.SidebarController;
@@ -33,10 +33,10 @@ namespace FavoriteMovies
 		{
 			base.ViewDidLoad ();
 
-			tableView = new UITableView (View.Bounds);
-			tableView.AutoresizingMask = UIViewAutoresizing.FlexibleBottomMargin;
-			tableView.AllowsSelectionDuringEditing = true;
-			tableView.Frame = View.Bounds;
+			//tableView = new UITableView (View.Bounds);
+			//tableView.AutoresizingMask = UIViewAutoresizing.FlexibleBottomMargin;
+			//tableView.AllowsSelectionDuringEditing = true;
+			//tableView.Frame = View.Bounds;
 
 
 		}

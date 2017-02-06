@@ -270,6 +270,7 @@
     <Compile Include="MovieFriendsViewController.cs" />
     <Compile Include="ConnectViewController.cs" />
     <Compile Include="UserProfileViewController.cs" />
+    <Compile Include="clTable.cs" />
   </ItemGroup>
   <ItemGroup>
     <BundleResource Include="Resources\placeholder.png" />
@@ -334,6 +335,7 @@
     <BundleResource Include="Resources\location-100.png" />
     <BundleResource Include="Resources\velvetropes.png" />
     <BundleResource Include="Resources\Divider_large_red_large.png" />
+    <BundleResource Include="Resources\ic_notifications.png" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\favoriteMoviesPCL\favoriteMoviesPCL.csproj">

@@ -35,7 +35,8 @@ namespace FavoriteMoviesPCL
 		public bool deleted { get; set;}
 		//public Version version { get; set;}
 		public DateTime createdAt { get; set;}
-		public DateTime updatedAt { get; set;}
+		public DateTime updatedAt { get; set; }
+		public string cloudId { get; set; }
 
 	}
 	public class MoviePOCO
@@ -58,6 +59,13 @@ namespace FavoriteMoviesPCL
 		public bool deleted { get; set;}
 		public int userid { get; set;}
 		public string cloudId { get; set; }
+	}
+	public class NotificationsCloud
+	{
+		public string Id { get; set; }
+		public string notification { get; set; }
+		public string userid { get; set; }
+
 	}
 
 	public class CustomListCloud

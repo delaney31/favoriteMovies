@@ -25,17 +25,19 @@ namespace FavoriteMovies
 		{
 			
 			base.ViewDidLoad ();
-
+			BTProgressHUD.Show ();
 			tableItems = await GetUserContactsAsync ();
 
-			tableSource = new ConnectCloudTableSource (tableItems, this, users, tableView);
+			tableSource = new ConnectCloudTableSource (tableItems, this);
 
-			tableView.Source = tableSource;
+			table.Source = tableSource;
 			await ((ConnectCloudTableSource)tableSource).updateImages ();
-			tableView.ContentInset = new UIEdgeInsets (0, 0, 64, 0);
-			View.Add (tableView);
+			//tableView.EstimatedRowHeight = 100;
+			table.RowHeight = 55;
+			table.ContentInset = new UIEdgeInsets (0, 0, 64, 0);
+			View.Add (table);
 			NavigationController.NavigationBar.Translucent = false;
-
+			BTProgressHUD.Dismiss ();
 		}
 		public override void ViewDidAppear (bool animated)
 		{
@@ -44,17 +46,17 @@ namespace FavoriteMovies
 		
 		
 		}
-		public override async void ViewWillAppear (bool animated)
+		public override void ViewWillAppear (bool animated)
 		{
 			base.ViewWillAppear (animated);
 			if (tableItems == null) // this means async viewdidload  not finished yet
 				BTProgressHUD.Show ();
 			
-			if (tableSource != null) 
-			{
-				await ((ConnectCloudTableSource)tableSource).updateCommonMovies ();
+			//if (tableSource != null) 
+			//{
+			//	await ((ConnectCloudTableSource)tableSource).updateCommonMovies ();
 
-			}
+			//}
 
 		}
 
@@ -66,7 +68,7 @@ namespace FavoriteMovies
 			const string cellId = "UserContacts";
 			List<ContactCard> results = new List<ContactCard> ();
 
-			tableView.TableHeaderView = new UIView () {
+			table.TableHeaderView = new UIView () {
 				Frame = new CGRect () { X = 0.0f, Y = 0.0f, Width = View.Layer.Frame.Width, Height = 20f }
 			};
 			users = await postService.GetUserCloud ();
@@ -79,6 +81,7 @@ namespace FavoriteMovies
 					result.connection = user.connection;
 					result.id = user.Id;
 					result.moviesInCommon = await postService.MoviesInCommon (ColorExtensions.CurrentUser, user);
+					result.location = user.City + " " + user.State + " " + user.Country;
 					results.Add (result);
 					Console.WriteLine (user.Id	);
 				}
@@ -87,7 +90,7 @@ namespace FavoriteMovies
 			watch.Stop ();
 			Console.WriteLine("GetUserContactsAsync Method took " + watch.ElapsedMilliseconds/ 1000.0 + " seconds") ;
 
-			BTProgressHUD.Dismiss ();
+
 			return results.OrderByDescending (x => x.moviesInCommon).ToList ();
 
 		}
@@ -97,20 +100,12 @@ namespace FavoriteMovies
 	{
 		List<ContactCard> listItems;
 		ConnectViewController controller;
-		AzureTablesService postService = AzureTablesService.DefaultService;
-		List<UserCloud> users;
-		UITableView tableView;
 
-		public ConnectCloudTableSource (List<ContactCard> items, ConnectViewController cont, List<UserCloud> users)
+		public ConnectCloudTableSource (List<ContactCard> items, ConnectViewController cont)
 		{
 			this.listItems = items;
 			this.controller = cont;
-			this.users = users;
-		}
 
-		public ConnectCloudTableSource (List<ContactCard> items, ConnectViewController cont, List<UserCloud> users, UITableView tableView) : this (items, cont, users)
-		{
-			this.tableView = tableView;
 		}
 
 		public async Task updateImages ()
@@ -123,18 +118,18 @@ namespace FavoriteMovies
 			}
 
 		}
-		public async Task  updateCommonMovies ()
-		{
-			int cnt = 0;
-			foreach (var user in listItems) 
-			{
-				user.moviesInCommon = await postService.MoviesInCommon (ColorExtensions.CurrentUser, users[cnt]);
-				cnt++;
-			}
-			listItems.OrderByDescending (x => x.moviesInCommon).ToList ();
+		//public async Task  updateCommonMovies ()
+		//{
+		//	int cnt = 0;
+		//	foreach (var user in listItems) 
+		//	{
+		//		user.moviesInCommon = await postService.MoviesInCommon (ColorExtensions.CurrentUser, users[cnt]);
+		//		cnt++;
+		//	}
+		//	listItems.OrderByDescending (x => x.moviesInCommon).ToList ();
 
 
-		}
+		//}
 
 		public override UITableViewCell GetCell (UITableView tableView, NSIndexPath indexPath)
 		{
@@ -162,15 +157,8 @@ namespace FavoriteMovies
 						if (inserted) 
 						{
 							listItems [indexPath.Row].connection = true;
-							controller.tableView.ReloadData ();
+							controller.table.ReloadData ();
 							BTProgressHUD.ShowToast ("Following " + cell.nameLabel.Text, false);
-							//Toast.MakeText (cell.nameLabel.Text + " is now your Movie Friend.")
-							//.SetUseShadow (true)
-							//.SetGravity (ToastGravity.Bottom)
-							//.SetCornerRadius (10)
-							//.SetDuration (1000)
-							//.Show (ToastType.Info);
-
 						}
 					});
 				});
@@ -197,20 +185,21 @@ namespace FavoriteMovies
 							{
 								MainViewController.NewCustomListToRefresh = 1;
 								listItems [indexPath.Row].connection = false;
-								controller.tableView.ReloadData ();
+								controller.table.ReloadData ();
 								BTProgressHUD.ShowToast ("UnFollowing " + cell.nameLabel.Text ,false);
-								// Toast.MakeText (cell.nameLabel.Text + " is no longer your Movie Friend.")
-								//.SetUseShadow (true)
-								//.SetGravity (ToastGravity.Bottom)
-								//.SetCornerRadius (10)
-								//.SetDuration (1000)
-								//.Show (ToastType.Info);
-
 							}
 						}
 					});
 				});
+
 				cell.AddGestureRecognizer (tapGesture);
+			}
+			if (cell.moviesInCommon == 0)
+				cell.descriptionLabel.Text = listItems [indexPath.Row].location;
+			else 
+			{
+				cell.descriptionLabel.Text = "You have " + cell.moviesInCommon + " movie" + (cell.moviesInCommon==0||cell.moviesInCommon > 1 ?"s":"") + " in common";;
+				cell.locationLabel.Text= listItems [indexPath.Row].location;
 			}
 
 			return cell;
@@ -218,6 +207,7 @@ namespace FavoriteMovies
 
 		public override nint RowsInSection (UITableView tableview, nint section)
 		{
+			
 			return listItems.Count;
 		}
 	}

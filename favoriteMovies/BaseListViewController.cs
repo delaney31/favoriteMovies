@@ -105,7 +105,7 @@ namespace FavoriteMovies
 
 		}
 
-		public void UpdateCustomAndMovieList (int? Id, bool upDateMovieDetail, List<ICustomList> tableItems)
+		public void UpdateCustomAndMovieList (int? Id, bool upDateMovieDetail, List<ICustomList> tableItems, string cloudid=null)
 		{
 			BTProgressHUD.Show ();
 			Task.Run (async () => {
@@ -125,18 +125,29 @@ namespace FavoriteMovies
 							}
 						}
 						DeleteAll ();
+						//await postService.DeleteCustomList (ColorExtensions.CurrentUser.Id);
 						//await postService.DeleteAll (ColorExtensions.CurrentUser.Id);
-						for (var list = 0; list < tableItems.Count; list++) {
-							if (tableItems [list].name != "add new") {
+						if (Id == null) //creating a new list
+						{
+							var lis = tableItems.Where (x => x.cloudId == cloudid);
+							custlistCloud = new CustomListCloud ();
+							custlistCloud.Name = lis.FirstOrDefault ().name;
+							custlistCloud.order = lis.FirstOrDefault ().order;
+							custlistCloud.shared = lis.FirstOrDefault ().shared;
+							custlistCloud.UserId = ColorExtensions.CurrentUser.Id;
+							await postService.InsertCustomListAsync (custlistCloud);
+						}
+						for (var list = 0; list < tableItems.Count; list++) 
+						{
+							if (tableItems [list].name != "add new") 
+							{
 								var item = tableItems [list] as CustomList;
+								if (custlistCloud.Id != null)
+									item.cloudId = custlistCloud.Id;
+								
 								if (item != null) {
-									db.InsertOrReplace (tableItems [list], typeof (CustomList));
-									custlistCloud = new CustomListCloud ();
-									custlistCloud.Name = tableItems [list].name;
-									custlistCloud.order = tableItems [list].order;
-									custlistCloud.shared = tableItems [list].shared;
-									custlistCloud.UserId = ColorExtensions.CurrentUser.Id;
-									await postService.InsertCustomListAsync (custlistCloud);
+									db.InsertOrReplace (item, typeof (CustomList));
+
 								} else {
 									db.Insert (tableItems [list], typeof (Movie));
 								}
@@ -175,9 +186,9 @@ namespace FavoriteMovies
 								movieCloud.Video = movieDetail.Video;
 								movieCloud.VoteAverage = movieDetail.VoteAverage.ToString ();
 								movieCloud.VoteCount = movieDetail.VoteCount.ToString ();
+								movieCloud.CustomListID = custlistCloud.Id ?? cloudid;
 
-
-								await postService.InsertMovieAsync (movieCloud, custlistCloud.Id);
+								await postService.InsertMovieAsync (movieCloud);
 							}
 						}
 					}
@@ -185,7 +196,8 @@ namespace FavoriteMovies
 				} catch (SQLiteException e) {
 					Debug.WriteLine (e.Message);
 
-					using (var conn = new SQLite.SQLiteConnection (MovieService.Database)) {
+					using (var conn = new SQLite.SQLiteConnection (MovieService.Database)) 
+					{
 						conn.CreateTable<Movie> (CreateFlags.ImplicitPK | CreateFlags.AutoIncPK);
 						conn.CreateTable<CustomList> (CreateFlags.ImplicitPK | CreateFlags.AutoIncPK);
 					}
@@ -250,8 +262,8 @@ namespace FavoriteMovies
 								movieCloud.Video = movieDetail.Video;
 								movieCloud.VoteAverage = movieDetail.VoteAverage.ToString ();
 								movieCloud.VoteCount = movieDetail.VoteCount.ToString ();
-
-								await postService.InsertMovieAsync (movieCloud, custlistCloud.Id);
+								movieCloud.CustomListID = custlistCloud.Id;
+								await postService.InsertMovieAsync (movieCloud);
 							}
 						}
 
@@ -390,6 +402,7 @@ namespace FavoriteMovies
 						item.name = list.name;
 						item.order = list.order;
 						item.shared = list.shared;
+						item.cloudId = list.cloudId;
 						result.Add (item);
 					}
 				}
@@ -413,6 +426,7 @@ namespace FavoriteMovies
 						item.name = list.name;
 						item.order = list.order;
 						item.shared = list.shared;
+						item.cloudId = list.cloudId;
 						result.Add (item);
 
 					}
@@ -535,7 +549,7 @@ namespace FavoriteMovies
 				if (tableView.NumberOfRowsInSection (0) > 0) {
 					var item = tableItems [(int)tableView.NumberOfRowsInSection (0) - 1] as CustomList;
 					if (item is CustomList) {
-						Owner.UpdateCustomAndMovieList (((CustomList)tableItems [(int)tableView.NumberOfRowsInSection (0) - 1]).id, false, tableItems);
+						Owner.UpdateCustomAndMovieList (((CustomList)tableItems [(int)tableView.NumberOfRowsInSection (0) - 1]).id, false, tableItems, ((CustomList)tableItems [(int)tableView.NumberOfRowsInSection (0) - 1]).cloudId);
 					} else {
 						Owner.UpdateCustomAndMovieList (((Movie)tableItems [(int)tableView.NumberOfRowsInSection (0) - 1]).CustomListID, true, tableItems);
 					}
@@ -658,7 +672,7 @@ namespace FavoriteMovies
 									ArrangeCustomList (true);
 									var item = tableItems [(int)indexPath.Row] as CustomList;
 									if (item is CustomList) {
-										Owner.UpdateCustomAndMovieList (((CustomList)tableItems [(int)tableView.NumberOfRowsInSection (0) - 1]).id, false, tableItems);
+										Owner.UpdateCustomAndMovieList (((CustomList)tableItems [(int)tableView.NumberOfRowsInSection (0) - 1]).id, false, tableItems,((CustomList)tableItems [(int)tableView.NumberOfRowsInSection (0) - 1]).cloudId);
 									} else {
 										Owner.UpdateCustomAndMovieList (((Movie)tableItems [(int)tableView.NumberOfRowsInSection (0) - 1]).id, true, tableItems);
 									}
@@ -681,7 +695,7 @@ namespace FavoriteMovies
 					//Debug.Write (tableItems [(int)tableView.NumberOfRowsInSection (0) - 1].GetType());
 					var item = tableItems [(int)indexPath.Row] as CustomList;
 					if (item is CustomList) {
-						Owner.UpdateCustomAndMovieList (((CustomList)tableItems [indexPath.Row]).id, false, tableItems);
+						Owner.UpdateCustomAndMovieList (((CustomList)tableItems [indexPath.Row]).id, false, tableItems,((CustomList)tableItems [(int)tableView.NumberOfRowsInSection (0) - 1]).cloudId);
 					} else {
 						//Owner.UpdateCustomAndMovieList (((Movie)tableItems [(int)indexPath.Row]).Id, Owner.fromAddList, tableItems);
 						Owner.NavigationController.PushViewController (new MovieDetailViewController (tableItems [indexPath.Row] as Movie, true), true);
@@ -764,7 +778,7 @@ namespace FavoriteMovies
 							custCloud.shared = false;
 						}
 						await postService.UpdatedShared (custCloud);
-						Owner.UpdateCustomAndMovieList (((CustomList)tableItems [indexPath.Row]).id, false, tableItems);
+						Owner.UpdateCustomAndMovieList (((CustomList)tableItems [indexPath.Row]).id, false, tableItems,((CustomList)tableItems [(int)tableView.NumberOfRowsInSection (0) - 1]).cloudId);
 
 					}, UIControlEvent.ValueChanged);
 				}

@@ -39,12 +39,15 @@ namespace MovieFriends
 		private IMobileServiceSyncTable<UserFriendsCloud> ufTable;
 		private IMobileServiceSyncTable<CustomListCloud> clTable;
 		private IMobileServiceSyncTable<MovieCloud> mfTable;
+		private IMobileServiceTable<NotificationsCloud> nfTable;
+
 #else
 		private IMobileServiceTable<PostItem> postTable;
 		private IMobileServiceTable<UserCloud> userTable;
 		private IMobileServiceTable<UserFriendsCloud> ufTable;
 		private IMobileServiceTable<CustomListCloud> clTable;
 		private IMobileServiceTable<MovieCloud> mfTable;
+		private IMobileServiceTable<NotificationsCloud> nfTable;
 
 
 #endif
@@ -62,12 +65,14 @@ namespace MovieFriends
 			ufTable = client.GetSyncTable<UserFriendsCloud>();
 			clTable = client.GetSyncTable<CustomListCloud>();
 			mfTable = client.GetSyncTable<MovieCloud>();
+			nfTable = client.GetSyncTable<NotificationsCloud>();
 #else
 			postTable = client.GetTable<PostItem> ();
 			userTable = client.GetTable<UserCloud> ();
 			ufTable = client.GetTable<UserFriendsCloud> ();
 			mfTable = client.GetTable<MovieCloud> ();
 			clTable = client.GetTable<CustomListCloud> ();
+			nfTable = client.GetTable<NotificationsCloud> ();
 #endif
 		}
 
@@ -142,6 +147,7 @@ namespace MovieFriends
 			}
 #endif
 		}
+
 		public async Task MovieSyncAsync (bool pullData = false)
 		{
 #if OFFLINE_SYNC_ENABLED
@@ -305,6 +311,11 @@ namespace MovieFriends
 			try {
 
 				await ufTable.InsertAsync (user);
+				var notification = new NotificationsCloud ();
+				notification.notification = ColorExtensions.CurrentUser.username + " is now following : " + user.friendusername;
+				notification.userid = ColorExtensions.CurrentUser.Id;
+				await nfTable.InsertAsync (notification);
+
 				return true;
 
 #if OFFLINE_SYNC_ENABLED
@@ -331,21 +342,21 @@ namespace MovieFriends
 				var user2Movies =
 					from movies in await mfTable.ToListAsync ()
 					join customlist in await clTable.ToListAsync () on movies.CustomListID equals customlist.Id
-					//where customlist.UserId == user2.Id
-					select new { movies.HighResPosterPath, movies.CustomListID,customlist.UserId };
+					where customlist.UserId == user2.Id
+					select new { movies.name};
 
 				var userMovies =
 					from movies in await mfTable.ToListAsync ()
 					join customlist in await clTable.ToListAsync () on movies.CustomListID equals customlist.Id
 					where customlist.UserId==user1.Id           
-					select new {movies.HighResPosterPath};
+					select new {movies.name};
 				
 				var common = from list1 in userMovies
 							 join list2 in user2Movies
-								  on list1.HighResPosterPath equals list2.HighResPosterPath
+					on list1.name equals list2.name
 							 select new 
 							 {
-								 list1.HighResPosterPath
+								 list1.name
 							 };
 				inCommon = common.Distinct().Count ();
 
@@ -356,14 +367,43 @@ namespace MovieFriends
 			}
 			return inCommon;
 		}
+
+		internal  async Task DeleteCustomList (CustomListCloud customList)
+		{
+			try 
+			{
+				await clTable.DeleteAsync (customList);
+				var notification = new NotificationsCloud ();
+				notification.notification = ColorExtensions.CurrentUser.username + " deleted Custom List: " + customList.Name;
+				notification.userid = ColorExtensions.CurrentUser.Id;
+				await nfTable.InsertAsync (notification);
+				
+			} catch (Exception ex) 
+			{
+				Console.WriteLine (@"ERROR{0}", ex.Message);
+			}
+
+		}
+
 		public async Task DeleteAll (string userid)
 		{
 			try {
 				var customList = await clTable.Where (item => item.UserId == userid).ToListAsync ();
 
-				foreach (var cl in customList) {
-					await clTable.DeleteAsync (cl);
+				foreach (var cl in customList) 
+				{
+					//never delete list only movies
+					//await clTable.DeleteAsync (cl);
+					var movies = await mfTable.Where (Movie => Movie.CustomListID == cl.Id).ToListAsync();
+					foreach (var movie in movies) 
+					{
+						await mfTable.DeleteAsync (movie);
+					}
+						
+
 				}
+
+
 			} catch (Exception e) {
 				Console.Error.WriteLine (@"ERROR {0}", e.Message);
 			}
@@ -371,22 +411,25 @@ namespace MovieFriends
 		public async Task UpdatedShared (CustomListCloud list)
 		{
 			try {
-				await clTable.DeleteAsync (list);
+				//await clTable.DeleteAsync (list);
 				await clTable.UpdateAsync (list);
+				var notification = new NotificationsCloud ();
+				if (list.shared)
+				   notification.notification = ColorExtensions.CurrentUser.username + " shared Custom List: " + list.Name;
+				notification.userid = ColorExtensions.CurrentUser.Id;
+				await nfTable.InsertAsync (notification);
 			} catch (Exception e) {
 				Console.Error.WriteLine (@"ERROR {0}", e.Message);
 			}
 		}
-		public async Task<bool> InsertMovieAsync (MovieCloud movie, string id)
+		public async Task<bool> InsertMovieAsync (MovieCloud movie)
 		{
 			bool retValue = false;
 			try {
 				
-				//var customList = await clTable.Where (item => item.Name.ToLower () == list.Name.ToLower ()).Where (item => item.UserId == list.UserId).ToListAsync ();
-				//if (customList.Count > 0) {
-					movie.CustomListID = id;
-					await mfTable.InsertAsync (movie);
-					retValue = true;
+				await mfTable.InsertAsync (movie);
+
+			retValue = true;
 
 
 #if OFFLINE_SYNC_ENABLED
@@ -420,9 +463,16 @@ namespace MovieFriends
 		public async Task<bool> InsertCustomListAsync (CustomListCloud list)
 		{
 			try {
-
-				await clTable.InsertAsync (list);
-
+				var exists = await clTable.Where (i => i.Name == list.Name && i.UserId == ColorExtensions.CurrentUser.Id).ToListAsync();
+				if (exists.Count() ==0)
+				   await clTable.InsertAsync (list);
+				if (list.shared) 
+				{
+					var notification = new NotificationsCloud ();
+					notification.notification = ColorExtensions.CurrentUser.username + " shared Custom List: " + list.Name;
+					notification.userid = ColorExtensions.CurrentUser.Id;
+					await nfTable.InsertAsync (notification);
+				}
 
 
 #if OFFLINE_SYNC_ENABLED
@@ -589,6 +639,12 @@ namespace MovieFriends
 					return false;
 				item.id = user.First ().id;
 				await ufTable.DeleteAsync (item);
+
+				var notification = new NotificationsCloud ();
+				notification.notification = ColorExtensions.CurrentUser.username + " is no longer following : " + item.friendusername;
+				notification.userid = ColorExtensions.CurrentUser.Id;
+				await nfTable.InsertAsync (notification);
+
 				return true;
 #if OFFLINE_SYNC_ENABLED
 				await UserFriendsSyncAsync (); // Send changes to the mobile app backend.

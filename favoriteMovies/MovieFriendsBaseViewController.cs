@@ -13,7 +13,7 @@ namespace FavoriteMovies
 {
 	public class MovieFriendsBaseViewController:UIViewController
 	{
-		protected UITableView table;
+		public UITableView table;
 		protected List<UserFriendsCloud> friendsList;
 		protected UITableViewSource tableSource;
 		static FriendSearchResultsViewController searchResultsController;
@@ -31,7 +31,7 @@ namespace FavoriteMovies
 
 			table.AllowsSelectionDuringEditing = true;
 			NavigationItem.Title = movieFriends;
-			Add (table);
+			//Add (table);
 
 			// Creates an instance of a custom View Controller that holds the results
 			searchResultsController = new FriendSearchResultsViewController ();

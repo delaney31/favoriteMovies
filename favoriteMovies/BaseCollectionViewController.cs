@@ -100,12 +100,12 @@ namespace FavoriteMovies
 						BaseListViewController.DeleteCustomList (customListId);
 
 					}
-					;
-					if (isCustomList) 
-					{
+
+					//if (isCustomList) 
+					//{
 						MainViewController.NewCustomListToRefresh = 1;
 						viewController.ViewWillAppear (true);
-					}
+					//}
 					BTProgressHUD.Dismiss ();
 				}
 			} catch (Exception ex) 
@@ -249,7 +249,7 @@ namespace FavoriteMovies
 			{
 				
 				Debug.WriteLine (e.Message);
-				throw;
+				//throw;
 			}
 			return cell;
 		}
