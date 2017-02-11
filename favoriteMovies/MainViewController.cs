@@ -43,11 +43,11 @@ namespace FavoriteMovies
 		static CGRect PopularLabelFrame = new CGRect (7, 595, 180, 20);
 		static CGRect MovieLatestLabelFrame = new CGRect (7, 790, 180, 20);
 		static int SpaceBetweenLabelsAndFrames = 245;
-		static CGRect FavoriteControllerFrame = new CGRect (-45, 30, 385, 205);
-		static CGRect TopRatedControllerFrame = new CGRect (-45, 225, 385, 205);
-		static CGRect NowPlayingControllerFrame = new CGRect (-45, 420, 385, 205);
-		static CGRect PopularControllerFrame = new CGRect (-45, 615, 385, 205);
-		static CGRect MovieLatestControllerFrame = new CGRect (-45, 810, 385, 205);
+		static CGRect FavoriteControllerFrame = new CGRect (-45, 30, 375, 205);
+		static CGRect TopRatedControllerFrame = new CGRect (-45, 225, 375, 205);
+		static CGRect NowPlayingControllerFrame = new CGRect (-45, 420, 375, 205);
+		static CGRect PopularControllerFrame = new CGRect (-45, 615, 375, 205);
+		static CGRect MovieLatestControllerFrame = new CGRect (-45, 810, 375, 205);
 		static string TopRated = "Top Rated";
 		static string NowPlaying = "Now Playing";
 		static string Popular = "Popular";
@@ -115,25 +115,6 @@ namespace FavoriteMovies
 			return UIInterfaceOrientationMask.Portrait;
 		}
 
-		//void ScrollView_WillEndDragging (object sender, WillEndDraggingEventArgs e)
-		//{
-		//	var targetPoint = e.TargetContentOffset;
-		//	var currentPoint = ((UIScrollView)sender).ContentOffset;
-
-
-		//	if (targetPoint.Y > currentPoint.Y) {
-		//		NewsFeedTableSource.HideTabBar (TabController);
-		//		NavController.SetNavigationBarHidden (true, true);
-		//		var statusView = new UIView () { Frame = UIApplication.SharedApplication.StatusBarFrame };
-		//		statusView.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f);
-		//		View.Add (statusView);
-		//	} else {
-		//		NewsFeedTableSource.ShowTabBar (TabController);
-		//		NavController.SetNavigationBarHidden (false, true);
-		//		UIApplication.SharedApplication.SetStatusBarHidden (false, true);
-		//	}
-
-		//}
 
 		public  override void  ViewDidAppear (bool animated)
 		{
@@ -213,7 +194,7 @@ namespace FavoriteMovies
 			return returnValue;
 		}
 
-		public async override void ViewWillAppear (bool animated)
+		public override void ViewWillAppear (bool animated)
 		{
 			base.ViewWillAppear (animated);
 
@@ -410,6 +391,7 @@ namespace FavoriteMovies
 								item.UserReview = movie.UserReview;
 								item.UserRating = movie.UserRating;
 								item.OriginalId = movie.OriginalId;
+								item.cloudId = movie.cloudId;
 								item.order = movie.order;
 								returnList.Add (item);
 							}
@@ -530,8 +512,10 @@ namespace FavoriteMovies
 			MovieLatestController.CollectionView.RegisterClassForCell (typeof (MovieCell), MovieLatestViewController.movieCellId);
 
 
-			if (NewCustomListToRefresh == 1 || NewCustomListToRefresh == -1) {
-				for (var cnt = 0; cnt < customLists.Count; cnt++) {
+			if (NewCustomListToRefresh == 1 || NewCustomListToRefresh == -1) 
+			{
+				for (var cnt = 0; cnt < customLists.Count; cnt++) 
+				{
 					 UpdateCustomListMovies (cnt);
 				}
 
@@ -608,6 +592,13 @@ namespace FavoriteMovies
 
 			//Set the search bar in the navigation bar
 			TabController.NavigationItem.TitleView = searchController.SearchBar;
+			NavigationItem.SetRightBarButtonItem (
+					new UIBarButtonItem (UIImage.FromBundle ("threelines")
+						, UIBarButtonItemStyle.Plain
+						, (sender, args) => {
+							SidebarController.ToggleMenu ();
+
+						}), true);
 
 		}
 
@@ -685,12 +676,16 @@ namespace FavoriteMovies
 		{
 		try 
 			{
-				if (element.HighResPosterPath != null) 
-				{
+				if (element.HighResPosterPath != null) {
 					var uri = new Uri (element.HighResPosterPath);
 					var imgUrl = new NSUrl (baseUrl + uri.AbsoluteUri.Substring (8));
-					ImageView.SetImage (imgUrl,UIImage.FromBundle ("blank.png"));	
+					ImageView.SetImage (imgUrl, UIImage.FromBundle ("blank.png"));
 
+				} else 
+				{
+					var uri = new Uri (element.PosterPath);
+					var imgUrl = new NSUrl (baseUrl + uri.AbsoluteUri.Substring (8));
+					ImageView.SetImage (imgUrl, UIImage.FromBundle ("blank.png"));
 				}
 				if (ColorExtensions.MovieIsFavorite (element.id.ToString ())) 
 				{

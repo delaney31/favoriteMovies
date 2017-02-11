@@ -11,6 +11,7 @@ using BigTed;
 using CoreGraphics;
 using FavoriteMoviesPCL;
 using Foundation;
+using MovieFriends;
 using SDWebImage;
 using UIKit;
 
@@ -60,6 +61,8 @@ namespace FavoriteMovies
 		bool canReview;
 		string youtubeMovieId = "";
 		UIColor backGroundColor;
+		string text;
+
 		public MovieDetailViewController (Movie movie, bool canReview)
 		{
 			movieDetail = movie;
@@ -77,6 +80,11 @@ namespace FavoriteMovies
 
 			IMDB.Image = UIImage.FromBundle ("imdb.png");
 
+		}
+
+		public MovieDetailViewController (Movie movie, bool canReview, string text) : this (movie, canReview)
+		{
+			this.text = text;
 		}
 
 		void Initialize ()
@@ -317,7 +325,7 @@ namespace FavoriteMovies
 
 		string GetUserName ()
 		{
-			return ColorExtensions.CurrentUser.username;
+			return this.text.Length > 0?this.text:ColorExtensions.CurrentUser.username;
 		}
 		public static bool IsDarkColor (UIColor newColor)
 		{
@@ -359,7 +367,7 @@ namespace FavoriteMovies
 				similarMoviesController.CollectionView.BackgroundColor = backGroundColor;
 				similarMoviesController.CollectionView.RegisterClassForCell (typeof (MovieCell), SimilarCollectionViewController.movieCellId);
 				//similar movies
-				similarMoviesLabel.Frame = new CGRect (16, descReview.Frame.Y + descReview.Frame.Height + userName.Frame.Height, 180, 20);
+				//similarMoviesLabel.Frame = new CGRect (16, descReview.Frame.Y + descReview.Frame.Height + userName.Frame.Height, 180, 20);
 				similarMoviesController.CollectionView.Frame = new CGRect (-35, descReview.Frame.Y + descReview.Frame.Height + userName.Frame.Height + 20, 345, 150);
 				lastViewPostion = similarMoviesController.CollectionView.Frame.Y + similarMoviesController.CollectionView.Frame.Height;
 				castHeader = new UILabel ();
@@ -419,7 +427,7 @@ namespace FavoriteMovies
 			//scrollView.SizeToFit ();
 
 			//For scrolling to work the scrollview Content size has to be bigger than the View.Frame.Height
-			scrollView.ContentSize = new CGSize (320, lastViewPostion);
+			scrollView.ContentSize = new CGSize (320, lastViewPostion + 20);
 			scrollView.ContentOffset = new CGPoint (0, -scrollView.ContentInset.Top);
 			scrollView.Bounces = true;
 
@@ -535,7 +543,7 @@ namespace FavoriteMovies
 
 
 		}
-		internal void updateMovie (Movie item)
+		internal async void updateMovie (Movie item)
 		{
 			try {
 				using (var db = new SQLite.SQLiteConnection (MovieService.Database)) {
@@ -545,6 +553,9 @@ namespace FavoriteMovies
 					db.InsertOrReplace (item, typeof (Movie));
 
 				}
+				AzureTablesService postService = AzureTablesService.DefaultService;
+				await postService.UpdateMovieCloud (item);
+				  
 
 			} catch (SQLite.SQLiteException s) {
 				Debug.Write (s.Message);
@@ -585,7 +596,7 @@ namespace FavoriteMovies
 			webView.LoadHtmlString (sb.ToString (), null);
 			viewController.View.Add (webView);
 			//this.View.AddSubview (webView);
-			NavController.PushViewController (viewController, true);
+			NavigationController.PushViewController (viewController, true);
 
 		}
 
@@ -688,7 +699,7 @@ namespace FavoriteMovies
 
 		}
 
-		void DeleteAllSubviews (UIScrollView view)
+		public static void DeleteAllSubviews (UIScrollView view)
 		{
 			foreach (UIView subview in view.Subviews) {
 				subview.RemoveFromSuperview ();

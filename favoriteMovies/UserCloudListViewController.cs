@@ -100,7 +100,8 @@ namespace FavoriteMovies
 
 		public override nint RowsInSection (UITableView tableview, nint section)
 		{
-			return  listItems.Count;
+			
+			return  listItems !=null ? listItems.Count: 0;
 		}
 	}
 }

@@ -323,7 +323,7 @@ namespace FavoriteMovies
 				return cell;
 			} catch (Exception e) {
 				Debug.WriteLine (e.Message);
-				throw;
+				//throw;
 
 			}
 			return cell;
@@ -334,13 +334,27 @@ namespace FavoriteMovies
 	{
 		ObservableCollection<Movie> _items { get; set; }
 		public static NSString movieCellId = new NSString ("SimilarMovieCell");
-		public SimilarCollectionViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies, MovieDetailViewController vc) : base (layout, movies, vc)
+		BaseController vc;
+		public SimilarCollectionViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies, BaseController vc) : base (layout, movies, vc)
 		{
 			_items = movies;
+			this.vc = vc;
 		}
 		public override nint GetItemsCount (UICollectionView collectionView, nint section)
 		{
 			return (_items!=null?_items.Count:0);
+		}
+		public override void ItemSelected (UICollectionView collectionView, NSIndexPath indexPath)
+		{
+			try {
+				var row = _items [indexPath.Row];
+				vc.NavigationController.PushViewController (new MovieDetailViewController (row, true), true);
+
+			} catch (Exception e) {
+
+				Debug.WriteLine (e.Message);
+				throw;
+			}
 		}
 		public override UICollectionViewCell GetCell (UICollectionView collectionView, NSIndexPath indexPath)
 		{
@@ -357,5 +371,53 @@ namespace FavoriteMovies
 			return cell;
 		}
 	}
+	public class UserCollectionViewController : BaseCollectionViewController
+	{
+		ObservableCollection<Movie> _items { get; set; }
+		public static NSString movieCellId = new NSString ("UserCollectionViewController");
+		BaseController vc;
+		string text;
 
+		public UserCollectionViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies, BaseController vc) : base (layout, movies, vc)
+		{
+			_items = movies;
+			this.vc = vc;
+		}
+
+		public UserCollectionViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies, BaseController vc, string text) : this (layout, movies, vc)
+		{
+			this.text = text;
+		}
+
+		public override nint GetItemsCount (UICollectionView collectionView, nint section)
+		{
+			return (_items != null ? _items.Count : 0);
+		}
+		public override void ItemSelected (UICollectionView collectionView, NSIndexPath indexPath)
+		{
+			try {
+				var row = _items [indexPath.Row];
+				vc.NavigationController.PushViewController (new MovieDetailViewController (row, true, this.text), true);
+
+			} catch (Exception e) {
+
+				Debug.WriteLine (e.Message);
+				throw;
+			}
+		}
+		public override UICollectionViewCell GetCell (UICollectionView collectionView, NSIndexPath indexPath)
+		{
+			var cell = (MovieCell)collectionView.DequeueReusableCell (movieCellId, indexPath);
+			try {
+
+				var row = _items [indexPath.Row];
+				cell.UpdateRow (row);
+				return cell;
+			} catch (Exception e) {
+				Debug.WriteLine (e.Message);
+
+			}
+			return cell;
+		}
+	}
 }

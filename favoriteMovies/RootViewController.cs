@@ -21,7 +21,7 @@ namespace FavoriteMovies
 		public SidebarController SidebarController { get; private set; }
 
 		//// the navigation controller
-		public NavController NavController { get; private set; }
+		public UINavigationController NavController { get; private set; }
 		//// the tab controller
 		public MovieTabBarController TabController { get; private set; }
 		//ObservableCollection<Movie> NowPlaying = new ObservableCollection<Movie>();
@@ -72,7 +72,7 @@ namespace FavoriteMovies
 		{
 			base.ViewDidLoad ();
 			//// create a slideout navigation controller with the top navigation controller and the menu view controller
-			NavController = new NavController ();
+			NavController = new UINavigationController ();
 			NavController.NavigationBar.BarTintColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f);
 			NavController.NavigationBar.TintColor = UIColor.White;
 			//NavController.NavigationBar.Translucent = true;
@@ -80,16 +80,27 @@ namespace FavoriteMovies
 				ForegroundColor = UIColor.White
 			};
 
-			//var mainView = new MainViewController (TopRated, NowPlaying, Popular, MovieLatest, Page);
+
+
+
 			var mainView = new MainViewController ();
 			mainView.Title = "Movies";
 			mainView.TabBarItem.SetFinishedImages(UIImage.FromBundle ("ic_movie.png"),UIImage.FromBundle ("ic_movie.png"));
 
 
+			var uinc1 = new UINavigationController (mainView);
+			uinc1.NavigationBar.BarTintColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f);
+			uinc1.NavigationBar.TintColor = UIColor.White;
+			//uinc2.NavigationBar.Translucent = true;
+			uinc1.NavigationBar.TitleTextAttributes = new UIStringAttributes () {
+				ForegroundColor = UIColor.White
+			};
+
 			var tab2 = new NewsFeedViewController ();
 			tab2.Title = "News";
 			tab2.View.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 			tab2.TabBarItem.SetFinishedImages (UIImage.FromBundle ("ic_whatshot.png"), UIImage.FromBundle ("ic_whatshot.png"));
+
 			var uinc2 = new UINavigationController (tab2);
 			uinc2.NavigationBar.BarTintColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f);
 			uinc2.NavigationBar.TintColor = UIColor.White;
@@ -144,7 +155,7 @@ namespace FavoriteMovies
 			};
 
 			var tabs = new UIViewController [] {
-				mainView,uinc4, uinc2,uinc3,uinc5};
+				uinc1,uinc4, uinc2,uinc3,uinc5};
 			TabController = new MovieTabBarController ();
 
 
@@ -158,11 +169,12 @@ namespace FavoriteMovies
 			try 
 			{
 				TabController.SetViewControllers (tabs, true);
-				TabController.SelectedViewController = mainView; 
+				TabController.SelectedViewController = uinc1; 
 			} catch (Exception ex) 
 			{
 				Debug.Write (ex.Message);
 			}
+
 			NavController.PushViewController (TabController, true);
 
 			SidebarController = new SidebarController (this, NavController, new SideMenuController ());

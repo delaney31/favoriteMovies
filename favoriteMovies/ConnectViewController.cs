@@ -13,7 +13,7 @@ using UIKit;
 
 namespace FavoriteMovies
 {
-	public class ConnectViewController:BaseBasicListViewController
+	public class ConnectViewController:MovieFriendsBaseViewController
 	{
 		List<ContactCard> tableItems;
 		//UIBarButtonItem following;
@@ -25,9 +25,9 @@ namespace FavoriteMovies
 		{
 			
 			base.ViewDidLoad ();
-			BTProgressHUD.Show ();
+			//BTProgressHUD.Show ();
 			tableItems = await GetUserContactsAsync ();
-
+			Title = "Connect";
 			tableSource = new ConnectCloudTableSource (tableItems, this);
 
 			table.Source = tableSource;
@@ -37,6 +37,8 @@ namespace FavoriteMovies
 			table.ContentInset = new UIEdgeInsets (0, 0, 64, 0);
 			View.Add (table);
 			NavigationController.NavigationBar.Translucent = false;
+
+
 			BTProgressHUD.Dismiss ();
 		}
 		public override void ViewDidAppear (bool animated)
@@ -51,13 +53,6 @@ namespace FavoriteMovies
 			base.ViewWillAppear (animated);
 			if (tableItems == null) // this means async viewdidload  not finished yet
 				BTProgressHUD.Show ();
-			
-			//if (tableSource != null) 
-			//{
-			//	await ((ConnectCloudTableSource)tableSource).updateCommonMovies ();
-
-			//}
-
 		}
 
 		async Task<List<ContactCard>> GetUserContactsAsync ()
@@ -118,31 +113,21 @@ namespace FavoriteMovies
 			}
 
 		}
-		//public async Task  updateCommonMovies ()
-		//{
-		//	int cnt = 0;
-		//	foreach (var user in listItems) 
-		//	{
-		//		user.moviesInCommon = await postService.MoviesInCommon (ColorExtensions.CurrentUser, users[cnt]);
-		//		cnt++;
-		//	}
-		//	listItems.OrderByDescending (x => x.moviesInCommon).ToList ();
 
-
-		//}
 
 		public override UITableViewCell GetCell (UITableView tableView, NSIndexPath indexPath)
 		{
 			
 			var cell = listItems [indexPath.Row];
 			if (cell.connection)
-				cell.addRemove.Image = UIImage.FromBundle ("unfollow.png");
+				cell.addRemove.Image = UIImage.FromBundle ("ic_remove_circle_outline.png");
 			else
 				cell.addRemove.Image = UIImage.FromBundle ("follow.png");
 			cell.id = listItems [indexPath.Row].id;
+			var tapGesture = new UITapGestureRecognizer ();
 			if (!cell.connection) 
 			{
-				var tapGesture = new UITapGestureRecognizer ();
+				
 				tapGesture.AddTarget (() =>
 				{
 					bool inserted= false;
@@ -153,7 +138,7 @@ namespace FavoriteMovies
 					InvokeOnMainThread (async () => 
 					{
 						inserted = await controller.postService.InsertUserFriendAsync (userfriend);
-						MainViewController.NewCustomListToRefresh = 1;
+
 						if (inserted) 
 						{
 							listItems [indexPath.Row].connection = true;
@@ -162,10 +147,10 @@ namespace FavoriteMovies
 						}
 					});
 				});
-				cell.AddGestureRecognizer (tapGesture);
+
 			} else 
 			{
-				var tapGesture = new UITapGestureRecognizer ();
+				
 				tapGesture.AddTarget(() =>
 				{
 					
@@ -183,7 +168,6 @@ namespace FavoriteMovies
 							deleted = await controller.postService.DeleteItemAsync (userfriend);
 							if (deleted) 
 							{
-								MainViewController.NewCustomListToRefresh = 1;
 								listItems [indexPath.Row].connection = false;
 								controller.table.ReloadData ();
 								BTProgressHUD.ShowToast ("UnFollowing " + cell.nameLabel.Text ,false);
@@ -192,8 +176,20 @@ namespace FavoriteMovies
 					});
 				});
 
-				cell.AddGestureRecognizer (tapGesture);
 			}
+
+			var userProfile = new UITapGestureRecognizer ();
+			var profile = new UserProfileViewController (listItems [indexPath.Row]);
+			userProfile.AddTarget (() => 
+			{
+				
+				controller.NavigationController.PushViewController (profile,true);
+
+			});
+			cell.addRemove.UserInteractionEnabled = true;
+			cell.addRemove.AddGestureRecognizer (tapGesture);
+			cell.profileImage.UserInteractionEnabled = true;
+			cell.profileImage.AddGestureRecognizer (userProfile);
 			if (cell.moviesInCommon == 0)
 				cell.descriptionLabel.Text = listItems [indexPath.Row].location;
 			else 

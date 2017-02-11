@@ -19,7 +19,7 @@ namespace FavoriteMovies
 		public static UIImage signUpImage;
 		UILabel loading;
 
-		public SideMenuController() : base(null, null)
+		public SideMenuController() : base()
 		{
 			//signUpImage = UIImage.FromBundle ("124817-matte-white-square-icon-business-signature1.png");
 			signUpImage = UIImage.FromBundle ("1481507483_compose.png");

@@ -7,28 +7,9 @@ namespace FavoriteMovies
 	public class BaseBasicListViewController: MovieFriendsBaseViewController
 	{
 		//public UITableView tableView;
-		protected LoadingOverlay loadPop;
 
-		public SidebarNavigation.SidebarController SidebarController {
-			get {
-				//return (UIApplication.SharedApplication.Delegate as AppDelegate).NavController.SidebarController;
-				return (UIApplication.SharedApplication.Delegate as AppDelegate).rootViewController.SidebarController;
-			}
-		}
 
-		//// provide access to the navigation controller to all inheriting controllers
-		public NavController NavController {
-			get {
-				//return (UIApplication.SharedApplication.Delegate as AppDelegate).NavController;
-				return (UIApplication.SharedApplication.Delegate as AppDelegate).rootViewController.NavController;
-			}
-		}
-		public MovieTabBarController TabController {
-			get {
-				//return (UIApplication.SharedApplication.Delegate as AppDelegate).NavController.SidebarController;
-				return (UIApplication.SharedApplication.Delegate as AppDelegate).rootViewController.TabController;
-			}
-		}
+
 		public override void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();

@@ -32,6 +32,7 @@ namespace MovieFriends
 		static AzureTablesService instance = new AzureTablesService ();
 		const string applicationURL = @"https://moviefriends.azurewebsites.net";
 		public MobileServiceClient client;
+
 #if OFFLINE_SYNC_ENABLED
 		static readonly string localDbPath = MovieService.Database;
 		private IMobileServiceSyncTable<PostItem> postTable;
@@ -99,6 +100,7 @@ namespace MovieFriends
 			await client.SyncContext.InitializeAsync (store);
 #endif
 		}
+
 
 		public async Task PostSyncAsync (bool pullData = false)
 		{
@@ -196,25 +198,25 @@ namespace MovieFriends
 				return new List<CustomListCloud> ();
 			}
 		}
-		public async Task<List<MovieCloud>> GetCustomListMovies (string customListId)
+		public async Task<List<Movie>> GetCustomListMovies (string customListId)
 		{
 			try {
 
 				var movieList =
 					from movies in await mfTable.Where (item => item.CustomListID == customListId).ToListAsync ()
-					select new MovieCloud { id = movies.id, name = movies.name,
-					BackdropPath = movies.BackdropPath, CustomListID = movies.CustomListID,
+					select new Movie {  name = movies.name,
+					BackdropPath = movies.BackdropPath,
 					Favorite = movies.Favorite, HighResPosterPath = movies.HighResPosterPath,
 					OriginalLanguage = movies.OriginalLanguage, Overview = movies.Overview,
-					Popularity = movies.Popularity, PosterPath = movies.PosterPath, ReleaseDate = movies.ReleaseDate,
-					VoteAverage = movies.VoteAverage, UserReview = movies.UserReview, UserRating = movies.UserRating,
-					OriginalId = movies.OriginalId, order= movies.order};
+					Popularity = movies.Popularity, PosterPath = movies.PosterPath, ReleaseDate = DateTime.Parse(movies.ReleaseDate),
+					VoteAverage = float.Parse(movies.VoteAverage), UserReview = movies.UserReview, UserRating = int.Parse( movies.UserRating),
+					OriginalId = int.Parse(movies.OriginalId), order= movies.order};
 				
-				return new List<MovieCloud> (movieList);
+				return new List<Movie> (movieList);
 
 			} catch (Exception e) {
 				Console.Error.WriteLine (@"ERROR {0}", e.Message);
-				return new List<MovieCloud> ();
+				return new List<Movie> ();
 			}
 		}
 		public async Task<List<CustomListCloud>> GetUserFriendsLists (string userid)
@@ -422,6 +424,42 @@ namespace MovieFriends
 				Console.Error.WriteLine (@"ERROR {0}", e.Message);
 			}
 		}
+
+		public async Task UpdateMovieCloud (Movie movie)
+		{
+			try {
+
+				var customListId = await mfTable.Where (item => item.id == movie.cloudId).ToListAsync ();
+
+				var movieCloud = new MovieCloud ();
+
+				movieCloud.CustomListID = customListId.FirstOrDefault ().CustomListID;
+				movieCloud.id = movie.cloudId;
+				movieCloud.Adult = movie.Adult;
+				movieCloud.BackdropPath = movie.BackdropPath;
+				movieCloud.Favorite = movie.Favorite;
+				movieCloud.name = movie.name;
+				movieCloud.order = movie.order;
+				movieCloud.OriginalId = movie.OriginalId.ToString();
+				movieCloud.OriginalLanguage = movie.OriginalLanguage;
+				movieCloud.OriginalTitle = movie.OriginalTitle;
+				movieCloud.Overview = movie.Overview;
+				movieCloud.Popularity = movie.Popularity;
+				movieCloud.PosterPath = movie.PosterPath;
+				movieCloud.ReleaseDate = movie.ReleaseDate.Value.ToString ("MM/dd/yyyy", CultureInfo.InvariantCulture);
+				movieCloud.shared = movie.shared;
+				movieCloud.UserRating = movie.UserRating.ToString();
+				movieCloud.UserReview = movie.UserReview;
+				movieCloud.Video = movie.Video;
+				movieCloud.VoteAverage = movie.VoteAverage.ToString();
+				movieCloud.VoteCount = movie.VoteCount.ToString();
+
+				await mfTable.UpdateAsync (movieCloud);
+
+			} catch (Exception e) {
+				Console.Error.WriteLine (@"ERROR {0}", e.Message);
+			}
+		}
 		public async Task<bool> InsertMovieAsync (MovieCloud movie)
 		{
 			bool retValue = false;
@@ -572,7 +610,7 @@ namespace MovieFriends
 					};
 
 
-				return userfriends.Take(50).ToList ();
+				return userfriends.Take(100).ToList ();
 
 
 

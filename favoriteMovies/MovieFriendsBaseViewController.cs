@@ -11,7 +11,7 @@ using UIKit;
 
 namespace FavoriteMovies
 {
-	public class MovieFriendsBaseViewController:UIViewController
+	public class MovieFriendsBaseViewController:BaseController
 	{
 		public UITableView table;
 		protected List<UserFriendsCloud> friendsList;
@@ -22,7 +22,7 @@ namespace FavoriteMovies
 		const string findFriends = "Find Friends";
 
 
-		public override async void ViewDidLoad ()
+		public override void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
 
@@ -97,7 +97,7 @@ namespace FavoriteMovies
 
 
 		// provide access to the navigation controller to all inheriting controllers
-		public NavController NavController {
+		public UINavigationController NavController {
 			get {
 				//return (UIApplication.SharedApplication.Delegate as AppDelegate).NavController;
 				return (UIApplication.SharedApplication.Delegate as AppDelegate).rootViewController.NavController;

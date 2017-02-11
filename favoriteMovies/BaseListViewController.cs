@@ -167,7 +167,12 @@ namespace FavoriteMovies
 								}
 
 								movieDetail.id = null;
-								db.Insert (movieDetail, typeof (Movie));
+								if (movieDetail is MovieCloud) 
+								{
+									movieDetail.ReleaseDate = DateTime.Parse (((MovieCloud)movieDetail).ReleaseDate);
+									movieDetail.OriginalId = int.Parse(((MovieCloud)movieDetail).OriginalId);
+								}
+
 
 								MovieCloud movieCloud = new MovieCloud ();
 								movieCloud.Adult = movieDetail.Adult;
@@ -181,7 +186,10 @@ namespace FavoriteMovies
 								movieCloud.Overview = movieDetail.Overview;
 								movieCloud.Popularity = movieDetail.Popularity;
 								movieCloud.PosterPath = movieDetail.PosterPath;
-								movieCloud.ReleaseDate = movieDetail.ReleaseDate.Value.ToString ("MM/dd/yyyy", CultureInfo.InvariantCulture);
+								if(movieDetail is MovieCloud)
+								   movieCloud.ReleaseDate = ((MovieCloud)movieDetail).ReleaseDate;
+								else
+									movieCloud.ReleaseDate = movieDetail.ReleaseDate.Value.ToString ("MM/dd/yyyy", CultureInfo.InvariantCulture);
 								movieCloud.UserRating = movieDetail.UserRating.ToString ();
 								movieCloud.Video = movieDetail.Video;
 								movieCloud.VoteAverage = movieDetail.VoteAverage.ToString ();
@@ -189,6 +197,10 @@ namespace FavoriteMovies
 								movieCloud.CustomListID = custlistCloud.Id ?? cloudid;
 
 								await postService.InsertMovieAsync (movieCloud);
+
+								movieDetail.cloudId = movieCloud.id;
+
+								db.Insert (movieDetail, typeof (Movie));
 							}
 						}
 					}
@@ -242,6 +254,9 @@ namespace FavoriteMovies
 								else
 									movieDetail.CustomListID = value;
 
+								movieDetail.id = null;
+								if (movieDetail is MovieCloud)
+									movieDetail.ReleaseDate = DateTime.Parse (((MovieCloud)movieDetail).ReleaseDate);
 
 								db.Insert (movieDetail, typeof (Movie));
 
@@ -257,7 +272,10 @@ namespace FavoriteMovies
 								movieCloud.Overview = movieDetail.Overview;
 								movieCloud.Popularity = movieDetail.Popularity;
 								movieCloud.PosterPath = movieDetail.PosterPath;
-								movieCloud.ReleaseDate = movieDetail.ReleaseDate.Value.ToString ("MM/dd/yyyy", CultureInfo.InvariantCulture);
+								if (movieDetail is MovieCloud)
+									movieCloud.ReleaseDate = ((MovieCloud)movieDetail).ReleaseDate;
+								else
+									movieCloud.ReleaseDate = movieDetail.ReleaseDate.Value.ToString ("MM/dd/yyyy", CultureInfo.InvariantCulture);
 								movieCloud.UserRating = movieDetail.UserRating.ToString ();
 								movieCloud.Video = movieDetail.Video;
 								movieCloud.VoteAverage = movieDetail.VoteAverage.ToString ();

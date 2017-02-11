@@ -22,7 +22,7 @@ namespace FavoriteMovies
 		}
 
 		//// provide access to the navigation controller to all inheriting controllers
-		public NavController NavController {
+		public UINavigationController NavController {
 			get {
 				//return (UIApplication.SharedApplication.Delegate as AppDelegate).NavController;
 				return (UIApplication.SharedApplication.Delegate as AppDelegate).rootViewController.NavController;
@@ -34,22 +34,13 @@ namespace FavoriteMovies
 				return (UIApplication.SharedApplication.Delegate as AppDelegate).rootViewController.TabController;
 			}
 		}
-		//// provide access to the storyboard to all inheriting controllers
-		//public override UIStoryboard Storyboard {
-		//	get {
-		//		return (UIApplication.SharedApplication.Delegate as AppDelegate).NavController.Storyboard;
-		//	}
-		//}
 
-		public BaseController (IntPtr handle) : base (handle)
-		{
-		}
+
+
 		public BaseController ()
 		{
 		}
-		public BaseController (string nibName, NSBundle bundle) : base (nibName, bundle)
-		{
-		}
+
 		public override void ViewDidAppear (bool animated)
 		{
 			base.ViewDidAppear (animated);
@@ -66,22 +57,8 @@ namespace FavoriteMovies
 		public override void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
-			// show the loading overlay on the UI thread using the correct orientation sizing
-			//loadPop = new LoadingOverlay (View.Bounds);
-			//View.Add (loadPop);
 
-			// show the loading overlay on the UI thread using the correct orientation sizing
-			//loadPop = new LoadingOverlay (View.Bounds);
-			//View.Add (loadPop);
-
-				NavigationItem.SetRightBarButtonItem (
-					new UIBarButtonItem (UIImage.FromBundle ("threelines")
-						, UIBarButtonItemStyle.Plain
-						, (sender, args) => {
-							SidebarController.ToggleMenu ();
-
-						}), true);
-
+				
 
 
 		}

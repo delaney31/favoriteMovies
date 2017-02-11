@@ -32,7 +32,6 @@ namespace FavoriteMovies
 
 		}
 
-
 		public override void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
@@ -40,12 +39,14 @@ namespace FavoriteMovies
 
 			this.ViewControllerSelected += (sender, e) => 
 			{
-
+				MainViewController.NewCustomListToRefresh = 1;
 				// Take action based on the tab being selected
 				//Important fact** NavigationalController is only available for the selectedViewController!!
-				if (TabBar.SelectedItem.Title == "Movies")
+				if (TabBar.SelectedItem.Title == "Movies") 
+				{
 					NavigationController.NavigationBar.Hidden = false;
-				else
+
+				} else
 					NavigationController.NavigationBar.Hidden  = true;
 			};
 		}
@@ -69,7 +70,7 @@ namespace FavoriteMovies
 
 
 		// provide access to the navigation controller to all inheriting controllers
-		public NavController NavController {
+		public UINavigationController NavController {
 			get {
 				//return (UIApplication.SharedApplication.Delegate as AppDelegate).NavController;
 				return (UIApplication.SharedApplication.Delegate as AppDelegate).rootViewController.NavController;

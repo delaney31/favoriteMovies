@@ -211,8 +211,14 @@
     <ImageAsset Include="Assets.xcassets\LaunchImage.launchimage\Contents.json" />
     <ImageAsset Include="Assets.xcassets\LaunchImage.launchimage\Default%402x.png" />
     <ImageAsset Include="Assets.xcassets\LaunchImage.launchimage\Default-568h%402x.png" />
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\icon1.png" />
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\icon2.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\icon2 2.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\icon2 29.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\icon2 58.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\icon2-87.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\icon2-80.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\icon2 57.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\icon2-114.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
@@ -236,8 +242,6 @@
     <Compile Include="NavController.Designer.cs" />
     <Compile Include="MenuController.cs" />
     <Compile Include="ContentController.Designer.cs" />
-    <Compile Include="IntroController.cs" />
-    <Compile Include="IntroController.Designer.cs" />
     <Compile Include="MenuController.Designer.cs" />
     <Compile Include="asyncvoid.cs" />
     <Compile Include="SQLiteAsync.cs" />
@@ -257,7 +261,6 @@
     <Compile Include="CustomControls\MDCard.cs" />
     <Compile Include="AzureTablesService.cs" />
     <Compile Include="CustomControls\ContactCard.cs" />
-    <Compile Include="SignupProfileViewController.cs" />
     <Compile Include="CredentialsProvider.cs" />
     <Compile Include="FileHelper.cs" />
     <Compile Include="MovieChatViewController.cs" />
