@@ -89,16 +89,21 @@ namespace FavoriteMovies
 
 		void Initialize ()
 		{
-			var imDbUrl = "http://api.themoviedb.org/3/movie/" + movieDetail.OriginalId + "/videos?api_key=" + MovieService._apiKey;
+			try {
+
+				var imDbUrl = "http://api.themoviedb.org/3/movie/" + movieDetail.OriginalId + "/videos?api_key=" + MovieService._apiKey;
 
 
-			var UTubeMovidId = Task.Run (async () => {
-				youtubeMovieId = await MovieService.GetYouTubeMovieId (imDbUrl);
+				var UTubeMovidId = Task.Run (async () => {
+					youtubeMovieId = await MovieService.GetYouTubeMovieId (imDbUrl);
 
-			});
-			UTubeMovidId.Wait ();
+				});
+				UTubeMovidId.Wait ();
 
-
+			} catch (Exception ex) 
+			{
+				Debug.Write (ex.Message);
+			}
 
 
 		}
@@ -325,7 +330,7 @@ namespace FavoriteMovies
 
 		string GetUserName ()
 		{
-			return this.text.Length > 0?this.text:ColorExtensions.CurrentUser.username;
+			return text!=null ?this.text:ColorExtensions.CurrentUser.username;
 		}
 		public static bool IsDarkColor (UIColor newColor)
 		{
@@ -367,7 +372,6 @@ namespace FavoriteMovies
 				similarMoviesController.CollectionView.BackgroundColor = backGroundColor;
 				similarMoviesController.CollectionView.RegisterClassForCell (typeof (MovieCell), SimilarCollectionViewController.movieCellId);
 				//similar movies
-				//similarMoviesLabel.Frame = new CGRect (16, descReview.Frame.Y + descReview.Frame.Height + userName.Frame.Height, 180, 20);
 				similarMoviesController.CollectionView.Frame = new CGRect (-35, descReview.Frame.Y + descReview.Frame.Height + userName.Frame.Height + 20, 345, 150);
 				lastViewPostion = similarMoviesController.CollectionView.Frame.Y + similarMoviesController.CollectionView.Frame.Height;
 				castHeader = new UILabel ();
@@ -509,17 +513,6 @@ namespace FavoriteMovies
 
 		}
 
-		//nfloat CalculateScrollContent ()
-		//{
-		//	nfloat scrollViewHeight = 0;
-
-		//	foreach (var view in scrollView.Subviews) {
-		//		//Debug.Write (view.Frame.X);
-		//		//if (view.Frame.X == 16 ||view.Frame.X ==166)
-		//			scrollViewHeight += view.Frame.Size.Height;
-		//	}
-		//	return scrollViewHeight ;
-		//}
 
 		public override bool ShouldAutorotate ()
 		{
@@ -569,9 +562,7 @@ namespace FavoriteMovies
 
 		void HandleAction ()
 		{
-			//NavigationController.NavigationBar.Frame = new CGRect () { X = 0, Y = 20, Width = 320, Height = 10 };
-			//NavigationController.NavigationBarHidden = true;
-
+			
 			string videoCode = _embededMoveId;//.Substring (_embededMoveId.LastIndexOf ("/"));
 
 			webView = new UIWebView () {
@@ -664,12 +655,6 @@ namespace FavoriteMovies
 			//Add Text Input
 			textInputAlertController.AddTextField (textField => { textField.Text = movieDetail.UserReview; });
 
-			//UITextView textView= new UITextView ();
-			//textView.Frame = new CGRect () { Width = textInputAlertController.View.Frame.Width, Height = textInputAlertController.View.Frame.Height / 2 };
-			//textView.Text = movieDetail.UserReview;
-			//textInputAlertController.Add (textView);
-
-			//textInputAlertController.
 			//Add Actions
 			var cancelAction = UIAlertAction.Create ("Cancel", UIAlertActionStyle.Cancel, alertAction => {
 				Console.WriteLine ("Cancel was Pressed");

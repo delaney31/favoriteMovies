@@ -456,19 +456,7 @@ namespace FavoriteMovies
 
 			return result;
 		}
-		public static void DeleteAll (int? Id)
-		{
-			try {
-				using (var db = new SQLite.SQLiteConnection (MovieService.Database)) {
-					// there is a sqllite bug here https://forums.xamarin.com/discussion/52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
 
-					db.Query<Movie> ("DELETE FROM [CustomList] WHERE [ID] = " + Id);
-
-				}
-			} catch (SQLite.SQLiteException) {
-				//first time in no favorites yet.
-			}
-		}
 		public static void DeleteAll ()
 		{
 			var task = Task.Run (async () => {
@@ -476,7 +464,7 @@ namespace FavoriteMovies
 					using (var db = new SQLite.SQLiteConnection (MovieService.Database)) {
 						// there is a sqllite bug here https://forums.xamarin.com/discussion/52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
 
-						db.Query<Movie> ("DELETE FROM [CustomList]");
+						db.Query<CustomList> ("DELETE FROM [CustomList]");
 
 					}
 				} catch (SQLite.SQLiteException e) {

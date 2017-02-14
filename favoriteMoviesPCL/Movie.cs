@@ -5,7 +5,7 @@ using SQLite;
 namespace FavoriteMoviesPCL
 {
 
-	[Table ("Movies")]
+	[Table ("Movie")]
 	public class Movie :ICustomList
 	{
 		public string name { get; set; }

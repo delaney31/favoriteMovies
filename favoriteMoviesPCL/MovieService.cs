@@ -2,6 +2,8 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -9,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using SQLite;
 
 namespace FavoriteMoviesPCL
 {
@@ -48,21 +51,27 @@ namespace FavoriteMoviesPCL
 		public static async Task<string> GetYouTubeMovieId (string url)
 		{
 			var client = new HttpClient ();
-			HttpResponseMessage result = await client.GetAsync (url, CancellationToken.None);
-			if (result.IsSuccessStatusCode) {
-				try {
+			try 
+			{
+				HttpResponseMessage result = await client.GetAsync (url, CancellationToken.None);
+				if (result.IsSuccessStatusCode)
+				{
+
 					string content = await result.Content.ReadAsStringAsync ();
 					string videoId = ParceVideoId (content).Id.ToString ();
 					//return a ObservableCollection to fill a list of movies
 					return videoId;
 
-				} catch (Exception ex) {
-					//Model Error
-					Debug.WriteLine (ex);
-
 				}
+				return "";
+			} 
+			catch (Exception ex) 
+			{
+				//Model Error
+				Debug.WriteLine (ex);
+				return "";
 			}
-			return "";
+
 		}
 
 
@@ -114,26 +123,30 @@ namespace FavoriteMoviesPCL
 				break;
 
 			}
+			try 
+			{
+				HttpResponseMessage result = await client.GetAsync (Url, CancellationToken.None);
 
-			HttpResponseMessage result = await client.GetAsync (Url, CancellationToken.None);
+				if (result.IsSuccessStatusCode) 
+				{
 
-			if (result.IsSuccessStatusCode) {
-				try {
 					string content = await result.Content.ReadAsStringAsync ();
 					JObject jresponse = JObject.Parse (content);
 					var jarray = jresponse ["total_pages"];
 					MovieList = GetJsonData (content);
 					//return a ObservableCollection to fill a list of movies
 					return MovieList;
-
-				} catch (Exception ex) {
-					//Model Error
-					Debug.WriteLine (ex);
-
+				
 				}
+			} 
+				catch (Exception ex) 
+			{
+				//Model Error
+				Debug.WriteLine (ex);
+
 			}
 			//Server Error or no internet connection.
-			return null;
+			return new ObservableCollection<Movie> ();
 		}
 		//GET movies from service
 		public static async Task<ObservableCollection<Movie>> GetMoviesAsync (MovieType type, int page = 1, int movieId = 0)
@@ -142,7 +155,8 @@ namespace FavoriteMoviesPCL
 
 			string Url = "";
 
-			switch (type) {
+			switch (type) 
+			{
 
 			case MovieType.TopRated:
 				Url = _baseUrl + "movie/top_rated?api_key=" + _apiKey + _pageString + page;
@@ -164,59 +178,156 @@ namespace FavoriteMoviesPCL
 				break;
 
 			}
+			try {
+				HttpResponseMessage result = await client.GetAsync (Url, CancellationToken.None);
 
-			HttpResponseMessage result = await client.GetAsync (Url, CancellationToken.None);
+				if (result.IsSuccessStatusCode) 
+				{
 
-			if (result.IsSuccessStatusCode) {
-				try {
 					string content = await result.Content.ReadAsStringAsync ();
 					JObject jresponse = JObject.Parse (content);
 					var jarray = jresponse ["total_pages"];
 					MovieList = GetJsonData (content);
+					AddListToLocalDB (MovieList, type);
 					//return a ObservableCollection to fill a list of movies
 					return MovieList;
 
-				} catch (Exception ex) {
-					//Model Error
-					Debug.WriteLine (ex);
 
 				}
+			} catch (WebException we) 
+			{
+				//Server Error or no internet connection.
+				Debug.WriteLine (we);
+				return GetListFromLocalDB (type);
+
+			} 
+			catch (Exception ex) {
+				//Model Error
+				Debug.WriteLine (ex);
+
 			}
-			//Server Error or no internet connection.
-			return null;
+
+			return new ObservableCollection<Movie> ();;
 		}
+
+		static ObservableCollection<Movie> GetListFromLocalDB (MovieType type)
+		{
+			var returnList = new ObservableCollection<Movie> ();
+			using (var db = new SQLite.SQLiteConnection (MovieService.Database)) {
+				var task = Task.Run (() => 
+				{
+					// there is a sqllite bug here https://forums.xamarin.com/discussion/52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
+
+						var query = db.Query<Movie> ("SELECT * FROM [Movie] WHERE [CustomListID] = " + type);
+
+						foreach (var movie in query) 
+						{
+							var item = new Movie ();
+							item.id = movie.id;
+							item.name = movie.name;
+							item.BackdropPath = movie.BackdropPath;
+							item.CustomListID = movie.CustomListID;
+							item.Favorite = movie.Favorite;
+							item.HighResPosterPath = movie.HighResPosterPath;
+							item.OriginalLanguage = movie.OriginalLanguage;
+							item.Overview = movie.Overview;
+							item.Popularity = movie.Popularity;
+							item.PosterPath = movie.PosterPath;
+							item.ReleaseDate = movie.ReleaseDate;
+							item.VoteAverage = movie.VoteAverage;
+							item.UserReview = movie.UserReview;
+							item.UserRating = movie.UserRating;
+							item.OriginalId = movie.OriginalId;
+							item.cloudId = movie.cloudId;
+							item.order = movie.order;
+							returnList.Add (item);
+						}
+
+
+				});
+				task.Wait ();
+
+				return returnList;
+			}
+		
+		}
+
+		static void AddListToLocalDB (ObservableCollection<Movie> movieList, MovieType type)
+		{
+			try {
+				var listItem = new CustomList ();
+				listItem.shared = false;
+				listItem.order = 0;
+				listItem.name = type.ToString ();
+
+				using (var db = new SQLiteConnection (MovieService.Database)) 
+				{
+					var list = db.Query<CustomList> ("SELECT id FROM [CustomList] WHERE name = '" + listItem.name + "'");
+					if (list.Count > 0) 
+					{
+						var id = list.FirstOrDefault ().id;
+						db.Query<Movie> ("DELETE FROM [Movie] WHERE CustomListID = " + id);
+						db.Query<CustomList> ("DELETE FROM [CustomList] WHERE name = '" + listItem.name + "'");
+					}
+					db.InsertOrReplace (listItem, typeof (CustomList));
+					string sql = "select last_insert_rowid()";
+					var scalarValue = db.ExecuteScalar<string> (sql);
+					int value = scalarValue == null ? 0 : Convert.ToInt32 (scalarValue);
+					foreach (var movie in movieList) {
+						if (value > 0) {
+							movie.CustomListID = value;
+							db.InsertOrReplace (movie, typeof (Movie));
+
+						}
+					}
+
+				}
+			} catch (Exception ex)
+			{
+				Debug.WriteLine (ex);
+			}
+		}
+
 		public static async Task<ObservableCollection<CastCrew>> MovieCreditsAsync (string query)
 		{
 			var client = new HttpClient ();
 			string Url = "https://api.themoviedb.org/3/movie/" + query + "/credits?api_key=" + _apiKey;
+			try 
+			{
+				HttpResponseMessage result = await client.GetAsync (Url, CancellationToken.None);
+				if (result.IsSuccessStatusCode) 
+				{
+					
+						string content = await result.Content.ReadAsStringAsync ();
+						JObject jresponse = JObject.Parse (content);
+						var jarray = jresponse ["cast"];
+						var castCrew = GetCastJsonData (content);
+						//return a ObservableCollection to fill a list of movies
+						return castCrew;
 
-			HttpResponseMessage result = await client.GetAsync (Url, CancellationToken.None);
-			if (result.IsSuccessStatusCode) {
-				try {
-					string content = await result.Content.ReadAsStringAsync ();
-					JObject jresponse = JObject.Parse (content);
-					var jarray = jresponse ["cast"];
-					var castCrew = GetCastJsonData (content);
-					//return a ObservableCollection to fill a list of movies
-					return castCrew;
-
-				} catch (Exception ex) {
-					//Model Error
-					Debug.WriteLine (ex);
-
+					
 				}
 			}
+			catch (Exception ex) 
+			{
+				//Model Error
+				Debug.WriteLine (ex);
+
+			}
 			//Server Error or no internet connection.
-			return null;
+			return new ObservableCollection<CastCrew>();
+
 		}
 		public static async Task<ObservableCollection<Movie>> MovieSearch (string query)
 		{
 			var client = new HttpClient ();
 			string Url = "https://api.themoviedb.org/3/search/movie?api_key=" + _apiKey + "&language=en-US&query=" + query;
-
-			HttpResponseMessage result = await client.GetAsync (Url, CancellationToken.None);
-			if (result.IsSuccessStatusCode) {
-				try {
+			try 
+			{
+				HttpResponseMessage result = await client.GetAsync (Url, CancellationToken.None);
+				if (result.IsSuccessStatusCode) 
+				{
+				
 					string content = await result.Content.ReadAsStringAsync ();
 					JObject jresponse = JObject.Parse (content);
 					var jarray = jresponse ["total_pages"];
@@ -224,14 +335,17 @@ namespace FavoriteMoviesPCL
 					//return a ObservableCollection to fill a list of movies
 					return MovieList;
 
-				} catch (Exception ex) {
-					//Model Error
-					Debug.WriteLine (ex);
-
+				
 				}
+			} 
+			catch (Exception ex) 
+			{
+				//Model Error
+				Debug.WriteLine (ex);
+
 			}
 			//Server Error or no internet connection.
-			return null;
+			return new ObservableCollection<Movie>();
 		}
 
 		static ObservableCollection<CastCrew> GetCastJsonData (string content)

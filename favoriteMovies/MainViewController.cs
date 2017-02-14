@@ -363,7 +363,6 @@ namespace FavoriteMovies
 
 		 ObservableCollection<Movie> GetMovieList (CustomList customList)
 		{
-			AzureTablesService postService = AzureTablesService.DefaultService;
 			var returnList = new ObservableCollection<Movie> ();
 			try {
 				var watch = System.Diagnostics.Stopwatch.StartNew ();
@@ -396,13 +395,7 @@ namespace FavoriteMovies
 								returnList.Add (item);
 							}
 						}
-						//if (customList.cloudId != null) {
-						//	//get movies cloud
-						//	var movies = await postService.GetCustomListMovies (customList.cloudId);
-						//	foreach (var movie in movies) {
-						//		returnList.Add (movie);
-						//	}
-						//}
+
 					});
 					task.Wait();
 
@@ -445,7 +438,7 @@ namespace FavoriteMovies
 				//	Console.WriteLine ("The timeout interval elapsed in GetCollectionData.");
 			} catch (Exception e) {
 				Debug.WriteLine (e.Message);
-					throw;
+				//	throw;
 
 			}
 		}
@@ -606,15 +599,17 @@ namespace FavoriteMovies
 
 		 ObservableCollection<CustomList> GetCustomLists ()
 		{
-			AzureTablesService postService = AzureTablesService.DefaultService;
+			
 
 			var result = new ObservableCollection<CustomList> ();
-			using (var db = new SQLiteConnection (MovieService.Database)) 
-			{
-				Task.Run (async () => {
-					try {
+			try {
+					using (var db = new SQLiteConnection (MovieService.Database)) 
+					{
+						//Task.Run (async () => 
+						//{
+							
 						// there is a sqllite bug here https://forums.xamarin.com/discussion/52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
-						var query = db.Query<CustomList> ("SELECT * FROM [CustomList] ORDER BY [Order]");
+						var query = db.Query<CustomList> ("SELECT * FROM [CustomList] WHERE [Shared] = 1 ORDER BY [Order]");
 						//var query = db.Table<CustomList> ();
 						foreach (var list in query) 
 						{
@@ -624,24 +619,16 @@ namespace FavoriteMovies
 							item.cloudId = list.cloudId;
 							result.Add (item);
 						}
-						//get cloud lists
-						//var cloudList = await postService.GetUserFriendsLists (ColorExtensions.CurrentUser.Id);
-						//foreach (var list in cloudList) 
-						//{
-						//	var item = new CustomList ();
-						//	item.cloudId = list.Id;
-						//	item.name = list.Name;
-						//	result.Add (item);
-						//}
-						//favoriteViewController.CollectionView.ReloadData ();
-					} catch (SQLiteException e) 
-					{
-						Debug.WriteLine (e.Message);
-						//throw;
-					}
-				}).WithNetworkIndicator ().Wait();
+								
 
-			}
+						//}).Wait();
+
+					}
+				} catch (SQLiteException e) 
+				{
+					Debug.WriteLine (e.Message);
+					//throw;
+				}
 			return result;
 		}
 		public override void ViewWillDisappear (bool animated)

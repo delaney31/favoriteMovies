@@ -48,6 +48,34 @@ namespace MovieFriends
 		private IMobileServiceTable<UserFriendsCloud> ufTable;
 		private IMobileServiceTable<CustomListCloud> clTable;
 		private IMobileServiceTable<MovieCloud> mfTable;
+
+		internal async Task<string> GetFollowingAsync (string id)
+		{
+			try 
+			{
+
+				var following = await ufTable.Where (item => item.userid == id).ToListAsync ();
+				return following.Count().ToString();
+
+			} catch (Exception e) {
+				Console.Error.WriteLine (@"ERROR {0}", e.Message);
+				return "0";
+			}
+		}
+
+		internal async  Task<string> GetFollowersAsync (string id)
+		{
+			try {
+
+				var followers = await ufTable.Where (item => item.friendid == id).ToListAsync ();
+				return followers.Count ().ToString ();
+
+			} catch (Exception e) {
+				Console.Error.WriteLine (@"ERROR {0}", e.Message);
+				return "0";
+			}
+		}
+
 		private IMobileServiceTable<NotificationsCloud> nfTable;
 
 
