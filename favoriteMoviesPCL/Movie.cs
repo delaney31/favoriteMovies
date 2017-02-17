@@ -17,7 +17,7 @@ namespace FavoriteMoviesPCL
 		public int? CustomListID { get; set;}
 		public string Overview { get; set; }
 		public double VoteCount { get; set; }
-		public DateTime? ReleaseDate { get; set; }
+		public string ReleaseDate { get; set; }
 		public float VoteAverage { get; set; }
 		public bool Favorite { get; set; }
 		public bool Adult { get; set; }
@@ -30,12 +30,8 @@ namespace FavoriteMoviesPCL
 		public string UserReview { get; set; }
 		public int UserRating{ get; set; }
 		public bool shared { get; set; }
-		[AutoIncrement]
 		public int order { get; set; }
 		public bool deleted { get; set;}
-		//public Version version { get; set;}
-		public DateTime createdAt { get; set;}
-		public DateTime updatedAt { get; set; }
 		public string cloudId { get; set; }
 
 	}
@@ -50,12 +46,9 @@ namespace FavoriteMoviesPCL
 		public int? id { get; set; }
 		[MaxLength (50)]
 		public string name { get; set; }
-		[AutoIncrement]
 		public int order { get; set;}
 		public bool shared { get; set;}
-		//public Version version { get; set;}
-		public DateTime createdAt { get; set;}
-		public DateTime updatedAt { get; set;}
+		public bool custom { get; set; }
 		public bool deleted { get; set;}
 		public int userid { get; set;}
 		public string cloudId { get; set; }
@@ -83,7 +76,6 @@ namespace FavoriteMoviesPCL
 		public new string OriginalId { get; set; }
 		public new string CustomListID { get; set; }
 		public new string VoteCount { get; set; }
-		public new string ReleaseDate { get; set; }
 		public new string VoteAverage { get; set; }
 		public new string UserRating { get; set; }
 

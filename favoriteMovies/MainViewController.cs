@@ -405,7 +405,7 @@ namespace FavoriteMovies
 				}
 			} catch (SQLite.SQLiteException e) {
 				Debug.Write (e.Message);
-				throw;
+				//throw;
 			}
 			return returnList;
 		}
@@ -547,7 +547,6 @@ namespace FavoriteMovies
 			base.ViewDidLoad ();
 
 
-
 			// Creates an instance of a custom View Controller that holds the results
 			searchResultsController = new SearchResultsViewController ();
 
@@ -609,7 +608,7 @@ namespace FavoriteMovies
 						//{
 							
 						// there is a sqllite bug here https://forums.xamarin.com/discussion/52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
-						var query = db.Query<CustomList> ("SELECT * FROM [CustomList] WHERE [Shared] = 1 ORDER BY [Order]");
+						var query = db.Query<CustomList> ("SELECT * FROM [CustomList] WHERE [custom] = 1 ORDER BY [Order]");
 						//var query = db.Table<CustomList> ();
 						foreach (var list in query) 
 						{
@@ -617,6 +616,7 @@ namespace FavoriteMovies
 							item.id = list.id;
 							item.name = list.name;
 							item.cloudId = list.cloudId;
+							item.custom = list.custom;
 							result.Add (item);
 						}
 								
@@ -676,7 +676,7 @@ namespace FavoriteMovies
 				}
 				if (ColorExtensions.MovieIsFavorite (element.id.ToString ())) 
 				{
-					ContentView.Layer.BorderColor = UIColor.Orange.CGColor;
+					ContentView.Layer.BorderColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR).CGColor;
 					ContentView.Layer.BorderWidth = 2.0f;
 				} else {
 					ContentView.Layer.BorderColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f).CGColor;

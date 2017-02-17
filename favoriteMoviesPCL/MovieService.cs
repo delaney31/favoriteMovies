@@ -198,19 +198,42 @@ namespace FavoriteMoviesPCL
 			{
 				//Server Error or no internet connection.
 				Debug.WriteLine (we);
-				return GetListFromLocalDB (type);
+				return GetListFromLocalDB (GetCustomIdFromType(type.ToString()));
 
 			} 
 			catch (Exception ex) {
 				//Model Error
 				Debug.WriteLine (ex);
-
+				return GetListFromLocalDB (GetCustomIdFromType (type.ToString ()));
 			}
 
 			return new ObservableCollection<Movie> ();;
 		}
 
-		static ObservableCollection<Movie> GetListFromLocalDB (MovieType type)
+		static string GetCustomIdFromType (string type)
+		{
+			var retId = "";
+			try {
+				
+				using (var db = new SQLite.SQLiteConnection (MovieService.Database)) {
+					var task = Task.Run (() => {
+						// there is a sqllite bug here https://forums.xamarin.com/discussion/52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
+
+						var query = db.Query<CustomList> ("SELECT [id] FROM [CustomList] WHERE [name] = '" + type + "'");
+						retId = query.FirstOrDefault ().id.ToString ();
+					});
+					task.Wait ();
+				}
+			} catch (Exception ex) 
+			{
+				Debug.WriteLine (ex.Message);
+			}
+
+			return retId;
+
+		}
+
+		static ObservableCollection<Movie> GetListFromLocalDB (string id)
 		{
 			var returnList = new ObservableCollection<Movie> ();
 			using (var db = new SQLite.SQLiteConnection (MovieService.Database)) {
@@ -218,7 +241,7 @@ namespace FavoriteMoviesPCL
 				{
 					// there is a sqllite bug here https://forums.xamarin.com/discussion/52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
 
-						var query = db.Query<Movie> ("SELECT * FROM [Movie] WHERE [CustomListID] = " + type);
+						var query = db.Query<Movie> ("SELECT * FROM [Movie] WHERE [CustomListID] = " + id);
 
 						foreach (var movie in query) 
 						{
@@ -254,17 +277,17 @@ namespace FavoriteMoviesPCL
 
 		static void AddListToLocalDB (ObservableCollection<Movie> movieList, MovieType type)
 		{
-			try {
-				var listItem = new CustomList ();
-				listItem.shared = false;
-				listItem.order = 0;
-				listItem.name = type.ToString ();
 
-				using (var db = new SQLiteConnection (MovieService.Database)) 
-				{
+			var listItem = new CustomList ();
+			listItem.shared = false;
+			listItem.order = 0;
+			listItem.custom = false;
+			listItem.name = type.ToString ();
+
+			using (var db = new SQLiteConnection (MovieService.Database)) {
+				try {
 					var list = db.Query<CustomList> ("SELECT id FROM [CustomList] WHERE name = '" + listItem.name + "'");
-					if (list.Count > 0) 
-					{
+					if (list.Count > 0) {
 						var id = list.FirstOrDefault ().id;
 						db.Query<Movie> ("DELETE FROM [Movie] WHERE CustomListID = " + id);
 						db.Query<CustomList> ("DELETE FROM [CustomList] WHERE name = '" + listItem.name + "'");
@@ -280,11 +303,30 @@ namespace FavoriteMoviesPCL
 
 						}
 					}
+				} catch (Exception ex) {
+					try {
+						Debug.WriteLine (ex);
+						using (var conn = new SQLite.SQLiteConnection (MovieService.Database)) 
+						{
+							conn.CreateTable<Movie> (CreateFlags.ImplicitPK | CreateFlags.AutoIncPK);
+							conn.CreateTable<CustomList> (CreateFlags.ImplicitPK | CreateFlags.AutoIncPK);
+						}
+						db.InsertOrReplace (listItem, typeof (CustomList));
+						string sql = "select last_insert_rowid()";
+						var scalarValue = db.ExecuteScalar<string> (sql);
+						int value = scalarValue == null ? 0 : Convert.ToInt32 (scalarValue);
+						foreach (var movie in movieList) {
+							if (value > 0) {
+								movie.CustomListID = value;
+								db.InsertOrReplace (movie, typeof (Movie));
 
+							}
+						}
+					} catch (Exception e) {
+						Debug.WriteLine (e);
+					}
 				}
-			} catch (Exception ex)
-			{
-				Debug.WriteLine (ex);
+
 			}
 		}
 
@@ -391,7 +433,7 @@ namespace FavoriteMoviesPCL
 					newMovie.id = null;
 					newMovie.Overview = (string)jObj ["overview"];
 					newMovie.VoteCount = (double)jObj ["vote_count"];
-					newMovie.ReleaseDate = (DateTime?)jObj ["release_date"];
+					newMovie.ReleaseDate = (string)jObj ["release_date"];
 					newMovie.VoteAverage = (float)jObj ["vote_average"];
 					newMovie.Adult = (bool)jObj ["adult"];//(jObj ["adult"] == null) ? false : (bool)jObj ["adult"];
 					newMovie.BackdropPath = (string)jObj ["backdrop_path"];//(jObj ["backdrop_path"] == null) ? "" : (string)jObj ["backdrop_path"];

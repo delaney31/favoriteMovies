@@ -18,6 +18,7 @@ using FavoriteMovies;
 using System.Globalization;
 using UIKit;
 using BigTed;
+using System.Collections.ObjectModel;
 
 
 #if OFFLINE_SYNC_ENABLED
@@ -236,7 +237,7 @@ namespace MovieFriends
 					BackdropPath = movies.BackdropPath,
 					Favorite = movies.Favorite, HighResPosterPath = movies.HighResPosterPath,
 					OriginalLanguage = movies.OriginalLanguage, Overview = movies.Overview,
-					Popularity = movies.Popularity, PosterPath = movies.PosterPath, ReleaseDate = DateTime.Parse(movies.ReleaseDate),
+					Popularity = movies.Popularity, PosterPath = movies.PosterPath, ReleaseDate = movies.ReleaseDate,
 					VoteAverage = float.Parse(movies.VoteAverage), UserReview = movies.UserReview, UserRating = int.Parse( movies.UserRating),
 					OriginalId = int.Parse(movies.OriginalId), order= movies.order};
 				
@@ -364,21 +365,18 @@ namespace MovieFriends
 			int inCommon = 0;
 
 			try {
-
-
-				if (user2.username == "delaney51")
-					Console.WriteLine (user2.username);
+				
 				
 				var user2Movies =
 					from movies in await mfTable.ToListAsync ()
 					join customlist in await clTable.ToListAsync () on movies.CustomListID equals customlist.Id
-					where customlist.UserId == user2.Id
+						                            where customlist.UserId == user2.Id && customlist.shared
 					select new { movies.name};
 
 				var userMovies =
 					from movies in await mfTable.ToListAsync ()
 					join customlist in await clTable.ToListAsync () on movies.CustomListID equals customlist.Id
-					where customlist.UserId==user1.Id           
+					where customlist.UserId==user1.Id        
 					select new {movies.name};
 				
 				var common = from list1 in userMovies
@@ -396,6 +394,11 @@ namespace MovieFriends
 				return 0;
 			}
 			return inCommon;
+		}
+
+		internal async Task<ObservableCollection<ContactCard>> FriendSearch (string forSearchString)
+		{
+			
 		}
 
 		internal  async Task DeleteCustomList (CustomListCloud customList)
@@ -474,7 +477,7 @@ namespace MovieFriends
 				movieCloud.Overview = movie.Overview;
 				movieCloud.Popularity = movie.Popularity;
 				movieCloud.PosterPath = movie.PosterPath;
-				movieCloud.ReleaseDate = movie.ReleaseDate.Value.ToString ("MM/dd/yyyy", CultureInfo.InvariantCulture);
+				movieCloud.ReleaseDate = movie.ReleaseDate;
 				movieCloud.shared = movie.shared;
 				movieCloud.UserRating = movie.UserRating.ToString();
 				movieCloud.UserReview = movie.UserReview;
@@ -655,7 +658,7 @@ namespace MovieFriends
 			{
 				var customListId =  await clTable.Where (x => x.Name == customListName && x.UserId == ColorExtensions.CurrentUser.Id).ToListAsync();
 
-				var items = await mfTable.Where (item => item.CustomListID == customListId.FirstOrDefault().Id && item.name == movie.name && item.ReleaseDate == movie.ReleaseDate.Value.ToString ("MM/dd/yyyy", CultureInfo.InvariantCulture)).ToListAsync();
+				var items = await mfTable.Where (item => item.CustomListID == customListId.FirstOrDefault().Id && item.name == movie.name && item.ReleaseDate == movie.ReleaseDate).ToListAsync();
 
 				if (items.Count > 0)
 					foreach (var item in items) 

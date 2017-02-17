@@ -140,7 +140,7 @@ namespace FavoriteMovies
 			};
 
 			var tab5 = new ConnectViewController ();
-			tab5.Title = "Connect";
+			tab5.Title = "Friends";
 			tab5.View.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 			tab5.TabBarItem.SetFinishedImages (UIImage.FromBundle ("ic_person_add.png"),UIImage.FromBundle ("ic_person_add.png"));
 
@@ -155,7 +155,7 @@ namespace FavoriteMovies
 			};
 
 			var tabs = new UIViewController [] {
-				uinc1,uinc4, uinc2,uinc3,uinc5};
+				uinc1,uinc5, uinc4,uinc3,uinc2};
 			TabController = new MovieTabBarController ();
 
 

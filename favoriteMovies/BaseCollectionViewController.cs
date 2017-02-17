@@ -112,6 +112,7 @@ namespace FavoriteMovies
 			{
 				
 				Debug.WriteLine (ex.Message);
+				BTProgressHUD.Dismiss ();
 				//throw;
 			}
 		}
@@ -348,7 +349,7 @@ namespace FavoriteMovies
 		{
 			try {
 				var row = _items [indexPath.Row];
-				vc.NavigationController.PushViewController (new MovieDetailViewController (row, true), true);
+				vc.NavigationController.PushViewController (new MovieDetailViewController (row, false), true);
 
 			} catch (Exception e) {
 
@@ -395,14 +396,15 @@ namespace FavoriteMovies
 		}
 		public override void ItemSelected (UICollectionView collectionView, NSIndexPath indexPath)
 		{
-			try {
+			try 
+			{
 				var row = _items [indexPath.Row];
-				vc.NavigationController.PushViewController (new MovieDetailViewController (row, true, this.text), true);
+				vc.NavigationController.PushViewController (new MovieDetailViewController (row, false, this.text), true);
 
 			} catch (Exception e) {
 
 				Debug.WriteLine (e.Message);
-				throw;
+				//throw;
 			}
 		}
 		public override UICollectionViewCell GetCell (UICollectionView collectionView, NSIndexPath indexPath)

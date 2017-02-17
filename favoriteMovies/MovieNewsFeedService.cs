@@ -211,7 +211,7 @@ namespace FavoriteMovies
 
 		public static void DeleteAllFeedItems ()
 		{
-			var task = Task.Run (async () => {
+			var task = Task.Run (() => {
 				try {
 					using (var db = new SQLite.SQLiteConnection (MovieService.Database)) {
 						// there is a sqllite bug here https://forums.xamarin.com/discussion/52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);

@@ -75,6 +75,7 @@ namespace FavoriteMovies
 							tableSource.ArrangeCustomList (false);
 							var listItem = new CustomList ();
 							listItem.order = 0;
+							listItem.custom = true;
 							listItem.name = textInputAlertController.TextFields [0].Text;
 							tableItems.Insert (0, listItem);
 							table.EndUpdates (); // applies the changes
@@ -169,7 +170,7 @@ namespace FavoriteMovies
 								movieDetail.id = null;
 								if (movieDetail is MovieCloud) 
 								{
-									movieDetail.ReleaseDate = DateTime.Parse (((MovieCloud)movieDetail).ReleaseDate);
+								//	movieDetail.ReleaseDate = DateTime.Parse (((MovieCloud)movieDetail).ReleaseDate);
 									movieDetail.OriginalId = int.Parse(((MovieCloud)movieDetail).OriginalId);
 								}
 
@@ -186,10 +187,7 @@ namespace FavoriteMovies
 								movieCloud.Overview = movieDetail.Overview;
 								movieCloud.Popularity = movieDetail.Popularity;
 								movieCloud.PosterPath = movieDetail.PosterPath;
-								if(movieDetail is MovieCloud)
-								   movieCloud.ReleaseDate = ((MovieCloud)movieDetail).ReleaseDate;
-								else
-									movieCloud.ReleaseDate = movieDetail.ReleaseDate.Value.ToString ("MM/dd/yyyy", CultureInfo.InvariantCulture);
+								movieCloud.ReleaseDate = movieDetail.ReleaseDate;
 								movieCloud.UserRating = movieDetail.UserRating.ToString ();
 								movieCloud.Video = movieDetail.Video;
 								movieCloud.VoteAverage = movieDetail.VoteAverage.ToString ();
@@ -255,8 +253,8 @@ namespace FavoriteMovies
 									movieDetail.CustomListID = value;
 
 								movieDetail.id = null;
-								if (movieDetail is MovieCloud)
-									movieDetail.ReleaseDate = DateTime.Parse (((MovieCloud)movieDetail).ReleaseDate);
+								//if (movieDetail is MovieCloud)
+								//	movieDetail.ReleaseDate = DateTime.Parse (((MovieCloud)movieDetail).ReleaseDate);
 
 								db.Insert (movieDetail, typeof (Movie));
 
@@ -272,10 +270,7 @@ namespace FavoriteMovies
 								movieCloud.Overview = movieDetail.Overview;
 								movieCloud.Popularity = movieDetail.Popularity;
 								movieCloud.PosterPath = movieDetail.PosterPath;
-								if (movieDetail is MovieCloud)
-									movieCloud.ReleaseDate = ((MovieCloud)movieDetail).ReleaseDate;
-								else
-									movieCloud.ReleaseDate = movieDetail.ReleaseDate.Value.ToString ("MM/dd/yyyy", CultureInfo.InvariantCulture);
+								movieCloud.ReleaseDate = movieDetail.ReleaseDate;
 								movieCloud.UserRating = movieDetail.UserRating.ToString ();
 								movieCloud.Video = movieDetail.Video;
 								movieCloud.VoteAverage = movieDetail.VoteAverage.ToString ();
@@ -323,7 +318,7 @@ namespace FavoriteMovies
 				using (var db = new SQLite.SQLiteConnection (MovieService.Database)) {
 					// there is a sqllite bug here https://forums.xamarin.com/discussion/52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
 
-					var name = db.Query<CustomList> ("SELECT [Name] FROM [CustomList] WHERE [ID] = " + customListId);
+					var name = db.Query<CustomList> ("SELECT [name] FROM [CustomList] WHERE [ID] = " + customListId);
 					return name.FirstOrDefault ().name;
 				}
 
@@ -411,7 +406,7 @@ namespace FavoriteMovies
 				using (var db = new SQLiteConnection (MovieService.Database)) {
 					// there is a sqllite bug here https://forums.xamarin.com/discussion/
 					//52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
-					var query = db.Query<CustomList> ("SELECT * FROM [CustomList] ORDER BY [Order]");
+					var query = db.Query<CustomList> ("SELECT * FROM [CustomList] WHERE [custom] =1 ORDER BY [Order]");
 
 
 					foreach (var list in query) {
@@ -420,6 +415,7 @@ namespace FavoriteMovies
 						item.name = list.name;
 						item.order = list.order;
 						item.shared = list.shared;
+						item.custom = true;
 						item.cloudId = list.cloudId;
 						result.Add (item);
 					}
@@ -437,11 +433,12 @@ namespace FavoriteMovies
 					// there is a sqllite bug here https://forums.xamarin.com/discussion/
 					//52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
 					//	var query = db.Query<CustomList> ("SELECT * FROM CUSTOMLIST");
-					var query = db.Query<CustomList> ("SELECT * FROM [CustomList] ORDER BY [Order]");
+					var query = db.Query<CustomList> ("SELECT * FROM [CustomList] WHERE [custom] =1 ORDER BY [Order]");
 					foreach (var list in query) {
 						var item = new CustomList ();
 						item.id = list.id;
 						item.name = list.name;
+						item.custom = true;
 						item.order = list.order;
 						item.shared = list.shared;
 						item.cloudId = list.cloudId;
@@ -459,12 +456,13 @@ namespace FavoriteMovies
 
 		public static void DeleteAll ()
 		{
-			var task = Task.Run (async () => {
+			var task = Task.Run (() => 
+			{
 				try {
 					using (var db = new SQLite.SQLiteConnection (MovieService.Database)) {
 						// there is a sqllite bug here https://forums.xamarin.com/discussion/52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
 
-						db.Query<CustomList> ("DELETE FROM [CustomList]");
+						db.Query<CustomList> ("DELETE FROM [CustomList] WHERE [custom] =1" );
 
 					}
 				} catch (SQLite.SQLiteException e) {
@@ -671,6 +669,7 @@ namespace FavoriteMovies
 									ArrangeCustomList (false);
 									var listItem = new CustomList ();
 									listItem.order = 0;
+									listItem.custom = true;
 									listItem.name = textInputAlertController.TextFields [0].Text;
 									tableItems.Insert (0, listItem);
 									tableView.EndUpdates (); // applies the changes

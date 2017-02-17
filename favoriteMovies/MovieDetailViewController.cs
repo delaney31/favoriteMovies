@@ -43,7 +43,7 @@ namespace FavoriteMovies
 		static int MinimumLineSpacing = 5;
 		static UILabel similarMoviesLabel;
 		static CGSize ItemSize = new CGSize (100, 150);
-		ObservableCollection<Movie> similarMovies;
+		ObservableCollection<Movie> similarMovies = new ObservableCollection<Movie>();
 		static ObservableCollection<CastCrew> castList;
 		SimilarCollectionViewController similarMoviesController;
 		Movie movieDetail;
@@ -161,7 +161,7 @@ namespace FavoriteMovies
 			if (movieDetail is MovieCloud)
 				dateOpenView.Text = ((MovieCloud)movieDetail).ReleaseDate;
 			else
-				dateOpenView.Text = "Release Date: " + movieDetail.ReleaseDate.Value.ToString ("MM/dd/yyyy",CultureInfo.InvariantCulture);
+				dateOpenView.Text = "Release Date: " + DateTime.Parse(movieDetail.ReleaseDate).ToString ("MM/dd/yyyy",CultureInfo.InvariantCulture);
 			dateOpenView.Frame = new CGRect (183, 70, 135, 20);
 
 			Userstar1.Frame = new CGRect (183, 115, 20, 20);
@@ -462,55 +462,58 @@ namespace FavoriteMovies
 		public override void ViewWillAppear (bool animated)
 		{
 			base.ViewWillAppear (animated);
+				try 
+				{
+				_embededMoveId = youtubeMovieId;
+				var getSimilarMovies = Task.Run (async () => {
+					if (movieDetail is MovieCloud)
+						similarMovies = await MovieService.GetMoviesAsyncString (MovieService.MovieType.Similar, 1, ((MovieCloud)movieDetail).OriginalId);
+					else
+						similarMovies = await MovieService.GetMoviesAsync (MovieService.MovieType.Similar, 1, movieDetail.OriginalId);
+				});
+				getSimilarMovies.Wait ();
 
-			_embededMoveId = youtubeMovieId;
-			var getSimilarMovies = Task.Run (async () => 
-			{ 
-				if(movieDetail is MovieCloud)
-				   similarMovies = await MovieService.GetMoviesAsyncString (MovieService.MovieType.Similar, 1, ((MovieCloud)movieDetail).OriginalId);
-				else
-				   similarMovies = await MovieService.GetMoviesAsync (MovieService.MovieType.Similar, 1, movieDetail.OriginalId);
-			});
-			getSimilarMovies.Wait ();
+				} catch (Exception ex) 
+				{
+					Debug.WriteLine (ex.Message);
+				}
+				DeleteAllSubviews (scrollView);
+
+				scrollView.AddSubview (dateOpenView);
+				scrollView.AddSubview (descReview);
+				scrollView.AddSubview (descriptView);
+				scrollView.AddSubview (movieTitle);
+				if (this.canReview)
+					scrollView.AddSubview (addReviewButt);
+				scrollView.AddSubview (posterImage);
+				scrollView.AddSubview (saveFavoriteButt);
+				scrollView.AddSubview (voteResultText);
+				if (_embededMoveId != "")
+					scrollView.AddSubview (moviePlay);
+				if (this.canReview) {
+					scrollView.Add (Userstar1);
+					scrollView.Add (Userstar2);
+					scrollView.Add (Userstar3);
+					scrollView.Add (Userstar4);
+					scrollView.Add (Userstar5);
+					scrollView.Add (userResultText);
+				}
+
+				scrollView.Add (userName);
+
+				scrollView.Add (IMDB);
 
 
-			DeleteAllSubviews (scrollView);
+				View.AddSubview (scrollView);
 
-			scrollView.AddSubview (dateOpenView);
-			scrollView.AddSubview (descReview);
-			scrollView.AddSubview (descriptView);
-			scrollView.AddSubview (movieTitle);
-			if (this.canReview)
-				scrollView.AddSubview (addReviewButt);
-			scrollView.AddSubview (posterImage);
-			scrollView.AddSubview (saveFavoriteButt);
-			scrollView.AddSubview (voteResultText);
-			if (_embededMoveId != "")
-				scrollView.AddSubview (moviePlay);
-			if (this.canReview) {
-				scrollView.Add (Userstar1);
-				scrollView.Add (Userstar2);
-				scrollView.Add (Userstar3);
-				scrollView.Add (Userstar4);
-				scrollView.Add (Userstar5);
-				scrollView.Add (userResultText);
-			}
+				//HACK until i find out why when you open a movie details and come back the view.height changes.
+				if (View.Frame.Height == 504) {
 
-			scrollView.Add (userName);
+					scrollView.ContentSize = new CGSize (View.Frame.Width, 723 + 50);
+					scrollView.ContentOffset = new CGPoint (0, -scrollView.ContentInset.Top);
 
-			scrollView.Add (IMDB);
-
-
-			View.AddSubview (scrollView);
-
-			//HACK until i find out why when you open a movie details and come back the view.height changes.
-			if (View.Frame.Height == 504) {
-
-				scrollView.ContentSize = new CGSize (View.Frame.Width, 723 + 50);
-				scrollView.ContentOffset = new CGPoint (0, -scrollView.ContentInset.Top);
-
-			}
-
+				}
+			
 		}
 
 
