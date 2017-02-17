@@ -398,7 +398,23 @@ namespace MovieFriends
 
 		internal async Task<ObservableCollection<ContactCard>> FriendSearch (string forSearchString)
 		{
-			
+			const string cellIdentifier = "ContactCard";
+			var retCollect = new ObservableCollection<ContactCard> ();
+			var friends = await userTable.Where (f => f.username.StartsWith (forSearchString)).ToListAsync ();
+			foreach (var friend in friends) 
+			{
+
+				if (friend.Id != ColorExtensions.CurrentUser.Id) {
+					var result = new ContactCard (UITableViewCellStyle.Default, cellIdentifier);
+					result.nameLabel.Text = friend.username;
+					result.connection = friend.connection ;
+					result.id = friend.Id;
+
+					retCollect.Add (result);
+
+				}
+			}
+			return retCollect;
 		}
 
 		internal  async Task DeleteCustomList (CustomListCloud customList)
@@ -591,8 +607,7 @@ namespace MovieFriends
 			try {
 
 				List<UserFriendsCloud> items = await ufTable
-					.Where (item => item.friendusername == search)
-				  .ToListAsync ();
+					.Where (item => item.friendusername.StartsWith (search, StringComparison.CurrentCulture)).ToListAsync();
 
 				return new List<UserFriendsCloud> (items);
 

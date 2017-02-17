@@ -555,7 +555,8 @@ namespace FavoriteMovies
 			searchUpdater.UpdateSearchResults += searchResultsController.Search;
 
 			//add the search controller
-			searchController = new UISearchController (searchResultsController) {
+			searchController = new UISearchController (searchResultsController) 
+			{
 				SearchResultsUpdater = searchUpdater,
 
 				WeakDelegate = searchUpdater,

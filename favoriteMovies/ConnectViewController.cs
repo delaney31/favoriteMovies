@@ -72,7 +72,7 @@ namespace FavoriteMovies
 			((UITextField)searchController.SearchBar.ValueForKey (new NSString ("_searchField"))).ResignFirstResponder ();
 			//the search bar is contained in the navigation bar, so it should be visible
 			searchController.HidesNavigationBarDuringPresentation = false;
-
+			NavigationItem.TitleView = searchController.SearchBar;
 			//Ensure the searchResultsController is presented in the current View Controller 
 			DefinesPresentationContext = true;
 
@@ -254,7 +254,7 @@ namespace FavoriteMovies
 		public UISearchController searchController;
 		ConnectViewController connectViewController;
 
-		public ObservableCollection<ContactCard> Friends { get; set; }
+		public ObservableCollection<ContactCard> Friends = new ObservableCollection<ContactCard> ();
 
 
 
@@ -405,7 +405,8 @@ namespace FavoriteMovies
 			try {
 				UIApplication.SharedApplication.NetworkActivityIndicatorVisible = true;
 				// perform search
-				if (forSearchString.Length > 0) {
+				if (forSearchString.Length > 0) 
+				{
 					Friends = await postService.FriendSearch (forSearchString);
 					TableView.ReloadData ();
 				}
