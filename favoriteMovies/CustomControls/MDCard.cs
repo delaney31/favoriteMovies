@@ -50,7 +50,7 @@ namespace FavoriteMovies
 
 			titleLabel = new UILabel ();
 			titleLabel.Frame = new CoreGraphics.CGRect () { X = 15, Y = -5, Width = 250, Height = 100 };
-			titleLabel.Font = UIFont.FromName (ColorExtensions.TITLE_FONT, ColorExtensions.HEADER_FONT_SIZE);
+			titleLabel.Font = UIFont.FromName (ColorExtensions.TITLE_FONT,14);
 			titleLabel.Lines = 2;
 			titleLabel.TextAlignment = UITextAlignment.Left;
 			liked = true;

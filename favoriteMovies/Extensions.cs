@@ -68,6 +68,7 @@ namespace FavoriteMovies
 		public const string TITLE_COLOR = "#DE9A2D";
 		public const string TITLE_FONT = "AppleSDGothicNeo-Bold";
 		public const string CONTENT_FONT = "AppleSDGothicNeo-Regular";
+		public const string PROFILE_NAME = "BodoniSvtyTwoOSITCTT-Bold";
 		//public const string TAB_BACKGROUND_COLOR = "#000000";//black
 		//public const string TAB_BACKGROUND_COLOR = "#555555"; //grey
 		public const string TAB_BACKGROUND_COLOR = "#FFFFFF"; //white

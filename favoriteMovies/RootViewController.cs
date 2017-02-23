@@ -110,7 +110,7 @@ namespace FavoriteMovies
 			};
 			Console.WriteLine (uinc2.ViewControllers.Length);
 
-			var tab3 = new UIViewController ();
+			var tab3 = new NotificationsViewController ();
 			tab3.Title = "Notifications";
 			tab3.View.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 			tab3.TabBarItem.SetFinishedImages (UIImage.FromBundle ("ic_notifications.png"), UIImage.FromBundle ("ic_notifications.png"));

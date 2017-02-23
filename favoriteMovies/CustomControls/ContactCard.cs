@@ -27,9 +27,9 @@ namespace FavoriteMovies
 			locationLabel = new UILabel ();
 
 			profileImage.Image = ColorExtensions.profileImage;
-			nameLabel.Font = UIFont.FromName (ColorExtensions.TITLE_FONT, 15);
-			descriptionLabel.Font = UIFont.FromName (ColorExtensions.TITLE_FONT, 10);
-			locationLabel.Font = UIFont.FromName (ColorExtensions.TITLE_FONT, 10);
+			nameLabel.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, 15);
+			descriptionLabel.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, 10);
+			locationLabel.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, 10);
 			ContentView.AddSubviews (profileImage, descriptionLabel, nameLabel, addRemove, locationLabel);
 
 		}

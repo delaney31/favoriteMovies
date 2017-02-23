@@ -32,6 +32,7 @@ namespace MovieFriends
 	{
 		static AzureTablesService instance = new AzureTablesService ();
 		const string applicationURL = @"https://moviefriends.azurewebsites.net";
+
 		public MobileServiceClient client;
 
 #if OFFLINE_SYNC_ENABLED
@@ -131,6 +132,7 @@ namespace MovieFriends
 		}
 
 
+
 		public async Task PostSyncAsync (bool pullData = false)
 		{
 
@@ -146,6 +148,27 @@ namespace MovieFriends
 				Console.Error.WriteLine (@"Sync Failed: {0}", e.Message);
 			}
 #endif
+		}
+
+		internal async Task<List<NotificationsCloud>> GetNotifications ()
+		{
+			try {
+
+				var notifications =
+
+						from notifs in await nfTable.ToListAsync ()
+						join friends in await ufTable.ToListAsync () on notifs.userid equals friends.friendid
+						where friends.userid == ColorExtensions.CurrentUser.Id
+						select new NotificationsCloud { Id = notifs.Id, notification = notifs.notification, userid = notifs.userid };
+
+				return new List<NotificationsCloud> (notifications).Take(50).ToList();
+
+
+
+			} catch (Exception e) {
+				Console.Error.WriteLine (@"ERROR {0}", e.Message);
+				return new List<NotificationsCloud> ();
+			}
 		}
 		public async Task UserSyncAsync (bool pullData = false)
 		{
@@ -400,20 +423,25 @@ namespace MovieFriends
 		{
 			const string cellIdentifier = "ContactCard";
 			var retCollect = new ObservableCollection<ContactCard> ();
-			var friends = await userTable.Where (f => f.username.StartsWith (forSearchString)).ToListAsync ();
-			foreach (var friend in friends) 
-			{
+			try {
+				var friends = await userTable.Where (f => f.username.Substring(0,forSearchString.Length).ToLower()== forSearchString.ToLower()).ToListAsync ();
+				foreach (var friend in friends) {
 
-				if (friend.Id != ColorExtensions.CurrentUser.Id) {
-					var result = new ContactCard (UITableViewCellStyle.Default, cellIdentifier);
-					result.nameLabel.Text = friend.username;
-					result.connection = friend.connection ;
-					result.id = friend.Id;
+					if (friend.Id != ColorExtensions.CurrentUser.Id) {
+						var result = new ContactCard (UITableViewCellStyle.Default, cellIdentifier);
+						result.nameLabel.Text = friend.username;
+						result.connection = friend.connection;
+						result.id = friend.Id;
 
-					retCollect.Add (result);
+						retCollect.Add (result);
 
+					}
 				}
+			}catch(Exception ex)
+			{
+				Console.WriteLine (ex.Message);
 			}
+
 			return retCollect;
 		}
 
@@ -656,7 +684,7 @@ namespace MovieFriends
 					};
 
 
-				return userfriends.Take(100).ToList ();
+				return userfriends.Take(50).ToList ();
 
 
 

@@ -81,7 +81,7 @@
     <DefineConstants>DEBUG;ENABLE_TEST_CLOUD;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CodesignKey>iPhone Developer</CodesignKey>
+    <CodesignKey>iPhone Developer: TIMOTHY DELANEY (LP695RTGQ3)</CodesignKey>
     <DeviceSpecificBuild>true</DeviceSpecificBuild>
     <MtouchDebug>true</MtouchDebug>
     <MtouchFastDev>true</MtouchFastDev>
@@ -95,7 +95,7 @@
     <MtouchHttpClientHandler>HttpClientHandler</MtouchHttpClientHandler>
     <MtouchTlsProvider>Default</MtouchTlsProvider>
     <PlatformTarget>x86</PlatformTarget>
-    <CodesignProvision>fdf1b85e-afdb-40d2-b62a-2d70b2b345dc</CodesignProvision>
+    <CodesignProvision></CodesignProvision>
     <MtouchSdkVersion></MtouchSdkVersion>
     <MtouchExtraArgs>-v -v -v -v</MtouchExtraArgs>
   </PropertyGroup>
@@ -183,9 +183,6 @@
     <Reference Include="Microsoft.Rest.ClientRuntime.Azure">
       <HintPath>..\packages\Microsoft.Rest.ClientRuntime.Azure.3.3.4\lib\netstandard1.5\Microsoft.Rest.ClientRuntime.Azure.dll</HintPath>
     </Reference>
-    <Reference Include="ToastIOS">
-      <HintPath>..\Components\ToastIOS-1.6\lib\ios-unified\ToastIOS.dll</HintPath>
-    </Reference>
     <Reference Include="Plugin.Messaging.Abstractions">
       <HintPath>..\packages\Xam.Plugins.Messaging.3.2.1\lib\Xamarin.iOS10\Plugin.Messaging.Abstractions.dll</HintPath>
     </Reference>
@@ -200,6 +197,9 @@
     </Reference>
     <Reference Include="Geolocator.Plugin">
       <HintPath>..\packages\Xam.Plugin.Geolocator.1.0.3\lib\Xamarin.iOS10\Geolocator.Plugin.dll</HintPath>
+    </Reference>
+    <Reference Include="ToastIOS">
+      <HintPath>..\Components\ToastIOS-1.6\lib\ios-unified\ToastIOS.dll</HintPath>
     </Reference>
     <Reference Include="BTProgressHUD">
       <HintPath>..\Components\btprogresshud-1.20\lib\ios-unified\BTProgressHUD.dll</HintPath>
@@ -274,6 +274,7 @@
     <Compile Include="ConnectViewController.cs" />
     <Compile Include="UserProfileViewController.cs" />
     <Compile Include="clTable.cs" />
+    <Compile Include="NotificationsViewController.cs" />
   </ItemGroup>
   <ItemGroup>
     <BundleResource Include="Resources\placeholder.png" />
