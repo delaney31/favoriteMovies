@@ -351,7 +351,7 @@ namespace FavoriteMovies
 		public override void ViewDidAppear (bool animated)
 		{
 			base.ViewDidAppear (animated);
-
+			NewsFeedTableSource.HideTabBar ((UIApplication.SharedApplication.Delegate as AppDelegate).rootViewController.TabController,View.BackgroundColor);
 			nfloat lastViewPostion=0;
 			if (similarMovies.Count > 0) 
 			{
@@ -570,7 +570,7 @@ namespace FavoriteMovies
 
 			webView = new UIWebView () {
 				AutoresizingMask = UIViewAutoresizing.FlexibleHeight | UIViewAutoresizing.FlexibleWidth,
-				BackgroundColor = UIColor.Black,
+				BackgroundColor = UIColor.White
 			};
 			var viewController = new UIViewController ();
 

@@ -223,7 +223,7 @@ namespace FavoriteMovies
 			this.newsFeedViewController = newsFeedViewController;
 
 		}
-		public static void HideTabBar (UIViewController tab)
+		public static void HideTabBar (UIViewController tab,UIColor viewColor)
 		{
 			var screenRect = UIScreen.MainScreen.Bounds;
 			nfloat fHeight = screenRect.Height;
@@ -239,7 +239,7 @@ namespace FavoriteMovies
 					view.Frame = new CGRect (view.Frame.X, fHeight, view.Frame.Width, view.Frame.Height);
 				} else {
 					view.Frame = new CGRect (view.Frame.X, view.Frame.Y, view.Frame.Width, fHeight);
-					view.BackgroundColor = UIColor.Black;
+					view.BackgroundColor = viewColor;
 				}
 			}
 			UIView.CommitAnimations ();
@@ -273,7 +273,7 @@ namespace FavoriteMovies
 
 
 			if (targetPoint.Y > currentPoint.Y) {
-				HideTabBar ((UIApplication.SharedApplication.Delegate as AppDelegate).rootViewController.TabController);
+				HideTabBar ((UIApplication.SharedApplication.Delegate as AppDelegate).rootViewController.TabController,newsFeedViewController.View.BackgroundColor);
 				newsFeedViewController.NavigationController.SetNavigationBarHidden (true, true);
 				var statusView = new UIView () { Frame = UIApplication.SharedApplication.StatusBarFrame };
 				statusView.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f);

@@ -21,6 +21,13 @@ namespace FavoriteMovies
 				base.ViewDidAppear (animated);
 				BTProgressHUD.Show ();
 				notificationsList = await getNotifications ();
+				if (notificationsList.Count == 0) 
+				{
+					var noNotifications = new NotificationsCloud ();
+					noNotifications.notification = "Follow someone to see notifications here.";
+					notificationsList.Add (noNotifications);
+				}
+
 				tableSource = new NotificationsCloudTableSource (notificationsList, this);
 				BTProgressHUD.Dismiss ();
 
@@ -40,6 +47,7 @@ namespace FavoriteMovies
 		}
 
 
+
 		async Task<List<NotificationsCloud>> getNotifications ()
 		{
 			return await postService.GetNotifications ();
@@ -57,12 +65,18 @@ namespace FavoriteMovies
 			this.controller = cont;
 
 		}
+		public void updateImage (UITableViewCell cell, NotificationsCloud user)
+		{
+			
+			//cell.ImageView.Image = await BlobUpload.getProfileImage (user.userid, 150, 150);
 
+
+		}
 		public override UITableViewCell GetCell (UITableView tableView, NSIndexPath indexPath)
 		{
 
 			UITableViewCell cell = tableView.DequeueReusableCell (cellIdentifier);
-		
+
 
 			var cellStyle = UITableViewCellStyle.Default;
 
@@ -74,8 +88,8 @@ namespace FavoriteMovies
 
 			cell.TextLabel.Text = listItems [indexPath.Row].notification;
 			cell.TextLabel.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, ColorExtensions.CAST_FONT_SIZE);
-
-
+			//cell.ImageView.Image = await BlobUpload.getProfileImage (listItems [indexPath.Row].userid, 150, 150);
+		
 			return cell;
 		}
 

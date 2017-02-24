@@ -27,7 +27,7 @@ namespace FavoriteMovies
 		{
 			
 			base.ViewDidLoad ();
-			//BTProgressHUD.Show ();
+						//BTProgressHUD.Show ();
 			tableItems = await GetUserContactsAsync ();
 			//Title = "Connect";
 			tableSource = new ConnectCloudTableSource (tableItems, this);
@@ -147,7 +147,7 @@ namespace FavoriteMovies
 			foreach (var user in listItems) 
 			{
 				
-				user.profileImage.Image = (await BlobUpload.getProfileImage (user.id, 150, 150));
+				user.profileImage.Image = await BlobUpload.getProfileImage (user.id, 150, 150);
 					
 			}
 
