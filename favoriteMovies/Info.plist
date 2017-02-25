@@ -45,5 +45,7 @@
 	<string></string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string></string>
+	<key>Pushwoosh_APPID</key>
+	<string>373F3-33A2A</string>
 </dict>
 </plist>
