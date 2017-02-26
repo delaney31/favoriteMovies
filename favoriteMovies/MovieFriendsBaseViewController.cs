@@ -222,6 +222,11 @@ namespace FavoriteMovies
 
 			return cell;
 		}
+		public override void RowSelected (UITableView tableView, NSIndexPath indexPath)
+		{
+			var row = userFriends [indexPath.Row];
+			movieFriendsBaseViewController.NavigationController.PushViewController (new MovieChatViewController (row), true);
+		}
 
 		public override nint RowsInSection (UITableView tableview, nint section)
 		{

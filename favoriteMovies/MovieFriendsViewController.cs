@@ -8,16 +8,7 @@ namespace FavoriteMovies
 {
 	public class MovieFriendsViewController:MovieFriendsBaseViewController
 	{
-
-		public override async void ViewDidLoad ()
-		{
-			base.ViewDidLoad ();
-			friendsList = await GetMovieFriends ();
-
-			tableSource = new FriendsTableSource (friendsList, this);
-			table.Source = tableSource;
-		}
-
+		
 		async Task<List<UserFriendsCloud>> GetMovieFriends ()
 		{
 			AzureTablesService userFriendsService = AzureTablesService.DefaultService;
@@ -26,5 +17,22 @@ namespace FavoriteMovies
 			var retList = await userFriendsService.GetUserFriends (ColorExtensions.CurrentUser.Id);
 			return retList;
 		}
-}
+
+		public override void ViewDidLoad ()
+		{
+			base.ViewDidLoad ();
+
+		}
+		public override async void ViewDidAppear (bool animated)
+		{
+			base.ViewDidAppear (animated);
+			friendsList = await GetMovieFriends ();
+
+			tableSource = new FriendsTableSource (friendsList, this);
+			table.Source = tableSource;
+			View.Add (table);
+			NavigationController.NavigationBar.Translucent = false;
+		}
+
+	}
 }

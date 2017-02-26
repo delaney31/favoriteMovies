@@ -16,7 +16,17 @@ namespace FavoriteMovies
 		UserCloud friend = new UserCloud { Id = "12345", DisplayName = "Tom Anderson" };
 
 		MessageFactory messageFactory = new MessageFactory ();
-	
+		UserFriendsCloud row;
+
+		public MovieChatViewController (UserFriendsCloud row)
+		{
+			this.row = row;
+		}
+		public override void ViewDidAppear (bool animated)
+		{
+			base.ViewDidAppear (animated);
+			NewsFeedTableSource.HideTabBar ((UIApplication.SharedApplication.Delegate as AppDelegate).rootViewController.TabController, View.BackgroundColor);
+		}
 		public override void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
