@@ -81,7 +81,7 @@
     <DefineConstants>DEBUG;ENABLE_TEST_CLOUD;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CodesignKey>iPhone Developer: TIMOTHY DELANEY (LP695RTGQ3)</CodesignKey>
+    <CodesignKey>iPhone Developer</CodesignKey>
     <DeviceSpecificBuild>true</DeviceSpecificBuild>
     <MtouchDebug>true</MtouchDebug>
     <MtouchFastDev>true</MtouchFastDev>
@@ -95,7 +95,7 @@
     <MtouchHttpClientHandler>HttpClientHandler</MtouchHttpClientHandler>
     <MtouchTlsProvider>Default</MtouchTlsProvider>
     <PlatformTarget>x86</PlatformTarget>
-    <CodesignProvision></CodesignProvision>
+    <CodesignProvision>2df78397-80de-4db9-9408-c84c31c244cf</CodesignProvision>
     <MtouchSdkVersion></MtouchSdkVersion>
     <MtouchExtraArgs>-v -v -v -v</MtouchExtraArgs>
   </PropertyGroup>
@@ -211,14 +211,12 @@
     <ImageAsset Include="Assets.xcassets\LaunchImage.launchimage\Contents.json" />
     <ImageAsset Include="Assets.xcassets\LaunchImage.launchimage\Default%402x.png" />
     <ImageAsset Include="Assets.xcassets\LaunchImage.launchimage\Default-568h%402x.png" />
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\icon2.png" />
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\icon2 2.png" />
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\icon2 29.png" />
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\icon2 58.png" />
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\icon2-87.png" />
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\icon2-80.png" />
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\icon2 57.png" />
-    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\icon2-114.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Final-Logo.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Final-Logo120.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Final-Logo80.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Final-Logo87.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Final-Logo57.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Final-Logo58.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
@@ -345,6 +343,10 @@
     <ProjectReference Include="..\favoriteMoviesPCL\favoriteMoviesPCL.csproj">
       <Project>{5E21058F-6E9D-49C9-B81F-9B975C2A44BD}</Project>
       <Name>favoriteMoviesPCL</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\pushwoosh-xamarin-master\iOS\Pushwoosh\PushwooshSDK.iOS.csproj">
+      <Project>{44A022F7-B823-4378-B609-5DEE80AD38B3}</Project>
+      <Name>PushwooshSDK.iOS</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

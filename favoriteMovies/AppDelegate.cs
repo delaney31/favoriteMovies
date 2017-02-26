@@ -8,6 +8,7 @@ using Foundation;
 using SidebarNavigation;
 using UIKit;
 using WindowsAzure.Messaging;
+using Pushwoosh;
 namespace FavoriteMovies
 {
 	// The UIApplicationDelegate for the application. This class is responsible for launching the
@@ -23,7 +24,20 @@ namespace FavoriteMovies
 			set;
 		}
 
+		public override void RegisteredForRemoteNotifications (UIApplication application, NSData deviceToken)
+		{
+			PushNotificationManager.PushManager.HandlePushRegistration (deviceToken);
+		}
 
+		public override void FailedToRegisterForRemoteNotifications (UIApplication application, NSError error)
+		{
+			PushNotificationManager.PushManager.HandlePushRegistrationFailure (error);
+		}
+
+		public override void ReceivedRemoteNotification (UIApplication application, NSDictionary userInfo)
+		{
+			PushNotificationManager.PushManager.HandlePushReceived (userInfo);
+		}
 		public override bool FinishedLaunching (UIApplication application, NSDictionary launchOptions)
 		{
 			// Override point for customization after application launch.
@@ -70,7 +84,16 @@ namespace FavoriteMovies
 				UIApplication.SharedApplication.RegisterForRemoteNotificationTypes (notificationTypes);
 			}
 
+			PushNotificationManager pushmanager = PushNotificationManager.PushManager;
+			pushmanager.Delegate = this;
 
+			if (launchOptions != null) {
+				if (launchOptions.ContainsKey (UIApplication.LaunchOptionsRemoteNotificationKey)) {
+					pushmanager.HandlePushReceived (launchOptions);
+				}
+			}
+			pushmanager.StartLocationTracking ();
+			pushmanager.RegisterForPushNotifications ();
 						// Code to start the Xamarin Test Cloud Agent
 			#if ENABLE_TEST_CLOUD
 						Xamarin.Calabash.Start ();
@@ -108,28 +131,28 @@ namespace FavoriteMovies
 				}
 			}
 		}
-		public override void ReceivedRemoteNotification (UIApplication application, NSDictionary userInfo)
-		{
-			ProcessNotification (userInfo, false);
+		//public override void ReceivedRemoteNotification (UIApplication application, NSDictionary userInfo)
+		//{
+		//	ProcessNotification (userInfo, false);
 
-		}
-		public override void RegisteredForRemoteNotifications (UIApplication application, NSData deviceToken)
-		{
-			Hub = new SBNotificationHub (Constants.ConnectionString, Constants.NotificationHubPath);
+		//}
+		//public override void RegisteredForRemoteNotifications (UIApplication application, NSData deviceToken)
+		//{
+		//	Hub = new SBNotificationHub (Constants.ConnectionString, Constants.NotificationHubPath);
 
-			Hub.UnregisterAllAsync (deviceToken, (error) => {
-				if (error != null) {
-					Console.WriteLine ("Error calling Unregister: {0}", error.ToString ());
-					return;
-				}
+		//	Hub.UnregisterAllAsync (deviceToken, (error) => {
+		//		if (error != null) {
+		//			Console.WriteLine ("Error calling Unregister: {0}", error.ToString ());
+		//			return;
+		//		}
 
-				NSSet tags = null; // create tags if you want
-				Hub.RegisterNativeAsync (deviceToken, tags, (errorCallback) => {
-					if (errorCallback != null)
-						Console.WriteLine ("RegisterNativeAsync error: " + errorCallback.ToString ());
-				});
-			});
-		}
+		//		NSSet tags = null; // create tags if you want
+		//		Hub.RegisterNativeAsync (deviceToken, tags, (errorCallback) => {
+		//			if (errorCallback != null)
+		//				Console.WriteLine ("RegisterNativeAsync error: " + errorCallback.ToString ());
+		//		});
+		//	});
+		//}
 		public override void OnResignActivation (UIApplication application)
 		{
 			// Invoked when the application is about to move from active to inactive state.
