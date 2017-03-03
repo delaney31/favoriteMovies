@@ -6,7 +6,7 @@ using MovieFriends;
 
 namespace FavoriteMovies
 {
-	public class MovieFriendsViewController:MovieFriendsBaseViewController
+	public class MovieFriendsViewController:ConnectViewController
 	{
 		
 		async Task<List<UserFriendsCloud>> GetMovieFriends ()
@@ -18,11 +18,7 @@ namespace FavoriteMovies
 			return retList;
 		}
 
-		public override void ViewDidLoad ()
-		{
-			base.ViewDidLoad ();
 
-		}
 		public override async void ViewDidAppear (bool animated)
 		{
 			base.ViewDidAppear (animated);
