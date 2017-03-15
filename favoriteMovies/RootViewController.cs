@@ -134,12 +134,11 @@ namespace FavoriteMovies
 		
 			uinc4.NavigationBar.BarTintColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f);
 			uinc4.NavigationBar.TintColor = UIColor.White;
-			//uinc4.NavigationBar.Translucent = true;
 			uinc4.NavigationBar.TitleTextAttributes = new UIStringAttributes () {
 				ForegroundColor = UIColor.White
 			};
 
-			var tab5 = new ConnectViewController ();
+			var tab5 = new FindFriendsViewController ();
 			tab5.Title = "Friends";
 			tab5.View.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 			tab5.TabBarItem.SetFinishedImages (UIImage.FromBundle ("ic_person_add.png"),UIImage.FromBundle ("ic_person_add.png"));

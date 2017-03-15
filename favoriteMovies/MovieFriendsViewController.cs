@@ -14,20 +14,28 @@ namespace FavoriteMovies
 			AzureTablesService userFriendsService = AzureTablesService.DefaultService;
 		//	await userFriendsService.InitializeStoreAsync ();
 
-			var retList = await userFriendsService.GetUserFriends (ColorExtensions.CurrentUser.Id);
-			return retList;
+			return  await userFriendsService.GetUserFriends (ColorExtensions.CurrentUser.Id);
+
 		}
 
+		public override async void ViewDidLoad ()
+		{
+			base.ViewDidLoad ();
+			tableItems = await GetFriendsContactsAsync ();
+			tableSource = new ConnectCloudTableSource (tableItems, this);
 
-		public override async void ViewDidAppear (bool animated)
+			table.Source = tableSource;
+			await ((ConnectCloudTableSource)tableSource).updateImages ();
+			NavigationController.NavigationBar.Translucent = false;
+			View.Add (table);
+		
+
+		}
+		public override void ViewDidAppear (bool animated)
 		{
 			base.ViewDidAppear (animated);
-			friendsList = await GetMovieFriends ();
-
-			tableSource = new FriendsTableSource (friendsList, this);
-			table.Source = tableSource;
-			View.Add (table);
-			NavigationController.NavigationBar.Translucent = false;
+		
+		
 		}
 
 	}

@@ -17,7 +17,7 @@ namespace FavoriteMovies
 {
 	public class ConnectViewController:MovieFriendsBaseViewController
 	{
-		List<ContactCard> tableItems;
+		protected List<ContactCard> tableItems;
 		//UIBarButtonItem following;
 		const string cellIdentifier = "UserCloudCells";
 		List<UserCloud> users;
@@ -28,18 +28,10 @@ namespace FavoriteMovies
 			
 			base.ViewDidLoad ();
 						//BTProgressHUD.Show ();
-			tableItems = await GetUserContactsAsync ();
+
 			//Title = "Connect";
-			tableSource = new ConnectCloudTableSource (tableItems, this);
 
-			table.Source = tableSource;
-			await ((ConnectCloudTableSource)tableSource).updateImages ();
 			//tableView.EstimatedRowHeight = 100;
-			table.RowHeight = 55;
-			table.ContentInset = new UIEdgeInsets (0, 0, 64, 0);
-			View.Add (table);
-			NavigationController.NavigationBar.Translucent = false;
-
 			// Creates an instance of a custom View Controller that holds the results
 			var searchResultsController = new SearchFriendResultsViewController (this);
 
@@ -76,7 +68,7 @@ namespace FavoriteMovies
 			//Ensure the searchResultsController is presented in the current View Controller 
 			DefinesPresentationContext = true;
 
-			BTProgressHUD.Dismiss ();
+
 
 
 		}
@@ -94,7 +86,7 @@ namespace FavoriteMovies
 				BTProgressHUD.Show ();
 		}
 
-		async Task<List<ContactCard>> GetUserContactsAsync ()
+		protected async Task<List<ContactCard>> GetUserContactsAsync ()
 		{
 			BTProgressHUD.Show ();
 			var watch = System.Diagnostics.Stopwatch.StartNew ();
@@ -114,8 +106,8 @@ namespace FavoriteMovies
 					result.nameLabel.Text = user.username;
 					result.connection = user.connection;
 					result.id = user.Id;
-					result.moviesInCommon = await postService.MoviesInCommon (ColorExtensions.CurrentUser, user);
-					result.location = user.City + " " + user.State + " " + user.Country;
+					result.moviesInCommon = await postService.MoviesInCommon (ColorExtensions.CurrentUser.Id, user.Id);
+					result.location = user.city + " " + user.state + " " + user.country;
 					results.Add (result);
 					Console.WriteLine (user.Id	);
 				}
@@ -128,6 +120,40 @@ namespace FavoriteMovies
 			return results.OrderByDescending (x => x.moviesInCommon).ToList ();
 
 		}
+		protected async Task<List<ContactCard>> GetFriendsContactsAsync ()
+		{
+			BTProgressHUD.Show ();
+			var watch = System.Diagnostics.Stopwatch.StartNew ();
+
+			const string cellId = "UserContacts";
+			List<ContactCard> results = new List<ContactCard> ();
+
+			table.TableHeaderView = new UIView () {
+				Frame = new CGRect () { X = 0.0f, Y = 0.0f, Width = View.Layer.Frame.Width, Height = 20f }
+			};
+			var friends = await postService.GetUserFriends (ColorExtensions.CurrentUser.Id);
+			foreach (var user in friends) {
+				
+					var result = new ContactCard (UITableViewCellStyle.Default, cellId);
+					result.nameLabel.Text = user.friendusername;
+					result.connection = null;
+					result.id = user.friendid;
+					result.moviesInCommon = await postService.MoviesInCommon (ColorExtensions.CurrentUser.Id, user.Id);
+					var location = await postService.GetUserLocation (user.friendid);
+					result.location = location.city + " " + location.state + " " + location.country;
+					results.Add (result);
+					Console.WriteLine (user.Id);
+
+
+			}
+			watch.Stop ();
+			Console.WriteLine ("GetUserContactsAsync Method took " + watch.ElapsedMilliseconds / 1000.0 + " seconds");
+
+
+			return results.OrderByDescending (x => x.moviesInCommon).ToList ();
+
+		}
+	
 	}
 
 	public class ConnectCloudTableSource : UITableViewSource
@@ -158,65 +184,64 @@ namespace FavoriteMovies
 		{
 			
 			var cell = listItems [indexPath.Row];
-			if (cell.connection)
-				cell.addRemove.Image = UIImage.FromBundle ("ic_remove_circle_outline.png");
-			else
-				cell.addRemove.Image = UIImage.FromBundle ("follow.png");
+
 			cell.id = listItems [indexPath.Row].id;
 			var tapGesture = new UITapGestureRecognizer ();
-			if (!cell.connection) 
+			if (cell.connection != null) 
 			{
-				
-				tapGesture.AddTarget (() =>
-				{
-					bool inserted= false;
-					var userfriend = new UserFriendsCloud ();
-					userfriend.userid = ColorExtensions.CurrentUser.Id;
-					userfriend.friendid = cell.id;
-					userfriend.friendusername = cell.nameLabel.Text;
-					InvokeOnMainThread (async () => 
-					{
-						inserted = await controller.postService.InsertUserFriendAsync (userfriend);
+				if ((bool)cell.connection)
+					cell.addRemove.Image = UIImage.FromBundle ("ic_remove_circle_outline.png");
+				else
+					cell.addRemove.Image = UIImage.FromBundle ("follow.png");
+				if ((bool)!cell.connection) {
 
-						if (inserted) 
-						{
-							listItems [indexPath.Row].connection = true;
-							controller.table.ReloadData ();
-							BTProgressHUD.ShowToast ("Following " + cell.nameLabel.Text, false);
-						}
-					});
-				});
+					tapGesture.AddTarget (() => {
+						bool inserted = false;
+						var userfriend = new UserFriendsCloud ();
+						userfriend.userid = ColorExtensions.CurrentUser.Id;
+						userfriend.friendid = cell.id;
+						userfriend.friendusername = cell.nameLabel.Text;
+						InvokeOnMainThread (async () => {
+							inserted = await controller.postService.InsertUserFriendAsync (userfriend);
 
-			} else 
-			{
-				
-				tapGesture.AddTarget(() =>
-				{
-					
-					var userfriend = new UserFriendsCloud ();
-					userfriend.userid = ColorExtensions.CurrentUser.Id;
-					userfriend.friendid = cell.id;
-					userfriend.friendusername = cell.nameLabel.Text;
-					bool deleted = false;
-					InvokeOnMainThread (async () => 
-					{
-						bool accepted = await BaseCollectionViewController.ShowAlert ("Confirm", "Are you sure you want to remove this friend?");
-					    Console.WriteLine ("Selected button {0}", accepted ? "Accepted" : "Canceled");
-						if (accepted) 
-						{
-							deleted = await controller.postService.DeleteItemAsync (userfriend);
-							if (deleted) 
-							{
-								listItems [indexPath.Row].connection = false;
+							if (inserted) {
+								listItems [indexPath.Row].connection = true;
 								controller.table.ReloadData ();
-								BTProgressHUD.ShowToast ("Unfollowing " + cell.nameLabel.Text ,false);
+								BTProgressHUD.ShowToast ("Following " + cell.nameLabel.Text, false);
 							}
-						}
+						});
 					});
-				});
 
-			}
+				} else {
 
+					tapGesture.AddTarget (() => {
+
+						var userfriend = new UserFriendsCloud ();
+						userfriend.userid = ColorExtensions.CurrentUser.Id;
+						userfriend.friendid = cell.id;
+						userfriend.friendusername = cell.nameLabel.Text;
+						bool deleted = false;
+						InvokeOnMainThread (async () => {
+							bool accepted = await BaseCollectionViewController.ShowAlert ("Confirm", "Are you sure you want to remove this friend?");
+							Console.WriteLine ("Selected button {0}", accepted ? "Accepted" : "Canceled");
+							if (accepted) {
+								deleted = await controller.postService.DeleteItemAsync (userfriend);
+								if (deleted) 
+								{
+									listItems [indexPath.Row].connection = false;
+									controller.table.ReloadData ();
+									BTProgressHUD.ShowToast ("Unfollowing " + cell.nameLabel.Text, false);
+								}
+							}
+						});
+					});
+
+				}
+			} else
+				
+			{
+				cell.addRemove.Image = UIImage.FromBundle ("chat.png");
+			}			
 			var userProfile = new UITapGestureRecognizer ();
 			var profile = new UserProfileViewController (listItems [indexPath.Row]);
 			userProfile.AddTarget (() => 
@@ -305,13 +330,14 @@ namespace FavoriteMovies
 		{
 
 			var cell = Friends [indexPath.Row];
-			if (cell.connection)
+			if ((bool)cell.connection)
 				cell.addRemove.Image = UIImage.FromBundle ("ic_remove_circle_outline.png");
 			else
 				cell.addRemove.Image = UIImage.FromBundle ("follow.png");
 			cell.id = Friends [indexPath.Row].id;
 			var tapGesture = new UITapGestureRecognizer ();
-			if (!cell.connection) {
+			if ((bool)!cell.connection) 
+			{
 
 				tapGesture.AddTarget (() => {
 					bool inserted = false;

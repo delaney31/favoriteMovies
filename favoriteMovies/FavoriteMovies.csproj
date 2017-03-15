@@ -17,7 +17,7 @@
     <DefineConstants>DEBUG;ENABLE_TEST_CLOUD;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CodesignKey>iPhone Distribution</CodesignKey>
+    <CodesignKey>iPhone Developer: TIMOTHY DELANEY (LP695RTGQ3)</CodesignKey>
     <MtouchDebug>true</MtouchDebug>
     <MtouchFastDev>true</MtouchFastDev>
     <MtouchProfiling>true</MtouchProfiling>
@@ -273,6 +273,8 @@
     <Compile Include="UserProfileViewController.cs" />
     <Compile Include="clTable.cs" />
     <Compile Include="NotificationsViewController.cs" />
+    <Compile Include="MFVideoViewController.cs" />
+    <Compile Include="FindFriendsViewController.cs" />
   </ItemGroup>
   <ItemGroup>
     <BundleResource Include="Resources\placeholder.png" />
@@ -338,6 +340,7 @@
     <BundleResource Include="Resources\velvetropes.png" />
     <BundleResource Include="Resources\Divider_large_red_large.png" />
     <BundleResource Include="Resources\ic_notifications.png" />
+    <BundleResource Include="Resources\chat.png" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\favoriteMoviesPCL\favoriteMoviesPCL.csproj">

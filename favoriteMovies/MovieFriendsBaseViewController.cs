@@ -16,8 +16,6 @@ namespace FavoriteMovies
 		public UITableView table;
 		protected List<UserFriendsCloud> friendsList;
 		protected UITableViewSource tableSource;
-		static FriendSearchResultsViewController searchResultsController;
-		UISearchController searchController;
 		const string movieFriends = "Movie Friends";
 		const string findFriends = "Find Friends";
 
@@ -31,46 +29,6 @@ namespace FavoriteMovies
 
 			table.AllowsSelectionDuringEditing = true;
 			NavigationItem.Title = movieFriends;
-			//Add (table);
-
-			//// Creates an instance of a custom View Controller that holds the results
-			//searchResultsController = new FriendSearchResultsViewController ();
-
-			////Creates a search controller updater
-			//var searchUpdater = new FriendSearchResultsUpdator ();
-			//searchUpdater.UpdateSearchResults += searchResultsController.Search;
-
-			////add the search controller
-			//searchController = new UISearchController (searchResultsController) {
-			//	SearchResultsUpdater = searchUpdater,
-
-			//	WeakDelegate = searchUpdater,
-			//	WeakSearchResultsUpdater = searchUpdater,
-			//};
-
-			//searchResultsController.searchController = searchController;
-
-			////format the search bar
-			//searchController.SearchBar.SizeToFit ();
-			//searchController.SearchBar.SearchBarStyle = UISearchBarStyle.Prominent;
-			//searchController.SearchBar.Placeholder = findFriends;
-
-			////searchResultsController.TableView.WeakDelegate = this;
-			//searchController.SearchBar.WeakDelegate = searchResultsController;
-
-			//((UITextField)searchController.SearchBar.ValueForKey (new NSString ("_searchField"))).TextColor = UIColor.White;
-			//((UITextField)searchController.SearchBar.ValueForKey (new NSString ("_searchField"))).Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, ColorExtensions.CAST_FONT_SIZE);
-			//((UITextField)searchController.SearchBar.ValueForKey (new NSString ("_searchField"))).BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f);
-
-			////the search bar is contained in the navigation bar, so it should be visible
-			//searchController.HidesNavigationBarDuringPresentation = false;
-
-			////Ensure the searchResultsController is presented in the current View Controller 
-			//DefinesPresentationContext = true;
-
-			////Set the search bar in the navigation bar
-			////(UIApplication.SharedApplication.Delegate as AppDelegate).rootViewController.TabController.NavigationItem.TitleView = searchController.SearchBar;
-			//NavigationItem.TitleView = searchController.SearchBar;
 
 		}
 

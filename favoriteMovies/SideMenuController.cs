@@ -81,7 +81,7 @@ namespace FavoriteMovies
 				SidebarController.CloseMenu ();
 			};
 			var locationIcon = new UIImageView () { Image = UIImage.FromBundle ("location-100.png") };
-			if (ColorExtensions.CurrentUser.City != null) 
+			if (ColorExtensions.CurrentUser.city != null) 
 			{
 				
 				locationIcon.Frame = new CGRect () { X = 110, Y = 243, Width = 10, Height = 10 };
@@ -90,7 +90,7 @@ namespace FavoriteMovies
 				//title.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.NAV_BAR_COLOR, 1.0f);
 				location.HorizontalAlignment = UIControlContentHorizontalAlignment.Center;
 				location.SetTitleColor (UIColor.White, UIControlState.Normal);
-				location.SetTitle (ColorExtensions.CurrentUser.City + " " + ColorExtensions.CurrentUser.State + " " + ColorExtensions.CurrentUser.Country, UIControlState.Normal);
+				location.SetTitle (ColorExtensions.CurrentUser.city + " " + ColorExtensions.CurrentUser.state + " " + ColorExtensions.CurrentUser.country, UIControlState.Normal);
 				location.TouchUpInside += (sender, e) => {
 					NavController.PopToRootViewController (false);
 					SidebarController.CloseMenu ();

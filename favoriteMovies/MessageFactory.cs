@@ -43,7 +43,7 @@ namespace FavoriteMovies
 			if (messageIndex >= messages.Count)
 				messageIndex = 0;
 
-			return Message.Create (user.Id, user.DisplayName, msg);
+			return Message.Create (user.Id, user.displayname, msg);
 		}
 
 		async Task<Message> CreateOverflowMessageAsync (string source, UserCloud user)
@@ -59,7 +59,7 @@ namespace FavoriteMovies
 
 			var photoItem = new PhotoMediaItem (image);
 			photoItem.AppliesMediaViewMaskAsOutgoing = false;
-			return Message.Create (user.Id, user.DisplayName, photoItem);
+			return Message.Create (user.Id, user.displayname, photoItem);
 		}
 			
 		UIImage CreateAnimatedImage (byte [] data)

@@ -26,17 +26,17 @@ namespace FavoriteMovies
 
 		public override void RegisteredForRemoteNotifications (UIApplication application, NSData deviceToken)
 		{
-			PushNotificationManager.PushManager.HandlePushRegistration (deviceToken);
+			//PushNotificationManager.PushManager.HandlePushRegistration (deviceToken);
 		}
 
 		public override void FailedToRegisterForRemoteNotifications (UIApplication application, NSError error)
 		{
-			PushNotificationManager.PushManager.HandlePushRegistrationFailure (error);
+			//PushNotificationManager.PushManager.HandlePushRegistrationFailure (error);
 		}
 
 		public override void ReceivedRemoteNotification (UIApplication application, NSDictionary userInfo)
 		{
-			PushNotificationManager.PushManager.HandlePushReceived (userInfo);
+			//PushNotificationManager.PushManager.HandlePushReceived (userInfo);
 		}
 		public override bool FinishedLaunching (UIApplication application, NSDictionary launchOptions)
 		{
@@ -55,7 +55,7 @@ namespace FavoriteMovies
   			, null);
 			UIApplication.SharedApplication.RegisterUserNotificationSettings (settings);
 		
-			UIApplication.SharedApplication.ApplicationIconBadgeNumber = 0;
+			//UIApplication.SharedApplication.ApplicationIconBadgeNumber = 0;
 			MainViewController.getUser ();
 			Window.RootViewController = rootViewController;
 			// check for a local notification
@@ -84,16 +84,18 @@ namespace FavoriteMovies
 				UIApplication.SharedApplication.RegisterForRemoteNotificationTypes (notificationTypes);
 			}
 
-			PushNotificationManager pushmanager = PushNotificationManager.PushManager;
-			pushmanager.Delegate = this;
+			//PushNotificationManager pushmanager = PushNotificationManager.PushManager;
+		//	pushmanager.Delegate = this;
 
 			if (launchOptions != null) {
 				if (launchOptions.ContainsKey (UIApplication.LaunchOptionsRemoteNotificationKey)) {
-					pushmanager.HandlePushReceived (launchOptions);
+				//	pushmanager.HandlePushReceived (launchOptions);
 				}
 			}
-			pushmanager.StartLocationTracking ();
-			pushmanager.RegisterForPushNotifications ();
+			//pushmanager.StartLocationTracking ();
+			//pushmanager.RegisterForPushNotifications ();
+
+		
 						// Code to start the Xamarin Test Cloud Agent
 			#if ENABLE_TEST_CLOUD
 						Xamarin.Calabash.Start ();

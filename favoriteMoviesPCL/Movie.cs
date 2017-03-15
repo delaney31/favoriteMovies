@@ -151,16 +151,23 @@ namespace FavoriteMoviesPCL
 	public class UserFriendsCloud
 	{
 		
-		public string id { get; set; }
+		public string Id { get; set; }
 		public string customlistid { get; set; }
 		public string friendid { get; set;}
 		public string userid { get; set;}
 		public string friendusername { get; set; }
+	}
 
+	public class UserBase
+	{
+		public string city { get; set; }
+		public string state { get; set; }
+		public string zip { get; set; }
+		public string country { get; set; }
 	}
 
 	[Table ("User")]
-	public class User
+	public class User:UserBase
 
 	{
 		public string Id { get; set; }
@@ -168,10 +175,6 @@ namespace FavoriteMoviesPCL
 		public string profilepic { get; set;}
 		public string username { get; set;}
 		public string password { get; set;}
-		public string City { get; set; }
-		public string State { get; set; }
-		public string Zip { get; set; }
-		public string Country { get; set; }
 	}
 
 	public class UserCloud
@@ -181,12 +184,12 @@ namespace FavoriteMoviesPCL
 		public string email { get; set;}
 		public string profilepic { get; set;}
 		public string username { get; set; }
-		public string DisplayName { get; set; }
-		public string City { get; set; }
-		public string State { get; set; }
-		public string Zip { get; set; }
-		public string Country { get; set; }
+		public string displayname { get; set; }
 		public bool connection { get; set; }
+		public string city { get; set; }
+		public string state { get; set; }
+		public string zip { get; set; }
+		public string country { get; set; }
 
 	}
 

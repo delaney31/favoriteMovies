@@ -12,8 +12,8 @@ namespace FavoriteMovies
 	{
 		MessagesBubbleImage outgoingBubbleImageData,incomingBubbleImageData;
 		List<Message> messages = new List<Message> ();
-		UserCloud sender = new UserCloud { Id = "1234", DisplayName = "Tim" };
-		UserCloud friend = new UserCloud { Id = "12345", DisplayName = "Tom Anderson" };
+		UserCloud sender = new UserCloud { Id = "1234", displayname = "Tim" };
+		UserCloud friend = new UserCloud { Id = "12345", displayname = "Tom Anderson" };
 
 		MessageFactory messageFactory = new MessageFactory ();
 		UserFriendsCloud row;
@@ -35,7 +35,7 @@ namespace FavoriteMovies
 
 			// You must set your senderId and display name
 			SenderId = sender.Id;
-			SenderDisplayName = sender.DisplayName;
+			SenderDisplayName = sender.displayname;
 
 			// These MessagesBubbleImages will be used in the GetMessageBubbleImageData override
 			var bubbleFactory = new MessagesBubbleImageFactory ();
@@ -50,8 +50,8 @@ namespace FavoriteMovies
 			CollectionView.CollectionViewLayout.OutgoingAvatarViewSize = CoreGraphics.CGSize.Empty;
 
 			// Load some messagees to start
-			messages.Add (new Message (sender.Id, sender.DisplayName, NSDate.DistantPast, "Hi There"));
-			messages.Add (new Message (friend.Id, friend.DisplayName, NSDate.DistantPast, "I'm sorry, my responses are limited. You must ask the right questions."));
+			messages.Add (new Message (sender.Id, sender.displayname, NSDate.DistantPast, "Hi There"));
+			messages.Add (new Message (friend.Id, friend.displayname, NSDate.DistantPast, "I'm sorry, my responses are limited. You must ask the right questions."));
 		}
 
 		public override UICollectionViewCell GetCell (UICollectionView collectionView, NSIndexPath indexPath)

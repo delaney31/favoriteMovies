@@ -15,7 +15,7 @@ namespace FavoriteMovies
 		public UILabel locationLabel { get; set; }
 		public string id;
 		public bool imageDataAvailable { get; set; }
-		public bool connection { get; set; }
+		public bool? connection { get; set; }
 		[Export ("initWithStyle:reuseIdentifier:")]
 		public ContactCard (UITableViewCellStyle style, string cellId) : base (style, cellId)
 		{

@@ -170,6 +170,7 @@ namespace MovieFriends
 				return new List<NotificationsCloud> ();
 			}
 		}
+
 		public async Task UserSyncAsync (bool pullData = false)
 		{
 #if OFFLINE_SYNC_ENABLED
@@ -325,23 +326,23 @@ namespace MovieFriends
 			}
 		}
 
-		public async Task RefreshDataAsync (UserFriendsCloud userFriend)
-		{
-			try {
-#if OFFLINE_SYNC_ENABLED
-				// Update the local store
-				await UserFriendsSyncAsync (pullData: true);
-#endif
-				if (userFriend.id != null)
-					await DeleteItemAsync (userFriend);
-				await InsertUserFriendAsync (userFriend);
-				Console.WriteLine ("Saved to the cloud!");
+//		public async Task RefreshDataAsync (UserFriendsCloud userFriend)
+//		{
+//			try {
+//#if OFFLINE_SYNC_ENABLED
+//				// Update the local store
+//				await UserFriendsSyncAsync (pullData: true);
+//#endif
+//				if (userFriend.id != null)
+//					await DeleteItemAsync (userFriend);
+//				await InsertUserFriendAsync (userFriend);
+//				Console.WriteLine ("Saved to the cloud!");
 
-			} catch (MobileServiceInvalidOperationException e) {
-				Console.Error.WriteLine (@"ERROR {0}", e.Message);
+//			} catch (MobileServiceInvalidOperationException e) {
+//				Console.Error.WriteLine (@"ERROR {0}", e.Message);
 
-			}
-		}
+//			}
+//		}
 		public async Task<bool> InsertUserAsync (UserCloud user)
 		{
 			try {
@@ -364,10 +365,11 @@ namespace MovieFriends
 		{
 			try {
 
-				await ufTable.InsertAsync (user);
+
 				var notification = new NotificationsCloud ();
 				notification.notification = ColorExtensions.CurrentUser.username + " is now following : " + user.friendusername;
 				notification.userid = ColorExtensions.CurrentUser.Id;
+				await ufTable.InsertAsync (user);
 				await nfTable.InsertAsync (notification);
 
 				return true;
@@ -383,7 +385,7 @@ namespace MovieFriends
 
 		}
 
-		public async Task<int> MoviesInCommon (UserCloud user1, UserCloud user2)
+		public async Task<int> MoviesInCommon (string user1Id, string user2Id)
 		{
 			int inCommon = 0;
 
@@ -393,13 +395,13 @@ namespace MovieFriends
 				var user2Movies =
 					from movies in await mfTable.ToListAsync ()
 					join customlist in await clTable.ToListAsync () on movies.CustomListID equals customlist.Id
-						                            where customlist.UserId == user2.Id && customlist.shared
+						                            where customlist.UserId == user2Id && customlist.shared
 					select new { movies.name};
 
 				var userMovies =
 					from movies in await mfTable.ToListAsync ()
 					join customlist in await clTable.ToListAsync () on movies.CustomListID equals customlist.Id
-					where customlist.UserId==user1.Id        
+					where customlist.UserId==user1Id        
 					select new {movies.name};
 				
 				var common = from list1 in userMovies
@@ -630,6 +632,24 @@ namespace MovieFriends
 			}
 
 		}
+
+		internal async Task<UserCloud> GetUserLocation (string id)
+		{
+			try {
+
+				var user = await userTable
+					.Where (item => item.Id == id).ToListAsync();
+
+
+				return user.FirstOrDefault();
+
+			} catch (Exception e) {
+				Console.Error.WriteLine (@"ERROR {0}", e.Message);
+				return null;
+			}
+
+		}
+
 		internal async Task<List<UserFriendsCloud>> GetSearchUserFriends (string search)
 		{
 			try {
@@ -676,9 +696,9 @@ namespace MovieFriends
 					select new UserCloud ()
 					{ 
 						username = u.username, 
-						State = u.State,
-						City = u.City,
-						Country = u.Country,
+						state = u.state,
+						city = u.city,
+						country = u.country,
 						connection = friend,
 						Id= u.Id
 					};
@@ -749,7 +769,7 @@ namespace MovieFriends
 				var user = await ufTable.Where (post => post.userid == item.userid && post.friendid == item.friendid).ToListAsync ();
 				if (user.Count == 0)
 					return false;
-				item.id = user.First ().id;
+				//item.id = user.First ().id;
 				await ufTable.DeleteAsync (item);
 
 				var notification = new NotificationsCloud ();

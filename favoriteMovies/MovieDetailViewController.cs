@@ -15,6 +15,7 @@ using MovieFriends;
 using SDWebImage;
 using UIKit;
 
+
 namespace FavoriteMovies
 {
 	public class MovieDetailViewController : BaseController
@@ -37,7 +38,8 @@ namespace FavoriteMovies
 
 		//static string _googleApiKey = "AIzaSyCu634TJuZR_0iUhJQ6D8E9xr2a3VbU3_M";
 		static string _youTubeURl = "https://www.youtube.com/embed/";
-		string _embededMoveId;
+		static string _embededMoveId;
+		public static string URL;
 		static CGSize HeaderReferenceSize = new CGSize (50, 50);
 		static int MinimumInteritemSpacing = 30;
 		static int MinimumLineSpacing = 5;
@@ -562,11 +564,15 @@ namespace FavoriteMovies
 			return UIInterfaceOrientationMask.Portrait;
 		}
 
-
+	
 		void HandleAction ()
 		{
-			
+			URL = _youTubeURl + _embededMoveId;
 			string videoCode = _embededMoveId;//.Substring (_embededMoveId.LastIndexOf ("/"));
+
+			//var bundle = NSBundle.MainBundle;
+			//var resource = bundle.PathForResource (_youTubeURl + videoCode, "mp4");
+			//var controller = new MFVideoViewController ();
 
 			webView = new UIWebView () {
 				AutoresizingMask = UIViewAutoresizing.FlexibleHeight | UIViewAutoresizing.FlexibleWidth,
@@ -591,6 +597,8 @@ namespace FavoriteMovies
 			viewController.View.Add (webView);
 			//this.View.AddSubview (webView);
 			NavigationController.PushViewController (viewController, true);
+
+			//NavigationController.PushViewController (controller, true);
 
 		}
 

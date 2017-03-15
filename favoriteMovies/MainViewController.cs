@@ -157,10 +157,10 @@ namespace FavoriteMovies
 							currentUser.username = query [0].username;
 							currentUser.email = query [0].email;
 							currentUser.Id = query [0].Id;
-							currentUser.City = query [0].City;
-							currentUser.State = query [0].State;
-							currentUser.Country = query [0].Country;
-							currentUser.Zip = query [0].Zip;
+							currentUser.city = query [0].city;
+							currentUser.state = query [0].state;
+							currentUser.country = query [0].country;
+							currentUser.zip = query [0].zip;
 
 
 						}
@@ -177,10 +177,10 @@ namespace FavoriteMovies
 								currentUser.username = query [0].username;
 								currentUser.email = query [0].email;
 								currentUser.Id = query [0].Id;
-								currentUser.City = query [0].City;
-								currentUser.State = query [0].State;
-								currentUser.Country = query [0].Country;
-								currentUser.Zip = query [0].Zip;
+								currentUser.city = query [0].city;
+								currentUser.state = query [0].state;
+								currentUser.country = query [0].country;
+								currentUser.zip = query [0].zip;
 
 
 							}

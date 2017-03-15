@@ -47,7 +47,7 @@ namespace FavoriteMovies
 				{
 					MainViewController.getUser ();
 					SideMenuController.title.SetTitle (ColorExtensions.CurrentUser.username, UIControlState.Normal);
-					SideMenuController.location.SetTitle (ColorExtensions.CurrentUser.City + ", " + ColorExtensions.CurrentUser.State + " " + ColorExtensions.CurrentUser.Country, UIControlState.Normal);
+					SideMenuController.location.SetTitle (ColorExtensions.CurrentUser.city + ", " + ColorExtensions.CurrentUser.state + " " + ColorExtensions.CurrentUser.country, UIControlState.Normal);
 
 				}
 			});
@@ -83,14 +83,14 @@ namespace FavoriteMovies
 						var Country = xmlDocument.SelectNodes ("geonames") [0].SelectSingleNode ("code").SelectSingleNode ("countryCode").InnerText;
 						var zip = xmlDocument.SelectNodes ("geonames") [0].SelectSingleNode ("code").SelectSingleNode ("postalcode").InnerText;
 
-						var userCloud = new UserCloud () { email = email, username = userName, City = CityName, State = State, Country = Country, Zip = zip };
+						var userCloud = new UserCloud () { email = email, username = userName, city = CityName, state = State, country = Country, zip = zip };
 
 						var unique = await postService.InsertUserAsync (userCloud);
 						if (!unique)
 							failCallback (new LoginScreenFaultDetails { UserNameErrorMessage = "This username already exits." });
 						else {
 							ColorExtensions.CurrentUser = userCloud;
-							var user = new User () { email = email, password = password, username = userName, Id = userCloud.Id, City = CityName, Country = Country, State = State, Zip = zip };
+							var user = new User () { email = email, password = password, username = userName, Id = userCloud.Id, city = CityName, country = Country, state = State, zip = zip };
 							//inset username and password locally
 							await AddUserAsync (user);
 							successCallback ();
