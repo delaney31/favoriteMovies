@@ -88,18 +88,18 @@ namespace FavoriteMovies
 			followers.TextColor = UIColor.White;
 
 
-			numFollowers.Frame = new CGRect () { X = 15, Y = 95, Width = View.Bounds.Width, Height = 120 };
+			numFollowers.Frame = new CGRect () { X = 15, Y = 100, Width = View.Bounds.Width, Height = 120 };
 			numFollowers.TextAlignment = UITextAlignment.Left;
 			numFollowers.Font = UIFont.FromName (ColorExtensions.PROFILE_NAME, 25);
 			numFollowers.TextColor = UIColor.White;
 
 			sharedLists.Frame = new CGRect () { X = 0, Y = 120, Width = View.Bounds.Width, Height = 120 };
-			sharedLists.Text = "Movie List(s)".ToUpper();
+			sharedLists.Text = "Shared Movie List(s)".ToUpper();
 			sharedLists.TextAlignment = UITextAlignment.Center;
 			sharedLists.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, 10);
 			sharedLists.TextColor = UIColor.White;
 
-			numSharedLists.Frame = new CGRect () { X = 0, Y = 95, Width = View.Bounds.Width, Height = 120 };
+			numSharedLists.Frame = new CGRect () { X = 0, Y = 100, Width = View.Bounds.Width, Height = 120 };
 			numSharedLists.TextAlignment = UITextAlignment.Center;
 			numSharedLists.TextColor = UIColor.White;
 			numSharedLists.Font = UIFont.FromName (ColorExtensions.PROFILE_NAME, 25);
@@ -111,7 +111,7 @@ namespace FavoriteMovies
 			following.TextColor = UIColor.White;
 
 
-			numFollowing.Frame = new CGRect () { X = 10, Y = 95, Width = View.Bounds.Width - 25, Height = 120 };
+			numFollowing.Frame = new CGRect () { X = 10, Y = 100, Width = View.Bounds.Width - 25, Height = 120 };
 			numFollowing.TextAlignment = UITextAlignment.Right;
 			numFollowing.Font = UIFont.FromName (ColorExtensions.PROFILE_NAME, 25);
 			numFollowing.TextColor = UIColor.White;

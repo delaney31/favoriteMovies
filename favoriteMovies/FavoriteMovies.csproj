@@ -204,19 +204,24 @@
     <Reference Include="BTProgressHUD">
       <HintPath>..\Components\btprogresshud-1.20\lib\ios-unified\BTProgressHUD.dll</HintPath>
     </Reference>
+    <Reference Include="iCarousel">
+      <HintPath>..\Components\icarousel-1.8.2.1\lib\ios-unified\iCarousel.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Contents.json" />
     <ImageAsset Include="Assets.xcassets\Contents.json" />
     <ImageAsset Include="Assets.xcassets\LaunchImage.launchimage\Contents.json" />
     <ImageAsset Include="Assets.xcassets\LaunchImage.launchimage\Default%402x.png" />
-    <ImageAsset Include="Assets.xcassets\LaunchImage.launchimage\Default-568h%402x.png" />
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Final-Logo.png" />
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Final-Logo120.png" />
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Final-Logo80.png" />
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Final-Logo87.png" />
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Final-Logo57.png" />
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Final-Logo58.png" />
+    <ImageAsset Include="Assets.xcassets\LaunchImage.launchimage\SPLASH2.640.960.png" />
+    <ImageAsset Include="Assets.xcassets\LaunchImage.launchimage\SPLASH2.png" />
+    <ImageAsset Include="Assets.xcassets\LaunchImage.launchimage\SPLASH2.640.960 copy.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
@@ -275,6 +280,7 @@
     <Compile Include="NotificationsViewController.cs" />
     <Compile Include="MFVideoViewController.cs" />
     <Compile Include="FindFriendsViewController.cs" />
+    <Compile Include="TipsViewController.cs" />
   </ItemGroup>
   <ItemGroup>
     <BundleResource Include="Resources\placeholder.png" />
@@ -390,6 +396,10 @@
     </XamarinComponentReference>
     <XamarinComponentReference Include="btprogresshud">
       <Version>1.20</Version>
+      <Visible>False</Visible>
+    </XamarinComponentReference>
+    <XamarinComponentReference Include="icarousel">
+      <Version>1.8.2.1</Version>
       <Visible>False</Visible>
     </XamarinComponentReference>
   </ItemGroup>

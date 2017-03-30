@@ -76,6 +76,7 @@ namespace FavoriteMovies
 							var listItem = new CustomList ();
 							listItem.order = 0;
 							listItem.custom = true;
+							listItem.shared = true;
 							listItem.name = textInputAlertController.TextFields [0].Text;
 							tableItems.Insert (0, listItem);
 							table.EndUpdates (); // applies the changes
@@ -199,6 +200,7 @@ namespace FavoriteMovies
 								movieDetail.cloudId = movieCloud.id;
 
 								db.Insert (movieDetail, typeof (Movie));
+
 							}
 						}
 					}
@@ -285,9 +287,10 @@ namespace FavoriteMovies
 				}
 
 
-			}).WithNetworkIndicator ().Wait ();
+			}).Wait ();
 			BTProgressHUD.Dismiss ();
-
+			var notification = NSNotification.FromName (Constants.CustomListChange, new NSObject ());
+			NSNotificationCenter.DefaultCenter.PostNotification (notification);
 		}
 
 

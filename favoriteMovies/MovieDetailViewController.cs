@@ -162,8 +162,11 @@ namespace FavoriteMovies
 			dateOpenView.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, 11);
 			if (movieDetail is MovieCloud)
 				dateOpenView.Text = ((MovieCloud)movieDetail).ReleaseDate;
-			else
-				dateOpenView.Text = "Release Date: " + DateTime.Parse(movieDetail.ReleaseDate).ToString ("MM/dd/yyyy",CultureInfo.InvariantCulture);
+			else 
+			{
+				if (movieDetail.ReleaseDate != "")
+					dateOpenView.Text = "Release Date: " + DateTime.Parse (movieDetail.ReleaseDate).ToString ("MM/dd/yyyy", CultureInfo.InvariantCulture);
+			}
 			dateOpenView.Frame = new CGRect (183, 70, 135, 20);
 
 			Userstar1.Frame = new CGRect (183, 115, 20, 20);

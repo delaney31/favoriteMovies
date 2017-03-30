@@ -108,6 +108,8 @@ namespace FavoriteMovies
 					//}
 					BTProgressHUD.Dismiss ();
 				}
+				var notification = NSNotification.FromName (Constants.CustomListChange, new NSObject ());
+				NSNotificationCenter.DefaultCenter.PostNotification (notification);
 			} catch (Exception ex) 
 			{
 				
@@ -115,6 +117,7 @@ namespace FavoriteMovies
 				BTProgressHUD.Dismiss ();
 				//throw;
 			}
+
 		}
 
 

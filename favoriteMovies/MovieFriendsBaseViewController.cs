@@ -26,9 +26,9 @@ namespace FavoriteMovies
 
 			table = new UITableView (View.Bounds);
 			table.AutoresizingMask = UIViewAutoresizing.All;
-
+			table.RowHeight = 55;
 			table.AllowsSelectionDuringEditing = true;
-			NavigationItem.Title = movieFriends;
+
 
 		}
 
@@ -111,7 +111,8 @@ namespace FavoriteMovies
 				cell.TextLabel.Font = UIFont.FromName (ColorExtensions.TITLE_FONT, ColorExtensions.HEADER_FONT_SIZE);
 				var profileImage = UIImage.FromBundle ("1481507483_compose.png"); //default image
 				cell.ImageView.Image = profileImage;
-				Task.Run (async () => {
+				Task.Run (async () => 
+				{
 					profileImage = await BlobUpload.getProfileImage (userFriends [indexPath.Row].friendid, 50,50);
 				});
 				if (profileImage != null)
@@ -185,8 +186,8 @@ namespace FavoriteMovies
 		}
 		public override void RowSelected (UITableView tableView, NSIndexPath indexPath)
 		{
-			var row = userFriends [indexPath.Row];
-			movieFriendsBaseViewController.NavigationController.PushViewController (new MovieChatViewController (row), true);
+			//var row = userFriends [indexPath.Row];
+			//movieFriendsBaseViewController.NavigationController.PushViewController (new MovieChatViewController (row), true);
 		}
 
 		public override nint RowsInSection (UITableView tableview, nint section)

@@ -16,9 +16,9 @@ namespace FavoriteMovies
 		UserCloud friend = new UserCloud { Id = "12345", displayname = "Tom Anderson" };
 
 		MessageFactory messageFactory = new MessageFactory ();
-		UserFriendsCloud row;
+		ContactCard row;
 
-		public MovieChatViewController (UserFriendsCloud row)
+		public MovieChatViewController (ContactCard row)
 		{
 			this.row = row;
 		}

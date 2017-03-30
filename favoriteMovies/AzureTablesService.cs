@@ -19,6 +19,7 @@ using System.Globalization;
 using UIKit;
 using BigTed;
 using System.Collections.ObjectModel;
+using SQLite;
 
 
 #if OFFLINE_SYNC_ENABLED
@@ -131,8 +132,6 @@ namespace MovieFriends
 #endif
 		}
 
-
-
 		public async Task PostSyncAsync (bool pullData = false)
 		{
 
@@ -161,13 +160,13 @@ namespace MovieFriends
 						where friends.userid == ColorExtensions.CurrentUser.Id
 						select new NotificationsCloud { Id = notifs.Id, notification = notifs.notification, userid = notifs.userid };
 
-				return new List<NotificationsCloud> (notifications).Take(50).ToList();
+				return new List<NotificationsCloud> (notifications).Take(5).ToList();
 
 
 
 			} catch (Exception e) {
 				Console.Error.WriteLine (@"ERROR {0}", e.Message);
-				return new List<NotificationsCloud> ();
+				return new List<NotificationsCloud> ().Take(5).ToList();
 			}
 		}
 
@@ -385,41 +384,39 @@ namespace MovieFriends
 
 		}
 
-		public async Task<int> MoviesInCommon (string user1Id, string user2Id)
+		public async Task<int> MoviesInCommon (List<Movie> userMovies, string user2Id)
 		{
-			int inCommon = 0;
+			
 
-			try {
+			try 
+			{
 				
-				
+				var currentUser = userMovies.Where(q=> q.CustomListID!=null);
 				var user2Movies =
-					from movies in await mfTable.ToListAsync ()
-					join customlist in await clTable.ToListAsync () on movies.CustomListID equals customlist.Id
-						                            where customlist.UserId == user2Id && customlist.shared
-					select new { movies.name};
-
-				var userMovies =
-					from movies in await mfTable.ToListAsync ()
-					join customlist in await clTable.ToListAsync () on movies.CustomListID equals customlist.Id
-					where customlist.UserId==user1Id        
-					select new {movies.name};
+					from  movies in await mfTable.ToListAsync ()
+					join  customlist in await clTable.ToListAsync () 
+					on    movies.CustomListID equals customlist.Id
+					where customlist.UserId == user2Id && customlist.shared
+					select new { movies.OriginalId, customlist.UserId };
 				
-				var common = from list1 in userMovies
+				var common = from list1 in currentUser
 							 join list2 in user2Movies
-					on list1.name equals list2.name
+							 on list1.OriginalId.ToString() equals  list2.OriginalId
 							 select new 
 							 {
-								 list1.name
+								 list1.OriginalId, list1.name
 							 };
-				inCommon = common.Distinct().Count ();
+				return common.Count();
 
 			} catch (Exception ex) 
 			{
 				Console.Error.WriteLine (@"ERROR {0}", ex.Message);
 				return 0;
 			}
-			return inCommon;
+		
 		}
+
+
 
 		internal async Task<ObservableCollection<ContactCard>> FriendSearch (string forSearchString)
 		{
@@ -624,7 +621,7 @@ namespace MovieFriends
 					.Where (item => item.userid == userid)
 				  .ToListAsync ();
 
-				return new List<UserFriendsCloud> (items);
+				return new List<UserFriendsCloud> (items.DistinctBy (p => p.friendusername));
 
 			} catch (Exception e) {
 				Console.Error.WriteLine (@"ERROR {0}", e.Message);
@@ -770,7 +767,11 @@ namespace MovieFriends
 				if (user.Count == 0)
 					return false;
 				//item.id = user.First ().id;
-				await ufTable.DeleteAsync (item);
+
+				foreach (var friend in user) 
+				{
+					await ufTable.DeleteAsync (friend);
+				}
 
 				var notification = new NotificationsCloud ();
 				notification.notification = ColorExtensions.CurrentUser.username + " is no longer following : " + item.friendusername;

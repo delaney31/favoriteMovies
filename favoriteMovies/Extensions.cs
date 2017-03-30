@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Threading;
@@ -66,16 +67,16 @@ namespace FavoriteMovies
 													  //public const string NAV_BAR_COLOR ="#323232";
 		public const string AZURE_STORAGE_CONNECTION_STRING = "SharedAccessSignature=sv=2015-12-11&ss=bt&srt=sco&sp=rwdlacup&st=2017-01-13T01%3A11%3A00Z&se=2450-01-14T01%3A11%3A00Z&sig=f6ik2E%2BjiJX5eCBMMQnEffnXDGVhGTVt9oMVM9dqhPk%3D;BlobEndpoint=https://moviefriends.blob.core.windows.net/;TableEndpoint=https://moviefriends.table.core.windows.net";
 		public const string TITLE_COLOR = "#DE9A2D";
-		public const string TITLE_FONT = "AppleSDGothicNeo-Bold";
-		public const string CONTENT_FONT = "AppleSDGothicNeo-Regular";
-		public const string PROFILE_NAME = "BodoniSvtyTwoOSITCTT-Bold";
+		public const string TITLE_FONT = "Avenir-Heavy";
+		public const string CONTENT_FONT = "AvenirNext-Medium";
+		public const string PROFILE_NAME = "AvenirNext-Medium";
 		//public const string TAB_BACKGROUND_COLOR = "#000000";//black
 		//public const string TAB_BACKGROUND_COLOR = "#555555"; //grey
 		public const string TAB_BACKGROUND_COLOR = "#FFFFFF"; //white
 		public const string PROFILE_BACKGROUND_COLOR = "#4B5F82"; //light grey
 																  //public const string TAB_BACKGROUND_COLOR = "#3B3B3B"; //dark grey
-		public const float HEADER_FONT_SIZE = 17f;
-		public const float CAST_FONT_SIZE = 13f;
+		public const float HEADER_FONT_SIZE = 16f;
+		public const float CAST_FONT_SIZE = 12f;
 		public const string SQL_TABLE = "MovieEntries.db3";
 
 		public static UIImage profileImage = UIImage.FromBundle ("1481507483_compose.png");
@@ -98,7 +99,16 @@ namespace FavoriteMovies
 			UIGraphics.EndImageContext ();
 			return resultImage;
 		}
-
+		public static IEnumerable<TSource> DistinctBy<TSource, TKey>
+			(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector)
+		{
+			HashSet<TKey> seenKeys = new HashSet<TKey> ();
+			foreach (TSource element in source) {
+				if (seenKeys.Add (keySelector (element))) {
+					yield return element;
+				}
+			}
+		}
 		// resize the image (without trying to maintain aspect ratio)
 		public static UIImage ResizeImage (UIImage sourceImage, float width, float height)
 		{

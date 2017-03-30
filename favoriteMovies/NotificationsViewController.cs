@@ -5,6 +5,7 @@ using BigTed;
 using FavoriteMoviesPCL;
 using Foundation;
 using MovieFriends;
+using ObjCRuntime;
 using UIKit;
 
 namespace FavoriteMovies
@@ -19,12 +20,14 @@ namespace FavoriteMovies
 			try {
 				
 				base.ViewDidAppear (animated);
-				BTProgressHUD.Show ();
+				if (tableSource == null)
+					BTProgressHUD.Show ();
+				
 				notificationsList = await getNotifications ();
 				if (notificationsList.Count == 0) 
 				{
 					var noNotifications = new NotificationsCloud ();
-					noNotifications.notification = "Follow someone to see notifications here.";
+					noNotifications.notification = "          Follow someone to see notifications here.";
 					notificationsList.Add (noNotifications);
 				}
 
@@ -43,10 +46,20 @@ namespace FavoriteMovies
 		public override void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
-		
+			var name = new NSString (Constants.ModifyFollowerNotification);
+			NSNotificationCenter.DefaultCenter.AddObserver (this, new Selector (Constants.ModifyFollowerNotificationReceived), name, null);
 		}
 
-
+		[Export ("FollowerModifiedNotificationReceived:")]
+		public async void FollowerModifiedNotificationReceived (NSNotification n)
+		{
+			notificationsList = await getNotifications ();
+			if (notificationsList.Count == 0) {
+				var noNotifications = new NotificationsCloud ();
+				noNotifications.notification = "          Follow someone to see notifications here.";
+				notificationsList.Add (noNotifications);
+			}
+		}
 
 		async Task<List<NotificationsCloud>> getNotifications ()
 		{
@@ -57,12 +70,11 @@ namespace FavoriteMovies
 	public class NotificationsCloudTableSource : UITableViewSource
 	{
 		List<NotificationsCloud> listItems;
-		UIViewController controller;
 		string cellIdentifier = "NotificationCell";
 		public NotificationsCloudTableSource (List<NotificationsCloud> items, UIViewController cont)
 		{
 			this.listItems = items;
-			this.controller = cont;
+		
 
 		}
 		public void updateImage (UITableViewCell cell, NotificationsCloud user)
@@ -78,7 +90,7 @@ namespace FavoriteMovies
 			UITableViewCell cell = tableView.DequeueReusableCell (cellIdentifier);
 
 
-			var cellStyle = UITableViewCellStyle.Default;
+			var cellStyle = UITableViewCellStyle.Value2;
 
 			// if there are no cells to reuse, create a new one
 			if (cell == null) {
@@ -86,8 +98,10 @@ namespace FavoriteMovies
 
 			}
 
-			cell.TextLabel.Text = listItems [indexPath.Row].notification;
-			cell.TextLabel.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, ColorExtensions.CAST_FONT_SIZE);
+			cell.DetailTextLabel.Text = listItems [indexPath.Row].notification;
+			cell.DetailTextLabel.TextAlignment = UITextAlignment.Justified;
+			cell.DetailTextLabel.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, ColorExtensions.CAST_FONT_SIZE);
+			cell.DetailTextLabel.TextColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f);
 			//cell.ImageView.Image = await BlobUpload.getProfileImage (listItems [indexPath.Row].userid, 150, 150);
 		
 			return cell;

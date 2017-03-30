@@ -103,7 +103,7 @@ namespace FavoriteMovies
 			introButton.SetTitle ("Movies", UIControlState.Normal);
 			introButton.SetTitleColor (UIColor.White, UIControlState.Normal);
 			introButton.HorizontalAlignment = UIControlContentHorizontalAlignment.Left;
-			introButton.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, 18);
+			introButton.Font = UIFont.FromName (ColorExtensions.TITLE_FONT, 18);
 			introButton.TouchUpInside += (sender, e) => {
 				NavController.PopToRootViewController (false);
 				SidebarController.CloseMenu ();
@@ -115,7 +115,7 @@ namespace FavoriteMovies
 			contentButton.SetTitle ("Lists", UIControlState.Normal);
 			contentButton.SetTitleColor (UIColor.White, UIControlState.Normal);
 			contentButton.HorizontalAlignment = UIControlContentHorizontalAlignment.Left;
-			contentButton.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, 18);
+			contentButton.Font = UIFont.FromName (ColorExtensions.TITLE_FONT, 18);
 
 			contentButton.TouchUpInside += (sender, e) => 
 			{
@@ -132,7 +132,7 @@ namespace FavoriteMovies
 			connectionsButton.SetTitle ("Invite", UIControlState.Normal);
 			connectionsButton.SetTitleColor (UIColor.White, UIControlState.Normal);
 			connectionsButton.HorizontalAlignment = UIControlContentHorizontalAlignment.Left;
-			connectionsButton.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, 18);
+			connectionsButton.Font = UIFont.FromName (ColorExtensions.TITLE_FONT, 18);
 			connectionsButton.TouchUpInside += (sender, e) => {
 				NavController.PushViewController (new UserCloudListViewController (), false);
 				SidebarController.CloseMenu ();
@@ -144,7 +144,7 @@ namespace FavoriteMovies
 			SettingsButton.SetTitle ("Settings", UIControlState.Normal);
 			SettingsButton.SetTitleColor (UIColor.White, UIControlState.Normal);
 			SettingsButton.HorizontalAlignment = UIControlContentHorizontalAlignment.Left;
-			SettingsButton.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, 18);
+			SettingsButton.Font = UIFont.FromName (ColorExtensions.TITLE_FONT, 18);
 			SettingsButton.TouchUpInside += (sender, e) => 
 			{
 				
@@ -159,7 +159,7 @@ namespace FavoriteMovies
 			showTipsButton.SetTitle ("Tips", UIControlState.Normal);
 			showTipsButton.HorizontalAlignment = UIControlContentHorizontalAlignment.Left;
 			showTipsButton.SetTitleColor (UIColor.White, UIControlState.Normal);
-			showTipsButton.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, 18);
+			showTipsButton.Font = UIFont.FromName (ColorExtensions.TITLE_FONT, ColorExtensions.HEADER_FONT_SIZE);
 			showTipsButton.TouchUpInside += (sender, e) => 
 			{
 				
@@ -172,7 +172,7 @@ namespace FavoriteMovies
 			logoutButton.SetTitle ("Sign Out", UIControlState.Normal);
 			logoutButton.HorizontalAlignment = UIControlContentHorizontalAlignment.Left;
 			logoutButton.SetTitleColor (UIColor.White, UIControlState.Normal);
-			logoutButton.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, 18);
+			logoutButton.Font = UIFont.FromName (ColorExtensions.TITLE_FONT, 18);
 			logoutButton.TouchUpInside += (sender, e) => {
 				//NavController.PushViewController(new ContentController(), false);
 				//NavController.PushViewController (new MovieListPickerViewController (null, false), false);
