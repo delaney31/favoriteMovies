@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using FavoriteMoviesPCL;
 using Foundation;
 using JSQMessagesViewController;
+using Plugin.Messaging;
 using UIKit;
 
 namespace FavoriteMovies
@@ -12,15 +13,16 @@ namespace FavoriteMovies
 	{
 		MessagesBubbleImage outgoingBubbleImageData,incomingBubbleImageData;
 		List<Message> messages = new List<Message> ();
-		UserCloud sender = new UserCloud { Id = "1234", displayname = "Tim" };
-		UserCloud friend = new UserCloud { Id = "12345", displayname = "Tom Anderson" };
+		UserCloud sender = ColorExtensions.CurrentUser;
+		UserFriendsCloud friend;
 
 		MessageFactory messageFactory = new MessageFactory ();
 		ContactCard row;
 
-		public MovieChatViewController (ContactCard row)
+		public MovieChatViewController (ContactCard row, UserFriendsCloud userToChatWith)
 		{
 			this.row = row;
+			this.friend = userToChatWith;
 		}
 		public override void ViewDidAppear (bool animated)
 		{
@@ -35,7 +37,7 @@ namespace FavoriteMovies
 
 			// You must set your senderId and display name
 			SenderId = sender.Id;
-			SenderDisplayName = sender.displayname;
+			SenderDisplayName = sender.username;
 
 			// These MessagesBubbleImages will be used in the GetMessageBubbleImageData override
 			var bubbleFactory = new MessagesBubbleImageFactory ();
@@ -50,8 +52,8 @@ namespace FavoriteMovies
 			CollectionView.CollectionViewLayout.OutgoingAvatarViewSize = CoreGraphics.CGSize.Empty;
 
 			// Load some messagees to start
-			messages.Add (new Message (sender.Id, sender.displayname, NSDate.DistantPast, "Hi There"));
-			messages.Add (new Message (friend.Id, friend.displayname, NSDate.DistantPast, "I'm sorry, my responses are limited. You must ask the right questions."));
+			messages.Add (new Message (sender.Id, sender.username, NSDate.DistantPast, "Hi There"));
+			messages.Add (new Message (friend.Id, friend.friendusername, NSDate.DistantPast, "I'm sorry, my responses are limited. You must ask the right questions."));
 		}
 
 		public override UICollectionViewCell GetCell (UICollectionView collectionView, NSIndexPath indexPath)
@@ -107,7 +109,27 @@ namespace FavoriteMovies
 
 			var message = new Message (SenderId, SenderDisplayName, NSDate.Now, text);
 			messages.Add (message);
+			var smsMessenger = CrossMessaging.Current.SmsMessenger;
+			if (smsMessenger.CanSendSms)
+				//smsMessenger.SendSms ("+27213894839493", "Well hello there from Xam.Messaging.Plugin");
+				smsMessenger.SendSms ("+18134937008", text);
 
+			//var emailMessenger = CrossMessaging.Current.EmailMessenger;
+			//if (emailMessenger.CanSendEmail) {
+			//	// Send simple e-mail to single receiver without attachments, bcc, cc etc.
+			//	//emailMessenger.SendEmail ("to.plugins@xamarin.com", "Xamarin Messaging Plugin", "Well hello there from Xam.Messaging.Plugin");
+			//	emailMessenger.SendEmail ("tldelaney@gmail.com", "Xamarin Messaging Plugin", "Well hello there from Xam.Messaging.Plugin");
+			//	// Alternatively use EmailBuilder fluent interface to construct more complex e-mail with multiple recipients, bcc, attachments etc. 
+			//	var email = new EmailMessageBuilder ()
+			//	  .To ("tldelaney@gmail.com")
+			//	  .Cc ("tldelaney@gmail.com")
+			//	  //.Bcc (new [] { "bcc1.plugins@xamarin.com", "bcc2.plugins@xamarin.com" })
+			//	  .Subject ("Xamarin Messaging Plugin")
+			//	  .Body ("Well hello there from Xam.Messaging.Plugin")
+			//	  .Build ();
+
+			//	emailMessenger.SendEmail (email);
+			//}
 			FinishSendingMessage (true);
 
 			await Task.Delay (500);

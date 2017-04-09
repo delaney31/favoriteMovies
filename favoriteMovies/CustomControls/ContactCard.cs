@@ -38,7 +38,7 @@ namespace FavoriteMovies
 		{
 			base.LayoutSubviews ();
 			//profileImage.Frame = new CoreGraphics.CGRect () { X = ContentView.Bounds.X - 80, Y = ContentView.Bounds.Y + 43, Width = ContentView.Bounds.Width - 103, Height = ContentView.Bounds.Height - 90 };
-			profileImage.Frame = new CoreGraphics.CGRect (10, 5, 40, 40);
+			profileImage.Frame = new CoreGraphics.CGRect (10, 5, 45, 45);
 			profileImage.ClipsToBounds = true;
 			profileImage.ContentMode = UIViewContentMode.ScaleAspectFit;
 			profileImage.Layer.CornerRadius =profileImage.Frame.Size.Width / 2 ;

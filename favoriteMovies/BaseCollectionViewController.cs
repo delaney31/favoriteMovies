@@ -200,6 +200,7 @@ namespace FavoriteMovies
 		public override UICollectionViewCell GetCell (UICollectionView collectionView, NSIndexPath indexPath)
 		{
 			var cell = (MovieCell)collectionView.DequeueReusableCell (movieCellId, indexPath);
+			cell.Layer.BorderWidth = -5.0f;
 			try {
 
 				var row = _items [indexPath.Row];

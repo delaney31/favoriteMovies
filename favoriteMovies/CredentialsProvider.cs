@@ -2,11 +2,14 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Xml;
+using Contacts;
 using FavoriteMoviesPCL;
+using Foundation;
 using Geolocator.Plugin;
 using LoginScreen;
 using MovieFriends;
@@ -25,19 +28,15 @@ namespace FavoriteMovies
 
 		}
 		public bool NeedLoginAfterRegistration {
-			get {
+			get 
+			{
 				// If you want your user to login after he/she has been registered
 				return false;
-
-				// Otherwise you can:
-				// return false;
 			}
 		}
 
 		public void Login (string userName, string password, Action successCallback, Action<LoginScreenFaultDetails> failCallback)
 		{
-			// Do some operations to login user
-
 			// If login was successfully completed
 			DelayInvoke (async () => {
 				if (password!=await GetPassword(userName)) 
@@ -46,14 +45,44 @@ namespace FavoriteMovies
 				} else 
 				{
 					MainViewController.getUser ();
-					SideMenuController.title.SetTitle (ColorExtensions.CurrentUser.username, UIControlState.Normal);
-					SideMenuController.location.SetTitle (ColorExtensions.CurrentUser.city + ", " + ColorExtensions.CurrentUser.state + " " + ColorExtensions.CurrentUser.country, UIControlState.Normal);
+					successCallback ();
+					//SideMenuController.title.SetTitle (ColorExtensions.CurrentUser.username, UIControlState.Normal);
+					//SideMenuController.location.SetTitle (ColorExtensions.CurrentUser.city + ", " + ColorExtensions.CurrentUser.state + " " + ColorExtensions.CurrentUser.country, UIControlState.Normal);
 
 				}
 			});
 
 		}
+		CNContact GetCurrentUser (string email)
+		{
+			// Define fields to be searched
+			var fetchKeys = new NSString [] { CNContactKey.GivenName, CNContactKey.FamilyName, CNContactKey.PhoneNumbers,CNContactKey.EmailAddresses, CNContactKey.ImageDataAvailable, CNContactKey.ThumbnailImageData };
 
+			try {
+				var store = new CNContactStore ();
+				NSError error;
+				CNContainer [] containers = store.GetContainers (null, out error);
+
+				foreach (var container in containers) {
+					var fetchPredicate = CNContact.GetPredicateForContactsInContainer (container.Identifier);
+
+					var containerResults = store.GetUnifiedContacts (fetchPredicate, fetchKeys, out error);
+					foreach (var contact in containerResults) 
+					{
+						var userEmail = contact.EmailAddresses.FirstOrDefault ()?.Value;
+						if (userEmail == email)
+							return contact;
+						
+					}
+
+				}
+			} catch (Exception ex) {
+				Console.WriteLine (ex.Message);
+				return null;
+			}
+
+			return null;
+		}
 		public void Register (string email, string userName, string password, Action successCallback, Action<LoginScreenFaultDetails> failCallback)
 		{
 			try {
@@ -82,13 +111,14 @@ namespace FavoriteMovies
 						var State = xmlDocument.SelectNodes ("geonames") [0].SelectSingleNode ("code").SelectSingleNode ("adminCode1").InnerText;
 						var Country = xmlDocument.SelectNodes ("geonames") [0].SelectSingleNode ("code").SelectSingleNode ("countryCode").InnerText;
 						var zip = xmlDocument.SelectNodes ("geonames") [0].SelectSingleNode ("code").SelectSingleNode ("postalcode").InnerText;
-
-						var userCloud = new UserCloud () { email = email, username = userName, city = CityName, state = State, country = Country, zip = zip };
+						var currentUser = GetCurrentUser (email);
+						var userCloud = new UserCloud () { firstname = currentUser.GivenName ?? "", lastname = currentUser.FamilyName??"", phone = currentUser.PhoneNumbers.FirstOrDefault ().Value.ValueForKey (new NSString("digits")).ToString(), email = email, username = userName, city = CityName, state = State, country = Country, zip = zip };
 
 						var unique = await postService.InsertUserAsync (userCloud);
 						if (!unique)
 							failCallback (new LoginScreenFaultDetails { UserNameErrorMessage = "This username already exits." });
-						else {
+						else 
+						{
 							ColorExtensions.CurrentUser = userCloud;
 							var user = new User () { email = email, password = password, username = userName, Id = userCloud.Id, city = CityName, country = Country, state = State, zip = zip };
 							//inset username and password locally
@@ -104,13 +134,6 @@ namespace FavoriteMovies
 				Debug.WriteLine (ex.Message);
 			}
 
-			// Otherwise
-			// failCallback(new LoginScreenFaultDetails {
-			// 	CommonErrorMessage = "Some error message relative to whole form",
-			// 	EmailErrorMessage = "Some error message relative to e-mail form field",
-			// 	UserNameErrorMessage = "Some error message relative to user name form field",
-			// 	PasswordErrorMessage = "Some error message relative to password form field"
-			// });
 		}
 
 		async Task<string> GetPassword (string userName)

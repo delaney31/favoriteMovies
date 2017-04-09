@@ -630,7 +630,7 @@ namespace MovieFriends
 
 		}
 
-		internal async Task<UserCloud> GetUserLocation (string id)
+		internal async Task<UserCloud> GetUser (string id)
 		{
 			try {
 

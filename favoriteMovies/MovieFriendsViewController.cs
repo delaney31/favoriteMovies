@@ -27,7 +27,7 @@ namespace FavoriteMovies
 			NSNotificationCenter.DefaultCenter.AddObserver (this, new Selector (Constants.ModifyFollowerNotificationReceived), name, null);
 
 			tableItems = await GetFriendsContactsAsync ();
-			tableSource = new ConnectCloudTableSource (tableItems, this);
+			tableSource = new ConnectCloudTableSource (tableItems, this, friends);
 
 			table.Source = tableSource;
 			if (tableItems.FirstOrDefault ().id != "0")
@@ -42,7 +42,7 @@ namespace FavoriteMovies
 		public async void FollowerModifiedNotificationReceived (NSNotification n)
 		{
 			tableItems = await GetFriendsContactsAsync ();
-			tableSource = new ConnectCloudTableSource (tableItems, this);
+			tableSource = new ConnectCloudTableSource (tableItems, this, friends);
 
 			table.Source = tableSource;
 			if (tableItems.FirstOrDefault ().id != "0")

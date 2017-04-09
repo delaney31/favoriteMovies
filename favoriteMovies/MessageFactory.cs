@@ -25,7 +25,7 @@ namespace FavoriteMovies
 
 		int messageIndex = 0;
 
-		public async Task <Message> CreateMessageAsync (UserCloud user)
+		public async Task <Message> CreateMessageAsync (UserFriendsCloud user)
 		{
 			var rnd = new Random ();
 			var choice = rnd.Next () % 3;
@@ -36,17 +36,17 @@ namespace FavoriteMovies
 			return await CreateOverflowMessageAsync (choice == 2 ? "dogoverflow.com" : "catoverflow.com", user);
 		}
 
-		Message CreateMonkeyMessage (UserCloud user)
+		Message CreateMonkeyMessage (UserFriendsCloud user)
 		{
 			var msg = messages [messageIndex++];
 
 			if (messageIndex >= messages.Count)
 				messageIndex = 0;
 
-			return Message.Create (user.Id, user.displayname, msg);
+			return Message.Create (user.Id, user.friendusername, msg);
 		}
 
-		async Task<Message> CreateOverflowMessageAsync (string source, UserCloud user)
+		async Task<Message> CreateOverflowMessageAsync (string source, UserFriendsCloud user)
 		{
 			WebClient client = new WebClient ();
 			var catUrl = await client.DownloadStringTaskAsync (
@@ -59,7 +59,7 @@ namespace FavoriteMovies
 
 			var photoItem = new PhotoMediaItem (image);
 			photoItem.AppliesMediaViewMaskAsOutgoing = false;
-			return Message.Create (user.Id, user.displayname, photoItem);
+			return Message.Create (user.Id, user.friendusername, photoItem);
 		}
 			
 		UIImage CreateAnimatedImage (byte [] data)

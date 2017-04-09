@@ -275,7 +275,7 @@ namespace FavoriteMovies
 
 			saveFavoriteButt.TouchDown += SaveFavoriteButt_TouchDown;
 			posterImage.UserInteractionEnabled = true;
-			if (_embededMoveId != "")
+			if (youtubeMovieId != "")
 				moviePlay.AddGestureRecognizer (playClip);
 
 			updateBackGroundColors ();

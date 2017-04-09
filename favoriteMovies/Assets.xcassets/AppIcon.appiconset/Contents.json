@@ -1,7 +1,7 @@
 {
   "images": [
     {
-      "filename": "Final-Logo80.png",
+      "filename": "Final-Logo29.png",
       "size": "29x29",
       "scale": "1x",
       "idiom": "iphone"
@@ -19,7 +19,7 @@
       "idiom": "iphone"
     },
     {
-      "filename": "Final-Logo80.png",
+      "filename": "Final-Logo180.png",
       "size": "40x40",
       "scale": "2x",
       "idiom": "iphone"
@@ -43,13 +43,13 @@
       "idiom": "iphone"
     },
     {
-      "filename": "Final-Logo.png",
+      "filename": "Final-Logo120.png",
       "size": "60x60",
       "scale": "2x",
       "idiom": "iphone"
     },
     {
-      "filename": "Final-Logo.png",
+      "filename": "Final-Logo180a.png",
       "size": "60x60",
       "scale": "3x",
       "idiom": "iphone"

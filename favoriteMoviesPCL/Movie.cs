@@ -184,6 +184,9 @@ namespace FavoriteMoviesPCL
 		public string email { get; set;}
 		public string profilepic { get; set;}
 		public string username { get; set; }
+		public string firstname { get; set;}
+		public string lastname { get; set;}
+		public string phone { get; set;}
 		public string displayname { get; set; }
 		public bool connection { get; set; }
 		public string city { get; set; }

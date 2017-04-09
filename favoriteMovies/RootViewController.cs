@@ -182,10 +182,6 @@ namespace FavoriteMovies
 			SidebarController.ReopenOnRotate = false;
 			SidebarController.HasShadowing = true;
 
-	
-
-
-
 		}
 	}
 }

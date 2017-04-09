@@ -173,10 +173,8 @@ namespace FavoriteMovies
 			logoutButton.HorizontalAlignment = UIControlContentHorizontalAlignment.Left;
 			logoutButton.SetTitleColor (UIColor.White, UIControlState.Normal);
 			logoutButton.Font = UIFont.FromName (ColorExtensions.TITLE_FONT, 18);
-			logoutButton.TouchUpInside += (sender, e) => {
-				//NavController.PushViewController(new ContentController(), false);
-				//NavController.PushViewController (new MovieListPickerViewController (null, false), false);
-				//SidebarController.ChangeContentView (new MovieListPickerViewController (null, true));
+			logoutButton.TouchUpInside += (sender, e) => 
+			{
 				LoginScreenControl<CredentialsProvider>.Activate (this);
 			};
 

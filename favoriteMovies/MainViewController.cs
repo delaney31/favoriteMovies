@@ -27,7 +27,7 @@ namespace FavoriteMovies
 		static int SpaceBetweenContainers = 30;
 		static int SeparationBuffer = 20;
 		static int SpaceBetweenListTypes = 50;
-		static int MinimumLineSpacing = 5;
+		static int MinimumLineSpacing = 10;
 		static int DefaultYPositionTopRatedLabel = 10;
 		static int DefaultYPositionTopRatedController = 30;
 		static int DefaultYPositionNowPlayingLabel = 270;
@@ -263,7 +263,7 @@ namespace FavoriteMovies
 			customLists = GetCustomLists ();
 			if (customLists.Count == 0 && userWantsSuggestions ) 
 			{
-				CreateSuggestedListBeforeCustom ();
+				CreateSuggestedListNoCustom ();
 			
 			} 
 			else 
@@ -314,7 +314,7 @@ namespace FavoriteMovies
 
 		}
 
-		void CreateSuggestedListBeforeCustom ()
+		void CreateSuggestedListNoCustom ()
 		{
 			TopRatedLabel.Frame = new CGRect (TopRatedLabel.Frame.X, DefaultYPositionTopRatedLabel, TopRatedLabel.Frame.Width, TopRatedLabel.Frame.Height);
 			topRatedController.CollectionView.Frame = new CGRect (TopRatedControllerFrame.X, DefaultYPositionTopRatedController, TopRatedControllerFrame.Width, TopRatedControllerFrame.Height);
@@ -674,8 +674,8 @@ namespace FavoriteMovies
 				ImageView.Center = ContentView.Center;
 				ImageView.Frame = ContentView.Frame;
 				ImageView.ContentMode = UIViewContentMode.ScaleToFill;
-				ContentView.Layer.BorderWidth = 1.0f;
-				ContentView.Layer.BorderColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f).CGColor;
+				ContentView.Layer.BorderWidth = -5.0f;
+				//ContentView.Layer.BorderColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f).CGColor;
 				ContentView.AddSubview (ImageView);
 			} catch (Exception ex) { Debug.Write (ex.Message); throw; }
 
@@ -700,10 +700,10 @@ namespace FavoriteMovies
 				}
 				if (ColorExtensions.MovieIsFavorite (element.id.ToString ())) 
 				{
-					ContentView.Layer.BorderColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR).CGColor;
-					ContentView.Layer.BorderWidth = 2.0f;
+					//ContentView.Layer.BorderColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR).CGColor;
+					//ContentView.Layer.BorderWidth = 2.0f;
 				} else {
-					ContentView.Layer.BorderColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f).CGColor;
+					//ContentView.Layer.BorderColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f).CGColor;
 				}
 			} catch (SQLite.SQLiteException ex) 
 			{

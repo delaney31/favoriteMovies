@@ -31,7 +31,7 @@ namespace FavoriteMovies
 		async Task<List<ContactCard>> GetUserContactsAsync ()
 		{
 			// Define fields to be searched
-			var fetchKeys = new NSString [] { CNContactKey.GivenName, CNContactKey.FamilyName, CNContactKey.EmailAddresses,CNContactKey.ImageDataAvailable, CNContactKey.ThumbnailImageData };
+			var fetchKeys = new NSString [] { CNContactKey.GivenName, CNContactKey.FamilyName,CNContactKey.EmailAddresses,CNContactKey.ImageDataAvailable, CNContactKey.ThumbnailImageData };
 			List<ContactCard> result = new List<ContactCard> ();
 			try {
 				var store = new CNContactStore ();
@@ -42,7 +42,9 @@ namespace FavoriteMovies
 					var fetchPredicate = CNContact.GetPredicateForContactsInContainer (container.Identifier);
 
 					var containerResults = store.GetUnifiedContacts (fetchPredicate, fetchKeys, out error);
-					foreach (var contact in containerResults) {
+					foreach (var contact in containerResults) 
+					{
+						
 						var conCard = new ContactCard (UITableViewCellStyle.Default, cellIdentifier);
 						conCard.nameLabel.Text = contact.GivenName + " " + contact.FamilyName;
 
@@ -62,7 +64,7 @@ namespace FavoriteMovies
 			return result.ToList ();
 
 		}
-}
+	}
 
 
 	public class UserCloudTableSource : UITableViewSource

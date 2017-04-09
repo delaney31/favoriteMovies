@@ -21,8 +21,6 @@
     <MtouchDebug>true</MtouchDebug>
     <MtouchFastDev>true</MtouchFastDev>
     <MtouchProfiling>true</MtouchProfiling>
-    <MtouchUseSGen>true</MtouchUseSGen>
-    <MtouchUseRefCounting>true</MtouchUseRefCounting>
     <MtouchLink>SdkOnly</MtouchLink>
     <MtouchArch>x86_64</MtouchArch>
     <MtouchHttpClientHandler>HttpClientHandler</MtouchHttpClientHandler>
@@ -38,8 +36,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodesignKey>iPhone Distribution: JadeSystems Inc. (JM7Y3WT9SW)</CodesignKey>
-    <MtouchUseSGen>true</MtouchUseSGen>
-    <MtouchUseRefCounting>true</MtouchUseRefCounting>
     <MtouchFloat32>true</MtouchFloat32>
     <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
     <MtouchLink>SdkOnly</MtouchLink>
@@ -61,8 +57,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodesignKey>iPhone Developer</CodesignKey>
-    <MtouchUseSGen>true</MtouchUseSGen>
-    <MtouchUseRefCounting>true</MtouchUseRefCounting>
     <MtouchLink>SdkOnly</MtouchLink>
     <MtouchArch>x86_64</MtouchArch>
     <MtouchHttpClientHandler>HttpClientHandler</MtouchHttpClientHandler>
@@ -86,8 +80,6 @@
     <MtouchDebug>true</MtouchDebug>
     <MtouchFastDev>true</MtouchFastDev>
     <MtouchProfiling>true</MtouchProfiling>
-    <MtouchUseSGen>true</MtouchUseSGen>
-    <MtouchUseRefCounting>true</MtouchUseRefCounting>
     <MtouchFloat32>true</MtouchFloat32>
     <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
     <MtouchLink>SdkOnly</MtouchLink>
@@ -222,6 +214,9 @@
     <ImageAsset Include="Assets.xcassets\LaunchImage.launchimage\SPLASH2.640.960.png" />
     <ImageAsset Include="Assets.xcassets\LaunchImage.launchimage\SPLASH2.png" />
     <ImageAsset Include="Assets.xcassets\LaunchImage.launchimage\SPLASH2.640.960 copy.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Final-Logo180.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Final-Logo29.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Final-Logo180a.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />

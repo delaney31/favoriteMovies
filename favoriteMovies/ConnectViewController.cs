@@ -8,8 +8,10 @@ using BigTed;
 using CoreGraphics;
 using FavoriteMoviesPCL;
 using Foundation;
+using JSQMessagesViewController;
 using MovieFriends;
 using ObjCRuntime;
+using Plugin.Messaging;
 using SDWebImage;
 using SQLite;
 using ToastIOS;
@@ -22,7 +24,8 @@ namespace FavoriteMovies
 		protected List<ContactCard> tableItems;
 		//UIBarButtonItem following;
 		const string cellIdentifier = "UserCloudCells";
-		List<UserCloud> users;
+		protected List<UserCloud> users;
+		protected List<UserFriendsCloud> friends;
 		UILabel loading;
 		public AzureTablesService postService = AzureTablesService.DefaultService;
 		public ConnectViewController()
@@ -137,7 +140,7 @@ namespace FavoriteMovies
 
 			const string cellId = "UserContacts";
 			List<ContactCard> results = new List<ContactCard> ();
-			List<UserFriendsCloud> friends = new List<UserFriendsCloud> ();
+
 			table.TableHeaderView = new UIView () {
 				Frame = new CGRect () { X = 0.0f, Y = 0.0f, Width = View.Layer.Frame.Width, Height = 20f }
 			};
@@ -156,7 +159,7 @@ namespace FavoriteMovies
 				result.connection = null;
 				result.id = user.friendid;
 				result.moviesInCommon = await postService.MoviesInCommon (GetAllMoviesInCustomLists (), user.Id);
-				var location = await postService.GetUserLocation (user.friendid);
+				var location = await postService.GetUser (user.friendid);
 				if (location != null) 
 				{
 					result.location = location.city + " " + location.state + " " + location.country;
@@ -180,12 +183,17 @@ namespace FavoriteMovies
 	{
 		List<ContactCard> listItems;
 		ConnectViewController controller;
+		List<UserFriendsCloud> friends;
 
 		public ConnectCloudTableSource (List<ContactCard> items, ConnectViewController cont)
 		{
 			this.listItems = items;
 			this.controller = cont;
+		}
 
+		public ConnectCloudTableSource (List<ContactCard> items, ConnectViewController cont, List<UserFriendsCloud> friends) : this (items, cont)
+		{
+			this.friends = friends;
 		}
 
 		public async Task updateImages ()
@@ -194,7 +202,7 @@ namespace FavoriteMovies
 			foreach (var user in listItems) 
 			{
 				
-				user.profileImage.Image = await BlobUpload.getProfileImage (user.id, 150, 150);
+				user.profileImage.Image = await BlobUpload.getProfileImage (user.id, 200, 200);
 					
 			}
 			//BTProgressHUD.Dismiss ();
@@ -273,10 +281,43 @@ namespace FavoriteMovies
 			{
 				if(cell.id !="0")
 				  cell.addRemove.Image = UIImage.FromBundle ("chat.png");
-				tapGesture.AddTarget (() => 
-				{
+
+				tapGesture.AddTarget (async () => {
 					var row = listItems [indexPath.Row];
-					controller.NavigationController.PushViewController (new MovieChatViewController (row), true);
+					//controller.NavigationController.PushViewController (new MovieChatViewController (row,friends [indexPath.Row]), true);
+
+					//SystemSoundPlayer.PlayMessageSentSound ();
+
+					//var message = new Message (row.id, friends[indexPath.Row].friendusername, NSDate.Now, "");
+					//messages.Add (message);
+					var smsMessenger = CrossMessaging.Current.SmsMessenger;
+					if (smsMessenger.CanSendSms) 
+					{
+						var user = await controller.postService.GetUser (friends [indexPath.Row].friendid);
+						//smsMessenger.SendSms ("+27213894839493", "Well hello there from Xam.Messaging.Plugin");
+						smsMessenger.SendSms ("+" + user.phone, "");
+					}
+					//var emailMessenger = CrossMessaging.Current.EmailMessenger;
+					//if (emailMessenger.CanSendEmail) {
+					//	// Send simple e-mail to single receiver without attachments, bcc, cc etc.
+					//	//emailMessenger.SendEmail ("to.plugins@xamarin.com", "Xamarin Messaging Plugin", "Well hello there from Xam.Messaging.Plugin");
+					//	emailMessenger.SendEmail ("tldelaney@gmail.com", "Xamarin Messaging Plugin", "Well hello there from Xam.Messaging.Plugin");
+					//	// Alternatively use EmailBuilder fluent interface to construct more complex e-mail with multiple recipients, bcc, attachments etc. 
+					//	var email = new EmailMessageBuilder ()
+					//	  .To ("tldelaney@gmail.com")
+					//	  .Cc ("tldelaney@gmail.com")
+					//	  //.Bcc (new [] { "bcc1.plugins@xamarin.com", "bcc2.plugins@xamarin.com" })
+					//	  .Subject ("Xamarin Messaging Plugin")
+					//	  .Body ("Well hello there from Xam.Messaging.Plugin")
+					//	  .Build ();
+
+					//	emailMessenger.SendEmail (email);
+					//}
+					//FinishSendingMessage (true);
+
+					//await Task.Delay (500);
+
+					//await SimulateDelayedMessageReceived ();
 				});
 				
 			}
@@ -370,7 +411,10 @@ namespace FavoriteMovies
 
 			var cell = Friends [indexPath.Row];
 			cell.id = Friends [indexPath.Row].id;
-			var tapGesture = new UITapGestureRecognizer ();
+
+			var profileImageTapGesture = new UITapGestureRecognizer ();
+
+			var followTapGesture = new UITapGestureRecognizer ();
 			if (cell.connection != null)
 			{
 				if ((bool)cell.connection)
@@ -381,7 +425,7 @@ namespace FavoriteMovies
 
 				if ((bool)!cell.connection) {
 
-					tapGesture.AddTarget (() => {
+					followTapGesture.AddTarget (() => {
 						bool inserted = false;
 						var userfriend = new UserFriendsCloud ();
 						userfriend.userid = ColorExtensions.CurrentUser.Id;
@@ -404,7 +448,7 @@ namespace FavoriteMovies
 
 				} else {
 
-					tapGesture.AddTarget (() => {
+					followTapGesture.AddTarget (() => {
 
 						var userfriend = new UserFriendsCloud ();
 						userfriend.userid = ColorExtensions.CurrentUser.Id;
@@ -440,7 +484,7 @@ namespace FavoriteMovies
 
 			});
 			cell.addRemove.UserInteractionEnabled = true;
-			cell.addRemove.AddGestureRecognizer (tapGesture);
+			cell.addRemove.AddGestureRecognizer (followTapGesture);
 
 			cell.UserInteractionEnabled = true;
 			cell.AddGestureRecognizer (userProfile);
