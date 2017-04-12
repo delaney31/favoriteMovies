@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using CoreGraphics;
 using Foundation;
 using LoginScreen;
+using ObjCRuntime;
 using UIKit;
 
 namespace FavoriteMovies
@@ -38,6 +39,33 @@ namespace FavoriteMovies
 			NavController.PresentModalViewController (imagePicker, true);
 
 		}
+		[Export ("CurrentUserSetNotificationReceived:")]
+		public async void CurrentUserSetNotificationReceived (NSNotification n)
+		{
+			InvokeOnMainThread (async () => 
+			{
+				title.SetTitle (ColorExtensions.CurrentUser.username, UIControlState.Normal);
+				var locationIcon = new UIImageView () { Image = UIImage.FromBundle ("location-100.png") };
+				if (ColorExtensions.CurrentUser.city != null) 
+				{
+					
+					locationIcon.Frame = new CGRect () { X = 110, Y = 243, Width = 10, Height = 10 };
+					location = new UIButton (new RectangleF (20, 220, 192, 20));
+					location.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, 13);
+					//title.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.NAV_BAR_COLOR, 1.0f);
+					location.HorizontalAlignment = UIControlContentHorizontalAlignment.Center;
+					location.SetTitleColor (UIColor.White, UIControlState.Normal);
+					location.SetTitle (ColorExtensions.CurrentUser.city + " " + ColorExtensions.CurrentUser.state + " " + ColorExtensions.CurrentUser.country, UIControlState.Normal);
+					location.TouchUpInside += (sender, e) => 
+					{
+						NavController.PopToRootViewController (false);
+						SidebarController.CloseMenu ();
+					};
+					View.Add (location);
+					View.Add (locationIcon);
+				}
+			});
+		}
 		public override async void ViewDidAppear (bool animated)
 		{
 			base.ViewDidAppear (animated);
@@ -67,6 +95,8 @@ namespace FavoriteMovies
 			View.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f);
 			View.Add (loading);
 
+			var name = new NSString (Constants.CurrentUserSetNotification);
+			NSNotificationCenter.DefaultCenter.AddObserver (this, new Selector (Constants.CurrentUserSetNotificationReceived), name, null);
 
 			title = new UIButton (new RectangleF (20, 200, 192, 20));
 			title.Font = UIFont.FromName (ColorExtensions.TITLE_FONT, 20);
@@ -91,7 +121,8 @@ namespace FavoriteMovies
 				location.HorizontalAlignment = UIControlContentHorizontalAlignment.Center;
 				location.SetTitleColor (UIColor.White, UIControlState.Normal);
 				location.SetTitle (ColorExtensions.CurrentUser.city + " " + ColorExtensions.CurrentUser.state + " " + ColorExtensions.CurrentUser.country, UIControlState.Normal);
-				location.TouchUpInside += (sender, e) => {
+				location.TouchUpInside += (sender, e) => 
+				{
 					NavController.PopToRootViewController (false);
 					SidebarController.CloseMenu ();
 				};
@@ -103,7 +134,7 @@ namespace FavoriteMovies
 			introButton.SetTitle ("Movies", UIControlState.Normal);
 			introButton.SetTitleColor (UIColor.White, UIControlState.Normal);
 			introButton.HorizontalAlignment = UIControlContentHorizontalAlignment.Left;
-			introButton.Font = UIFont.FromName (ColorExtensions.TITLE_FONT, 18);
+			introButton.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, 18);
 			introButton.TouchUpInside += (sender, e) => {
 				NavController.PopToRootViewController (false);
 				SidebarController.CloseMenu ();
@@ -115,7 +146,7 @@ namespace FavoriteMovies
 			contentButton.SetTitle ("Lists", UIControlState.Normal);
 			contentButton.SetTitleColor (UIColor.White, UIControlState.Normal);
 			contentButton.HorizontalAlignment = UIControlContentHorizontalAlignment.Left;
-			contentButton.Font = UIFont.FromName (ColorExtensions.TITLE_FONT, 18);
+			contentButton.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, 18);
 
 			contentButton.TouchUpInside += (sender, e) => 
 			{
@@ -132,7 +163,7 @@ namespace FavoriteMovies
 			connectionsButton.SetTitle ("Invite", UIControlState.Normal);
 			connectionsButton.SetTitleColor (UIColor.White, UIControlState.Normal);
 			connectionsButton.HorizontalAlignment = UIControlContentHorizontalAlignment.Left;
-			connectionsButton.Font = UIFont.FromName (ColorExtensions.TITLE_FONT, 18);
+			connectionsButton.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, 18);
 			connectionsButton.TouchUpInside += (sender, e) => {
 				NavController.PushViewController (new UserCloudListViewController (), false);
 				SidebarController.CloseMenu ();
@@ -144,7 +175,7 @@ namespace FavoriteMovies
 			SettingsButton.SetTitle ("Settings", UIControlState.Normal);
 			SettingsButton.SetTitleColor (UIColor.White, UIControlState.Normal);
 			SettingsButton.HorizontalAlignment = UIControlContentHorizontalAlignment.Left;
-			SettingsButton.Font = UIFont.FromName (ColorExtensions.TITLE_FONT, 18);
+			SettingsButton.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, 18);
 			SettingsButton.TouchUpInside += (sender, e) => 
 			{
 				
@@ -159,7 +190,7 @@ namespace FavoriteMovies
 			showTipsButton.SetTitle ("Tips", UIControlState.Normal);
 			showTipsButton.HorizontalAlignment = UIControlContentHorizontalAlignment.Left;
 			showTipsButton.SetTitleColor (UIColor.White, UIControlState.Normal);
-			showTipsButton.Font = UIFont.FromName (ColorExtensions.TITLE_FONT, ColorExtensions.HEADER_FONT_SIZE);
+			showTipsButton.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, 18);
 			showTipsButton.TouchUpInside += (sender, e) => 
 			{
 				
@@ -172,9 +203,11 @@ namespace FavoriteMovies
 			logoutButton.SetTitle ("Sign Out", UIControlState.Normal);
 			logoutButton.HorizontalAlignment = UIControlContentHorizontalAlignment.Left;
 			logoutButton.SetTitleColor (UIColor.White, UIControlState.Normal);
-			logoutButton.Font = UIFont.FromName (ColorExtensions.TITLE_FONT, 18);
-			logoutButton.TouchUpInside += (sender, e) => 
-			{
+			logoutButton.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, 18);
+			logoutButton.TouchUpInside += (sender, e) => {
+				//NavController.PushViewController(new ContentController(), false);
+				//NavController.PushViewController (new MovieListPickerViewController (null, false), false);
+				//SidebarController.ChangeContentView (new MovieListPickerViewController (null, true));
 				LoginScreenControl<CredentialsProvider>.Activate (this);
 			};
 

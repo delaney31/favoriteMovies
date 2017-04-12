@@ -147,7 +147,7 @@ namespace FavoriteMovies
 			friends = await postService.GetUserFriends (ColorExtensions.CurrentUser.Id);
 			if (friends.Count == 0) 
 			{
-				friends.Add (new UserFriendsCloud () { friendusername = "Follow friends and chat with them here.", Id = "0", friendid = "0" });
+				friends.Add (new UserFriendsCloud () { friendusername = "          Follow friends and chat with them here.", Id = "0", friendid = "0" });
 			}
 		
 			foreach (var user in friends) 
@@ -184,7 +184,7 @@ namespace FavoriteMovies
 		List<ContactCard> listItems;
 		ConnectViewController controller;
 		List<UserFriendsCloud> friends;
-
+		string cellIdentifier = "ConnectCell";
 		public ConnectCloudTableSource (List<ContactCard> items, ConnectViewController cont)
 		{
 			this.listItems = items;
@@ -211,141 +211,152 @@ namespace FavoriteMovies
 
 		public override UITableViewCell GetCell (UITableView tableView, NSIndexPath indexPath)
 		{
-			var cell = listItems [indexPath.Row];
 
-			cell.id = listItems [indexPath.Row].id;
-			var tapGesture = new UITapGestureRecognizer ();
-			if (cell.connection != null) 
+			//UITableViewCell cell;
+
+
+			if (listItems [indexPath.Row].id == "0") {
+				var cell = tableView.DequeueReusableCell (cellIdentifier);
+				var cellStyle = UITableViewCellStyle.Value2;
+				// if there are no cells to reuse, create a new one
+				if (cell == null) {
+					cell = new UITableViewCell (cellStyle, cellIdentifier);
+					cell.DetailTextLabel.Text= listItems [indexPath.Row].nameLabel.Text;
+					cell.DetailTextLabel.TextAlignment = UITextAlignment.Justified;
+					cell.DetailTextLabel.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, ColorExtensions.CAST_FONT_SIZE);
+					cell.DetailTextLabel.TextColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f);
+
+				}
+				return cell;
+			} else 
 			{
-				if ((bool)cell.connection)
-					cell.addRemove.Image = UIImage.FromBundle ("ic_remove_circle_outline.png");
-				else
-					cell.addRemove.Image = UIImage.FromBundle ("follow.png");
-				
-				if ((bool)!cell.connection) 
-				{
+				var cell = listItems [indexPath.Row];
 
-					tapGesture.AddTarget (() => {
-						bool inserted = false;
-						var userfriend = new UserFriendsCloud ();
-						userfriend.userid = ColorExtensions.CurrentUser.Id;
-						userfriend.friendid = cell.id;
-						userfriend.friendusername = cell.nameLabel.Text;
-						InvokeOnMainThread (async () => 
-						{
-							inserted = await controller.postService.InsertUserFriendAsync (userfriend);
 
-							if (inserted) {
-								listItems [indexPath.Row].connection = true;
-								controller.table.ReloadData ();
-								BTProgressHUD.ShowToast ("Following " + cell.nameLabel.Text, false);
-								var notification = NSNotification.FromName (Constants.ModifyFollowerNotification, new NSObject ());
-								NSNotificationCenter.DefaultCenter.PostNotification (notification);
-							}
-						});
-					});
 
-				} 
-				 else 
-				{
 
-					tapGesture.AddTarget (() => {
+				//cell.id = listItems [indexPath.Row].id;
+				var tapGesture = new UITapGestureRecognizer ();
+				if (cell.connection != null) {
+					if ((bool)cell.connection)
+						cell.addRemove.Image = UIImage.FromBundle ("ic_remove_circle_outline.png");
+					else
+						cell.addRemove.Image = UIImage.FromBundle ("follow.png");
 
-						var userfriend = new UserFriendsCloud ();
-						userfriend.userid = ColorExtensions.CurrentUser.Id;
-						userfriend.friendid = cell.id;
-						userfriend.friendusername = cell.nameLabel.Text;
-						bool deleted = false;
-						InvokeOnMainThread (async () => 
-						{
-							bool accepted = await BaseCollectionViewController.ShowAlert ("Confirm", "Are you sure you want to remove this friend?");
-							Console.WriteLine ("Selected button {0}", accepted ? "Accepted" : "Canceled");
-							if (accepted) {
-								deleted = await controller.postService.DeleteItemAsync (userfriend);
-								if (deleted) 
-								{
-									listItems [indexPath.Row].connection = false;
+					if ((bool)!cell.connection) {
+
+						tapGesture.AddTarget (() => {
+							bool inserted = false;
+							var userfriend = new UserFriendsCloud ();
+							userfriend.userid = ColorExtensions.CurrentUser.Id;
+							userfriend.friendid = cell.id;
+							userfriend.friendusername = cell.nameLabel.Text;
+							InvokeOnMainThread (async () => {
+								inserted = await controller.postService.InsertUserFriendAsync (userfriend);
+
+								if (inserted) {
+									listItems [indexPath.Row].connection = true;
 									controller.table.ReloadData ();
-									BTProgressHUD.ShowToast ("Unfollowing " + cell.nameLabel.Text, false);
+									BTProgressHUD.ShowToast ("Following " + cell.nameLabel.Text, false);
 									var notification = NSNotification.FromName (Constants.ModifyFollowerNotification, new NSObject ());
 									NSNotificationCenter.DefaultCenter.PostNotification (notification);
-
 								}
-							}
+							});
 						});
+
+					} else {
+
+						tapGesture.AddTarget (() => {
+
+							var userfriend = new UserFriendsCloud ();
+							userfriend.userid = ColorExtensions.CurrentUser.Id;
+							userfriend.friendid = cell.id;
+							userfriend.friendusername = cell.nameLabel.Text;
+							bool deleted = false;
+							InvokeOnMainThread (async () => {
+								bool accepted = await BaseCollectionViewController.ShowAlert ("Confirm", "Are you sure you want to remove this friend?");
+								Console.WriteLine ("Selected button {0}", accepted ? "Accepted" : "Canceled");
+								if (accepted) {
+									deleted = await controller.postService.DeleteItemAsync (userfriend);
+									if (deleted) {
+										listItems [indexPath.Row].connection = false;
+										controller.table.ReloadData ();
+										BTProgressHUD.ShowToast ("Unfollowing " + cell.nameLabel.Text, false);
+										var notification = NSNotification.FromName (Constants.ModifyFollowerNotification, new NSObject ());
+										NSNotificationCenter.DefaultCenter.PostNotification (notification);
+
+									}
+								}
+							});
+						});
+
+					}
+				} else {
+					if (cell.id != "0")
+						cell.addRemove.Image = UIImage.FromBundle ("chat.png");
+
+					tapGesture.AddTarget (async () => {
+						var row = listItems [indexPath.Row];
+						//controller.NavigationController.PushViewController (new MovieChatViewController (row,friends [indexPath.Row]), true);
+
+						//SystemSoundPlayer.PlayMessageSentSound ();
+
+						//var message = new Message (row.id, friends[indexPath.Row].friendusername, NSDate.Now, "");
+						//messages.Add (message);
+						var smsMessenger = CrossMessaging.Current.SmsMessenger;
+						if (smsMessenger.CanSendSms) {
+							var user = await controller.postService.GetUser (friends [indexPath.Row].friendid);
+							//smsMessenger.SendSms ("+27213894839493", "Well hello there from Xam.Messaging.Plugin");
+							smsMessenger.SendSms ("+" + user.phone, "");
+						}
+						//var emailMessenger = CrossMessaging.Current.EmailMessenger;
+						//if (emailMessenger.CanSendEmail) {
+						//	// Send simple e-mail to single receiver without attachments, bcc, cc etc.
+						//	//emailMessenger.SendEmail ("to.plugins@xamarin.com", "Xamarin Messaging Plugin", "Well hello there from Xam.Messaging.Plugin");
+						//	emailMessenger.SendEmail ("tldelaney@gmail.com", "Xamarin Messaging Plugin", "Well hello there from Xam.Messaging.Plugin");
+						//	// Alternatively use EmailBuilder fluent interface to construct more complex e-mail with multiple recipients, bcc, attachments etc. 
+						//	var email = new EmailMessageBuilder ()
+						//	  .To ("tldelaney@gmail.com")
+						//	  .Cc ("tldelaney@gmail.com")
+						//	  //.Bcc (new [] { "bcc1.plugins@xamarin.com", "bcc2.plugins@xamarin.com" })
+						//	  .Subject ("Xamarin Messaging Plugin")
+						//	  .Body ("Well hello there from Xam.Messaging.Plugin")
+						//	  .Build ();
+
+						//	emailMessenger.SendEmail (email);
+						//}
+						//FinishSendingMessage (true);
+
+						//await Task.Delay (500);
+
+						//await SimulateDelayedMessageReceived ();
 					});
 
 				}
-			} 
-			else	
-			{
-				if(cell.id !="0")
-				  cell.addRemove.Image = UIImage.FromBundle ("chat.png");
 
-				tapGesture.AddTarget (async () => {
-					var row = listItems [indexPath.Row];
-					//controller.NavigationController.PushViewController (new MovieChatViewController (row,friends [indexPath.Row]), true);
+				var userProfile = new UITapGestureRecognizer ();
+				var profile = new UserProfileViewController (listItems [indexPath.Row]);
 
-					//SystemSoundPlayer.PlayMessageSentSound ();
+				userProfile.AddTarget (() => {
 
-					//var message = new Message (row.id, friends[indexPath.Row].friendusername, NSDate.Now, "");
-					//messages.Add (message);
-					var smsMessenger = CrossMessaging.Current.SmsMessenger;
-					if (smsMessenger.CanSendSms) 
-					{
-						var user = await controller.postService.GetUser (friends [indexPath.Row].friendid);
-						//smsMessenger.SendSms ("+27213894839493", "Well hello there from Xam.Messaging.Plugin");
-						smsMessenger.SendSms ("+" + user.phone, "");
-					}
-					//var emailMessenger = CrossMessaging.Current.EmailMessenger;
-					//if (emailMessenger.CanSendEmail) {
-					//	// Send simple e-mail to single receiver without attachments, bcc, cc etc.
-					//	//emailMessenger.SendEmail ("to.plugins@xamarin.com", "Xamarin Messaging Plugin", "Well hello there from Xam.Messaging.Plugin");
-					//	emailMessenger.SendEmail ("tldelaney@gmail.com", "Xamarin Messaging Plugin", "Well hello there from Xam.Messaging.Plugin");
-					//	// Alternatively use EmailBuilder fluent interface to construct more complex e-mail with multiple recipients, bcc, attachments etc. 
-					//	var email = new EmailMessageBuilder ()
-					//	  .To ("tldelaney@gmail.com")
-					//	  .Cc ("tldelaney@gmail.com")
-					//	  //.Bcc (new [] { "bcc1.plugins@xamarin.com", "bcc2.plugins@xamarin.com" })
-					//	  .Subject ("Xamarin Messaging Plugin")
-					//	  .Body ("Well hello there from Xam.Messaging.Plugin")
-					//	  .Build ();
+					controller.NavigationController.PushViewController (profile, true);
 
-					//	emailMessenger.SendEmail (email);
-					//}
-					//FinishSendingMessage (true);
-
-					//await Task.Delay (500);
-
-					//await SimulateDelayedMessageReceived ();
 				});
-				
-			}
-				 
-			var userProfile = new UITapGestureRecognizer ();
-			var profile = new UserProfileViewController (listItems [indexPath.Row]);
+				cell.addRemove.UserInteractionEnabled = true;
+				cell.addRemove.AddGestureRecognizer (tapGesture);
 
-			userProfile.AddTarget (() => 
-			{
-				
-				controller.NavigationController.PushViewController (profile,true);
+				cell.UserInteractionEnabled = true;
+				cell.AddGestureRecognizer (userProfile);
 
-			});
-			cell.addRemove.UserInteractionEnabled = true;
-			cell.addRemove.AddGestureRecognizer (tapGesture);
-
-			cell.UserInteractionEnabled = true;
-			cell.AddGestureRecognizer (userProfile);
-
-			if (cell.moviesInCommon == 0)
-				cell.descriptionLabel.Text = listItems [indexPath.Row].location;
-			else 
-			{
-				cell.descriptionLabel.Text = "You have " + cell.moviesInCommon + " movie" + (cell.moviesInCommon==0||cell.moviesInCommon > 1 ?"s":"") + " in common";;
-				cell.locationLabel.Text= listItems [indexPath.Row].location;
+				if (cell.moviesInCommon == 0)
+					cell.descriptionLabel.Text = listItems [indexPath.Row].location;
+				else {
+					cell.descriptionLabel.Text = "You have " + cell.moviesInCommon + " movie" + (cell.moviesInCommon == 0 || cell.moviesInCommon > 1 ? "s" : "") + " in common"; ;
+					cell.locationLabel.Text = listItems [indexPath.Row].location;
+				}
+				return cell;
 			}
 
-			return cell;
 		}
 
 		public override nint RowsInSection (UITableView tableview, nint section)
@@ -506,8 +517,8 @@ namespace FavoriteMovies
 				//this.searchController.Active = false;
 				var row = Friends [indexPath.Row];
 
-
-				connectViewController.NavigationController.PushViewController (new UserProfileViewController (row), true);
+				if(row.id !="0")
+				   connectViewController.NavigationController.PushViewController (new UserProfileViewController (row), true);
 
 				//*****this fixes a problem with the uitableview adding space at the top after each selection*****
 

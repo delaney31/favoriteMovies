@@ -123,10 +123,15 @@ namespace FavoriteMovies
 			base.ViewDidAppear (animated);
 
 			needLogin = ColorExtensions.CurrentUser.username == null;
+
 			if (needLogin) {
 				LoginScreenControl<CredentialsProvider>.Activate (this);
 				needLogin = false;
+
+
 			}
+		
+
 			//NewsFeedTableSource.ShowTabBar (TabController);
 			TabController.NavigationController.NavigationBar.Hidden = false;
 			UIApplication.SharedApplication.SetStatusBarHidden (false, true);
@@ -568,8 +573,7 @@ namespace FavoriteMovies
 		public override  void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
-
-
+            
 			// Creates an instance of a custom View Controller that holds the results
 			searchResultsController = new SearchResultsViewController ();
 

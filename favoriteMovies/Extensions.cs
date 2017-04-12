@@ -80,11 +80,16 @@ namespace FavoriteMovies
 		public const string SQL_TABLE = "MovieEntries.db3";
 
 		public static UIImage profileImage = UIImage.FromBundle ("1481507483_compose.png");
+		public static UserCloud _userCloud;
 		public static PointF Rotate (this PointF pt)
 		{
 			return new PointF (pt.Y, pt.X);
 		}
-		public static UserCloud CurrentUser {get;set;}
+		public static UserCloud CurrentUser 
+		{
+			get { return _userCloud; }
+			set {_userCloud = value;}
+		}
 		// resize the image to be contained within a maximum width and height, keeping aspect ratio
 		public static  UIImage MaxResizeImage (UIImage sourceImage, float maxWidth, float maxHeight)
 		{

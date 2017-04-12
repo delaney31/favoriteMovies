@@ -1,12 +1,14 @@
 ﻿
 using System;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Xml;
+using com.google.i18n.phonenumbers;
 using Contacts;
 using FavoriteMoviesPCL;
 using Foundation;
@@ -85,12 +87,20 @@ namespace FavoriteMovies
 		}
 		public void Register (string email, string userName, string password, Action successCallback, Action<LoginScreenFaultDetails> failCallback)
 		{
-			try {
+			
 				// If registration was successfully completed
-				DelayInvoke (async () => {
-					if (password.Length < 4) {
+				DelayInvoke (async () => 
+				{
+				try 
+				{
+					if (password.Length < 4) 
+					{
 						failCallback (new LoginScreenFaultDetails { PasswordErrorMessage = "Password must be at least 4 chars." });
-					} else {
+					} 
+
+					else 
+					
+					{
 						await postService.InitializeStoreAsync ();
 						var locator = CrossGeolocator.Current;
 						locator.DesiredAccuracy = 50;
@@ -112,14 +122,30 @@ namespace FavoriteMovies
 						var Country = xmlDocument.SelectNodes ("geonames") [0].SelectSingleNode ("code").SelectSingleNode ("countryCode").InnerText;
 						var zip = xmlDocument.SelectNodes ("geonames") [0].SelectSingleNode ("code").SelectSingleNode ("postalcode").InnerText;
 						var currentUser = GetCurrentUser (email);
-						var userCloud = new UserCloud () { firstname = currentUser.GivenName ?? "", lastname = currentUser.FamilyName??"", phone = currentUser.PhoneNumbers.FirstOrDefault ().Value.ValueForKey (new NSString("digits")).ToString(), email = email, username = userName, city = CityName, state = State, country = Country, zip = zip };
+						UserCloud userCloud;
+						if (currentUser != null) 
+						{
+							var util = PhoneNumberUtil.getInstance();
+							var number = util.parse (currentUser.PhoneNumbers.FirstOrDefault ().Value.ValueForKey (new NSString ("digits")).ToString (), Country);
+							var phoneNumber = util.format (number, PhoneNumberUtil.PhoneNumberFormat.E164);
+
+							userCloud = new UserCloud () { firstname = currentUser.GivenName ?? string.Empty, lastname = currentUser.FamilyName ?? string.Empty, phone =phoneNumber ?? string.Empty, email = email, username = userName, city = CityName, state = State, country = Country, zip = zip };
+							
+						} 
+						else
+							userCloud = new UserCloud () { email = email, username = userName, city = CityName, state = State, country = Country, zip = zip };
 
 						var unique = await postService.InsertUserAsync (userCloud);
+
 						if (!unique)
 							failCallback (new LoginScreenFaultDetails { UserNameErrorMessage = "This username already exits." });
 						else 
 						{
 							ColorExtensions.CurrentUser = userCloud;
+                          
+							var notification = NSNotification.FromName (Constants.CurrentUserSetNotification, new NSObject ());
+							NSNotificationCenter.DefaultCenter.PostNotification (notification);
+	
 							var user = new User () { email = email, password = password, username = userName, Id = userCloud.Id, city = CityName, country = Country, state = State, zip = zip };
 							//inset username and password locally
 							await AddUserAsync (user);
@@ -127,12 +153,15 @@ namespace FavoriteMovies
 						}
 
 					}
-				});
 
-			} catch (Exception ex) 
-			{
-				Debug.WriteLine (ex.Message);
-			}
+					} 
+					catch (Exception ex) 
+					{
+						Debug.WriteLine (ex.Message);
+					}
+				});
+			  	
+			
 
 		}
 
@@ -248,8 +277,15 @@ namespace FavoriteMovies
 			Timer timer = new Timer ();
 			timer.AutoReset = false;
 			timer.Interval = 3000;
-			timer.Elapsed += (object sender, ElapsedEventArgs e) => operation.Invoke ();
+			timer.Elapsed += (object sender, ElapsedEventArgs e) => 
+			{
+				operation.Invoke ();
+				//SideMenuController.title.SetTitle (ColorExtensions.CurrentUser.username, UIControlState.Normal);
+			};
 			timer.Start ();
+			
+
+
 		}
 
 	}
