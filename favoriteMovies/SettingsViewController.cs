@@ -29,13 +29,14 @@ namespace FavoriteMovies
 			iap = new InAppPurchaseManager();
 			iap.SimulateiTunesAppStore = true;
 			iap.SimulatedRestoredPurchaseProducts = "product.nonconsumable,antivirus.nonrenewingsubscription.duration6months,content.nonconsumable.downloadable";
-			AttachToPurchaseManager (null, iap);
+
 
 		}
 
 		public override async void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
+            AttachToPurchaseManager (null, iap);
 			// Perform any additional setup after loading the view, typically from a nib.
 			NavigationItem.Title = "Profile";
 			txtLastName.Text = ColorExtensions.CurrentUser.lastname;
@@ -262,7 +263,7 @@ namespace FavoriteMovies
 				{
 					// Update list to remove any non-consumable products that were
 					// purchased
-					ColorExtensions.CurrentUser.removeAds = !ColorExtensions.CurrentUser.removeAds;
+					ColorExtensions.CurrentUser.removeAds = true;
 					switchRemoveAds.On = true;
 				};
 
@@ -270,7 +271,7 @@ namespace FavoriteMovies
 				{
 					// Update list to remove any non-consumable products that were
 					// purchased
-					ColorExtensions.CurrentUser.removeAds = !ColorExtensions.CurrentUser.removeAds;
+					ColorExtensions.CurrentUser.removeAds = true;
 					switchRemoveAds.On = true;
 				};
 

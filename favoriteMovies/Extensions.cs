@@ -127,16 +127,17 @@ namespace FavoriteMovies
 				{
 					
 					CurrentSize = SmallTiles;
-					_CurrentTileSize = 0;
+
 				} else if (value ==1) 
 				{
 					CurrentSize = MediumTiles;
-					_CurrentTileSize = 1;
+
 				} else if (value ==2 ) 
 				{
 					CurrentSize = LargeTiles;
-					_CurrentTileSize = 2;
+
 				}
+				_CurrentTileSize = value;
 				CurrentUser.tilesize = (int)value;
 			}
 		}
