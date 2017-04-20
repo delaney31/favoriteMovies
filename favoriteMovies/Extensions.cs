@@ -7,7 +7,9 @@ using System.Threading.Tasks;
 using Accelerate;
 using CoreGraphics;
 using FavoriteMoviesPCL;
+using Foundation;
 using JSQMessagesViewController;
+using Security;
 using UIKit;
 
 namespace FavoriteMovies
@@ -63,32 +65,90 @@ namespace FavoriteMovies
 	{
 		public const string TITLE = "Movie Explorer";
 		public const string containerName = "moviefriend";
-		public const string NAV_BAR_COLOR = "#3B5998";//facebook blue
+		public static string NAV_BAR_COLOR= "#3B5998";//facebook blue
 													  //public const string NAV_BAR_COLOR ="#323232";
 		public const string AZURE_STORAGE_CONNECTION_STRING = "SharedAccessSignature=sv=2015-12-11&ss=bt&srt=sco&sp=rwdlacup&st=2017-01-13T01%3A11%3A00Z&se=2450-01-14T01%3A11%3A00Z&sig=f6ik2E%2BjiJX5eCBMMQnEffnXDGVhGTVt9oMVM9dqhPk%3D;BlobEndpoint=https://moviefriends.blob.core.windows.net/;TableEndpoint=https://moviefriends.table.core.windows.net";
 		public const string TITLE_COLOR = "#DE9A2D";
-		public const string TITLE_FONT = "Avenir-Heavy";
-		public const string CONTENT_FONT = "AvenirNext-Medium";
-		public const string PROFILE_NAME = "AvenirNext-Medium";
+		public const string TITLE_FONT = "HelveticaNeue";
+		public const string CONTENT_FONT = "HelveticaNeue";
+		public const string PROFILE_NAME = "HelveticaNeue";
 		//public const string TAB_BACKGROUND_COLOR = "#000000";//black
 		//public const string TAB_BACKGROUND_COLOR = "#555555"; //grey
-		public const string TAB_BACKGROUND_COLOR = "#FFFFFF"; //white
+		public static string TAB_BACKGROUND_COLOR= "#FFFFFF"; //white
+
 		public const string PROFILE_BACKGROUND_COLOR = "#4B5F82"; //light grey
 																  //public const string TAB_BACKGROUND_COLOR = "#3B3B3B"; //dark grey
-		public const float HEADER_FONT_SIZE = 16f;
+		public const float HEADER_FONT_SIZE = 15f;
 		public const float CAST_FONT_SIZE = 12f;
 		public const string SQL_TABLE = "MovieEntries.db3";
-
 		public static UIImage profileImage = UIImage.FromBundle ("1481507483_compose.png");
-		public static UserCloud _userCloud;
+		public static User _user;
+		public static nint _CurrentTileSize;
+		public static CGSize SmallTiles = new CGSize (100, 150);
+		public static CGSize MediumTiles = new CGSize (133, 185);
+		public static CGSize LargeTiles = new CGSize (153, 205);
+		public static CGSize CurrentSize;
+		public static bool DarkTheme 
+		{
+			get {
+				return TAB_BACKGROUND_COLOR == "#000000";
+			}
+			set {
+				if (value) 
+				{
+					TAB_BACKGROUND_COLOR = "#000000";
+					NAV_BAR_COLOR = "#3B5998";
+					UITabBar.Appearance.BarTintColor = UIColor.Clear.FromHexString (NAV_BAR_COLOR, 1.0f);
+					UITabBar.Appearance.TintColor = UIColor.Clear.FromHexString ("#FFFFFF", 1.0f);
+				} else 
+				{
+					TAB_BACKGROUND_COLOR = "#FFFFFF";
+					NAV_BAR_COLOR = "#3B5998";
+					UITabBar.Appearance.BarTintColor = UIColor.Clear.FromHexString ("#FFFFFF", 1.0f);
+
+				}
+			}
+		}
+		public static byte [] ConvertImageToByteArray (UIImage image)
+		{
+			byte [] byteArray;
+			using (NSData imageData = image.AsPNG ()) {
+				byteArray = new Byte [imageData.Length];
+				System.Runtime.InteropServices.Marshal.Copy (imageData.Bytes, byteArray, 0, Convert.ToInt32 (imageData.Length));
+			}
+			return byteArray;
+		}
+		public static nint CurrentTileSize 
+		{
+			get { return _CurrentTileSize;}
+			set
+			{
+				if (value == 0) 
+				{
+					
+					CurrentSize = SmallTiles;
+					_CurrentTileSize = 0;
+				} else if (value ==1) 
+				{
+					CurrentSize = MediumTiles;
+					_CurrentTileSize = 1;
+				} else if (value ==2 ) 
+				{
+					CurrentSize = LargeTiles;
+					_CurrentTileSize = 2;
+				}
+				CurrentUser.tilesize = (int)value;
+			}
+		}
+
 		public static PointF Rotate (this PointF pt)
 		{
 			return new PointF (pt.Y, pt.X);
 		}
-		public static UserCloud CurrentUser 
+		public static User CurrentUser 
 		{
-			get { return _userCloud; }
-			set {_userCloud = value;}
+			get { return _user; }
+			set {_user = value;}
 		}
 		// resize the image to be contained within a maximum width and height, keeping aspect ratio
 		public static  UIImage MaxResizeImage (UIImage sourceImage, float maxWidth, float maxHeight)
@@ -232,7 +292,57 @@ namespace FavoriteMovies
 			}
 			return ApplyBlur (self, blurRadius: 10, tintColor: effectColor, saturationDeltaFactor: -1, maskImage: null);
 		}
+		public static string GetDeviceId()
+		{
+			/*
+			* The value of CurrentDevice.IdentifierForVendor changes if the app is removed and reinstalled.
+			* Therefore some ID (the value of IdentifierForVendor) is stored to the keychain and
+			* reused every time (even after a reinstall). See http://stackoverflow.com/a/22937460
+			*/
 
+			String id;
+
+			String ServiceId = "KeyChainAccountStore";
+
+			//use the bundle identifier of the app to identifie the value in the keychain
+			String appId = NSBundle.MainBundle.InfoDictionary ["CFBundleIdentifier"].ToString ();
+
+			//Try to read the id from the keychain
+			var rec = new SecRecord (SecKind.GenericPassword) {
+				Service = ServiceId,
+				Account = appId,
+			};
+
+			SecStatusCode res;
+			var match = SecKeyChain.QueryAsRecord (rec, out res);
+			 
+			//Store a new ID to the keychain
+			if (match?.Generic == null)
+			{
+			    //Get the vendor ID (does change after a reinstall of the app)
+			    var vendorId = UIKit.UIDevice.CurrentDevice.IdentifierForVendor.AsString ().Replace ("-", "");
+
+			SecRecord record = new SecRecord (SecKind.GenericPassword) {
+				Service = ServiceId,
+				Account = appId,
+				Generic = NSData.FromString (vendorId),
+				Accessible = SecAccessible.Always
+			};
+
+			var statusCode = SecKeyChain.Add (record);
+			 
+			    if(statusCode != SecStatusCode.Success)
+			        Debug.WriteLine("Could not save key to KeyChain: " + statusCode);
+			 
+			    id = vendorId;
+			}
+			else
+			{   //Use ID from keychain
+			    id = match.Generic.ToString();
+			}
+			 
+			return id;
+		}
 		public  static UIImage ApplyBlur (UIImage image, float blurRadius, UIColor tintColor, float saturationDeltaFactor, UIImage maskImage)
 		{
 			if (image.Size.Width < 1 || image.Size.Height < 1) {

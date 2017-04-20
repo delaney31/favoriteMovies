@@ -124,7 +124,7 @@
         <image name="Default.png" width="320" height="480"/>
         <image name="threelines.png" width="30" height="30"/>
         <image name="blank.png" width="400" height="400"/>
-        <image name="star.png" width="160" height="120"/>
+        <image name="star.png" width="512" height="512"/>
         <image name="imdb.png" width="208" height="226"/>
         <image name="play-468292_640.png" width="225" height="225"/>
         <image name="images.png" width="225" height="225"/>
@@ -148,5 +148,44 @@
         <image name="tips.png" width="600" height="600"/>
         <image name="432920-200.png" width="20" height="20"/>
         <image name="432920-200 (1).png" width="40" height="40"/>
+        <image name="like.png" width="900" height="758"/>
+        <image name="unlike.png" width="208" height="152"/>
+        <image name="IMG_2848.png" width="173" height="90"/>
+        <image name="imageedit_1_9121618535.png" width="173" height="90"/>
+        <image name="logout-512.png" width="824" height="980"/>
+        <image name="ic_exit_to_app_3x.png" width="62" height="62"/>
+        <image name="User Groups-50.png" width="50" height="50"/>
+        <image name="User Groups.png" width="50" height="50"/>
+        <image name="connect.png" width="219" height="230"/>
+        <image name="ic_person_add_2x.png" width="48" height="48"/>
+        <image name="ic_person_add.png" width="24" height="24"/>
+        <image name="ic_whatshot.png" width="24" height="24"/>
+        <image name="ic_chat.png" width="24" height="24"/>
+        <image name="ic_movie.png" width="24" height="24"/>
+        <image name="ic_photo.png" width="24" height="24"/>
+        <image name="Q4ZWS.png" width="29" height="32"/>
+        <image name="ic_star_border.png" width="24" height="24"/>
+        <image name="ic_stars.png" width="24" height="24"/>
+        <image name="stardark.png" width="512" height="512"/>
+        <image name="ic_indeterminate_check_box.png" width="24" height="24"/>
+        <image name="ic_plus_one.png" width="24" height="24"/>
+        <image name="ic_delete.png" width="24" height="24"/>
+        <image name="ic_remove_circle.png" width="24" height="24"/>
+        <image name="ic_remove_circle_outline.png" width="24" height="24"/>
+        <image name="ic_person_remove.png" width="24" height="24"/>
+        <image name="unfollow.png" width="188" height="56"/>
+        <image name="follow.png" width="188" height="56"/>
+        <image name="location-100.png" width="1200" height="1200"/>
+        <image name="velvetropes.png" width="396" height="110"/>
+        <image name="Divider_large_red_large.png" width="480" height="60"/>
+        <image name="ic_notifications.png" width="24" height="24"/>
+        <image name="chat.png" width="188" height="56"/>
+        <image name="1---search-movies.png" width="480" height="801"/>
+        <image name="2 - list.png" width="2000" height="3333"/>
+        <image name="3 - chat.png" width="2000" height="3333"/>
+        <image name="4 -  news feed.png" width="2000" height="3333"/>
+        <image name="5 - connect.png" width="2000" height="3333"/>
+        <image name="play.png" width="270" height="270"/>
+        <image name="play2.png" width="270" height="270"/>
     </resources>
 </document>

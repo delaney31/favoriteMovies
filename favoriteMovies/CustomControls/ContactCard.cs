@@ -16,6 +16,7 @@ namespace FavoriteMovies
 		public string id;
 		public bool imageDataAvailable { get; set; }
 		public bool? connection { get; set; }
+		public string email;
 		[Export ("initWithStyle:reuseIdentifier:")]
 		public ContactCard (UITableViewCellStyle style, string cellId) : base (style, cellId)
 		{

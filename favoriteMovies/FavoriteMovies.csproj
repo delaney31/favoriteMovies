@@ -17,7 +17,7 @@
     <DefineConstants>DEBUG;ENABLE_TEST_CLOUD;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CodesignKey>iPhone Distribution</CodesignKey>
+    <CodesignKey>iPhone Developer: TIMOTHY DELANEY (LP695RTGQ3)</CodesignKey>
     <MtouchDebug>true</MtouchDebug>
     <MtouchFastDev>true</MtouchFastDev>
     <MtouchProfiling>true</MtouchProfiling>
@@ -199,17 +199,14 @@
     <Reference Include="iCarousel">
       <HintPath>..\Components\icarousel-1.8.2.1\lib\ios-unified\iCarousel.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.IdentityModel.Logging">
-      <HintPath>..\packages\Microsoft.IdentityModel.Logging.1.1.2\lib\netstandard1.4\Microsoft.IdentityModel.Logging.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.IdentityModel.Tokens">
-      <HintPath>..\packages\Microsoft.IdentityModel.Tokens.5.1.2\lib\netstandard1.4\Microsoft.IdentityModel.Tokens.dll</HintPath>
-    </Reference>
-    <Reference Include="System.IdentityModel.Tokens.Jwt">
-      <HintPath>..\packages\System.IdentityModel.Tokens.Jwt.5.1.2\lib\netstandard1.4\System.IdentityModel.Tokens.Jwt.dll</HintPath>
-    </Reference>
     <Reference Include="libphonenumber">
       <HintPath>..\packages\Google.LibPhoneNumber.1.0.0\lib\libphonenumber.dll</HintPath>
+    </Reference>
+    <Reference Include="Facebook.AudienceNetwork">
+      <HintPath>..\Components\fbaudiencenetworkios-4.19.0.0\lib\ios-unified\Facebook.AudienceNetwork.dll</HintPath>
+    </Reference>
+    <Reference Include="Xamarin.InAppPurchase-Unified">
+      <HintPath>..\Components\xamarin.inapppurchase-2.8\lib\ios-unified\Xamarin.InAppPurchase-Unified.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -217,13 +214,20 @@
     <ImageAsset Include="Assets.xcassets\Contents.json" />
     <ImageAsset Include="Assets.xcassets\LaunchImage.launchimage\Contents.json" />
     <ImageAsset Include="Assets.xcassets\LaunchImage.launchimage\Default%402x.png" />
-    <ImageAsset Include="Assets.xcassets\LaunchImage.launchimage\Default-568h%402x.png" />
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Final-Logo.png" />
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Final-Logo120.png" />
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Final-Logo80.png" />
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Final-Logo87.png" />
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Final-Logo57.png" />
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Final-Logo58.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Final-Logo180.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Final-Logo29.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Final-Logo180a.png" />
+    <ImageAsset Include="Assets.xcassets\LaunchImage.launchimage\SPLASH2.640.960 copy.png" />
+    <ImageAsset Include="Assets.xcassets\LaunchImage.launchimage\SPLASH2 copy.png" />
+    <ImageAsset Include="Assets.xcassets\LaunchImage.launchimage\SPLASH2.320.480 copy.png" />
+    <ImageAsset Include="Assets.xcassets\LaunchImage.launchimage\SPLASH2.640.960.png" />
+    <ImageAsset Include="Assets.xcassets\LaunchImage.launchimage\SPLASH2.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
@@ -280,8 +284,13 @@
     <Compile Include="UserProfileViewController.cs" />
     <Compile Include="clTable.cs" />
     <Compile Include="NotificationsViewController.cs" />
-    <Compile Include="TipsViewController.cs" />
+    <Compile Include="MFVideoViewController.cs" />
     <Compile Include="FindFriendsViewController.cs" />
+    <Compile Include="TipsViewController.cs" />
+    <Compile Include="SettingsViewController.cs" />
+    <Compile Include="SettingsViewController.designer.cs">
+      <DependentUpon>SettingsViewController.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <BundleResource Include="Resources\placeholder.png" />
@@ -347,6 +356,16 @@
     <BundleResource Include="Resources\velvetropes.png" />
     <BundleResource Include="Resources\Divider_large_red_large.png" />
     <BundleResource Include="Resources\ic_notifications.png" />
+    <BundleResource Include="Resources\chat.png" />
+    <BundleResource Include="Resources\1---search-movies.png" />
+    <BundleResource Include="Resources\2 - list.png" />
+    <BundleResource Include="Resources\3 - chat.png" />
+    <BundleResource Include="Resources\4 -  news feed.png" />
+    <BundleResource Include="Resources\5 - connect.png" />
+    <BundleResource Include="Resources\play.png" />
+    <BundleResource Include="Resources\play2.png" />
+    <BundleResource Include="Resources\ic_contact_mail_3x.png" />
+    <BundleResource Include="Resources\ic_contact_mail.png" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\favoriteMoviesPCL\favoriteMoviesPCL.csproj">
@@ -360,6 +379,7 @@
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="Phone.storyboard" />
+    <InterfaceDefinition Include="SettingsViewController.xib" />
   </ItemGroup>
   <ItemGroup>
     <XamarinComponentReference Include="SidebarNavigation">
@@ -400,6 +420,14 @@
     </XamarinComponentReference>
     <XamarinComponentReference Include="icarousel">
       <Version>1.8.2.1</Version>
+      <Visible>False</Visible>
+    </XamarinComponentReference>
+    <XamarinComponentReference Include="fbaudiencenetworkios">
+      <Version>4.19.0.0</Version>
+      <Visible>False</Visible>
+    </XamarinComponentReference>
+    <XamarinComponentReference Include="xamarin.inapppurchase">
+      <Version>2.8</Version>
       <Visible>False</Visible>
     </XamarinComponentReference>
   </ItemGroup>

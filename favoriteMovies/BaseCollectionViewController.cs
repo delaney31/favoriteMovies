@@ -62,6 +62,7 @@ namespace FavoriteMovies
 				return;
 			BTProgressHUD.Show ();
 			AzureTablesService postService = AzureTablesService.DefaultService;
+			bool accepted = false;
 			await postService.InitializeStoreAsync ();
 			try {
 				var p = lpgr.LocationInView (CollectionView);
@@ -75,8 +76,11 @@ namespace FavoriteMovies
 
 					var customListId = _items [indexPath.Row].CustomListID;
 					var isCustomList = _items [indexPath.Row].CustomListID != null;
-					bool accepted = await ShowAlert ("Confirm", "Are you sure you want to delete this movie?");
-					Console.WriteLine ("Selected button {0}", accepted ? "Accepted" : "Canceled");
+					if (isCustomList) 
+					{
+						accepted = await ShowAlert ("Confirm", "Are you sure you want to delete this movie?");
+						Console.WriteLine ("Selected button {0}", accepted ? "Accepted" : "Canceled");
+					}
 					var item = _items [indexPath.Row];
 					if (accepted) 
 					{

@@ -434,7 +434,7 @@ namespace FavoriteMovies
 				}
 				using (var db = new SQLiteConnection (MovieService.Database)) {
 					// there is a sqllite bug here https://forums.xamarin.com/discussion/
-					//52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
+					//52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);				
 					//	var query = db.Query<CustomList> ("SELECT * FROM CUSTOMLIST");
 					var query = db.Query<CustomList> ("SELECT * FROM [CustomList] WHERE [custom] =1 ORDER BY [Order]");
 					foreach (var list in query) {

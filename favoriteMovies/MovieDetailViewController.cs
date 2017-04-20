@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using BigTed;
 using CoreGraphics;
+using Facebook.AudienceNetwork;
 using FavoriteMoviesPCL;
 using Foundation;
 using MovieFriends;
@@ -18,7 +19,7 @@ using UIKit;
 
 namespace FavoriteMovies
 {
-	public class MovieDetailViewController : BaseController
+	public class MovieDetailViewController : BaseController, IAdViewDelegate
 	{
 
 		UILabel dateOpenView = new UILabel ();
@@ -35,7 +36,9 @@ namespace FavoriteMovies
 		/// <summary>
 		/// This is the view controller for the movie details page. In addition it allows you to save and clear favorite movies
 		/// </summary>
-
+		// Generate your own Placement ID on the Facebook app settings
+		const string PlacementId = "696067800580326_696071757246597";
+		AdView adView;
 		//static string _googleApiKey = "AIzaSyCu634TJuZR_0iUhJQ6D8E9xr2a3VbU3_M";
 		static string _youTubeURl = "https://www.youtube.com/embed/";
 		static string _embededMoveId;
@@ -78,7 +81,7 @@ namespace FavoriteMovies
 			Userstar5 = new UIImageView () { UserInteractionEnabled = true };
 			IMDB = new UIImageView ();
 
-			moviePlay.Image = UIImage.FromBundle ("download.png");
+			moviePlay.Image = UIImage.FromBundle ("play2.png");
 
 			IMDB.Image = UIImage.FromBundle ("imdb.png");
 
@@ -114,6 +117,7 @@ namespace FavoriteMovies
 		{
 			base.ViewDidLoad ();
 
+
 			const string baseUrl = "https://image.tmdb.org/t/p/w300/";
 			scrollView.Frame = new CGRect () { X = View.Frame.X, Y = View.Frame.Y, Width = View.Frame.Width, Height = View.Frame.Height };
 			Initialize ();
@@ -134,7 +138,7 @@ namespace FavoriteMovies
 
 			addReviewButt.SetTitle ("Add/Edit Review", UIControlState.Normal);
 			addReviewButt.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f);
-			addReviewButt.SetTitleColor (UIColor.White, UIControlState.Normal);
+			addReviewButt.SetTitleColor (UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f), UIControlState.Normal);
 			addReviewButt.Frame = new CGRect (saveFavoriteButt.Frame.X, saveFavoriteButt.Frame.Y - 40, saveFavoriteButt.Frame.Width, saveFavoriteButt.Frame.Height);
 			addReviewButt.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, ColorExtensions.CAST_FONT_SIZE);
 			addReviewButt.TouchDown += AddReviewButt_TouchDown;
@@ -144,10 +148,10 @@ namespace FavoriteMovies
 
 			saveFavoriteButt.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f);
 			saveFavoriteButt.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, ColorExtensions.CAST_FONT_SIZE);
-			saveFavoriteButt.SetTitleColor (UIColor.White, UIControlState.Normal);
+			saveFavoriteButt.SetTitleColor (UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f), UIControlState.Normal);
 			saveFavoriteButt.Frame = new CGRect () { X = 183, Y = 215, Width = 130, Height = 25 };
 
-			moviePlay.Frame = new CGRect ((posterImage.Frame.Size.Width / 2) - (moviePlay.Frame.Size.Width), (posterImage.Frame.Size.Height / 2) - (moviePlay.Frame.Size.Height), 40, 40);
+			moviePlay.Frame = new CGRect (70, 100, 60, 60);
 
 
 
@@ -404,7 +408,7 @@ namespace FavoriteMovies
 			if (castList.Count > 0) {
 				castHeader.Font = UIFont.FromName (ColorExtensions.TITLE_FONT, ColorExtensions.HEADER_FONT_SIZE);
 				castHeader.Text = "Cast";
-				castHeader.TextColor = IsDarkColor (backGroundColor) ? UIColor.White : UIColor.Black;
+				castHeader.TextColor = IsDarkColor (backGroundColor) ?UIColor.White : UIColor.Black;
 				castHeader.SizeToFit ();
 				scrollView.Add (castHeader);
 			}
@@ -415,7 +419,7 @@ namespace FavoriteMovies
 				actorName.Frame = new CGRect () { X = castHeader.Frame.X, Y = castHeader.Frame.Y + 20 + (30 * castCount), Width = 150 };
 				actorName.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, ColorExtensions.CAST_FONT_SIZE);
 				actorName.Text = cast.Actor;
-				actorName.TextColor = IsDarkColor (backGroundColor) ? UIColor.White : UIColor.Black;
+				actorName.TextColor = IsDarkColor (backGroundColor) ?UIColor.White : UIColor.Black;
 				actorName.Lines = 2;
 				actorName.SizeToFit ();
 
@@ -423,7 +427,7 @@ namespace FavoriteMovies
 				character.Frame = new CGRect () { X = castHeader.Frame.X + 150, Y = castHeader.Frame.Y + 20 + (30 * castCount), Width = 150 };
 				character.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, ColorExtensions.CAST_FONT_SIZE);
 				character.Text = cast.Character;
-				character.TextColor = IsDarkColor (backGroundColor) ? UIColor.White : UIColor.Black;
+				character.TextColor = IsDarkColor (backGroundColor) ?UIColor.White : UIColor.Black;
 				character.TextAlignment = UITextAlignment.Left;
 				character.Lines = 2;
 				character.SizeToFit ();
@@ -461,8 +465,8 @@ namespace FavoriteMovies
 			descriptView.BackgroundColor = backGroundColor;
 			descriptView.TextColor = IsDarkColor (backGroundColor) ? UIColor.White : UIColor.Black;
 			descReview.BackgroundColor = backGroundColor;
-			descReview.TextColor = IsDarkColor (backGroundColor) ? UIColor.White : UIColor.Black;
-			userName.TextColor = IsDarkColor (backGroundColor) ? UIColor.White : UIColor.Black;
+			descReview.TextColor = IsDarkColor (backGroundColor) ? UIColor.White  : UIColor.Black;
+			userName.TextColor = IsDarkColor (backGroundColor) ? UIColor.White  : UIColor.Black;
 		}
 		public override void ViewWillAppear (bool animated)
 		{
@@ -518,7 +522,29 @@ namespace FavoriteMovies
 					scrollView.ContentOffset = new CGPoint (0, -scrollView.ContentInset.Top);
 
 				}
-			
+				if (!ColorExtensions.CurrentUser.removeAds) 
+				{
+					// Create a banner's ad view with a unique placement ID (generate your own on the Facebook app settings).
+					// Use different ID for each ad placement in your app.
+					adView = new AdView (PlacementId, AdSizes.BannerHeight50, this) {
+						Delegate = this
+					};
+					AdSettings.AddTestDevice (AdSettings.TestDeviceHash);
+
+
+					// Initiate a request to load an ad.
+					adView.LoadAd ();
+
+					// Reposition the adView to the bottom of the screen
+					var viewSize = View.Bounds.Size;
+					var bottomAlignedY = viewSize.Height - AdSizes.BannerHeight50.Size.Height;
+
+					adView.Frame = new CGRect (0, bottomAlignedY, viewSize.Width, AdSizes.BannerHeight50.Size.Height);
+
+					// Add adView to the view hierarchy.
+					View.AddSubview (adView);
+					View.BringSubviewToFront (adView);
+				}
 		}
 
 
@@ -579,7 +605,7 @@ namespace FavoriteMovies
 
 			webView = new UIWebView () {
 				AutoresizingMask = UIViewAutoresizing.FlexibleHeight | UIViewAutoresizing.FlexibleWidth,
-				BackgroundColor = UIColor.White
+				BackgroundColor = UIColor.White 
 			};
 			var viewController = new UIViewController ();
 
@@ -623,7 +649,7 @@ namespace FavoriteMovies
 					saveFavoriteButt.TouchDown += SaveFavoriteButt_TouchDown;
 					saveFavoriteButt.SetTitle ("Save Favorite", UIControlState.Normal);
 					saveFavoriteButt.BackgroundColor = backGroundColor;
-					saveFavoriteButt.SetTitleColor (UIColor.White, UIControlState.Normal);
+					saveFavoriteButt.SetTitleColor (UIColor.White , UIControlState.Normal);
 				}
 			} catch (SQLite.SQLiteException) {
 				//first time in no favorites yet.
@@ -727,6 +753,34 @@ namespace FavoriteMovies
 			base.DidReceiveMemoryWarning ();
 			// Release any cached data, images, etc that aren't in use.
 		}
+
+		#region IAdViewDelegate
+
+		[Export ("adViewDidClick:")]
+		public void AdViewDidClick (AdView adView)
+		{
+			// Handle when the banner is clicked
+		}
+
+		[Export ("adViewDidFinishHandlingClick:")]
+		public void AdViewDidFinishHandlingClick (AdView adView)
+		{
+			// Handle when the window that is opened by the click is closed);
+		}
+
+		[Export ("adViewDidLoad:")]
+		public void AdViewDidLoad (AdView adView)
+		{
+			// Handle when the ad on the banner is loaded
+		}
+
+		[Export ("adView:didFailWithError:")]
+		public void AdViewDidFail (AdView adView, NSError error)
+ 		{
+			// Handle if the ad is not loaded correctly
+		}
+
+		#endregion
 	}
 
 

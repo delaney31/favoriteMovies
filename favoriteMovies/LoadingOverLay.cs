@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using CoreGraphics;
 using UIKit;
 
@@ -13,7 +13,7 @@ namespace FavoriteMovies
 		public LoadingOverlay (CGRect frame) : base (frame)
 		{
 			// configurable bits
-			BackgroundColor = UIColor.White;
+			BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 			Alpha = 0.75f;
 			AutoresizingMask = UIViewAutoresizing.All;
 
@@ -43,7 +43,7 @@ namespace FavoriteMovies
 				labelHeight
 				));
 			loadingLabel.BackgroundColor = UIColor.Clear;
-			loadingLabel.TextColor = UIColor.White;
+			loadingLabel.TextColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 			loadingLabel.Text = "Loading Data...";
 			loadingLabel.TextAlignment = UITextAlignment.Center;
 			loadingLabel.AutoresizingMask = UIViewAutoresizing.All;

@@ -34,11 +34,13 @@ namespace FavoriteMovies
 			View.Add (loading);
 			//postService = AzureTablesService.DefaultService;
 			await postService.InitializeStoreAsync ();
-
+			View.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 			tableItems = await MovieNewsFeedService.GetMDCardItems ();
 
 			table = new UITableView (View.Bounds);
+			table.BackgroundColor =  UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 			table.AutoresizingMask = UIViewAutoresizing.All;
+			table.SeparatorStyle = UITableViewCellSeparatorStyle.None;
 			tableSource = new NewsFeedTableSource (tableItems, this);
 
 			table.Source = tableSource;
@@ -77,7 +79,7 @@ namespace FavoriteMovies
 		{
 			base.ViewDidLoad ();
 
-			View.BackgroundColor = UIColor.White;
+			View.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 
 			close = new UIBarButtonItem (UIBarButtonSystemItem.Cancel, (s, e) => {
 
@@ -93,10 +95,10 @@ namespace FavoriteMovies
 			comment.BecomeFirstResponder ();
 
 			NavigationController.NavigationBar.BarTintColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f);
-			NavigationController.NavigationBar.TintColor = UIColor.White;
+			NavigationController.NavigationBar.TintColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 			NavigationController.NavigationBar.Translucent = true;
 			NavigationController.NavigationBar.TitleTextAttributes = new UIStringAttributes () {
-				ForegroundColor = UIColor.White
+				ForegroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f)
 			};
 
 
@@ -373,14 +375,14 @@ namespace FavoriteMovies
 			cell.titleLabel.TextColor = MovieDetailViewController.IsDarkColor (backGroundColor) ? UIColor.White : UIColor.Black;
 			//cell.titleLabel.TextColor = UIColor.Black;
 			cell.nameLabel.Text = tableItems [indexPath.Row].Creator;
-			cell.nameLabel.TextColor = MovieDetailViewController.IsDarkColor (backGroundColor) ? UIColor.White : UIColor.Black;
+			cell.nameLabel.TextColor = MovieDetailViewController.IsDarkColor (backGroundColor) ? UIColor.White  : UIColor.Black;
 			//cell.nameLabel.TextColor = UIColor.Black;
 			//cell.descriptionLabel.Text = tableItems [indexPath.Row].Description;
-			cell.descriptionLabel.TextColor = MovieDetailViewController.IsDarkColor (backGroundColor) ? UIColor.White : UIColor.Black;
+			cell.descriptionLabel.TextColor = MovieDetailViewController.IsDarkColor (backGroundColor) ? UIColor.White  : UIColor.Black;
 			//cell.descriptionLabel.TextColor = UIColor.Black;
 			//cell.likeLabel.Text = tableItems [indexPath.Row].like;
 			cell.cardView.BackgroundColor = backGroundColor;
-			cell.BackgroundColor = UIColor.White;
+			cell.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f) ;
 			// My father is an English teacher
 			if (tableItems [(int)cell.Tag].likes > 0)
 				cell.numberLikes.Text = tableItems [(int)cell.Tag].likes == 1 ? tableItems [(int)cell.Tag].likes + " Like" : tableItems [(int)cell.Tag].likes + " Likes";
@@ -388,10 +390,10 @@ namespace FavoriteMovies
 				cell.numberLikes.Text = "";
 			cell.likeLabel.BackgroundColor = backGroundColor;
 			//cell.likeButton.BackgroundColor = backGroundColor;
-			cell.likeLabel.TextColor = MovieDetailViewController.IsDarkColor (backGroundColor) ? UIColor.White : UIColor.Black;
-			cell.numberLikes.TextColor = MovieDetailViewController.IsDarkColor (backGroundColor) ? UIColor.White : UIColor.Black;
+			cell.likeLabel.TextColor = MovieDetailViewController.IsDarkColor (backGroundColor) ? UIColor.White  : UIColor.Black;
+			cell.numberLikes.TextColor = MovieDetailViewController.IsDarkColor (backGroundColor) ? UIColor.White  : UIColor.Black;
 
-			//cell.likeButton.Image= cell.likeButton.Image.WithColor(MovieDetailViewController.IsDarkColor (backGroundColor) ? UIColor.White : UIColor.Black).ImageWithRenderingMode (UIImageRenderingMode.AlwaysOriginal);
+			//cell.likeButton.Image= cell.likeButton.Image.WithColor(MovieDetailViewController.IsDarkColor (backGroundColor) ? UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f) : UIColor.Black).ImageWithRenderingMode (UIImageRenderingMode.AlwaysOriginal);
 			return cell;
 		}
 	}

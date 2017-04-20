@@ -73,7 +73,7 @@ namespace FavoriteMovies
 			if (this.profileImage.Image == null) {
 				profileImage.Image = UIImage.FromBundle ("blank.png");
 			}
-			View.BackgroundColor = UIColor.White;
+			View.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 
 			name.Frame = new CGRect () { X = 0, Y = 40, Width = View.Bounds.Width, Height = 120 };
 			name.Text = user.nameLabel.Text;
@@ -82,39 +82,39 @@ namespace FavoriteMovies
 			name.TextColor = UIColor.Black;
 
 			followers.Frame = new CGRect () { X = 15, Y = 120, Width = View.Bounds.Width, Height = 120 };
-			followers.Text = "Followers".ToUpper();
+			followers.Text = "Follower(s)".ToUpper();
 			followers.TextAlignment = UITextAlignment.Left;
 			followers.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, 10);
-			followers.TextColor = UIColor.White;
+			followers.TextColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 
 
 			numFollowers.Frame = new CGRect () { X = 15, Y = 100, Width = View.Bounds.Width, Height = 120 };
 			numFollowers.TextAlignment = UITextAlignment.Left;
 			numFollowers.Font = UIFont.FromName (ColorExtensions.PROFILE_NAME, 25);
-			numFollowers.TextColor = UIColor.White;
+			numFollowers.TextColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 
 			sharedLists.Frame = new CGRect () { X = 0, Y = 120, Width = View.Bounds.Width, Height = 120 };
 			sharedLists.Text = "Shared Movie List(s)".ToUpper();
 			sharedLists.TextAlignment = UITextAlignment.Center;
 			sharedLists.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, 10);
-			sharedLists.TextColor = UIColor.White;
+			sharedLists.TextColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 
 			numSharedLists.Frame = new CGRect () { X = 0, Y = 100, Width = View.Bounds.Width, Height = 120 };
 			numSharedLists.TextAlignment = UITextAlignment.Center;
-			numSharedLists.TextColor = UIColor.White;
+			numSharedLists.TextColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 			numSharedLists.Font = UIFont.FromName (ColorExtensions.PROFILE_NAME, 25);
 
 			following.Frame = new CGRect () { X = 10, Y = 120, Width = View.Bounds.Width - 25, Height = 120 };
 			following.Text = "Following".ToUpper();
 			following.TextAlignment = UITextAlignment.Right;
 			following.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT,10);
-			following.TextColor = UIColor.White;
+			following.TextColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 
 
 			numFollowing.Frame = new CGRect () { X = 10, Y = 100, Width = View.Bounds.Width - 25, Height = 120 };
 			numFollowing.TextAlignment = UITextAlignment.Right;
 			numFollowing.Font = UIFont.FromName (ColorExtensions.PROFILE_NAME, 25);
-			numFollowing.TextColor = UIColor.White;
+			numFollowing.TextColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 
 			location.Frame = new CGRect () { X = 0, Y = 60, Width = View.Bounds.Width, Height = 120 };
 			location.Text = user.location;
@@ -146,9 +146,10 @@ namespace FavoriteMovies
 		}
 		public override async void ViewDidAppear (bool animated)
 		{
+           
 			base.ViewDidAppear (animated);
 			MovieDetailViewController.DeleteAllSubviews (scrollView);
-
+            Initialize ();
 
 			int cnt = 0;
 			CGRect lastLabelFrame = new CGRect ();
@@ -163,7 +164,7 @@ namespace FavoriteMovies
 					if (cnt == 0) {
 
 						custlistName = new UILabel () {
-							TextColor = UIColor.Black, Frame = new CGRect (16, background.Frame.Y + 70, 180, 20),
+							TextColor =ColorExtensions.DarkTheme ? UIColor.White: UIColor.Black, Frame = new CGRect (16, background.Frame.Y + 70, 180, 20),
 							//BackgroundColor = View.BackgroundColor,
 							Font = UIFont.FromName (ColorExtensions.TITLE_FONT, 15),
 							Text = list.Name
@@ -171,7 +172,7 @@ namespace FavoriteMovies
 
 					} else {
 						custlistName = new UILabel () {
-							TextColor = UIColor.Black, Frame = new CGRect (16, lastLabelFrame.Y + viewController.CollectionView.Frame.Height + 45, 180, 20),
+							TextColor = ColorExtensions.DarkTheme ? UIColor.White: UIColor.Black, Frame = new CGRect (16, lastLabelFrame.Y + viewController.CollectionView.Frame.Height + 45, 180, 20),
 							Font = UIFont.FromName (ColorExtensions.TITLE_FONT, 15),
 							Text = list.Name
 						};

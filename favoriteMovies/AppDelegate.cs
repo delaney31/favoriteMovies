@@ -48,7 +48,9 @@ namespace FavoriteMovies
 			Window.MakeKeyAndVisible ();
 			MovieService.Database = Path.Combine (FileHelper.GetLocalStoragePath (), "MovieEntries.db3");
 
-
+			MainViewController.getUser ();
+			ColorExtensions.DarkTheme = ColorExtensions.CurrentUser.darktheme;
+			ColorExtensions.CurrentTileSize = ColorExtensions.CurrentUser.tilesize;
 			rootViewController = new RootViewController ();
 			var settings = UIUserNotificationSettings.GetSettingsForTypes (
   			UIUserNotificationType.Alert | UIUserNotificationType.Badge | UIUserNotificationType.Sound
@@ -56,8 +58,18 @@ namespace FavoriteMovies
 			UIApplication.SharedApplication.RegisterUserNotificationSettings (settings);
 		
 			//UIApplication.SharedApplication.ApplicationIconBadgeNumber = 0;
-			MainViewController.getUser ();
+
+
 			Window.RootViewController = rootViewController;
+			//if (ColorExtensions.CurrentUser.username == null)
+			//{
+			//	var tipsPage = new TipsViewController ();
+			//	Window.RootViewController.AddChildViewController (tipsPage);
+			//	//Window.AddSubview (tipsPage.View);
+			//	tipsPage.DidMoveToParentViewController (Window.RootViewController);
+			//}
+				
+			
 			// check for a local notification
 			if (launchOptions != null) {
 				if (launchOptions.ContainsKey (UIApplication.LaunchOptionsLocalNotificationKey)) {

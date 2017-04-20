@@ -123,7 +123,7 @@ namespace FavoriteMovies
 			this.cardView.Layer.ShadowPath = path.CGPath;
 
 			//	this.BackgroundColor = UIColor.FromRGBA (.9f, .9f, .9f, 1);
-			//this.BackgroundColor = UIColor.White;
+			//this.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 			//BackgroundColor = MovieDetailViewController.averageColor (profileImage.Image);
 		}
 
@@ -133,7 +133,7 @@ namespace FavoriteMovies
 			profileImage.ClipsToBounds = true;
 			profileImage.Layer.CornerRadius = 20f;
 			profileImage.ContentMode = UIViewContentMode.ScaleAspectFit;
-			//profileImage.BackgroundColor = UIColor.White;
+			//profileImage.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 		}
 
 

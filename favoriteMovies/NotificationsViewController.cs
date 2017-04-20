@@ -10,10 +10,12 @@ using UIKit;
 
 namespace FavoriteMovies
 {
-	public class NotificationsViewController: MovieFriendsBaseViewController
+	public class NotificationsViewController: UIViewController
 	{
 		List<NotificationsCloud> notificationsList = new List<NotificationsCloud> ();
 		public AzureTablesService postService = AzureTablesService.DefaultService;
+		UITableView table;
+		UITableViewSource tableSource;
 
 		public override async void ViewDidAppear (bool animated)
 		{
@@ -46,6 +48,12 @@ namespace FavoriteMovies
 		public override void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
+			table = new UITableView (View.Bounds);
+			//table.BackgroundColor =  UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f) ;
+			table.AutoresizingMask = UIViewAutoresizing.All;
+			table.RowHeight = 55;
+			table.AllowsSelectionDuringEditing = true;
+
 			var name = new NSString (Constants.ModifyFollowerNotification);
 			NSNotificationCenter.DefaultCenter.AddObserver (this, new Selector (Constants.ModifyFollowerNotificationReceived), name, null);
 		}

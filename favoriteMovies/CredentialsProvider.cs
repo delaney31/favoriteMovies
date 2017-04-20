@@ -87,7 +87,8 @@ namespace FavoriteMovies
 		}
 		public void Register (string email, string userName, string password, Action successCallback, Action<LoginScreenFaultDetails> failCallback)
 		{
-			
+				java.lang.String phoneNumber = "";
+				CNContact currentUser;
 				// If registration was successfully completed
 				DelayInvoke (async () => 
 				{
@@ -121,13 +122,13 @@ namespace FavoriteMovies
 						var State = xmlDocument.SelectNodes ("geonames") [0].SelectSingleNode ("code").SelectSingleNode ("adminCode1").InnerText;
 						var Country = xmlDocument.SelectNodes ("geonames") [0].SelectSingleNode ("code").SelectSingleNode ("countryCode").InnerText;
 						var zip = xmlDocument.SelectNodes ("geonames") [0].SelectSingleNode ("code").SelectSingleNode ("postalcode").InnerText;
-						var currentUser = GetCurrentUser (email);
+						currentUser = GetCurrentUser (email);
 						UserCloud userCloud;
 						if (currentUser != null) 
 						{
 							var util = PhoneNumberUtil.getInstance();
 							var number = util.parse (currentUser.PhoneNumbers.FirstOrDefault ().Value.ValueForKey (new NSString ("digits")).ToString (), Country);
-							var phoneNumber = util.format (number, PhoneNumberUtil.PhoneNumberFormat.E164);
+							phoneNumber = util.format (number, PhoneNumberUtil.PhoneNumberFormat.E164);
 
 							userCloud = new UserCloud () { firstname = currentUser.GivenName ?? string.Empty, lastname = currentUser.FamilyName ?? string.Empty, phone =phoneNumber ?? string.Empty, email = email, username = userName, city = CityName, state = State, country = Country, zip = zip };
 							
@@ -141,14 +142,32 @@ namespace FavoriteMovies
 							failCallback (new LoginScreenFaultDetails { UserNameErrorMessage = "This username already exits." });
 						else 
 						{
-							ColorExtensions.CurrentUser = userCloud;
+							
                           
 							var notification = NSNotification.FromName (Constants.CurrentUserSetNotification, new NSObject ());
 							NSNotificationCenter.DefaultCenter.PostNotification (notification);
 	
-							var user = new User () { email = email, password = password, username = userName, Id = userCloud.Id, city = CityName, country = Country, state = State, zip = zip };
-							//inset username and password locally
-							await AddUserAsync (user);
+								//inset username and password locally
+							ColorExtensions.CurrentUser.tilesize = 1;
+							ColorExtensions.CurrentUser.suggestmovies= true;
+							ColorExtensions.CurrentUser.darktheme =false;
+							if (currentUser != null) 
+							{
+								ColorExtensions.CurrentUser.lastname = currentUser.FamilyName ?? string.Empty;
+								ColorExtensions.CurrentUser.firstname = currentUser.GivenName ?? string.Empty;
+							}
+							ColorExtensions.CurrentUser.phone =phoneNumber;
+							ColorExtensions.CurrentUser.email = email;
+							ColorExtensions.CurrentUser.password = password;
+							ColorExtensions.CurrentUser.username = userName;
+							ColorExtensions.CurrentUser.Id = userCloud.Id;
+							ColorExtensions.CurrentUser.city = CityName;
+							ColorExtensions.CurrentUser.country = Country;
+							ColorExtensions.CurrentUser.state = State;
+							ColorExtensions.CurrentUser.zip = zip;
+							ColorExtensions.CurrentUser.removeAds = false;
+						
+							await AddUserAsync (ColorExtensions.CurrentUser);
 							successCallback ();
 						}
 

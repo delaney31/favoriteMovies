@@ -13,7 +13,7 @@ namespace FavoriteMovies
 	{
 		MessagesBubbleImage outgoingBubbleImageData,incomingBubbleImageData;
 		List<Message> messages = new List<Message> ();
-		UserCloud sender = ColorExtensions.CurrentUser;
+		User sender = ColorExtensions.CurrentUser;
 		UserFriendsCloud friend;
 
 		MessageFactory messageFactory = new MessageFactory ();

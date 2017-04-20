@@ -25,6 +25,7 @@ namespace FavoriteMovies
 			base.ViewDidLoad ();
 
 			table = new UITableView (View.Bounds);
+			//table.BackgroundColor =  UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f) ;
 			table.AutoresizingMask = UIViewAutoresizing.All;
 			table.RowHeight = 55;
 			table.AllowsSelectionDuringEditing = true;
@@ -155,13 +156,13 @@ namespace FavoriteMovies
 	}
 	class FriendsTableSource : UITableViewSource
 	{
-		MovieFriendsBaseViewController movieFriendsBaseViewController;
+		//MovieFriendsBaseViewController movieFriendsBaseViewController;
 		List<UserFriendsCloud> userFriends;
 		const string  moviefriendsCell = "MovieFriendsCell";
 		public FriendsTableSource (List<UserFriendsCloud> userFriends, MovieFriendsBaseViewController movieFriendsBaseViewController)
 		{
 			this.userFriends = userFriends;
-			this.movieFriendsBaseViewController = movieFriendsBaseViewController;
+			//this.movieFriendsBaseViewController = movieFriendsBaseViewController;
 		}
 
 		public override UITableViewCell GetCell (UITableView tableView, NSIndexPath indexPath)

@@ -149,8 +149,7 @@ namespace FavoriteMoviesPCL
 
 
 	public class UserFriendsCloud
-	{
-		
+	{		
 		public string Id { get; set; }
 		public string customlistid { get; set; }
 		public string friendid { get; set;}
@@ -170,15 +169,22 @@ namespace FavoriteMoviesPCL
 	public class User:UserBase
 
 	{
+		[PrimaryKey]
 		public string Id { get; set; }
 		public string email { get; set;}
 		public string profilepic { get; set;}
 		public string username { get; set;}
 		public string password { get; set;}
+		public string firstname { get; set;}
+		public string lastname { get; set;}
+		public string phone { get; set;}
+		public int tilesize { get; set;}
+		public bool suggestmovies { get; set;}
+		public bool darktheme { get; set;}
+		public bool removeAds { get; set;}
 	}
 
 	public class UserCloud
-
 	{
 		public string Id { get; set;}
 		public string email { get; set;}
@@ -197,12 +203,20 @@ namespace FavoriteMoviesPCL
 	}
 
 	public class UserFriend
-
 	{
 		public string Id { get; set; }
 		public string email { get; set; }
 		public string username { get; set; }
 		public bool Friend { get; set; }
+	}
+
+	public class Settings
+	{
+
+		//bool FamilyFriendly { get; set; }
+		bool DarkTheme { get; set; }
+		//string TileSize { get; set; }
+		bool MovieSuggestions { get; set;}
 
 	}
 }

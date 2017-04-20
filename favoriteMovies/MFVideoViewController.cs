@@ -25,7 +25,7 @@ namespace FavoriteMovies
 			base.ViewDidLoad ();
 			//var webView = new UIWebView () {
 			//	AutoresizingMask = UIViewAutoresizing.FlexibleHeight | UIViewAutoresizing.FlexibleWidth,
-			//	BackgroundColor = UIColor.White
+			//	BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f)
 			//};
 			//var viewController = new UIViewController ();
 

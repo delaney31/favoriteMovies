@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -61,16 +61,17 @@ namespace FavoriteMovies
 
 			//format the search bar
 			searchController.SearchBar.SizeToFit ();
-			searchController.SearchBar.SearchBarStyle = UISearchBarStyle.Prominent;
-			searchController.SearchBar.Placeholder = "Find a friend";
+			searchController.SearchBar.SearchBarStyle = UISearchBarStyle.Default;
+		
 
 			//searchResultsController.TableView.WeakDelegate = this;
 			searchController.SearchBar.WeakDelegate = searchResultsController;
-
 			((UITextField)searchController.SearchBar.ValueForKey (new NSString ("_searchField"))).TextColor = UIColor.White;
+			//((UITextField)searchController.SearchBar.ValueForKey (new NSString ("_searchField"))).TextColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 			((UITextField)searchController.SearchBar.ValueForKey (new NSString ("_searchField"))).Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, ColorExtensions.CAST_FONT_SIZE);
 			((UITextField)searchController.SearchBar.ValueForKey (new NSString ("_searchField"))).BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, BackGroundColorAlpha);
 			((UITextField)searchController.SearchBar.ValueForKey (new NSString ("_searchField"))).ResignFirstResponder ();
+			((UITextField)searchController.SearchBar.ValueForKey (new NSString ("_searchField"))).AttributedPlaceholder=new NSAttributedString ("Search", null, UIColor.White);
 			//the search bar is contained in the navigation bar, so it should be visible
 			searchController.HidesNavigationBarDuringPresentation = false;
 			NavigationItem.TitleView = searchController.SearchBar;
@@ -227,6 +228,7 @@ namespace FavoriteMovies
 					cell.DetailTextLabel.TextColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f);
 
 				}
+
 				return cell;
 			} else 
 			{
@@ -354,6 +356,7 @@ namespace FavoriteMovies
 					cell.descriptionLabel.Text = "You have " + cell.moviesInCommon + " movie" + (cell.moviesInCommon == 0 || cell.moviesInCommon > 1 ? "s" : "") + " in common"; ;
 					cell.locationLabel.Text = listItems [indexPath.Row].location;
 				}
+
 				return cell;
 			}
 
@@ -422,8 +425,6 @@ namespace FavoriteMovies
 
 			var cell = Friends [indexPath.Row];
 			cell.id = Friends [indexPath.Row].id;
-
-			var profileImageTapGesture = new UITapGestureRecognizer ();
 
 			var followTapGesture = new UITapGestureRecognizer ();
 			if (cell.connection != null)

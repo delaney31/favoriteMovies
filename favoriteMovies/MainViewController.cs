@@ -14,14 +14,18 @@ using LoginScreen;
 using MovieFriends;
 using SDWebImage;
 using BigTed;
+using Facebook.AudienceNetwork;
 
 namespace FavoriteMovies
 {/// <summary>
  /// This is the Main View controller for the application. It serves as the Top Rated collection of movies and creates the Now Playing 
  /// Poplular scrollable collections.
  /// </summary>
-	public class MainViewController : BaseController
+	public class MainViewController : BaseController, IInterstitialAdDelegate
 	{
+		// Generate your own Placement ID on the Facebook app settings
+		const string YourPlacementId = "696067800580326_696647140522392";
+		InterstitialAd interstitialAd;
 		static CGSize HeaderReferenceSize = new CGSize (50, 50);
 		static int MinimumInteritemSpacing = 30;
 		static int SpaceBetweenContainers = 30;
@@ -36,7 +40,7 @@ namespace FavoriteMovies
 		public static int NewCustomListToRefresh = -1;
 		//public static int OldCustomListToRefresh;
 		//static CGSize ItemSize = new CGSize (153, 205);
-		static CGSize ItemSize = new CGSize (133, 185);
+		//static CGSize ItemSize = new CGSize (133, 185);
 		static CGRect FavoriteLabelFrame = new CGRect (7, 10, 180, 20);
 		static CGRect TopRatedLabelFrame = new CGRect (7, 205, 180, 20);
 		static CGRect NowPlayingLabelFrame = new CGRect (7, 400, 180, 20);
@@ -75,8 +79,6 @@ namespace FavoriteMovies
 		//static UIView horizontalLine = new UIView();
 		static UIImageView velvetRopes = new UIImageView ();
 
-		bool userWantsSuggestions=true;
-
 		private bool needLogin = true;
 
 
@@ -89,7 +91,7 @@ namespace FavoriteMovies
 				ScrollDirection = UICollectionViewScrollDirection.Horizontal,
 				MinimumInteritemSpacing = MinimumInteritemSpacing, // minimum spacing between cells
 				MinimumLineSpacing = MinimumLineSpacing, // minimum spacing between rows if ScrollDirection is Vertical or between columns if Horizontal
-				ItemSize = ItemSize
+				ItemSize = ColorExtensions.CurrentSize
 				//SectionInset = new UIEdgeInsets (80, -40, 97, 127)
 			};
 
@@ -124,11 +126,12 @@ namespace FavoriteMovies
 
 			needLogin = ColorExtensions.CurrentUser.username == null;
 
-			if (needLogin) {
+			if (needLogin) 
+			{
 				LoginScreenControl<CredentialsProvider>.Activate (this);
 				needLogin = false;
 
-
+				SideMenuController.ShowTipsController ();
 			}
 		
 
@@ -150,18 +153,18 @@ namespace FavoriteMovies
 
 		}
 
-		public static string getUser ()
+		public static void getUser ()
 		{
-			string returnValue = string.Empty;
+			
 			using (var db = new SQLiteConnection (MovieService.Database)) {
 				var task = Task.Run (() => {
 					try {
 						// there is a sqllite bug here https://forums.xamarin.com/discussion/52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
 						var query = db.Query<User> ("SELECT * FROM [User]");
-						var currentUser = new UserCloud ();
+						var currentUser =  new User () { tilesize = 2, suggestmovies = true, darktheme = false};
+
 						if (query.Count > 0) 
 						{
-							returnValue = query [0].username;
 							currentUser.username = query [0].username;
 							currentUser.email = query [0].email;
 							currentUser.Id = query [0].Id;
@@ -169,19 +172,26 @@ namespace FavoriteMovies
 							currentUser.state = query [0].state;
 							currentUser.country = query [0].country;
 							currentUser.zip = query [0].zip;
-
-
+							currentUser.lastname = query [0].lastname;
+							currentUser.firstname = query [0].firstname;
+							currentUser.phone =  query [0].phone;
+							currentUser.suggestmovies = query[0].suggestmovies;
+							currentUser.darktheme = query[0].darktheme;
+							currentUser.tilesize = query[0].tilesize;
+							currentUser.password = query [0].password;
+							currentUser.removeAds = query[0].removeAds;
 						}
 						ColorExtensions.CurrentUser = currentUser;
 						//favoriteViewController.CollectionView.ReloadData ();
-					} catch (SQLiteException e) {
+					} catch (SQLiteException e) 
+					{
 						Debug.WriteLine (e.Message);
 						using (var conn = new SQLite.SQLiteConnection (MovieService.Database)) {
 							conn.CreateTable<User> ();
 							var query = db.Query<User> ("SELECT * FROM [User]");
-							var currentUser = new UserCloud ();
-							if (query.Count > 0) {
-								returnValue = query [0].username;
+							var currentUser = new User () { tilesize = 2, suggestmovies = true, darktheme = false};
+							if (query.Count > 0) 
+							{
 								currentUser.username = query [0].username;
 								currentUser.email = query [0].email;
 								currentUser.Id = query [0].Id;
@@ -189,17 +199,27 @@ namespace FavoriteMovies
 								currentUser.state = query [0].state;
 								currentUser.country = query [0].country;
 								currentUser.zip = query [0].zip;
-
-
+								currentUser.lastname = query [0].lastname;
+								currentUser.firstname = query [0].firstname;
+								currentUser.phone =  query [0].phone;
+								currentUser.suggestmovies = query[0].suggestmovies;
+								currentUser.darktheme = query[0].darktheme;
+								currentUser.tilesize = query[0].tilesize;
+								currentUser.password = query [0].password;
+								currentUser.removeAds = query[0].removeAds;
 							}
 							ColorExtensions.CurrentUser = currentUser;
 						}
 
 					}
+					catch (Exception ex)
+					{
+						Debug.Write (ex.Message);
+					}
 				});
 				task.Wait ();
 			}
-			return returnValue;
+
 		}
 
 		public override void ViewWillAppear (bool animated)
@@ -209,8 +229,9 @@ namespace FavoriteMovies
 			if (NewCustomListToRefresh == -1) 
 			{
 				//BTProgressHUD.Show ();
-				if (userWantsSuggestions)
-				   GetCollectionData ();
+               
+				if (ColorExtensions.CurrentUser.suggestmovies)
+                      GetCollectionData ();
 				LoadCollectionViewControllers ();
 				UpdateCustomViews ();
 				FavoritesDisplay ();
@@ -219,9 +240,13 @@ namespace FavoriteMovies
 			}
 
 			SidebarController.Disabled = false;
-
+			if (NewCustomListToRefresh > 1) 
+			{
+				LoadCollectionViewControllers ();
+			}
 			if (NewCustomListToRefresh > 0)// 0 means nothing has changed and i don't have to refresh lists
 				FavoritesDisplay ();
+			
 			LoadViews ();
 
 		}
@@ -232,13 +257,13 @@ namespace FavoriteMovies
 			customLabels = new UILabel [customLists.Count];
 			customControllers = new FavoritesViewController [customLists.Count];
 			customLabels [cnt] = new UILabel () {
-				TextColor = UIColor.Black,// UIColor.Clear.FromHexString (ColorExtensions.TITLE_COLOR);
+				TextColor =  ColorExtensions.DarkTheme ? UIColor.White: UIColor.Black,// UIColor.Clear.FromHexString (ColorExtensions.TITLE_COLOR);
 				BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha),
 				Font = UIFont.FromName (ColorExtensions.TITLE_FONT, ColorExtensions.HEADER_FONT_SIZE)
 			};
 			customControllers [cnt] = new FavoritesViewController (new UICollectionViewFlowLayout () {
 				MinimumInteritemSpacing = MinimumInteritemSpacing, MinimumLineSpacing = MinimumLineSpacing,
-				HeaderReferenceSize = HeaderReferenceSize, ItemSize = ItemSize,
+				HeaderReferenceSize = HeaderReferenceSize, ItemSize = ColorExtensions.CurrentSize,
 				ScrollDirection = UICollectionViewScrollDirection.Horizontal
 			}, new ObservableCollection<Movie> ((GetMovieList (customLists [cnt])).Reverse ()), this);
 
@@ -266,7 +291,7 @@ namespace FavoriteMovies
 			//horizontalLine.Frame = new CGRect ();
 			velvetRopes.Frame = new CGRect ();
 			customLists = GetCustomLists ();
-			if (customLists.Count == 0 && userWantsSuggestions ) 
+			if (customLists.Count == 0 && ColorExtensions.CurrentUser.suggestmovies ) 
 			{
 				CreateSuggestedListNoCustom ();
 			
@@ -277,7 +302,7 @@ namespace FavoriteMovies
 				/// A new list was added(0) or this is the first time through (-1)
 				/// </summary>
 				/// <param name="customList">Custom list.</param>
-				if (NewCustomListToRefresh == 1 || NewCustomListToRefresh == -1) 
+				if (NewCustomListToRefresh ==1 || NewCustomListToRefresh == -1) 
 				{
 
 
@@ -289,14 +314,14 @@ namespace FavoriteMovies
 						UpdateCustomListMovies (cnt);
 
 					}
-					if(userWantsSuggestions)
+					if(ColorExtensions.CurrentUser.suggestmovies)
 					  CreateSuggestedListAfterCustom ();
 
-				} else 
-				{
-					 UpdateCustomListMovies (NewCustomListToRefresh);
+				} //else 
+				//{
+				//	 UpdateCustomListMovies (NewCustomListToRefresh);
 					  
-				}
+				//}
 
 				velvetRopes.Image = UIImage.FromBundle ("Divider_large_red_large.png");
 				velvetRopes.Frame =new CGRect () { X = 0, Y = TopRatedLabelFrame.Y + (SpaceBetweenLabelsAndFrames * (customLists.Count - 1) + SpaceBetweenContainers + SeparationBuffer + SpaceBetweenListTypes) - 40, Width =View.Bounds.Width, Height = 20};
@@ -306,7 +331,7 @@ namespace FavoriteMovies
 			NewCustomListToRefresh = 0;
 
 			//For scrolling to work the scrollview Content size has to be bigger than the View.Frame.Height
-			if (userWantsSuggestions)
+			if (ColorExtensions.CurrentUser.suggestmovies)
 				scrollView.ContentSize = new CGSize (View.Frame.Width, MovieLatestController.CollectionView.Frame.Y + MovieLatestController.CollectionView.Frame.Height + SpaceBetweenContainers + SeparationBuffer);
 			else 
 			{
@@ -439,6 +464,9 @@ namespace FavoriteMovies
 		 void GetCollectionData ()
 		{
 			int Page;
+
+			if (topRated.Count > 0)
+				return;
 			try 
 			{
 
@@ -465,68 +493,81 @@ namespace FavoriteMovies
 		}
 		void LoadCollectionViewControllers ()
 		{
+			try {
+				//scrollView.PagingEnabled = true;
+				var watch = System.Diagnostics.Stopwatch.StartNew ();
+				scrollView.Frame = new CGRect () { X = View.Frame.X, Y = View.Frame.Y, Width = View.Frame.Width, Height = View.Frame.Height };
+				customLists = GetCustomLists ();
 
-			//scrollView.PagingEnabled = true;
-			var watch = System.Diagnostics.Stopwatch.StartNew ();
-			scrollView.Frame = new CGRect () { X = View.Frame.X, Y = View.Frame.Y, Width = View.Frame.Width, Height = View.Frame.Height };
-			customLists = GetCustomLists ();
+				customLabels = new UILabel [customLists.Count];
+				customControllers = new FavoritesViewController [customLists.Count];
 
-			customLabels = new UILabel [customLists.Count];
-			customControllers = new FavoritesViewController [customLists.Count];
+				TopRatedLabel = new UILabel () {
+					TextColor = ColorExtensions.DarkTheme ? UIColor.White : UIColor.Black, Frame = TopRatedLabelFrame,
+					BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha),
+					Font = UIFont.FromName (ColorExtensions.TITLE_FONT, ColorExtensions.HEADER_FONT_SIZE),
+					Text = TopRated
+				};
 
-			TopRatedLabel = new UILabel () {
-				TextColor = UIColor.Black, Frame = TopRatedLabelFrame,
-				BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha),
-				Font = UIFont.FromName (ColorExtensions.TITLE_FONT, ColorExtensions.HEADER_FONT_SIZE),
-				Text = TopRated
-			};
+				PlayingNowLabel = new UILabel () {
+					TextColor = ColorExtensions.DarkTheme ? UIColor.White : UIColor.Black, Frame = NowPlayingLabelFrame,
+					BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha),
+					Font = UIFont.FromName (ColorExtensions.TITLE_FONT, ColorExtensions.HEADER_FONT_SIZE),
+					Text = NowPlaying
+				};
+				PopularLabel = new UILabel () {
+					TextColor = ColorExtensions.DarkTheme ? UIColor.White : UIColor.Black, Frame = PopularLabelFrame,
+					BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha),
+					Font = UIFont.FromName (ColorExtensions.TITLE_FONT, ColorExtensions.HEADER_FONT_SIZE),
+					Text = Popular
+				};
 
-			PlayingNowLabel = new UILabel () {
-				TextColor = UIColor.Black, Frame = NowPlayingLabelFrame,
-				BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha),
-				Font = UIFont.FromName (ColorExtensions.TITLE_FONT, ColorExtensions.HEADER_FONT_SIZE),
-				Text = NowPlaying
-			};
-			PopularLabel = new UILabel () {
-				TextColor = UIColor.Black, Frame = PopularLabelFrame,
-				BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha),
-				Font = UIFont.FromName (ColorExtensions.TITLE_FONT, ColorExtensions.HEADER_FONT_SIZE),
-				Text = Popular
-			};
-
-			MovieLatestLabel = new UILabel () {
-				TextColor = UIColor.Black, Frame = MovieLatestLabelFrame,
-				BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha),
-				Font = UIFont.FromName (ColorExtensions.TITLE_FONT, ColorExtensions.HEADER_FONT_SIZE),
-				Text = LatestMovies
-			};
-			TopRatedLabel.Layer.ZPosition = LabelZPosition;
-			PlayingNowLabel.Layer.ZPosition = LabelZPosition;
-			PopularLabel.Layer.ZPosition = LabelZPosition;
-
-
-			topRatedController = new TopRatedCollectionViewController (flowLayout, topRated, this);
-			topRatedController.CollectionView.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha);
-			topRatedController.CollectionView.RegisterClassForCell (typeof (MovieCell), TopRatedCollectionViewController.movieCellId);
-
-
-			nowPlayingController = new NowPlayingCollectionViewController (flowLayout, nowPlaying, this);
-			nowPlayingController.CollectionView.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha);
-			nowPlayingController.CollectionView.RegisterClassForCell (typeof (MovieCell), NowPlayingCollectionViewController.movieCellId);
+				MovieLatestLabel = new UILabel () {
+					TextColor = ColorExtensions.DarkTheme ? UIColor.White : UIColor.Black, Frame = MovieLatestLabelFrame,
+					BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha),
+					Font = UIFont.FromName (ColorExtensions.TITLE_FONT, ColorExtensions.HEADER_FONT_SIZE),
+					Text = LatestMovies
+				};
+				TopRatedLabel.Layer.ZPosition = LabelZPosition;
+				PlayingNowLabel.Layer.ZPosition = LabelZPosition;
+				PopularLabel.Layer.ZPosition = LabelZPosition;
+				flowLayout = new UICollectionViewFlowLayout () {
+					HeaderReferenceSize = HeaderReferenceSize,
+					ScrollDirection = UICollectionViewScrollDirection.Horizontal,
+					MinimumInteritemSpacing = MinimumInteritemSpacing, // minimum spacing between cells
+					MinimumLineSpacing = MinimumLineSpacing, // minimum spacing between rows if ScrollDirection is Vertical or between columns if Horizontal
+					ItemSize = ColorExtensions.CurrentSize
+				};
+				//SectionInset = new UIEdgeInsets (80, -40, 97, 12			};
 
 
+				topRatedController = new TopRatedCollectionViewController (flowLayout, topRated, this);
+				topRatedController.CollectionView.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha);
+				topRatedController.CollectionView.RegisterClassForCell (typeof (MovieCell), TopRatedCollectionViewController.movieCellId);
 
-			popularController = new PopularCollectionViewController (flowLayout, popular, this);
-			popularController.CollectionView.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha);
-			popularController.CollectionView.RegisterClassForCell (typeof (MovieCell), PopularCollectionViewController.movieCellId);
+
+				nowPlayingController = new NowPlayingCollectionViewController (flowLayout, nowPlaying, this);
+				nowPlayingController.CollectionView.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha);
+				nowPlayingController.CollectionView.RegisterClassForCell (typeof (MovieCell), NowPlayingCollectionViewController.movieCellId);
 
 
-			MovieLatestController = new MovieLatestViewController (flowLayout, MovieLatest, this);
-			MovieLatestController.CollectionView.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha);
-			MovieLatestController.CollectionView.RegisterClassForCell (typeof (MovieCell), MovieLatestViewController.movieCellId);
 
-			watch.Stop ();
-			Console.WriteLine ("LoadCollectionViewControllers Method took " + watch.ElapsedMilliseconds / 1000.0 + "seconds");
+				popularController = new PopularCollectionViewController (flowLayout, popular, this);
+				popularController.CollectionView.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha);
+				popularController.CollectionView.RegisterClassForCell (typeof (MovieCell), PopularCollectionViewController.movieCellId);
+
+
+				MovieLatestController = new MovieLatestViewController (flowLayout, MovieLatest, this);
+				MovieLatestController.CollectionView.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha);
+				MovieLatestController.CollectionView.RegisterClassForCell (typeof (MovieCell), MovieLatestViewController.movieCellId);
+
+				watch.Stop ();
+				Console.WriteLine ("LoadCollectionViewControllers Method took " + watch.ElapsedMilliseconds / 1000.0 + "seconds");
+			}
+			    catch(Exception ex)
+			{
+				Debug.WriteLine (ex.Message);
+			}
 
 		}
 
@@ -548,7 +589,7 @@ namespace FavoriteMovies
 
 		void LoadViews ()
 		{
-			if (userWantsSuggestions) 
+			if (ColorExtensions.CurrentUser.suggestmovies) 
 			{
 				scrollView.AddSubview (topRatedController.CollectionView);
 				scrollView.AddSubview (nowPlayingController.CollectionView);
@@ -563,7 +604,27 @@ namespace FavoriteMovies
 				scrollView.AddSubview (velvetRopes);
 			}
 			View.AddSubview (scrollView);
+			if (!ColorExtensions.CurrentUser.removeAds) 
+			{
+				// Create a banner's ad view with a unique placement ID (generate your own on the Facebook app settings).
+				// Use different ID for each ad placement in your app.
+				interstitialAd = new InterstitialAd (YourPlacementId) {
+					Delegate = this
+				};
 
+				// When testing on a device, add its hashed ID to force test ads.
+				// The hash ID is printed to console when running on a device.
+				AdSettings.AddTestDevice (AdSettings.TestDeviceHash);
+
+				// Initiate a request to load an ad.
+				interstitialAd.LoadAd ();
+
+				// Verify if the ad is ready to be shown, if not, you will need to check later somehow (with a button, timer, delegate, etc.)
+				if (interstitialAd.IsAdValid) {
+					// Ad is ready, present it!
+					interstitialAd.ShowAdFromRootViewController (this);
+				}
+			}
 		}
 		public override void ViewDidDisappear (bool animated)
 		{
@@ -594,8 +655,9 @@ namespace FavoriteMovies
 
 			//format the search bar
 			searchController.SearchBar.SizeToFit ();
-			searchController.SearchBar.SearchBarStyle = UISearchBarStyle.Prominent;
+			searchController.SearchBar.SearchBarStyle = UISearchBarStyle.Minimal;
 			searchController.SearchBar.Placeholder = "Add Your Movies";
+           
 
 			//searchResultsController.TableView.WeakDelegate = this;
 			searchController.SearchBar.WeakDelegate = searchResultsController;
@@ -604,6 +666,7 @@ namespace FavoriteMovies
 			((UITextField)searchController.SearchBar.ValueForKey (new NSString ("_searchField"))).Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, ColorExtensions.CAST_FONT_SIZE);
 			((UITextField)searchController.SearchBar.ValueForKey (new NSString ("_searchField"))).BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, BackGroundColorAlpha);
 			((UITextField)searchController.SearchBar.ValueForKey (new NSString ("_searchField"))).ResignFirstResponder ();
+			((UITextField)searchController.SearchBar.ValueForKey (new NSString ("_searchField"))).AttributedPlaceholder=new NSAttributedString("Add Your Movies", null, UIColor.White);
 			//the search bar is contained in the navigation bar, so it should be visible
 			searchController.HidesNavigationBarDuringPresentation = false;
 
@@ -624,7 +687,7 @@ namespace FavoriteMovies
 
 
 
-		 public static ObservableCollection<CustomList> GetCustomLists ()
+		public static ObservableCollection<CustomList> GetCustomLists ()
 		{
 			
 
@@ -663,6 +726,44 @@ namespace FavoriteMovies
 		{
 			base.ViewWillDisappear (animated);
 		}
+
+		#region IInterstitialAdDelegate
+
+		[Export ("interstitialAdDidLoad:")]
+		public void InterstitialAdDidLoad (InterstitialAd interstitialAd)
+		{
+			// Handle when the ad is loaded and ready to be shown
+			if (interstitialAd.IsAdValid) {
+				// Ad is ready, present it!
+				interstitialAd.ShowAdFromRootViewController (this);
+			}
+		}
+
+		[Export ("interstitialAd:didFailWithError:")]
+		public void IntersitialDidFail (InterstitialAd interstitialAd, NSError error)
+		{
+			// Handle if the ad is not loaded correctly
+		}
+
+		[Export ("interstitialAdDidClick:")]
+		public void InterstitialAdDidClick (InterstitialAd interstitialAd)
+		{
+			// Handle when the user tap the ad
+		}
+
+		[Export ("interstitialAdDidClose:")]
+		public void InterstitialAdDidClose (InterstitialAd interstitialAd)
+		{
+			// Handle when the user close the ad
+		}
+
+		[Export ("interstitialAdWillClose:")]
+		public void InterstitialAdWillClose (InterstitialAd interstitialAd)
+		{
+			// Handle before the ad is closed
+		}
+
+		#endregion
 	}
 
 	public class MovieCell : UICollectionViewCell
