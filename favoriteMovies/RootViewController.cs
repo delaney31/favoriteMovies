@@ -126,10 +126,11 @@ namespace FavoriteMovies
 			};
 			Console.WriteLine (uinc3.ViewControllers.Length);
 
-			var tab4 = new MovieFriendsViewController ();
-			tab4.Title = "Chat";
+
+			var tab4 = new MovieListPickerViewController (null, false);
+			tab4.Title = "Lists";
 			tab4.View.BackgroundColor = UIColor.White;
-			tab4.TabBarItem.SetFinishedImages (UIImage.FromBundle ("ic_chat.png"), UIImage.FromBundle ("ic_chat.png"));
+			tab4.TabBarItem.SetFinishedImages (UIImage.FromBundle ("ic_list.png"), UIImage.FromBundle ("ic_list.png"));
 
 			var uinc4 = new UINavigationController (tab4);
 		
@@ -155,23 +156,23 @@ namespace FavoriteMovies
 			};
 
 
-			//var tab6 = new SettingsViewController ();
-			//tab6.Title = "Profile";
-			//			tab6.View.BackgroundColor = UIColor.White;
-			//			tab6.TabBarItem.SetFinishedImages (UIImage.FromBundle ("ic_chat.png"), UIImage.FromBundle ("ic_chat.png"));
+			var tab6 = new SettingsViewController ();
+			tab6.Title = "Profile";
+						tab6.View.BackgroundColor = UIColor.White;
+						tab6.TabBarItem.SetFinishedImages (UIImage.FromBundle ("ic_settings.png"), UIImage.FromBundle ("ic_settings.png"));
 
-			//			var uinc6 = new UINavigationController (tab6);
+						var uinc6 = new UINavigationController (tab6);
 
-			//uinc6.NavigationBar.BarTintColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f);
-			//			uinc6.NavigationBar.TintColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
-			//			uinc6.NavigationBar.TitleTextAttributes = new UIStringAttributes ()
-			//			{
-			//				ForegroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f)
-			//			};
+			uinc6.NavigationBar.BarTintColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f);
+						uinc6.NavigationBar.TintColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
+						uinc6.NavigationBar.TitleTextAttributes = new UIStringAttributes ()
+						{
+							ForegroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f)
+						};
 
 
 			var tabs = new UIViewController [] {
-				uinc1,uinc5, uinc4,uinc3,uinc2};
+				uinc1,uinc4,uinc5,uinc3,uinc2};
 			TabController = new MovieTabBarController ();
 
 

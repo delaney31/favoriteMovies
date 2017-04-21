@@ -144,7 +144,7 @@ namespace FavoriteMovies
 			customImage.Frame = new RectangleF (40, 315, 40, 40);
 			var contentButton = new UIButton (UIButtonType.System);
 			contentButton.Frame = new RectangleF (80, 330, 230, 20);
-			contentButton.SetTitle ("Lists", UIControlState.Normal);
+			contentButton.SetTitle ("Notifications", UIControlState.Normal);
 			contentButton.SetTitleColor (UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f), UIControlState.Normal);
 			contentButton.HorizontalAlignment = UIControlContentHorizontalAlignment.Left;
 			contentButton.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, 16);
@@ -152,7 +152,7 @@ namespace FavoriteMovies
 			contentButton.TouchUpInside += (sender, e) => 
 			{
 				
-				NavController.PushViewController (new MovieListPickerViewController (null, false), true);
+				NavController.PushViewController (new NotificationsViewController (), true);
 
 				SidebarController.CloseMenu ();
 			};

@@ -49,7 +49,7 @@ namespace FavoriteMovies
 		{
 			base.ViewDidLoad ();
 			table = new UITableView (View.Bounds);
-			//table.BackgroundColor =  UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f) ;
+			table.BackgroundColor =  UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f) ;
 			table.AutoresizingMask = UIViewAutoresizing.All;
 			table.RowHeight = 55;
 			table.AllowsSelectionDuringEditing = true;

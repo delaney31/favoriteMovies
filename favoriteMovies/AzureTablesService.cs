@@ -557,19 +557,21 @@ namespace MovieFriends
 
 		}
 
-		internal async Task DeleteItemAsync (string name, string currentUserId)
+		internal async Task DeleteItemAsync (string name, string customListId)
 		{
-			//onetime cleanup
-			foreach (var item in await clTable.ToListAsync()) 
+			
+			var list = await mfTable.Where (x => x.cloudId == name && x.CustomListID == customListId).ToListAsync();
+			if (list.Count () > 0)
+				await mfTable.DeleteAsync (list [0]);
+
+
+			//cleanup
+			foreach (var item in await clTable.ToListAsync ()) 
 			{
 				var orphan = await mfTable.Where (x => x.CustomListID == item.Id).ToListAsync ();
 				if (orphan.Count () == 0)
 					await clTable.DeleteAsync (item);
 			}
-			var list = await clTable.Where (x => x.Name == name && x.UserId == currentUserId).ToListAsync();
-			if (list.Count () > 0)
-				await clTable.DeleteAsync (list [0]);
-
 		}
 
 		public async Task<bool> InsertCustomListAsync (CustomListCloud list)

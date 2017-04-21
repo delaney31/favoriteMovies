@@ -366,6 +366,8 @@
     <BundleResource Include="Resources\play2.png" />
     <BundleResource Include="Resources\ic_contact_mail_3x.png" />
     <BundleResource Include="Resources\ic_contact_mail.png" />
+    <BundleResource Include="Resources\ic_settings.png" />
+    <BundleResource Include="Resources\ic_list.png" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\favoriteMoviesPCL\favoriteMoviesPCL.csproj">

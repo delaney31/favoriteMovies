@@ -75,11 +75,14 @@ namespace FavoriteMovies
 				else {
 
 					var customListId = _items [indexPath.Row].CustomListID;
-					var isCustomList = _items [indexPath.Row].CustomListID != null;
-					if (isCustomList) 
-					{
+					var isCustomList = _items [indexPath.Row].cloudId != null;
+					if (isCustomList) {
 						accepted = await ShowAlert ("Confirm", "Are you sure you want to delete this movie?");
 						Console.WriteLine ("Selected button {0}", accepted ? "Accepted" : "Canceled");
+					} else 
+					{
+						BTProgressHUD.Dismiss ();
+						return;
 					}
 					var item = _items [indexPath.Row];
 					if (accepted) 
@@ -100,7 +103,7 @@ namespace FavoriteMovies
 
 					if (_items.Count == 0) 
 					{
-						await postService.DeleteItemAsync (item.name, ColorExtensions.CurrentUser.Id);
+						await postService.DeleteItemAsync (item.cloudId, customListId.ToString());
 						BaseListViewController.DeleteCustomList (customListId);
 
 					}
@@ -384,7 +387,7 @@ namespace FavoriteMovies
 	{
 		ObservableCollection<Movie> _items { get; set; }
 		public static NSString movieCellId = new NSString ("UserCollectionViewController");
-		BaseController vc;
+		UIViewController vc;
 		string text;
 
 		public UserCollectionViewController (UICollectionViewLayout layout, ObservableCollection<Movie> movies, BaseController vc) : base (layout, movies, vc)

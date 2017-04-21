@@ -61,22 +61,23 @@ namespace FavoriteMovies
 
 			//format the search bar
 			searchController.SearchBar.SizeToFit ();
-			searchController.SearchBar.SearchBarStyle = UISearchBarStyle.Default;
+			searchController.SearchBar.SearchBarStyle = UISearchBarStyle.Minimal;
 		
-
 			//searchResultsController.TableView.WeakDelegate = this;
 			searchController.SearchBar.WeakDelegate = searchResultsController;
 			((UITextField)searchController.SearchBar.ValueForKey (new NSString ("_searchField"))).TextColor = UIColor.White;
 			//((UITextField)searchController.SearchBar.ValueForKey (new NSString ("_searchField"))).TextColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 			((UITextField)searchController.SearchBar.ValueForKey (new NSString ("_searchField"))).Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, ColorExtensions.CAST_FONT_SIZE);
-			((UITextField)searchController.SearchBar.ValueForKey (new NSString ("_searchField"))).BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, BackGroundColorAlpha);
+			((UITextField)searchController.SearchBar.ValueForKey (new NSString ("_searchField"))).BackgroundColor = UIColor.White;
 			((UITextField)searchController.SearchBar.ValueForKey (new NSString ("_searchField"))).ResignFirstResponder ();
-			((UITextField)searchController.SearchBar.ValueForKey (new NSString ("_searchField"))).AttributedPlaceholder=new NSAttributedString ("Search", null, UIColor.White);
+			((UITextField)searchController.SearchBar.ValueForKey (new NSString ("_searchField"))).AttributedPlaceholder=new NSAttributedString ("Search", null, UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, BackGroundColorAlpha));
 			//the search bar is contained in the navigation bar, so it should be visible
 			searchController.HidesNavigationBarDuringPresentation = false;
+			//Set the search bar in the navigation bar
 			NavigationItem.TitleView = searchController.SearchBar;
 			//Ensure the searchResultsController is presented in the current View Controller 
 			DefinesPresentationContext = true;
+
 			if (tableItems == null) // this means async viewdidload  not finished yet
 				BTProgressHUD.Show ();
 
@@ -92,9 +93,9 @@ namespace FavoriteMovies
 			const string cellId = "UserContacts";
 			List<ContactCard> results = new List<ContactCard> ();
 
-			table.TableHeaderView = new UIView () {
-				Frame = new CGRect () { X = 0.0f, Y = 0.0f, Width = View.Layer.Frame.Width, Height = 20f }
-			};
+			//table.TableHeaderView = new UIView () {
+			//	Frame = new CGRect () { X = 0.0f, Y = 0.0f, Width = View.Layer.Frame.Width, Height = 20f }
+			//};
 			users = await postService.GetUserCloud ();
 
 			foreach (var user in users) 
@@ -524,7 +525,7 @@ namespace FavoriteMovies
 				//*****this fixes a problem with the uitableview adding space at the top after each selection*****
 
 				Debug.Write (this.TableView.ContentInset);
-				this.TableView.ContentInset = new UIEdgeInsets (64, 0, 49, 0);
+			//	this.TableView.ContentInset = new UIEdgeInsets (64, 0, 49, 0);
 
 				//this.searchController.Active = true;
 			} catch (Exception e) {

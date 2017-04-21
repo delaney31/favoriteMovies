@@ -25,9 +25,9 @@ namespace FavoriteMovies
 
 			table.Source = tableSource;
 			await ((ConnectCloudTableSource)tableSource).updateImages ();
-			table.ContentInset = new UIEdgeInsets (0, 0, 64, 0);
+			table.ContentInset = new UIEdgeInsets (64, 0, 49, 0);
 			View.Add (table);
-			NavigationController.NavigationBar.Translucent = false;
+			//NavigationController.NavigationBar.Translucent = false;
 
 		}
 

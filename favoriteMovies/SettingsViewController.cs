@@ -29,14 +29,13 @@ namespace FavoriteMovies
 			iap = new InAppPurchaseManager();
 			iap.SimulateiTunesAppStore = true;
 			iap.SimulatedRestoredPurchaseProducts = "product.nonconsumable,antivirus.nonrenewingsubscription.duration6months,content.nonconsumable.downloadable";
-
+			AttachToPurchaseManager (null, iap);
 
 		}
 
 		public override async void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
-            AttachToPurchaseManager (null, iap);
 			// Perform any additional setup after loading the view, typically from a nib.
 			NavigationItem.Title = "Profile";
 			txtLastName.Text = ColorExtensions.CurrentUser.lastname;
@@ -49,7 +48,7 @@ namespace FavoriteMovies
 			txtEmail.Text = ColorExtensions.CurrentUser.email;
 			switchRemoveAds.On = ColorExtensions.CurrentUser.removeAds;
 			switchRemoveAds.ValueChanged += SwitchRemoveAds_ValueChanged;
-			lblVersion.Text = "V " + NSBundle.MainBundle.InfoDictionary ["CFBundleShortVersionString"];
+			lblVersion.Text = "Version " + NSBundle.MainBundle.InfoDictionary ["CFBundleShortVersionString"];
 			segmentTileSize.SelectedSegment = ColorExtensions.CurrentTileSize;
 			segmentTileSize.ValueChanged += SegmentTileSize_ValueChanged;
 			userProfileImage = new UIImageView ();
@@ -263,7 +262,7 @@ namespace FavoriteMovies
 				{
 					// Update list to remove any non-consumable products that were
 					// purchased
-					ColorExtensions.CurrentUser.removeAds = true;
+					ColorExtensions.CurrentUser.removeAds = !ColorExtensions.CurrentUser.removeAds;
 					switchRemoveAds.On = true;
 				};
 
@@ -271,7 +270,7 @@ namespace FavoriteMovies
 				{
 					// Update list to remove any non-consumable products that were
 					// purchased
-					ColorExtensions.CurrentUser.removeAds = true;
+					ColorExtensions.CurrentUser.removeAds = !ColorExtensions.CurrentUser.removeAds;
 					switchRemoveAds.On = true;
 				};
 

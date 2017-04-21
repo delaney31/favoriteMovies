@@ -604,7 +604,7 @@ namespace FavoriteMovies
 				scrollView.AddSubview (velvetRopes);
 			}
 			View.AddSubview (scrollView);
-			if (!ColorExtensions.CurrentUser.removeAds) 
+			if (!ColorExtensions.CurrentUser.removeAds && ColorExtensions.CurrentUser.username!=null) 
 			{
 				// Create a banner's ad view with a unique placement ID (generate your own on the Facebook app settings).
 				// Use different ID for each ad placement in your app.
@@ -655,18 +655,18 @@ namespace FavoriteMovies
 
 			//format the search bar
 			searchController.SearchBar.SizeToFit ();
-			searchController.SearchBar.SearchBarStyle = UISearchBarStyle.Minimal;
-			searchController.SearchBar.Placeholder = "Add Your Movies";
+			searchController.SearchBar.SearchBarStyle = UISearchBarStyle.Default;
+			//searchController.SearchBar.Placeholder = "Add Your Movies";
            
 
 			//searchResultsController.TableView.WeakDelegate = this;
 			searchController.SearchBar.WeakDelegate = searchResultsController;
 
-			((UITextField)searchController.SearchBar.ValueForKey (new NSString ("_searchField"))).TextColor = UIColor.White;
+			//((UITextField)searchController.SearchBar.ValueForKey (new NSString ("_searchField"))).TextColor = UIColor.White;
 			((UITextField)searchController.SearchBar.ValueForKey (new NSString ("_searchField"))).Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, ColorExtensions.CAST_FONT_SIZE);
-			((UITextField)searchController.SearchBar.ValueForKey (new NSString ("_searchField"))).BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, BackGroundColorAlpha);
+			((UITextField)searchController.SearchBar.ValueForKey (new NSString ("_searchField"))).BackgroundColor = UIColor.White;
 			((UITextField)searchController.SearchBar.ValueForKey (new NSString ("_searchField"))).ResignFirstResponder ();
-			((UITextField)searchController.SearchBar.ValueForKey (new NSString ("_searchField"))).AttributedPlaceholder=new NSAttributedString("Add Your Movies", null, UIColor.White);
+			((UITextField)searchController.SearchBar.ValueForKey (new NSString ("_searchField"))).AttributedPlaceholder=new NSAttributedString("Add Your Movies", null, UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, BackGroundColorAlpha));
 			//the search bar is contained in the navigation bar, so it should be visible
 			searchController.HidesNavigationBarDuringPresentation = false;
 
