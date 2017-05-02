@@ -634,7 +634,7 @@ namespace FavoriteMovies
 		public override  void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
-            
+
 			// Creates an instance of a custom View Controller that holds the results
 			searchResultsController = new SearchResultsViewController ();
 
@@ -675,13 +675,13 @@ namespace FavoriteMovies
 
 			//Set the search bar in the navigation bar
 			TabController.NavigationItem.TitleView = searchController.SearchBar;
-			NavigationItem.SetRightBarButtonItem (
-					new UIBarButtonItem (UIImage.FromBundle ("threelines")
-						, UIBarButtonItemStyle.Plain
-						, (sender, args) => {
-							SidebarController.ToggleMenu ();
+			//NavigationItem.SetRightBarButtonItem (
+			//		new UIBarButtonItem (UIImage.FromBundle ("threelines")
+			//			, UIBarButtonItemStyle.Plain
+			//			, (sender, args) => {
+			//				SidebarController.ToggleMenu ();
 
-						}), true);
+			//			}), true);
 
 		}
 

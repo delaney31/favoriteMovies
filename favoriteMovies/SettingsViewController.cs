@@ -33,11 +33,12 @@ namespace FavoriteMovies
 
 		}
 
-		public override async void ViewDidLoad ()
+		public override async void ViewWillAppear (bool animated)
 		{
-			base.ViewDidLoad ();
+			base.ViewWillAppear (animated);
 			// Perform any additional setup after loading the view, typically from a nib.
 			NavigationItem.Title = "Profile";
+			NavigationController.NavigationBar.Translucent = true;
 			txtLastName.Text = ColorExtensions.CurrentUser.lastname;
 			txtFirstName.Text = ColorExtensions.CurrentUser.firstname;
 			switchDarktheme.On = ColorExtensions.CurrentUser.darktheme;
@@ -59,7 +60,7 @@ namespace FavoriteMovies
 			if (signUpImage != null)
 				userProfileImage.Image = signUpImage;
 			userProfileImage.BackgroundColor = UIColor.Clear;
-			userProfileImage.Frame = new RectangleF (110, 70, 100, 100);
+			userProfileImage.Frame = new RectangleF (100, 65, 120, 120);
 			userProfileImage.ContentMode = UIViewContentMode.ScaleAspectFill;
 			//userProfileImage.Layer.BorderWidth = 2;
 			userProfileImage.Layer.CornerRadius = userProfileImage.Frame.Size.Width / 2;
@@ -80,8 +81,9 @@ namespace FavoriteMovies
 
 				 if (!isEmail)
 					{
-					
-						InvokeOnMainThread ( () => 
+
+
+						InvokeOnMainThread ( () =>
 						{
 							txtEmail.Layer.BorderColor =UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f).CGColor;
 							txtEmail.Layer.BorderWidth = 4;
@@ -95,6 +97,12 @@ namespace FavoriteMovies
 						txtEmail.Layer.BorderWidth = 0;
 					}
 				};
+		}
+
+		public override async void ViewDidLoad ()
+		{
+			base.ViewDidLoad ();
+
 		}
 		void Handle_Canceled (object sender, EventArgs e)
 		{

@@ -61,11 +61,11 @@ namespace FavoriteMovies
 
 			//format the search bar
 			searchController.SearchBar.SizeToFit ();
-			searchController.SearchBar.SearchBarStyle = UISearchBarStyle.Minimal;
+			searchController.SearchBar.SearchBarStyle = UISearchBarStyle.Default;
 		
 			//searchResultsController.TableView.WeakDelegate = this;
 			searchController.SearchBar.WeakDelegate = searchResultsController;
-			((UITextField)searchController.SearchBar.ValueForKey (new NSString ("_searchField"))).TextColor = UIColor.White;
+			//((UITextField)searchController.SearchBar.ValueForKey (new NSString ("_searchField"))).TextColor = UIColor.White;
 			//((UITextField)searchController.SearchBar.ValueForKey (new NSString ("_searchField"))).TextColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 			((UITextField)searchController.SearchBar.ValueForKey (new NSString ("_searchField"))).Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, ColorExtensions.CAST_FONT_SIZE);
 			((UITextField)searchController.SearchBar.ValueForKey (new NSString ("_searchField"))).BackgroundColor = UIColor.White;

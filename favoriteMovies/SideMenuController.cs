@@ -140,22 +140,22 @@ namespace FavoriteMovies
 				NavController.PopToRootViewController (false);
 				SidebarController.CloseMenu ();
 			};
-			UIImageView customImage = new UIImageView () { Image = UIImage.FromBundle ("1481443482_document.png") };
-			customImage.Frame = new RectangleF (40, 315, 40, 40);
-			var contentButton = new UIButton (UIButtonType.System);
-			contentButton.Frame = new RectangleF (80, 330, 230, 20);
-			contentButton.SetTitle ("Notifications", UIControlState.Normal);
-			contentButton.SetTitleColor (UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f), UIControlState.Normal);
-			contentButton.HorizontalAlignment = UIControlContentHorizontalAlignment.Left;
-			contentButton.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, 16);
+			//UIImageView customImage = new UIImageView () { Image = UIImage.FromBundle ("1481443482_document.png") };
+			//customImage.Frame = new RectangleF (40, 315, 40, 40);
+			//var contentButton = new UIButton (UIButtonType.System);
+			//contentButton.Frame = new RectangleF (80, 330, 230, 20);
+			//contentButton.SetTitle ("Notifications", UIControlState.Normal);
+			//contentButton.SetTitleColor (UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f), UIControlState.Normal);
+			//contentButton.HorizontalAlignment = UIControlContentHorizontalAlignment.Left;
+			//contentButton.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, 16);
 
-			contentButton.TouchUpInside += (sender, e) => 
-			{
+			//contentButton.TouchUpInside += (sender, e) => 
+			//{
 				
-				NavController.PushViewController (new NotificationsViewController (), true);
+			//	NavController.PushViewController (new NotificationsViewController (), true);
 
-				SidebarController.CloseMenu ();
-			};
+			//	SidebarController.CloseMenu ();
+			//};
 
 			//UIImageView friendsImage = new UIImageView () { Image = UIImage.FromBundle ("1481444239_AddFriends") };
 			//friendsImage.Frame = new RectangleF (60, 355, 40, 40);
@@ -216,11 +216,11 @@ namespace FavoriteMovies
 			if(location!=null)
 			   View.Add (location);
 			View.Add (introButton);
-			View.Add (contentButton);
+		//	View.Add (contentButton);
 		//	View.Add (connectionsButton);
 			View.Add (SettingsButton);
 			View.Add (profileImage);
-			View.Add (customImage);
+		//	View.Add (customImage);
 		//	View.Add (friendsImage);
 			View.Add (settingsImage);
 			if(locationIcon!=null)

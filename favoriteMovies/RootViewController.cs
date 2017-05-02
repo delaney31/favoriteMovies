@@ -1,20 +1,31 @@
 using System;
-using System.Drawing;
 using UIKit;
-using Foundation;
-using CoreGraphics;
 using SidebarNavigation;
-using System.Collections.ObjectModel;
-using FavoriteMoviesPCL;
-using System.Threading.Tasks;
 using System.Diagnostics;
-using Geolocator.Plugin;
-using System.Net;
-using System.IO;
-using System.Xml;
+using System.Collections.Generic;
+using Foundation;
+using LoginScreen;
 
 namespace FavoriteMovies
 {
+	public class LogOutController : UIViewController
+	{
+		public LogOutController ()
+		{
+
+		}
+		public override void ViewWillAppear (bool animated)
+		{
+			base.ViewWillAppear (animated);
+
+			LogOut ();
+		} 
+
+		public void LogOut ()
+		{
+			LoginScreenControl<CredentialsProvider, DefaultLoginScreenMessages>.Activate (this);
+		}
+	}
 	public partial class RootViewController : UIViewController
 	{
 		// the sidebar controller for the app
@@ -39,7 +50,7 @@ namespace FavoriteMovies
 
 		public RootViewController ()
 		{
-			
+
 			//try {
 			//	Page = RandomNumber (1, 50);
 
@@ -82,11 +93,22 @@ namespace FavoriteMovies
 			};
 
 
+			var notifications = new NotificationsViewController ();
+			notifications.Title = "Notifications";
+			notifications.TabBarItem.SetFinishedImages (UIImage.FromBundle ("ic_movie.png"), UIImage.FromBundle ("ic_movie.png"));
 
+
+			var uinc6 = new UINavigationController (notifications);
+			uinc6.NavigationBar.BarTintColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f);
+			uinc6.NavigationBar.TintColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
+			//uinc2.NavigationBar.Translucent = true;
+			uinc6.NavigationBar.TitleTextAttributes = new UIStringAttributes () {
+				ForegroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f)
+			};
 
 			var mainView = new MainViewController ();
 			mainView.Title = "Movies";
-			mainView.TabBarItem.SetFinishedImages(UIImage.FromBundle ("ic_movie.png"),UIImage.FromBundle ("ic_movie.png"));
+			mainView.TabBarItem.SetFinishedImages (UIImage.FromBundle ("ic_movie.png"), UIImage.FromBundle ("ic_movie.png"));
 
 
 			var uinc1 = new UINavigationController (mainView);
@@ -94,7 +116,7 @@ namespace FavoriteMovies
 			uinc1.NavigationBar.TintColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 			//uinc2.NavigationBar.Translucent = true;
 			uinc1.NavigationBar.TitleTextAttributes = new UIStringAttributes () {
-				ForegroundColor =UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f)
+				ForegroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f)
 			};
 
 			var tab2 = new NewsFeedViewController ();
@@ -133,67 +155,131 @@ namespace FavoriteMovies
 			tab4.TabBarItem.SetFinishedImages (UIImage.FromBundle ("ic_list.png"), UIImage.FromBundle ("ic_list.png"));
 
 			var uinc4 = new UINavigationController (tab4);
-		
+
 			uinc4.NavigationBar.BarTintColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f);
 			uinc4.NavigationBar.TintColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 			uinc4.NavigationBar.TitleTextAttributes = new UIStringAttributes () {
-				ForegroundColor =UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f)
+				ForegroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f)
 			};
 
 			var tab5 = new FindFriendsViewController ();
 			tab5.Title = "Connect";
 			tab5.View.BackgroundColor = UIColor.White;
-			tab5.TabBarItem.SetFinishedImages (UIImage.FromBundle ("ic_person_add.png"),UIImage.FromBundle ("ic_person_add.png"));
+			tab5.TabBarItem.SetFinishedImages (UIImage.FromBundle ("ic_person_add.png"), UIImage.FromBundle ("ic_person_add.png"));
 
 
 			var uinc5 = new UINavigationController (tab5);
 			uinc5.NavigationBar.BarTintColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f);
 			uinc5.NavigationBar.TintColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 			//uinc4.NavigationBar.Translucent = true;
-			uinc5.NavigationBar.TitleTextAttributes = new UIStringAttributes () 
-			{
-				ForegroundColor =UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f)
+			uinc5.NavigationBar.TitleTextAttributes = new UIStringAttributes () {
+				ForegroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f)
 			};
 
 
-			var tab6 = new SettingsViewController ();
-			tab6.Title = "Profile";
-						tab6.View.BackgroundColor = UIColor.White;
-						tab6.TabBarItem.SetFinishedImages (UIImage.FromBundle ("ic_settings.png"), UIImage.FromBundle ("ic_settings.png"));
+			var tab7 = new SettingsViewController ();
+			tab7.Title = "Profile";
+			tab7.View.BackgroundColor = UIColor.White;
 
-						var uinc6 = new UINavigationController (tab6);
+			var uinc7 = new UINavigationController (tab7);
 
-			uinc6.NavigationBar.BarTintColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f);
-						uinc6.NavigationBar.TintColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
-						uinc6.NavigationBar.TitleTextAttributes = new UIStringAttributes ()
-						{
-							ForegroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f)
-						};
+			uinc7.NavigationBar.BarTintColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f);
+			uinc7.NavigationBar.TintColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
+			uinc7.NavigationBar.TitleTextAttributes = new UIStringAttributes () {
+				ForegroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f)
+			};
+
+			var tab8 = new TipsViewController ();
+			tab8.Title = "Tips";
+			tab8.View.BackgroundColor = UIColor.White;
+
+			var uinc8 = new UINavigationController (tab8);
+
+			uinc8.NavigationBar.BarTintColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f);
+			uinc8.NavigationBar.TintColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
+			uinc8.NavigationBar.TitleTextAttributes = new UIStringAttributes () {
+				ForegroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f)
+			};
+
+			var tab9 = new LogOutController ();
+			tab9.Title = "Log Out";
+			tab9.View.BackgroundColor = UIColor.White;
+
+			var uinc9 = new UINavigationController (tab9);
+
+			uinc9.NavigationBar.BarTintColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f);
+			uinc9.NavigationBar.TintColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
+			uinc9.NavigationBar.TitleTextAttributes = new UIStringAttributes () {
+				ForegroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f)
+			};
+
+			//LoginScreenControl<CredentialsProvider>.Activate (this);
+			var tabs = new UIViewController []
+			{
+				uinc1,uinc4,uinc5,uinc3,uinc2,uinc6,uinc7,uinc8,uinc9
+			};
+			//var customizableControllers = new UIViewController [] 
+			//{
+			//	uinc1,uinc4,uinc5,uinc3,uinc2,uinc6
+			//};
 
 
-			var tabs = new UIViewController [] {
-				uinc1,uinc4,uinc5,uinc3,uinc2};
 			TabController = new MovieTabBarController ();
 
+			TabController.MoreNavigationController.NavigationBar.BarTintColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f);
+			TabController.MoreNavigationController.NavigationBar.TintColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
+			//uinc4.NavigationBar.Translucent = true;
+			TabController.MoreNavigationController.NavigationBar.TitleTextAttributes = new UIStringAttributes () {
+				ForegroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f)
+			};
 
 
-			TabController.NavigationItem.SetLeftBarButtonItem (
-				new UIBarButtonItem (UIImage.FromBundle ("threelines")
-					, UIBarButtonItemStyle.Plain
-					, (sender, args) => {
-						SidebarController.ToggleMenu ();
+			//TabController.NavigationItem.SetLeftBarButtonItem (
+			//	new UIBarButtonItem (UIImage.FromBundle ("threelines")
+			//		, UIBarButtonItemStyle.Plain
+			//		, (sender, args) => {
+			//			SidebarController.ToggleMenu ();
 
-					}), true);
-			try 
-			{
-				TabController.SetViewControllers (tabs, true);
+			//		}), true);
+			try {
+
+				TabController.ViewControllers = tabs;
 				TabController.SelectedViewController = uinc1;
 
-			} catch (Exception ex) 
-			{
+			} catch (Exception ex) {
 				Debug.Write (ex.Message);
 			}
 
+			UITableView moreList = (UIKit.UITableView)TabController.MoreNavigationController.TopViewController.View;
+
+
+			if (moreList.Subviews.Length > 0) {
+				foreach (UITableViewCell view in moreList.VisibleCells) {
+					view.TextLabel.Font = UIFont.FromName (ColorExtensions.TITLE_FONT, ColorExtensions.HEADER_FONT_SIZE);
+				}
+			}
+
+
+			// Tell the tab bar which controllers are allowed to customize.
+			// If we don't set this, it assumes all controllers are customizable.
+			TabController.CustomizableViewControllers = null;
+
+			// If tab bar order has been edited, save to UserPrefs as a comma-seperated list of Tag ids
+			// NOTE: assumes Tag id == order in the initial ViewControllers array
+			TabController.FinishedCustomizingViewControllers += delegate (object sender, UITabBarCustomizeChangeEventArgs e) {
+				Console.WriteLine ("FinishedCustomizingViewControllers - Changed=" + e.Changed);
+				if (e.Changed) {
+					var count = e.ViewControllers.Length;
+					var tabOrderArray = new List<string> ();
+					foreach (var viewController in e.ViewControllers) {
+						var tag = viewController.TabBarItem.Tag;
+						tabOrderArray.Add (tag.ToString ());
+						Console.WriteLine ("Tag = " + tag);
+					}
+					NSArray arr = NSArray.FromStrings (tabOrderArray.ToArray ());
+					NSUserDefaults.StandardUserDefaults ["tabBarOrder"] = arr;
+				}
+			};
 			NavController.PushViewController (TabController, true);
 
 			SidebarController = new SidebarController (this, NavController, new SideMenuController ());

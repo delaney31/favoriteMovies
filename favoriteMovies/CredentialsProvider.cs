@@ -1,7 +1,6 @@
 ﻿
 using System;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -12,11 +11,10 @@ using com.google.i18n.phonenumbers;
 using Contacts;
 using FavoriteMoviesPCL;
 using Foundation;
-using Geolocator.Plugin;
 using LoginScreen;
 using MovieFriends;
+using Plugin.Geolocator;
 using SQLite;
-using UIKit;
 
 namespace FavoriteMovies
 {
@@ -30,8 +28,7 @@ namespace FavoriteMovies
 
 		}
 		public bool NeedLoginAfterRegistration {
-			get 
-			{
+			get {
 				// If you want your user to login after he/she has been registered
 				return false;
 			}
@@ -41,11 +38,9 @@ namespace FavoriteMovies
 		{
 			// If login was successfully completed
 			DelayInvoke (async () => {
-				if (password!=await GetPassword(userName)) 
-				{
+				if (password != await GetPassword (userName)) {
 					failCallback (new LoginScreenFaultDetails { PasswordErrorMessage = "Password incorrect." });
-				} else 
-				{
+				} else {
 					MainViewController.getUser ();
 					successCallback ();
 					//SideMenuController.title.SetTitle (ColorExtensions.CurrentUser.username, UIControlState.Normal);
@@ -58,7 +53,7 @@ namespace FavoriteMovies
 		CNContact GetCurrentUser (string email)
 		{
 			// Define fields to be searched
-			var fetchKeys = new NSString [] { CNContactKey.GivenName, CNContactKey.FamilyName, CNContactKey.PhoneNumbers,CNContactKey.EmailAddresses, CNContactKey.ImageDataAvailable, CNContactKey.ThumbnailImageData };
+			var fetchKeys = new NSString [] { CNContactKey.GivenName, CNContactKey.FamilyName, CNContactKey.PhoneNumbers, CNContactKey.EmailAddresses, CNContactKey.ImageDataAvailable, CNContactKey.ThumbnailImageData };
 
 			try {
 				var store = new CNContactStore ();
@@ -69,12 +64,11 @@ namespace FavoriteMovies
 					var fetchPredicate = CNContact.GetPredicateForContactsInContainer (container.Identifier);
 
 					var containerResults = store.GetUnifiedContacts (fetchPredicate, fetchKeys, out error);
-					foreach (var contact in containerResults) 
-					{
+					foreach (var contact in containerResults) {
 						var userEmail = contact.EmailAddresses.FirstOrDefault ()?.Value;
 						if (userEmail == email)
 							return contact;
-						
+
 					}
 
 				}
@@ -87,21 +81,14 @@ namespace FavoriteMovies
 		}
 		public void Register (string email, string userName, string password, Action successCallback, Action<LoginScreenFaultDetails> failCallback)
 		{
-				java.lang.String phoneNumber = "";
-				CNContact currentUser;
-				// If registration was successfully completed
-				DelayInvoke (async () => 
-				{
-				try 
-				{
-					if (password.Length < 4) 
-					{
+			java.lang.String phoneNumber = "";
+			CNContact currentUser;
+			// If registration was successfully completed
+			DelayInvoke (async () => {
+				try {
+					if (password.Length < 4) {
 						failCallback (new LoginScreenFaultDetails { PasswordErrorMessage = "Password must be at least 4 chars." });
-					} 
-
-					else 
-					
-					{
+					} else {
 						await postService.InitializeStoreAsync ();
 						var locator = CrossGeolocator.Current;
 						locator.DesiredAccuracy = 50;
@@ -124,39 +111,35 @@ namespace FavoriteMovies
 						var zip = xmlDocument.SelectNodes ("geonames") [0].SelectSingleNode ("code").SelectSingleNode ("postalcode").InnerText;
 						currentUser = GetCurrentUser (email);
 						UserCloud userCloud;
-						if (currentUser != null) 
-						{
-							var util = PhoneNumberUtil.getInstance();
+						if (currentUser != null) {
+							var util = PhoneNumberUtil.getInstance ();
 							var number = util.parse (currentUser.PhoneNumbers.FirstOrDefault ().Value.ValueForKey (new NSString ("digits")).ToString (), Country);
 							phoneNumber = util.format (number, PhoneNumberUtil.PhoneNumberFormat.E164);
 
-							userCloud = new UserCloud () { firstname = currentUser.GivenName ?? string.Empty, lastname = currentUser.FamilyName ?? string.Empty, phone =phoneNumber ?? string.Empty, email = email, username = userName, city = CityName, state = State, country = Country, zip = zip };
-							
-						} 
-						else
+							userCloud = new UserCloud () { firstname = currentUser.GivenName ?? string.Empty, lastname = currentUser.FamilyName ?? string.Empty, phone = phoneNumber ?? string.Empty, email = email, username = userName, city = CityName, state = State, country = Country, zip = zip };
+
+						} else
 							userCloud = new UserCloud () { email = email, username = userName, city = CityName, state = State, country = Country, zip = zip };
 
 						var unique = await postService.InsertUserAsync (userCloud);
 
 						if (!unique)
 							failCallback (new LoginScreenFaultDetails { UserNameErrorMessage = "This username already exits." });
-						else 
-						{
-							
-                          
+						else {
+
+
 							var notification = NSNotification.FromName (Constants.CurrentUserSetNotification, new NSObject ());
 							NSNotificationCenter.DefaultCenter.PostNotification (notification);
-	
-								//inset username and password locally
+
+							//inset username and password locally
 							ColorExtensions.CurrentUser.tilesize = 1;
-							ColorExtensions.CurrentUser.suggestmovies= true;
-							ColorExtensions.CurrentUser.darktheme =false;
-							if (currentUser != null) 
-							{
+							ColorExtensions.CurrentUser.suggestmovies = true;
+							ColorExtensions.CurrentUser.darktheme = false;
+							if (currentUser != null) {
 								ColorExtensions.CurrentUser.lastname = currentUser.FamilyName ?? string.Empty;
 								ColorExtensions.CurrentUser.firstname = currentUser.GivenName ?? string.Empty;
 							}
-							ColorExtensions.CurrentUser.phone =phoneNumber;
+							ColorExtensions.CurrentUser.phone = phoneNumber;
 							ColorExtensions.CurrentUser.email = email;
 							ColorExtensions.CurrentUser.password = password;
 							ColorExtensions.CurrentUser.username = userName;
@@ -166,29 +149,26 @@ namespace FavoriteMovies
 							ColorExtensions.CurrentUser.state = State;
 							ColorExtensions.CurrentUser.zip = zip;
 							ColorExtensions.CurrentUser.removeAds = false;
-						
+
 							await AddUserAsync (ColorExtensions.CurrentUser);
 							successCallback ();
 						}
 
 					}
 
-					} 
-					catch (Exception ex) 
-					{
-						Debug.WriteLine (ex.Message);
-					}
-				});
-			  	
-			
+				} catch (Exception ex) {
+					Debug.WriteLine (ex.Message);
+				}
+			});
+
+
 
 		}
 
 		async Task<string> GetPassword (string userName)
 		{
-			string returnValue= string.Empty;
-			using (var db = new SQLiteConnection (MovieService.Database)) 
-			{
+			string returnValue = string.Empty;
+			using (var db = new SQLiteConnection (MovieService.Database)) {
 				var task = Task.Run (() => {
 					try {
 						// there is a sqllite bug here https://forums.xamarin.com/discussion/52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
@@ -208,21 +188,21 @@ namespace FavoriteMovies
 			}
 			return returnValue;
 		}
-		async Task  DeleteAll ()
+		async Task DeleteAll ()
 		{
-			
-				try {
-					using (var db = new SQLite.SQLiteConnection (MovieService.Database)) {
-						// there is a sqllite bug here https://forums.xamarin.com/discussion/52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
 
-						db.Query<Movie> ("DELETE FROM [User]");
+			try {
+				using (var db = new SQLite.SQLiteConnection (MovieService.Database)) {
+					// there is a sqllite bug here https://forums.xamarin.com/discussion/52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
 
-					}
-				} catch (SQLite.SQLiteException e) {
-					//first time in no favorites yet.
-					Debug.Write (e.Message);
+					db.Query<Movie> ("DELETE FROM [User]");
+
 				}
-		
+			} catch (SQLite.SQLiteException e) {
+				//first time in no favorites yet.
+				Debug.Write (e.Message);
+			}
+
 		}
 		async Task AddUserAsync (User user)
 		{
@@ -230,7 +210,7 @@ namespace FavoriteMovies
 
 				using (var db = new SQLiteConnection (MovieService.Database)) {
 					// there is a sqllite bug here https://forums.xamarin.com/discussion/
-					await DeleteAll ();	
+					await DeleteAll ();
 					db.InsertOrReplace (user, typeof (User));
 
 
@@ -247,9 +227,9 @@ namespace FavoriteMovies
 				}
 
 				using (var db = new SQLiteConnection (MovieService.Database)) {
-					
+
 					db.InsertOrReplace (user, typeof (User));
-				
+
 
 				}
 			}
@@ -296,13 +276,12 @@ namespace FavoriteMovies
 			Timer timer = new Timer ();
 			timer.AutoReset = false;
 			timer.Interval = 3000;
-			timer.Elapsed += (object sender, ElapsedEventArgs e) => 
-			{
+			timer.Elapsed += (object sender, ElapsedEventArgs e) => {
 				operation.Invoke ();
 				//SideMenuController.title.SetTitle (ColorExtensions.CurrentUser.username, UIControlState.Normal);
 			};
 			timer.Start ();
-			
+
 
 
 		}

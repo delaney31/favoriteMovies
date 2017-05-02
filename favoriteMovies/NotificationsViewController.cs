@@ -19,41 +19,43 @@ namespace FavoriteMovies
 
 		public override async void ViewDidAppear (bool animated)
 		{
+			base.ViewDidAppear (animated);
 			try {
-				
-				base.ViewDidAppear (animated);
 				if (tableSource == null)
 					BTProgressHUD.Show ();
-				
-				notificationsList = await getNotifications ();
 				if (notificationsList.Count == 0) 
 				{
-					var noNotifications = new NotificationsCloud ();
-					noNotifications.notification = "          Follow someone to see notifications here.";
-					notificationsList.Add (noNotifications);
+					notificationsList = await getNotifications ();
+					if (notificationsList.Count == 0) {
+						var noNotifications = new NotificationsCloud ();
+						noNotifications.notification = "          Follow someone to see notifications here.";
+						notificationsList.Add (noNotifications);
+					}
+
+					tableSource = new NotificationsCloudTableSource (notificationsList, this);
+					BTProgressHUD.Dismiss ();
+
+					table.Source = tableSource;
+
+					View.Add (table);
 				}
 
-				tableSource = new NotificationsCloudTableSource (notificationsList, this);
-				BTProgressHUD.Dismiss ();
-
-				table.Source = tableSource;
-
-				View.Add (table);
-				NavigationController.NavigationBar.Translucent = false;
-			}catch(Exception ex)
-			{
+			} catch (Exception ex) {
 				Console.WriteLine (ex.Message);
 			}
 		}
 		public override void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
+
+			
 			table = new UITableView (View.Bounds);
 			table.BackgroundColor =  UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f) ;
 			table.AutoresizingMask = UIViewAutoresizing.All;
 			table.RowHeight = 55;
 			table.AllowsSelectionDuringEditing = true;
-
+			NavigationController.NavigationBar.Translucent = false;
+			View.BackgroundColor = UIColor.White;//UIColor.Clear.FromHexString ("#e9755e", 1.0f);
 			var name = new NSString (Constants.ModifyFollowerNotification);
 			NSNotificationCenter.DefaultCenter.AddObserver (this, new Selector (Constants.ModifyFollowerNotificationReceived), name, null);
 		}
@@ -110,6 +112,7 @@ namespace FavoriteMovies
 			cell.DetailTextLabel.TextAlignment = UITextAlignment.Justified;
 			cell.DetailTextLabel.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, ColorExtensions.CAST_FONT_SIZE);
 			cell.DetailTextLabel.TextColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f);
+
 			//cell.ImageView.Image = await BlobUpload.getProfileImage (listItems [indexPath.Row].userid, 150, 150);
 		
 			return cell;

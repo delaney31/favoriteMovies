@@ -28,6 +28,11 @@ namespace FavoriteMovies
 			postService = AzureTablesService.DefaultService;
 
 		}
+		public override void ViewWillAppear (bool animated)
+		{
+			base.ViewWillAppear (animated);
+			NavigationController.NavigationBar.Translucent = true;
+		}
 		public override async void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
@@ -250,6 +255,7 @@ namespace FavoriteMovies
 		public static void ShowTabBar (UIViewController tab)
 		{
 			var screenRect = UIScreen.MainScreen.Bounds;
+			
 			nfloat fHeight = screenRect.Height - 49f;
 			if (UIApplication.SharedApplication.StatusBarOrientation == UIInterfaceOrientation.LandscapeLeft
 			   || UIApplication.SharedApplication.StatusBarOrientation == UIInterfaceOrientation.LandscapeRight) {
