@@ -24,13 +24,12 @@ namespace FavoriteMovies
 			View.AddSubview (background);
 
 			// create the carousel
-			carousel = new iCarousel (new CGRect (10, 65, 300.0f, 500.0f));
+			carousel = new iCarousel (new CGRect (10, 50, 300.0f, 500.0f));
 			carousel.Type = iCarouselType.Cylinder;
 			carousel.DataSource = new CarouselDataSource ();
 			carousel.AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight;
 			//Bocarousel.ScrollSpeed = 0.5f;
 			View.AddSubview (carousel);
-
 			 //customize the appearance of the carousel
 			carousel.GetValue = (sender, option, value) => 
 			{

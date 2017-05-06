@@ -215,21 +215,21 @@ namespace FavoriteMovies
 			View.Add (title);
 			if(location!=null)
 			   View.Add (location);
-			View.Add (introButton);
+			//View.Add (introButton);
 		//	View.Add (contentButton);
 		//	View.Add (connectionsButton);
-			View.Add (SettingsButton);
-			View.Add (profileImage);
+			//View.Add (SettingsButton);
+			//View.Add (profileImage);
 		//	View.Add (customImage);
 		//	View.Add (friendsImage);
-			View.Add (settingsImage);
+			//View.Add (settingsImage);
 			if(locationIcon!=null)
 			  View.Add (locationIcon);
 
-			View.Add (showTipsImage);
-			View.Add (showTipsButton);
-			View.Add (logoutButton);
-			View.Add (logOut);
+			//View.Add (showTipsImage);
+			//View.Add (showTipsButton);
+			//View.Add (logoutButton);
+			//View.Add (logOut);
 			loading.RemoveFromSuperview ();
 
 		}

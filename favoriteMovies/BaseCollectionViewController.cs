@@ -131,7 +131,6 @@ namespace FavoriteMovies
 		public override void ItemSelected (UICollectionView collectionView, NSIndexPath indexPath)
 		{
 			try {
-				BTProgressHUD.Show ();
 				NewsFeedTableSource.ShowTabBar (viewController.TabController);
 				viewController.NavController.SetNavigationBarHidden (false, true);
 				var row = _items [indexPath.Row];
@@ -268,7 +267,7 @@ namespace FavoriteMovies
 		public override void ItemSelected (UICollectionView collectionView, NSIndexPath indexPath)
 		{
 			try {
-				BTProgressHUD.Show ();
+				
 				NewsFeedTableSource.ShowTabBar (viewController.TabController);
 				viewController.NavController.SetNavigationBarHidden (false, true);
 				var row = _items [indexPath.Row];

@@ -52,20 +52,25 @@ namespace FavoriteMovies
 		void Initialize ()
 		{
 
-			InvokeOnMainThread (async () => {
+			Task.Run (async () =>  {
 				customLists = await postService.GetCustomList (user.id);
+
+			}).Wait();
+
+			InvokeOnMainThread (async () => 
+			{
 				numFollowing.Text = await postService.GetFollowingAsync (user.id);
 				numFollowers.Text = await postService.GetFollowersAsync (user.id);
 			});
-
-
 		}
 
-		public override void ViewDidLoad ()
+		public override  void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
 			Initialize ();
-
+			int cnt = 0;
+			CGRect lastLabelFrame = new CGRect ();
+			CGRect lastCollectionFrame = new CGRect ();
 
 
 			BTProgressHUD.Dismiss ();
@@ -81,7 +86,7 @@ namespace FavoriteMovies
 			name.TextColor = UIColor.Black;
 
 			followers.Frame = new CGRect () { X = 15, Y = 170, Width = View.Bounds.Width, Height = 120 };
-			followers.Text = "Follower(s)".ToUpper();
+			followers.Text = "Follower(s)".ToUpper ();
 			followers.TextAlignment = UITextAlignment.Left;
 			followers.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, 10);
 			followers.TextColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
@@ -93,7 +98,7 @@ namespace FavoriteMovies
 			numFollowers.TextColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 
 			sharedLists.Frame = new CGRect () { X = 0, Y = 170, Width = View.Bounds.Width, Height = 120 };
-			sharedLists.Text = "Shared Movie List(s)".ToUpper();
+			sharedLists.Text = "Shared Movie List(s)".ToUpper ();
 			sharedLists.TextAlignment = UITextAlignment.Center;
 			sharedLists.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, 10);
 			sharedLists.TextColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
@@ -104,9 +109,9 @@ namespace FavoriteMovies
 			numSharedLists.Font = UIFont.FromName (ColorExtensions.PROFILE_NAME, 25);
 
 			following.Frame = new CGRect () { X = 10, Y = 170, Width = View.Bounds.Width - 25, Height = 120 };
-			following.Text = "Following".ToUpper();
+			following.Text = "Following".ToUpper ();
 			following.TextAlignment = UITextAlignment.Right;
-			following.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT,10);
+			following.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, 10);
 			following.TextColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 
 
@@ -126,45 +131,26 @@ namespace FavoriteMovies
 
 			profileImage.Layer.BorderWidth = 3.0f;
 			profileImage.BackgroundColor = UIColor.Clear;
-			profileImage.Frame = new RectangleF (100, 10, 120, 120);
+			profileImage.Frame = new RectangleF (70, -40, 175, 175);
 			profileImage.ContentMode = UIViewContentMode.ScaleAspectFill;
 			//userProfileImage.Layer.BorderWidth = 2;
 			profileImage.Layer.CornerRadius = profileImage.Frame.Size.Width / 2;
 			profileImage.Layer.MasksToBounds = true;
-			profileImage.Layer.BorderColor =UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f).CGColor;
+			profileImage.Layer.BorderColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f).CGColor;
 
-
-		}
-
-
-		public override void ViewWillDisappear (bool animated)
-		{
-			base.ViewWillDisappear (animated);
-
-
-		}
-		public override async void ViewDidAppear (bool animated)
-		{
-           
-			base.ViewDidAppear (animated);
-			if (scrollView.Subviews.Length > 0)
-				return;
-			MovieDetailViewController.DeleteAllSubviews (scrollView);
-
-			int cnt = 0;
-			CGRect lastLabelFrame = new CGRect ();
-			CGRect lastCollectionFrame = new CGRect ();
 			if (customLists.Count > 0) {
-				foreach (var list in customLists) {
+				foreach (var list in customLists) 
+				{
 
-					userMovies = new ObservableCollection<Movie> (await postService.GetCustomListMovies (list.Id));
-
+					Task.Run (async () =>  {
+						userMovies = new ObservableCollection<Movie> (await postService.GetCustomListMovies (list.Id));
+					}).Wait();
 
 
 					if (cnt == 0) {
 
 						custlistName = new UILabel () {
-							TextColor =ColorExtensions.DarkTheme ? UIColor.White: UIColor.Black, Frame = new CGRect (16, background.Frame.Y + 70, 180, 20),
+							TextColor = ColorExtensions.DarkTheme ? UIColor.White : UIColor.Black, Frame = new CGRect (16, background.Frame.Y + 70, 180, 20),
 							//BackgroundColor = View.BackgroundColor,
 							Font = UIFont.FromName (ColorExtensions.TITLE_FONT, 15),
 							Text = list.Name
@@ -172,14 +158,13 @@ namespace FavoriteMovies
 
 					} else {
 						custlistName = new UILabel () {
-							TextColor = ColorExtensions.DarkTheme ? UIColor.White: UIColor.Black, Frame = new CGRect (16, lastLabelFrame.Y + viewController.CollectionView.Frame.Height + 45, 180, 20),
+							TextColor = ColorExtensions.DarkTheme ? UIColor.White : UIColor.Black, Frame = new CGRect (16, lastLabelFrame.Y + viewController.CollectionView.Frame.Height + 45, 180, 20),
 							Font = UIFont.FromName (ColorExtensions.TITLE_FONT, 15),
 							Text = list.Name
 						};
 					}
 					lastLabelFrame = custlistName.Frame;
-					viewController = new UserCollectionViewController (new UICollectionViewFlowLayout () 
-					{
+					viewController = new UserCollectionViewController (new UICollectionViewFlowLayout () {
 						MinimumInteritemSpacing = MinimumInteritemSpacing, MinimumLineSpacing = MinimumLineSpacing,
 						HeaderReferenceSize = HeaderReferenceSize, ItemSize = ItemSize,
 						ScrollDirection = UICollectionViewScrollDirection.Horizontal
@@ -201,8 +186,6 @@ namespace FavoriteMovies
 				}
 
 			}
-
-
 			numSharedLists.Text = customLists.Count.ToString ();
 
 			//scrollView.SizeToFit ();
@@ -211,7 +194,6 @@ namespace FavoriteMovies
 			scrollView.ContentSize = new CGSize (320, lastCollectionFrame.Y + lastCollectionFrame.Height+ 60);
 			//scrollView.ContentOffset = new CGPoint (0, -scrollView.ContentInset.Top);
 			scrollView.Bounces = true;
-
 
 			scrollView.AddSubview (background);
 			scrollView.AddSubview (name);
@@ -225,8 +207,9 @@ namespace FavoriteMovies
 			scrollView.AddSubview (numSharedLists);
 
 			View.AddSubview (scrollView);
-
 		}
+
+
 
 
 

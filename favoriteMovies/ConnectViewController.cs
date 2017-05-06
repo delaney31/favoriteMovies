@@ -30,6 +30,7 @@ namespace FavoriteMovies
 		public AzureTablesService postService = AzureTablesService.DefaultService;
 		public ConnectViewController()
 		{
+			UIApplication.SharedApplication.NetworkActivityIndicatorVisible = true;
 			loading = new UILabel () { Frame = new CoreGraphics.CGRect () { X = 115, Y = 155, Width = 100, Height = 100 } };
 			loading.Text = "Loading...";
 		}
@@ -116,7 +117,7 @@ namespace FavoriteMovies
 
 			watch.Stop ();
 			Console.WriteLine("GetUserContactsAsync Method took " + watch.ElapsedMilliseconds/ 1000.0 + " seconds") ;
-
+			UIApplication.SharedApplication.NetworkActivityIndicatorVisible = false;
 			return results.OrderByDescending (x => x.moviesInCommon).ToList ();
 
 		}

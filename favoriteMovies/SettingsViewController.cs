@@ -27,8 +27,8 @@ namespace FavoriteMovies
 		{
 			signUpImage = UIImage.FromBundle ("1481507483_compose.png");
 			iap = new InAppPurchaseManager();
-			iap.SimulateiTunesAppStore = true;
-			iap.SimulatedRestoredPurchaseProducts = "product.nonconsumable,antivirus.nonrenewingsubscription.duration6months,content.nonconsumable.downloadable";
+			//iap.SimulateiTunesAppStore = true;
+			//iap.SimulatedRestoredPurchaseProducts = "product.nonconsumable,antivirus.nonrenewingsubscription.duration6months,content.nonconsumable.downloadable";
 			AttachToPurchaseManager (null, iap);
 
 		}
@@ -60,7 +60,7 @@ namespace FavoriteMovies
 			if (signUpImage != null)
 				userProfileImage.Image = signUpImage;
 			userProfileImage.BackgroundColor = UIColor.Clear;
-			userProfileImage.Frame = new RectangleF (100, 65, 120, 120);
+			userProfileImage.Frame = new RectangleF (105, 65, 120, 120);
 			userProfileImage.ContentMode = UIViewContentMode.ScaleAspectFill;
 			//userProfileImage.Layer.BorderWidth = 2;
 			userProfileImage.Layer.CornerRadius = userProfileImage.Frame.Size.Width / 2;
@@ -196,8 +196,8 @@ namespace FavoriteMovies
 			if (!ColorExtensions.CurrentUser.removeAds) {
 				if (iap.CanMakePayments)
 					// initiate payment
-					//iap.BuyProduct (ProductId);
-					iap.RestorePreviousPurchases ();
+					iap.BuyProduct (ProductId);
+					//iap.RestorePreviousPurchases ();
 
 				else {
 					switchRemoveAds.Enabled = false;

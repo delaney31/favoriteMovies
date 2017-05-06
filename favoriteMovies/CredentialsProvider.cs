@@ -9,6 +9,7 @@ using System.Timers;
 using System.Xml;
 using com.google.i18n.phonenumbers;
 using Contacts;
+using CoreLocation;
 using FavoriteMoviesPCL;
 using Foundation;
 using LoginScreen;
@@ -43,6 +44,7 @@ namespace FavoriteMovies
 				} else {
 					MainViewController.getUser ();
 					successCallback ();
+
 					//SideMenuController.title.SetTitle (ColorExtensions.CurrentUser.username, UIControlState.Normal);
 					//SideMenuController.location.SetTitle (ColorExtensions.CurrentUser.city + ", " + ColorExtensions.CurrentUser.state + " " + ColorExtensions.CurrentUser.country, UIControlState.Normal);
 
@@ -84,7 +86,8 @@ namespace FavoriteMovies
 			java.lang.String phoneNumber = "";
 			CNContact currentUser;
 			// If registration was successfully completed
-			DelayInvoke (async () => {
+			DelayInvoke (async () => 
+			{
 				try {
 					if (password.Length < 4) {
 						failCallback (new LoginScreenFaultDetails { PasswordErrorMessage = "Password must be at least 4 chars." });
@@ -92,30 +95,37 @@ namespace FavoriteMovies
 						await postService.InitializeStoreAsync ();
 						var locator = CrossGeolocator.Current;
 						locator.DesiredAccuracy = 50;
-						var position = await locator.GetPositionAsync (timeoutMilliseconds: 10000);
+						string CityName = "", State = "", Country = "", zip = "";
+						if (CLLocationManager.LocationServicesEnabled) 
+						{
+							var position = await locator.GetPositionAsync (timeoutMilliseconds: 10000);
 
-						Console.WriteLine ("Position Status: {0}", position.Timestamp);
-						Console.WriteLine ("Position Latitude: {0}", position.Latitude);
-						Console.WriteLine ("Position Longitude: {0}", position.Longitude);
+							Console.WriteLine ("Position Status: {0}", position.Timestamp);
+							Console.WriteLine ("Position Latitude: {0}", position.Latitude);
+							Console.WriteLine ("Position Longitude: {0}", position.Longitude);
 
-						var url = String.Format ("http://api.geonames.org/findNearbyPostalCodes?lat={0}&lng={1}&username=delaney31", position.Latitude, position.Longitude);
-						WebRequest webRequest = WebRequest.Create (url);
-						WebResponse webResponse = webRequest.GetResponse ();
-						Stream stream = webResponse.GetResponseStream ();
-						XmlDocument xmlDocument = new XmlDocument ();
-						xmlDocument.Load (stream);
+							var url = String.Format ("http://api.geonames.org/findNearbyPostalCodes?lat={0}&lng={1}&username=delaney31", position.Latitude, position.Longitude);
+							WebRequest webRequest = WebRequest.Create (url);
+							WebResponse webResponse = webRequest.GetResponse ();
+							Stream stream = webResponse.GetResponseStream ();
+							XmlDocument xmlDocument = new XmlDocument ();
+							xmlDocument.Load (stream);
 
-						var CityName = xmlDocument.SelectNodes ("geonames") [0].SelectSingleNode ("code").SelectSingleNode ("name").InnerText;
-						var State = xmlDocument.SelectNodes ("geonames") [0].SelectSingleNode ("code").SelectSingleNode ("adminCode1").InnerText;
-						var Country = xmlDocument.SelectNodes ("geonames") [0].SelectSingleNode ("code").SelectSingleNode ("countryCode").InnerText;
-						var zip = xmlDocument.SelectNodes ("geonames") [0].SelectSingleNode ("code").SelectSingleNode ("postalcode").InnerText;
+							CityName = xmlDocument.SelectNodes ("geonames") [0].SelectSingleNode ("code").SelectSingleNode ("name").InnerText;
+							State = xmlDocument.SelectNodes ("geonames") [0].SelectSingleNode ("code").SelectSingleNode ("adminCode1").InnerText;
+							Country = xmlDocument.SelectNodes ("geonames") [0].SelectSingleNode ("code").SelectSingleNode ("countryCode").InnerText;
+							zip = xmlDocument.SelectNodes ("geonames") [0].SelectSingleNode ("code").SelectSingleNode ("postalcode").InnerText;
+						}
 						currentUser = GetCurrentUser (email);
 						UserCloud userCloud;
-						if (currentUser != null) {
-							var util = PhoneNumberUtil.getInstance ();
-							var number = util.parse (currentUser.PhoneNumbers.FirstOrDefault ().Value.ValueForKey (new NSString ("digits")).ToString (), Country);
-							phoneNumber = util.format (number, PhoneNumberUtil.PhoneNumberFormat.E164);
-
+						if (currentUser != null) 
+						{
+							if (Country != "") 
+							{
+								var util = PhoneNumberUtil.getInstance ();
+								var number = util.parse (currentUser.PhoneNumbers.FirstOrDefault ().Value.ValueForKey (new NSString ("digits")).ToString (), Country);
+								phoneNumber = util.format (number, PhoneNumberUtil.PhoneNumberFormat.E164);
+							}
 							userCloud = new UserCloud () { firstname = currentUser.GivenName ?? string.Empty, lastname = currentUser.FamilyName ?? string.Empty, phone = phoneNumber ?? string.Empty, email = email, username = userName, city = CityName, state = State, country = Country, zip = zip };
 
 						} else
@@ -168,8 +178,9 @@ namespace FavoriteMovies
 		async Task<string> GetPassword (string userName)
 		{
 			string returnValue = string.Empty;
-			using (var db = new SQLiteConnection (MovieService.Database)) {
-				var task = Task.Run (() => {
+			using (var db = new SQLiteConnection (MovieService.Database)) 
+			{
+				await Task.Run (() => {
 					try {
 						// there is a sqllite bug here https://forums.xamarin.com/discussion/52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
 						var query = db.Query<User> ("SELECT * FROM [User] WHERE [username] = '" + userName + "'");
@@ -184,7 +195,7 @@ namespace FavoriteMovies
 
 					}
 				});
-				task.Wait ();
+			
 			}
 			return returnValue;
 		}
@@ -255,7 +266,7 @@ namespace FavoriteMovies
 		public bool ShowPasswordResetLink {
 			get {
 				// If you want your login screen to have a forgot password button
-				return true;
+				return false;
 
 				// Otherwise you can:
 				// return false;
@@ -271,6 +282,7 @@ namespace FavoriteMovies
 				// return false;
 			}
 		}
+
 		private void DelayInvoke (Action operation)
 		{
 			Timer timer = new Timer ();

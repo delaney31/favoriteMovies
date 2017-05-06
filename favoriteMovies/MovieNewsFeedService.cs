@@ -5,6 +5,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using FavoriteMoviesPCL;
@@ -77,8 +78,8 @@ namespace FavoriteMovies
 
 				}
 
-			} catch (Exception) {
-				throw;
+			} catch (Exception e) {
+				Console.WriteLine (@"Error{0}", e.Message);
 			}
 
 			return feedItemsList;
@@ -211,6 +212,8 @@ namespace FavoriteMovies
 
 		public static void DeleteAllFeedItems ()
 		{
+			//var ts = new CancellationTokenSource ();
+			//CancellationToken ct = ts.Token;
 			var task = Task.Run (() => {
 				try {
 					using (var db = new SQLite.SQLiteConnection (MovieService.Database)) {
@@ -221,10 +224,12 @@ namespace FavoriteMovies
 					}
 				} catch (SQLite.SQLiteException e) {
 					//first time in no favorites yet.
+
 					Debug.Write (e.Message);
+				//	ts.Cancel ();
 				}
 			});
-			task.Wait ();
+			task.Wait();
 		}
 		static int? InsertNewsFeed (FeedItem feedItem)
 		{
@@ -261,7 +266,8 @@ namespace FavoriteMovies
 				using (var db = new SQLiteConnection (MovieService.Database)) 
 				{
 				//	foreach (var list in feedItemsList) {
-						if (feedItem.Title != null) {
+						if (feedItem.Title != null) 
+						{
 							db.InsertOrReplace (feedItem, typeof (FeedItem));
 						}
 				//	}

@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Mail;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Contacts;
+using FavoriteMovies;
 using Foundation;
 using UIKit;
+
 
 
 namespace FavoriteMovies
@@ -32,36 +35,42 @@ namespace FavoriteMovies
 
 		async Task<List<ContactCard>> GetUserContactsAsync ()
 		{
+           
 			// Define fields to be searched
 			var fetchKeys = new NSString [] { CNContactKey.GivenName, CNContactKey.FamilyName, CNContactKey.EmailAddresses, CNContactKey.ImageDataAvailable, CNContactKey.ThumbnailImageData };
 			List<ContactCard> result = new List<ContactCard> ();
-			try {
-				var store = new CNContactStore ();
-				NSError error;
-				CNContainer [] containers = store.GetContainers (null, out error);
+            InvokeOnMainThread (async () => 
+			//await Task.Run (() => 
+			{
+				try {
+					var store = new CNContactStore ();
+					NSError error;
 
-				foreach (var container in containers) {
-					var fetchPredicate = CNContact.GetPredicateForContactsInContainer (container.Identifier);
+					var containers = store.GetContainers (null, out error);
 
-					var containerResults = store.GetUnifiedContacts (fetchPredicate, fetchKeys, out error);
-					foreach (var contact in containerResults.OrderBy (x => x.GivenName)) {
-						if (contact.EmailAddresses.Count () > 0 && contact.GivenName.Length > 0) {
-							var conCard = new ContactCard (UITableViewCellStyle.Default, cellIdentifier);
-							conCard.nameLabel.Text = contact.GivenName + " " + contact.FamilyName;
-							conCard.email = contact.EmailAddresses.FirstOrDefault ()?.Value;
-							if (contact.ImageDataAvailable)
-								conCard.profileImage.Image = UIImage.LoadFromData (contact.ThumbnailImageData);
-							else
-								conCard.profileImage.Image = UIImage.FromBundle ("1481507483_compose.png"); //default image
-							result.Add (conCard);
+					foreach (var container in containers) {
+						var fetchPredicate = CNContact.GetPredicateForContactsInContainer (container.Identifier);
+
+						var containerResults = store.GetUnifiedContacts (fetchPredicate, fetchKeys, out error);
+						foreach (var contact in containerResults.OrderBy (x => x.GivenName)) {
+							if (contact.EmailAddresses.Count () > 0 && contact.GivenName.Length > 0) {
+								var conCard = new ContactCard (UITableViewCellStyle.Default, cellIdentifier);
+								conCard.nameLabel.Text = contact.GivenName + " " + contact.FamilyName;
+								conCard.email = contact.EmailAddresses.FirstOrDefault ()?.Value;
+								if (contact.ImageDataAvailable)
+									conCard.profileImage.Image = UIImage.LoadFromData (contact.ThumbnailImageData);
+								else
+									conCard.profileImage.Image = UIImage.FromBundle ("1481507483_compose.png"); //default image
+								result.Add (conCard);
+							}
 						}
+
 					}
+				} catch (Exception ex) {
+					Console.WriteLine (ex.Message);
 
 				}
-			} catch (Exception ex) {
-				Console.WriteLine (ex.Message);
-				return null;
-			}
+			});
 			return result.ToList ();
 
 		}

@@ -9,6 +9,7 @@ using FavoriteMovies;
 using FavoriteMoviesPCL;
 using Foundation;
 using MovieFriends;
+using ObjCRuntime;
 using SQLite;
 using UIKit;
 
@@ -32,6 +33,8 @@ namespace FavoriteMovies
 		public override void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
+			var name = new NSString (Constants.CustomListChange);
+			NSNotificationCenter.DefaultCenter.AddObserver (this, new Selector (Constants.CustomListChangeReceived), name, null);
 			tableItems = GetMovieList ();
 			table = new UITableView (View.Bounds);
 			table.AutoresizingMask = UIViewAutoresizing.All;
@@ -106,6 +109,18 @@ namespace FavoriteMovies
 			Add (table);
 
 		}
+
+		[Export ("CustomListChangeReceived:")]
+		public async void CustomListChangeReceived (NSNotification n)
+		{ 
+			tableItems = GetMovieList ();
+			//table = new UITableView (View.Bounds);
+
+			tableSource = new TableSource<ICustomList> (tableItems, this);
+			table.Source = tableSource;
+			table.ReloadData ();
+		}
+
 
 		public void UpdateCustomAndMovieList (int? Id, bool upDateMovieDetail, List<ICustomList> tableItems, string cloudid=null)
 		{

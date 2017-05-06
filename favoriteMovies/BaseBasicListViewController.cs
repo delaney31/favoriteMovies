@@ -14,12 +14,6 @@ namespace FavoriteMovies
 		{
 			base.ViewDidLoad ();
 
-			//tableView = new UITableView (View.Bounds);
-			//tableView.AutoresizingMask = UIViewAutoresizing.FlexibleBottomMargin;
-			//tableView.AllowsSelectionDuringEditing = true;
-			//tableView.Frame = View.Bounds;
-
-
 		}
 		public override void ViewWillAppear (bool animated)
 		{

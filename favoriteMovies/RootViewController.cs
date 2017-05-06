@@ -24,6 +24,8 @@ namespace FavoriteMovies
 		public void LogOut ()
 		{
 			LoginScreenControl<CredentialsProvider, DefaultLoginScreenMessages>.Activate (this);
+			this.NavigationController.PopToRootViewController (true);
+
 		}
 	}
 	public partial class RootViewController : UIViewController
