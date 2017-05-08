@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Drawing;
@@ -75,7 +75,7 @@ namespace FavoriteMovies
 				else {
 
 					var customListId = _items [indexPath.Row].CustomListID;
-					var isCustomList = _items [indexPath.Row].cloudId != null;
+					var isCustomList = _items [indexPath.Row].Favorite == true;
 					if (isCustomList) {
 						accepted = await ShowAlert ("Confirm", "Are you sure you want to delete this movie?");
 						Console.WriteLine ("Selected button {0}", accepted ? "Accepted" : "Canceled");
@@ -87,8 +87,7 @@ namespace FavoriteMovies
 					var item = _items [indexPath.Row];
 					if (accepted) 
 					{
-						_items.RemoveAt (indexPath.Row);
-						CollectionView.ReloadData ();
+						
 						//if customListId is null then we are on a pre-defined list (i.e Now Playing) not a custom one so nothing in table to delete
 						if (isCustomList) 
 						{
@@ -97,7 +96,9 @@ namespace FavoriteMovies
 						}
 						await postService.DeleteMovieItemAsync (item,BaseListViewController.GetCustomListName(item.CustomListID));
 
-						
+						_items.RemoveAt (indexPath.Row);
+						CollectionView.ReloadData ();
+						CollectionView.CollectionViewLayout.InvalidateLayout ();
 
 					}
 
@@ -110,8 +111,8 @@ namespace FavoriteMovies
 
 					//if (isCustomList) 
 					//{
-						MainViewController.NewCustomListToRefresh = 1;
-						viewController.ViewWillAppear (true);
+					MainViewController.NewCustomListToRefresh = 1;
+					viewController.ViewWillAppear (true);
 					//}
 					BTProgressHUD.Dismiss ();
 				}
@@ -120,7 +121,7 @@ namespace FavoriteMovies
 			} catch (Exception ex) 
 			{
 				
-				Debug.WriteLine (ex.Message);
+				Debug.WriteLine(ColorExtensions.Method + ColorExtensions.Method + "HandleAction " + ex.Message);
 				BTProgressHUD.Dismiss ();
 				//throw;
 			}
@@ -146,7 +147,7 @@ namespace FavoriteMovies
 				//loadingOverlay.Hide ();
 			} catch (Exception e) 
 			{
-				Debug.WriteLine (e.Message);
+				Debug.WriteLine(ColorExtensions.Method +"ItemSelected: " + e.Message);
 				throw;
 			}
 		}
@@ -175,7 +176,7 @@ namespace FavoriteMovies
 				return cell;
 			} catch (Exception e) 
 			{
-				Debug.WriteLine (e.Message);
+				Debug.WriteLine(ColorExtensions.Method + "GetCell Line 179 :" +  e.Message);
 
 			}
 			return cell;
@@ -201,6 +202,7 @@ namespace FavoriteMovies
 
 		public override nint GetItemsCount (UICollectionView collectionView, nint section)
 		{
+			
 			return (_items!=null?_items.Count:0);
 		}
 		public override UICollectionViewCell GetCell (UICollectionView collectionView, NSIndexPath indexPath)
@@ -213,7 +215,7 @@ namespace FavoriteMovies
 				cell.UpdateRow (row);
 			} catch (Exception e) 
 			{
-				Debug.WriteLine (e.Message);
+				Debug.WriteLine(ColorExtensions.Method + "GetCell line 217: " + e.Message);
 
 			}
 			return cell;
@@ -259,7 +261,7 @@ namespace FavoriteMovies
 			} catch (Exception e) 
 			{
 				
-				Debug.WriteLine (e.Message);
+				Debug.WriteLine(ColorExtensions.Method +"GetCell line 263 " +  e.Message);
 				//throw;
 			}
 			return cell;
@@ -276,7 +278,7 @@ namespace FavoriteMovies
 
 			} catch (Exception e) {
 				
-				Debug.WriteLine (e.Message);
+				Debug.WriteLine(ColorExtensions.Method + "GetCell line 280:" + e.Message);
 				throw;
 			}
 		}
@@ -303,7 +305,7 @@ namespace FavoriteMovies
 				cell.UpdateRow (row);
 				return cell;
 			} catch (Exception e) {
-				Debug.WriteLine (e.Message);
+				Debug.WriteLine(ColorExtensions.Method + "GetCell line 307: " + e.Message);
 				//throw;
 
 			}
@@ -333,7 +335,7 @@ namespace FavoriteMovies
 				cell.UpdateRow (row);
 				return cell;
 			} catch (Exception e) {
-				Debug.WriteLine (e.Message);
+				Debug.WriteLine(ColorExtensions.Method + "GetCell line 337: " + e.Message);
 				//throw;
 
 			}
@@ -363,7 +365,7 @@ namespace FavoriteMovies
 
 			} catch (Exception e) {
 
-				Debug.WriteLine (e.Message);
+				Debug.WriteLine(ColorExtensions.Method + "GetItemsCount Line 367: " +  e.Message);
 				throw;
 			}
 		}
@@ -376,7 +378,7 @@ namespace FavoriteMovies
 				cell.UpdateRow (row);
 				return cell;
 			} catch (Exception e) {
-				Debug.WriteLine (e.Message);
+				Debug.WriteLine(ColorExtensions.Method + "GetCell Line380: " +  e.Message);
 
 			}
 			return cell;
@@ -413,7 +415,7 @@ namespace FavoriteMovies
 
 			} catch (Exception e) {
 
-				Debug.WriteLine (e.Message);
+				Debug.WriteLine(ColorExtensions.Method + e.Message);
 				//throw;
 			}
 		}
@@ -426,7 +428,7 @@ namespace FavoriteMovies
 				cell.UpdateRow (row);
 				return cell;
 			} catch (Exception e) {
-				Debug.WriteLine (e.Message);
+				Debug.WriteLine(ColorExtensions.Method + e.Message);
 
 			}
 			return cell;

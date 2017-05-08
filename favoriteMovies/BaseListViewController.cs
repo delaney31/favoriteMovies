@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -184,6 +184,7 @@ namespace FavoriteMovies
 								}
 
 								movieDetail.id = null;
+
 								if (movieDetail is MovieCloud) 
 								{
 								//	movieDetail.ReleaseDate = DateTime.Parse (((MovieCloud)movieDetail).ReleaseDate);
@@ -213,7 +214,7 @@ namespace FavoriteMovies
 								await postService.InsertMovieAsync (movieCloud);
 
 								movieDetail.cloudId = movieCloud.id;
-
+								movieDetail.Favorite = true;
 								db.Insert (movieDetail, typeof (Movie));
 
 							}
@@ -273,7 +274,7 @@ namespace FavoriteMovies
 								//if (movieDetail is MovieCloud)
 								//	movieDetail.ReleaseDate = DateTime.Parse (((MovieCloud)movieDetail).ReleaseDate);
 
-								db.Insert (movieDetail, typeof (Movie));
+
 
 								MovieCloud movieCloud = new MovieCloud ();
 								movieCloud.Adult = movieDetail.Adult;
@@ -294,6 +295,11 @@ namespace FavoriteMovies
 								movieCloud.VoteCount = movieDetail.VoteCount.ToString ();
 								movieCloud.CustomListID = custlistCloud.Id;
 								await postService.InsertMovieAsync (movieCloud);
+								movieDetail.cloudId = movieCloud.id;
+								movieDetail.Favorite = true;
+								db.Insert (movieDetail, typeof (Movie));
+
+
 							}
 						}
 

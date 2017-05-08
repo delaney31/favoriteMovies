@@ -199,20 +199,24 @@ namespace FavoriteMovies
 
 		void SwitchRemoveAds_ValueChanged (object sender, EventArgs e)
 		{
-            switchRemoveAds.ValueChanged -= SwitchRemoveAds_ValueChanged;
-			if (switchRemoveAds.Enabled) 
-            {
-                if (iap.CanMakePayments) 
-                {
-                    // initiate payment
-                    iap.BuyProduct (ProductId);
-                  
-                }
+            		
+			if (switchRemoveAds.On == true) 
+            		{
+		                if (iap.CanMakePayments) 
+		                {   
+				    switchRemoveAds.ValueChanged -= SwitchRemoveAds_ValueChanged;
+		                    // initiate payment
+		                    iap.BuyProduct (ProductId);
+		                  
+		                }
 				else 
-                {
-					switchRemoveAds.Enabled = false;
+	        		{
+				    switchRemoveAds.On = false;
 				}
 			} 
+			else
+			   ColorExtensions.CurrentUser.removeAds = false;
+				
 		}
 
 		void SwitchDarktheme_ValueChanged (object sender, EventArgs e)
@@ -242,7 +246,8 @@ namespace FavoriteMovies
 			ColorExtensions.CurrentUser.phone = txtPhoneNumber.Text;
 			if(isEmail)
 			   ColorExtensions.CurrentUser.email = txtEmail.Text;
-            InsertCurrentUser ();
+            		InsertCurrentUser ();
+
 		}
 
 
@@ -287,15 +292,15 @@ namespace FavoriteMovies
 					// Update list to remove any non-consumable products that were
 					// purchased
 					iap.RestorePreviousPurchases ();
-                    ColorExtensions.CurrentUser.removeAds = false;
-                    switchRemoveAds.On = false;
+                   			 ColorExtensions.CurrentUser.removeAds = false;
+                    			switchRemoveAds.On = false;
 				};
 
 			iap.InAppPurchaseProcessingError += (string message) => 
 			{
 				Debug.WriteLine (message);
 				ColorExtensions.CurrentUser.removeAds = false;
-                switchRemoveAds.On = false;
+                		switchRemoveAds.On = false;
 			};
 		}
 

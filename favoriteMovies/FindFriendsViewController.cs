@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using BigTed;
 using Foundation;
@@ -38,14 +39,19 @@ namespace FavoriteMovies
 		[Export ("CustomListChangeReceived:")]
 		public async void CustomListChangeReceived (NSNotification n)
 		{
-			BTProgressHUD.Show ();
-			tableItems = await GetUserContactsAsync ();
-			tableSource = new ConnectCloudTableSource (tableItems, this);
+			try {
+				BTProgressHUD.Show ();
+				tableItems = await GetUserContactsAsync ();
+				tableSource = new ConnectCloudTableSource (tableItems, this);
 
-			table.Source = tableSource;
-			if (tableItems.FirstOrDefault ().id != "0")
-				await ((ConnectCloudTableSource)tableSource).updateImages ();
-			BTProgressHUD.Dismiss ();
+				table.Source = tableSource;
+				if (tableItems.FirstOrDefault ().id != "0")
+					await ((ConnectCloudTableSource)tableSource).updateImages ();
+				BTProgressHUD.Dismiss ();
+			} catch (Exception e)
+			{
+				Debug.WriteLine (e.Message);
+			}
 		}
 	}
 }

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using UIKit;
 using SidebarNavigation;
 using System.Diagnostics;
@@ -204,7 +204,7 @@ namespace FavoriteMovies
 			};
 
 			var tab9 = new LogOutController ();
-			tab9.Title = "Log Out";
+			tab9.Title = "Sign Out";
 			tab9.View.BackgroundColor = UIColor.White;
 
 			var uinc9 = new UINavigationController (tab9);

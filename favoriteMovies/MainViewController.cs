@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
@@ -231,7 +231,7 @@ namespace FavoriteMovies
 				//BTProgressHUD.Show ();
                
 				if (ColorExtensions.CurrentUser.suggestmovies)
-                      GetCollectionData ();
+                      		    GetCollectionData ();
 				LoadCollectionViewControllers ();
 				UpdateCustomViews ();
 				FavoritesDisplay ();
@@ -545,7 +545,6 @@ namespace FavoriteMovies
 				topRatedController.CollectionView.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha);
 				topRatedController.CollectionView.RegisterClassForCell (typeof (MovieCell), TopRatedCollectionViewController.movieCellId);
 
-
 				nowPlayingController = new NowPlayingCollectionViewController (flowLayout, nowPlaying, this);
 				nowPlayingController.CollectionView.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha);
 				nowPlayingController.CollectionView.RegisterClassForCell (typeof (MovieCell), NowPlayingCollectionViewController.movieCellId);
@@ -791,26 +790,28 @@ namespace FavoriteMovies
 		public void UpdateRow (Movie element)
 		{
 		try 
+		{
+			if (element.HighResPosterPath != null) 
 			{
-				if (element.HighResPosterPath != null) {
-					var uri = new Uri (element.HighResPosterPath);
-					var imgUrl = new NSUrl (baseUrl + uri.AbsoluteUri.Substring (8));
-					ImageView.SetImage (imgUrl, UIImage.FromBundle ("blank.png"));
-
-				} else 
-				{
-					var uri = new Uri (element.PosterPath);
-					var imgUrl = new NSUrl (baseUrl + uri.AbsoluteUri.Substring (8));
-					ImageView.SetImage (imgUrl, UIImage.FromBundle ("blank.png"));
-				}
-				if (ColorExtensions.MovieIsFavorite (element.id.ToString ())) 
-				{
-					//ContentView.Layer.BorderColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR).CGColor;
-					//ContentView.Layer.BorderWidth = 2.0f;
-				} else {
-					//ContentView.Layer.BorderColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f).CGColor;
-				}
-			} catch (SQLite.SQLiteException ex) 
+			    var uri = new Uri (element.HighResPosterPath);
+			    var imgUrl = new NSUrl (baseUrl + uri.AbsoluteUri.Substring (8));
+			    ImageView.SetImage (imgUrl, UIImage.FromBundle ("blank.png"));
+					  
+			} else 
+			{
+			   var uri = new Uri (element.PosterPath);
+			   var imgUrl = new NSUrl (baseUrl + uri.AbsoluteUri.Substring (8));
+			   ImageView.SetImage (imgUrl, UIImage.FromBundle ("blank.png"));
+			}
+			if (ColorExtensions.MovieIsFavorite (element.id.ToString ())) 
+			{
+				//ContentView.Layer.BorderColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR).CGColor;
+				//ContentView.Layer.BorderWidth = 2.0f;
+			} else {
+				//ContentView.Layer.BorderColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f).CGColor;
+			}
+			} 
+			   catch (SQLite.SQLiteException ex) 
 			{
 				//no favorites yet
 				Debug.Write (ex.Message);

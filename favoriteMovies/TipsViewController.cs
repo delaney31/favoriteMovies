@@ -14,12 +14,14 @@ namespace FavoriteMovies
 
 
 
-        public override void ViewWillAppear (bool animated)
-        {
-            base.ViewWillAppear (animated);
-			if (NavigationController != null)
+		public override void ViewWillAppear (bool animated)
+        	{
+           	base.ViewWillAppear (animated);
+		if (NavigationController != null) 
+			{
 				NavigationController.NavigationBar.Translucent = true;
-        }
+			}
+		}
 		public override void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();

@@ -109,6 +109,9 @@ namespace FavoriteMovies
 				}
 			}
 		}
+
+		public static string Method = "METHOD :";
+
 		public static byte [] ConvertImageToByteArray (UIImage image)
 		{
 			byte [] byteArray;
