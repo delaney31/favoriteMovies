@@ -11,6 +11,15 @@ namespace FavoriteMovies
 	{
 		iCarousel carousel;
 		UIImageView background;
+
+
+
+        public override void ViewWillAppear (bool animated)
+        {
+            base.ViewWillAppear (animated);
+			if (NavigationController != null)
+				NavigationController.NavigationBar.Translucent = true;
+        }
 		public override void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
@@ -21,10 +30,11 @@ namespace FavoriteMovies
 			background.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 			background.ContentMode = UIViewContentMode.ScaleToFill;
 			background.AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight;
+          
 			View.AddSubview (background);
 
 			// create the carousel
-			carousel = new iCarousel (new CGRect (10, 50, 300.0f, 500.0f));
+			carousel = new iCarousel (new CGRect (10, 57, 300.0f, 500.0f));
 			carousel.Type = iCarouselType.Cylinder;
 			carousel.DataSource = new CarouselDataSource ();
 			carousel.AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight;

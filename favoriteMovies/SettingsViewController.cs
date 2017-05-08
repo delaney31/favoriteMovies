@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using CoreGraphics;
 using FavoriteMoviesPCL;
 using Foundation;
 using MovieFriends;
@@ -26,8 +27,9 @@ namespace FavoriteMovies
 		public SettingsViewController () : base ("SettingsViewController", null)
 		{
 			signUpImage = UIImage.FromBundle ("1481507483_compose.png");
-			iap = new InAppPurchaseManager();
-			//iap.SimulateiTunesAppStore = true;
+			iap = new InAppPurchaseManager ();
+            iap.SimulateiTunesAppStore = false;
+         
 			//iap.SimulatedRestoredPurchaseProducts = "product.nonconsumable,antivirus.nonrenewingsubscription.duration6months,content.nonconsumable.downloadable";
 			AttachToPurchaseManager (null, iap);
 
@@ -36,6 +38,10 @@ namespace FavoriteMovies
 		public override async void ViewWillAppear (bool animated)
 		{
 			base.ViewWillAppear (animated);
+
+
+         
+
 			// Perform any additional setup after loading the view, typically from a nib.
 			NavigationItem.Title = "Profile";
 			NavigationController.NavigationBar.Translucent = true;
@@ -71,8 +77,9 @@ namespace FavoriteMovies
 			profileImageTapGestureRecognizer.AddTarget (() => { HandleAction (); });
 			userProfileImage.AddGestureRecognizer (profileImageTapGestureRecognizer);
 			View.BackgroundColor= UIColor.White;//UIColor.Clear.FromHexString ("#e9755e", 1.0f);
-			View.Add (userProfileImage);
 
+			View.Add (userProfileImage);
+         
 			// validation
 			txtEmail.EditingDidEnd += (object sender, EventArgs e) => 
 			{
@@ -192,19 +199,20 @@ namespace FavoriteMovies
 
 		void SwitchRemoveAds_ValueChanged (object sender, EventArgs e)
 		{
-
-			if (!ColorExtensions.CurrentUser.removeAds) {
-				if (iap.CanMakePayments)
-					// initiate payment
-					iap.BuyProduct (ProductId);
-					//iap.RestorePreviousPurchases ();
-
-				else {
+            switchRemoveAds.ValueChanged -= SwitchRemoveAds_ValueChanged;
+			if (switchRemoveAds.Enabled) 
+            {
+                if (iap.CanMakePayments) 
+                {
+                    // initiate payment
+                    iap.BuyProduct (ProductId);
+                  
+                }
+				else 
+                {
 					switchRemoveAds.Enabled = false;
 				}
-			} else
-				ColorExtensions.CurrentUser.removeAds = false;
-
+			} 
 		}
 
 		void SwitchDarktheme_ValueChanged (object sender, EventArgs e)
@@ -270,7 +278,7 @@ namespace FavoriteMovies
 				{
 					// Update list to remove any non-consumable products that were
 					// purchased
-					ColorExtensions.CurrentUser.removeAds = !ColorExtensions.CurrentUser.removeAds;
+					ColorExtensions.CurrentUser.removeAds = true;
 					switchRemoveAds.On = true;
 				};
 
@@ -278,13 +286,16 @@ namespace FavoriteMovies
 				{
 					// Update list to remove any non-consumable products that were
 					// purchased
-					ColorExtensions.CurrentUser.removeAds = !ColorExtensions.CurrentUser.removeAds;
-					switchRemoveAds.On = true;
+					iap.RestorePreviousPurchases ();
+                    ColorExtensions.CurrentUser.removeAds = false;
+                    switchRemoveAds.On = false;
 				};
 
 			iap.InAppPurchaseProcessingError += (string message) => 
 			{
 				Debug.WriteLine (message);
+				ColorExtensions.CurrentUser.removeAds = false;
+                switchRemoveAds.On = false;
 			};
 		}
 

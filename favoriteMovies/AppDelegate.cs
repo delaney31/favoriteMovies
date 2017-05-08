@@ -99,18 +99,18 @@ namespace FavoriteMovies
 			PushNotificationManager pushmanager = PushNotificationManager.PushManager;
 			pushmanager.Delegate = this;
 
-			//if (launchOptions != null) {
-			//	if (launchOptions.ContainsKey (UIApplication.LaunchOptionsRemoteNotificationKey)) {
-			//		pushmanager.HandlePushReceived (launchOptions);
-			//	}
-			//}
+			if (launchOptions != null) {
+				if (launchOptions.ContainsKey (UIApplication.LaunchOptionsRemoteNotificationKey)) {
+					pushmanager.HandlePushReceived (launchOptions);
+				}
+			}
 			pushmanager.StartLocationTracking ();
 			pushmanager.RegisterForPushNotifications ();
 
 		
 						// Code to start the Xamarin Test Cloud Agent
 			#if ENABLE_TEST_CLOUD
-						Xamarin.Calabash.Start ();
+					Xamarin.Calabash.Start ();
 			#endif
 
 			return true;

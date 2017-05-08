@@ -71,7 +71,7 @@ namespace FavoriteMovies
 			int cnt = 0;
 			CGRect lastLabelFrame = new CGRect ();
 			CGRect lastCollectionFrame = new CGRect ();
-
+            nfloat lastViewPostion = 0;
 
 			BTProgressHUD.Dismiss ();
 			if (this.profileImage.Image == null) {
@@ -172,13 +172,15 @@ namespace FavoriteMovies
 
 					viewController.CollectionView.BackgroundColor = View.BackgroundColor;
 					viewController.CollectionView.RegisterClassForCell (typeof (MovieCell), UserCollectionViewController.movieCellId);
-					if (cnt == 0) {
-						viewController.CollectionView.Frame = new CGRect (-35, custlistName.Frame.Y + custlistName.Frame.Height + 5, 345, 150);
-
-					} else
-						viewController.CollectionView.Frame = new CGRect (-35, lastCollectionFrame.Y + lastCollectionFrame.Height + 45, 345, 150);
-
-
+                    if (cnt == 0) {
+                        viewController.CollectionView.Frame = new CGRect (-35, custlistName.Frame.Y + custlistName.Frame.Height + 5, 345, 150);
+                        lastViewPostion = viewController.CollectionView.Frame.Y + viewController.CollectionView.Frame.Height;
+                    } else 
+                    {
+                        viewController.CollectionView.Frame = new CGRect (-35, lastCollectionFrame.Y + lastCollectionFrame.Height + 45, 345, 150);
+						lastViewPostion = lastViewPostion + viewController.CollectionView.Frame.Height;
+                    }
+                  
 					lastCollectionFrame = viewController.CollectionView.Frame;
 					scrollView.AddSubview (custlistName);
 					scrollView.AddSubview (viewController.CollectionView);
@@ -191,7 +193,7 @@ namespace FavoriteMovies
 			//scrollView.SizeToFit ();
 			scrollView.Frame = new CGRect () { X = View.Frame.X, Y = 60, Width = View.Frame.Width, Height = View.Frame.Height };
 			//For scrolling to work the scrollview Content size has to be bigger than the View.Frame.Height
-			scrollView.ContentSize = new CGSize (320, lastCollectionFrame.Y + lastCollectionFrame.Height+ 60);
+			scrollView.ContentSize = new CGSize (320, lastViewPostion + 250);
 			//scrollView.ContentOffset = new CGPoint (0, -scrollView.ContentInset.Top);
 			scrollView.Bounces = true;
 
