@@ -204,7 +204,7 @@ namespace FavoriteMovies
             		{
 		                if (iap.CanMakePayments) 
 		                {   
-				    switchRemoveAds.ValueChanged -= SwitchRemoveAds_ValueChanged;
+				            switchRemoveAds.ValueChanged -= SwitchRemoveAds_ValueChanged;
 		                    // initiate payment
 		                    iap.BuyProduct (ProductId);
 		                  
@@ -246,7 +246,7 @@ namespace FavoriteMovies
 			ColorExtensions.CurrentUser.phone = txtPhoneNumber.Text;
 			if(isEmail)
 			   ColorExtensions.CurrentUser.email = txtEmail.Text;
-            		InsertCurrentUser ();
+            InsertCurrentUser ();
 
 		}
 
@@ -292,15 +292,15 @@ namespace FavoriteMovies
 					// Update list to remove any non-consumable products that were
 					// purchased
 					iap.RestorePreviousPurchases ();
-                   			 ColorExtensions.CurrentUser.removeAds = false;
-                    			switchRemoveAds.On = false;
+                   	ColorExtensions.CurrentUser.removeAds = false;
+                    switchRemoveAds.On = false;
 				};
 
 			iap.InAppPurchaseProcessingError += (string message) => 
 			{
 				Debug.WriteLine (message);
 				ColorExtensions.CurrentUser.removeAds = false;
-                		switchRemoveAds.On = false;
+                switchRemoveAds.On = false;
 			};
 		}
 

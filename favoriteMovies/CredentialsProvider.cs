@@ -84,7 +84,8 @@ namespace FavoriteMovies
 		public void Register (string email, string userName, string password, Action successCallback, Action<LoginScreenFaultDetails> failCallback)
 		{
 			java.lang.String phoneNumber = "";
-			CNContact currentUser;
+			CNContact currentUser = null;
+            string CityName = "", State = "", Country = "", zip = "";
 			// If registration was successfully completed
 			DelayInvoke (async () => 
 			{
@@ -93,30 +94,35 @@ namespace FavoriteMovies
 						failCallback (new LoginScreenFaultDetails { PasswordErrorMessage = "Password must be at least 4 chars." });
 					} else {
 						await postService.InitializeStoreAsync ();
-						var locator = CrossGeolocator.Current;
-						locator.DesiredAccuracy = 50;
-						string CityName = "", State = "", Country = "", zip = "";
-						if (CLLocationManager.LocationServicesEnabled) 
-						{
-							var position = await locator.GetPositionAsync (timeoutMilliseconds: 10000);
+                        try {
+                            var locator = CrossGeolocator.Current;
+                            locator.DesiredAccuracy = 50;
 
-							Console.WriteLine ("Position Status: {0}", position.Timestamp);
-							Console.WriteLine ("Position Latitude: {0}", position.Latitude);
-							Console.WriteLine ("Position Longitude: {0}", position.Longitude);
+                            if (CLLocationManager.LocationServicesEnabled) {
+                                var position = await locator.GetPositionAsync (timeoutMilliseconds: 10000);
 
-							var url = String.Format ("http://api.geonames.org/findNearbyPostalCodes?lat={0}&lng={1}&username=delaney31", position.Latitude, position.Longitude);
-							WebRequest webRequest = WebRequest.Create (url);
-							WebResponse webResponse = webRequest.GetResponse ();
-							Stream stream = webResponse.GetResponseStream ();
-							XmlDocument xmlDocument = new XmlDocument ();
-							xmlDocument.Load (stream);
+                                Console.WriteLine ("Position Status: {0}", position.Timestamp);
+                                Console.WriteLine ("Position Latitude: {0}", position.Latitude);
+                                Console.WriteLine ("Position Longitude: {0}", position.Longitude);
 
-							CityName = xmlDocument.SelectNodes ("geonames") [0].SelectSingleNode ("code").SelectSingleNode ("name").InnerText;
-							State = xmlDocument.SelectNodes ("geonames") [0].SelectSingleNode ("code").SelectSingleNode ("adminCode1").InnerText;
-							Country = xmlDocument.SelectNodes ("geonames") [0].SelectSingleNode ("code").SelectSingleNode ("countryCode").InnerText;
-							zip = xmlDocument.SelectNodes ("geonames") [0].SelectSingleNode ("code").SelectSingleNode ("postalcode").InnerText;
-						}
-						currentUser = GetCurrentUser (email);
+                                var url = String.Format ("http://api.geonames.org/findNearbyPostalCodes?lat={0}&lng={1}&username=delaney31", position.Latitude, position.Longitude);
+                                WebRequest webRequest = WebRequest.Create (url);
+                                WebResponse webResponse = webRequest.GetResponse ();
+                                Stream stream = webResponse.GetResponseStream ();
+                                XmlDocument xmlDocument = new XmlDocument ();
+                                xmlDocument.Load (stream);
+
+                                CityName = xmlDocument.SelectNodes ("geonames") [0].SelectSingleNode ("code").SelectSingleNode ("name").InnerText;
+                                State = xmlDocument.SelectNodes ("geonames") [0].SelectSingleNode ("code").SelectSingleNode ("adminCode1").InnerText;
+                                Country = xmlDocument.SelectNodes ("geonames") [0].SelectSingleNode ("code").SelectSingleNode ("countryCode").InnerText;
+                                zip = xmlDocument.SelectNodes ("geonames") [0].SelectSingleNode ("code").SelectSingleNode ("postalcode").InnerText;
+                            }
+                            currentUser = GetCurrentUser (email);
+                        }
+                        catch(Exception ex)
+                        {
+                            Debug.WriteLine ((ex.Message));
+                        }
 						UserCloud userCloud;
 						if (currentUser != null) 
 						{

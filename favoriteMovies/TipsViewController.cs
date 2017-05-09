@@ -7,13 +7,23 @@ using UIKit;
 
 namespace FavoriteMovies
 {
-	public class TipsViewController : UIViewController
+	public class TipsViewController : BaseController
 	{
 		iCarousel carousel;
 		UIImageView background;
 
 
+        public override void ViewDidAppear (bool animated)
+        {
+            base.ViewDidAppear (animated);
+            NewsFeedTableSource.HideTabBar ((UIApplication.SharedApplication.Delegate as AppDelegate).rootViewController.TabController, View.BackgroundColor);
+        }
 
+        public override void ViewWillDisappear (bool animated)
+        {
+            base.ViewWillDisappear (animated);
+			NewsFeedTableSource.ShowTabBar ((UIApplication.SharedApplication.Delegate as AppDelegate).rootViewController.TabController);
+        }
 		public override void ViewWillAppear (bool animated)
         	{
            	base.ViewWillAppear (animated);
@@ -32,7 +42,7 @@ namespace FavoriteMovies
 			background.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 			background.ContentMode = UIViewContentMode.ScaleToFill;
 			background.AutoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight;
-          
+			
 			View.AddSubview (background);
 
 			// create the carousel
