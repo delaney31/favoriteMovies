@@ -154,6 +154,9 @@ namespace FavoriteMovies
 			get { return _user; }
 			set {_user = value;}
 		}
+
+		public static bool NoInternet { get; internal set; }
+
 		// resize the image to be contained within a maximum width and height, keeping aspect ratio
 		public static  UIImage MaxResizeImage (UIImage sourceImage, float maxWidth, float maxHeight)
 		{

@@ -85,6 +85,7 @@ namespace FavoriteMovies
 		{
 			java.lang.String phoneNumber = "";
 			CNContact currentUser = null;
+			bool unique = false;
             string CityName = "", State = "", Country = "", zip = "";
 			// If registration was successfully completed
 			DelayInvoke (async () => 
@@ -92,9 +93,11 @@ namespace FavoriteMovies
 				try {
 					if (password.Length < 4) {
 						failCallback (new LoginScreenFaultDetails { PasswordErrorMessage = "Password must be at least 4 chars." });
-					} else {
-						await postService.InitializeStoreAsync ();
+					} else 
+					{
+						
                         try {
+							await postService.InitializeStoreAsync ();
                             var locator = CrossGeolocator.Current;
                             locator.DesiredAccuracy = 50;
 
@@ -119,29 +122,35 @@ namespace FavoriteMovies
                             }
                             currentUser = GetCurrentUser (email);
                         }
+						catch (WebException e) 
+						{
+							ColorExtensions.NoInternet = true;
+						}
                         catch(Exception ex)
                         {
                             Debug.WriteLine ((ex.Message));
                         }
-						UserCloud userCloud;
-						if (currentUser != null) 
-						{
-							if (Country != "") 
-							{
-								var util = PhoneNumberUtil.getInstance ();
-								var number = util.parse (currentUser.PhoneNumbers.FirstOrDefault ().Value.ValueForKey (new NSString ("digits")).ToString (), Country);
-								phoneNumber = util.format (number, PhoneNumberUtil.PhoneNumberFormat.E164);
-							}
-							userCloud = new UserCloud () { firstname = currentUser.GivenName ?? string.Empty, lastname = currentUser.FamilyName ?? string.Empty, phone = phoneNumber ?? string.Empty, email = email, username = userName, city = CityName, state = State, country = Country, zip = zip };
+						UserCloud userCloud = null;
+						if (!ColorExtensions.NoInternet) {
+							if (currentUser != null) {
+								if (Country != "") {
+									var util = PhoneNumberUtil.getInstance ();
+									var number = util.parse (currentUser.PhoneNumbers.FirstOrDefault ().Value.ValueForKey (new NSString ("digits")).ToString (), Country);
+									phoneNumber = util.format (number, PhoneNumberUtil.PhoneNumberFormat.E164);
+								}
+								userCloud = new UserCloud () { firstname = currentUser.GivenName ?? string.Empty, lastname = currentUser.FamilyName ?? string.Empty, phone = phoneNumber ?? string.Empty, email = email, username = userName, city = CityName, state = State, country = Country, zip = zip };
 
-						} else
-							userCloud = new UserCloud () { email = email, username = userName, city = CityName, state = State, country = Country, zip = zip };
+							} else
+								userCloud = new UserCloud () { email = email, username = userName, city = CityName, state = State, country = Country, zip = zip };
 
-						var unique = await postService.InsertUserAsync (userCloud);
 
-						if (!unique)
+
+							unique = await postService.InsertUserAsync (userCloud);
+						}
+						if (!unique && !ColorExtensions.NoInternet)
 							failCallback (new LoginScreenFaultDetails { UserNameErrorMessage = "This username already exits." });
-						else {
+						else 
+						{
 
 
 							var notification = NSNotification.FromName (Constants.CurrentUserSetNotification, new NSObject ());
