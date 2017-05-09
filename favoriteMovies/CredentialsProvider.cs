@@ -168,7 +168,8 @@ namespace FavoriteMovies
 							ColorExtensions.CurrentUser.email = email;
 							ColorExtensions.CurrentUser.password = password;
 							ColorExtensions.CurrentUser.username = userName;
-							ColorExtensions.CurrentUser.Id = userCloud.Id;
+							if(!ColorExtensions.NoInternet)
+							   ColorExtensions.CurrentUser.Id = userCloud.Id;
 							ColorExtensions.CurrentUser.city = CityName;
 							ColorExtensions.CurrentUser.country = Country;
 							ColorExtensions.CurrentUser.state = State;
@@ -178,7 +179,7 @@ namespace FavoriteMovies
 							await AddUserAsync (ColorExtensions.CurrentUser);
 							successCallback ();
 						}
-
+                        successCallback ();
 					}
 
 				} catch (Exception ex) {
