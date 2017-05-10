@@ -109,7 +109,7 @@ namespace FavoriteMovies
 			};
 
 			var mainView = new MainViewController ();
-			mainView.Title = "Movies";
+
 			mainView.TabBarItem.SetFinishedImages (UIImage.FromBundle ("ic_movie.png"), UIImage.FromBundle ("ic_movie.png"));
 
 

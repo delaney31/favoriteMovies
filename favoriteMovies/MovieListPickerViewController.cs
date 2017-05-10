@@ -16,11 +16,15 @@ namespace FavoriteMovies
 		public MovieListPickerViewController (Movie movieDetail, bool fromAddList) : base (movieDetail, fromAddList)
 		{
 		}
-
+        public override void ViewDidAppear (bool animated)
+        {
+            base.ViewDidAppear (animated);
+          
+        }
 		public override void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
-			NavigationItem.Title = "Share Lists";
+			//NavigationItem.Title = "Share Your Movie Lists";
 		}
 	}
 

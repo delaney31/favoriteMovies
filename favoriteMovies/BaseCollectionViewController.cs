@@ -132,7 +132,7 @@ namespace FavoriteMovies
 		public override void ItemSelected (UICollectionView collectionView, NSIndexPath indexPath)
 		{
 			try {
-				NewsFeedTableSource.ShowTabBar (viewController.TabController);
+				//NewsFeedTableSource.ShowTabBar (viewController.TabController);
 				viewController.NavController.SetNavigationBarHidden (false, true);
 				var row = _items [indexPath.Row];
 				var bounds = UIScreen.MainScreen.Bounds;
@@ -270,7 +270,7 @@ namespace FavoriteMovies
 		{
 			try {
 				
-				NewsFeedTableSource.ShowTabBar (viewController.TabController);
+				//NewsFeedTableSource.ShowTabBar (viewController.TabController);
 				viewController.NavController.SetNavigationBarHidden (false, true);
 				var row = _items [indexPath.Row];
 				//MainViewController.OldCustomListToRefresh = this.Row;

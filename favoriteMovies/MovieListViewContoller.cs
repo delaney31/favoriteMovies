@@ -27,7 +27,7 @@ namespace FavoriteMovies
 			tableSource = new TableSource<ICustomList> (movieItems, this);
 			table.Source = tableSource;
 			table.AllowsSelectionDuringEditing = true;
-			NavigationItem.Title = "Movies";
+			//NavigationItem.Title = "Movies";
 			Add (table);
 		}
 

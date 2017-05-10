@@ -117,6 +117,7 @@ namespace FavoriteMovies
 		{
 			base.ViewDidLoad ();
 
+			//NewsFeedTableSource.HideTabBar ((UIApplication.SharedApplication.Delegate as AppDelegate).rootViewController.TabController,View.BackgroundColor);
 
 			const string baseUrl = "https://image.tmdb.org/t/p/w300/";
 			scrollView.Frame = new CGRect () { X = View.Frame.X, Y = View.Frame.Y, Width = View.Frame.Width, Height = View.Frame.Height };
@@ -356,11 +357,12 @@ namespace FavoriteMovies
 		{
 			base.ViewWillDisappear (animated);
 			updateMovie (movieDetail);
+			NewsFeedTableSource.ShowTabBar ((UIApplication.SharedApplication.Delegate as AppDelegate).rootViewController.TabController);
+
 		}
 		public override void ViewDidAppear (bool animated)
 		{
 			base.ViewDidAppear (animated);
-			NewsFeedTableSource.HideTabBar ((UIApplication.SharedApplication.Delegate as AppDelegate).rootViewController.TabController,View.BackgroundColor);
 			nfloat lastViewPostion=0;
 			if (similarMovies.Count > 0) 
 			{
@@ -471,6 +473,7 @@ namespace FavoriteMovies
 		public override void ViewWillAppear (bool animated)
 		{
 			base.ViewWillAppear (animated);
+
 				try 
 				{
 				_embededMoveId = youtubeMovieId;

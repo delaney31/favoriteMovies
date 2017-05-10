@@ -40,14 +40,16 @@ namespace FavoriteMovies
 			this.ViewControllerSelected += (sender, e) => 
 			{
 				MainViewController.NewCustomListToRefresh = 1;
-				// Take action based on the tab being selected
-				//Important fact** NavigationalController is only available for the selectedViewController!!
-				if (TabBar.SelectedItem.Title == "Movies") 
-				{
-					NavigationController.NavigationBar.Hidden = false;
+                // Take action based on the tab being selected
+                //Important fact** NavigationalController is only available for the selectedViewController!!
+                if (TabBar.SelectedItem.Title == "Movies") {
+                    NavigationController.NavigationBar.Hidden = false;
 
-				} else
-					NavigationController.NavigationBar.Hidden  = true;
+                } else 
+                {
+                    NavigationController.NavigationBar.Hidden = true;
+                   
+                }
 			};
 		}
 	}

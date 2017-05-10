@@ -277,6 +277,14 @@ namespace FavoriteMovies
 
 			return ApplyBlur (self, blurRadius: 20, tintColor: tintColor, saturationDeltaFactor: 1.8f, maskImage: null);
 		}
+		
+        public static void DeleteAllSubviews (this UIView self, UIScrollView view)
+		{
+			foreach (UIView subview in view.Subviews) {
+				subview.RemoveFromSuperview ();
+			}
+
+		}
 
 		public static UIImage ApplyTintEffect (this UIImage self, UIColor tintColor)
 		{

@@ -202,13 +202,15 @@ namespace FavoriteMovies
             		
 			if (switchRemoveAds.On == true) 
             		{
-		                if (iap.CanMakePayments) 
-		                {   
-				            switchRemoveAds.ValueChanged -= SwitchRemoveAds_ValueChanged;
-		                    // initiate payment
-		                    iap.BuyProduct (ProductId);
-		                  
-		                }
+                if (iap.CanMakePayments) 
+                    {
+                    switchRemoveAds.ValueChanged -= SwitchRemoveAds_ValueChanged;
+                    // initiate payment
+                    iap.BuyProduct (ProductId);
+#if (DEBUG)
+                    ColorExtensions.CurrentUser.removeAds = true;
+#endif
+                    }
 				else 
 	        		{
 				    switchRemoveAds.On = false;

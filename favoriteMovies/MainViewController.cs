@@ -133,12 +133,12 @@ namespace FavoriteMovies
 
 				SideMenuController.ShowTipsController ();
 			}
-		
 
-			//NewsFeedTableSource.ShowTabBar (TabController);
-			TabController.NavigationController.NavigationBar.Hidden = false;
+
+            //NewsFeedTableSource.ShowTabBar (TabController);
+
 			UIApplication.SharedApplication.SetStatusBarHidden (false, true);
-
+            TabController.NavigationController.NavigationBar.Hidden = false;
 			//searchResultsController.TableView.ContentInset = new UIEdgeInsets (80, 0, 0, 0);
 			//HACK until i find out why when you open a movie details and come back the view.height changes.
 			if (View.Frame.Height == 504) {
@@ -150,7 +150,7 @@ namespace FavoriteMovies
 			////*****this fixes a problem with the uitableview adding space at the top after each selection*****
 			//Debug.Write (searchResultsController.TableView.ContentInset);
 			// adding label views to View. 
-
+			
 		}
 
 		public static void getUser ()
@@ -222,35 +222,35 @@ namespace FavoriteMovies
 
 		}
 
-		public override void ViewWillAppear (bool animated)
-		{
-			base.ViewWillAppear (animated);
+        public override void ViewWillAppear (bool animated)
+        {
+            base.ViewWillAppear (animated);
+		    TabController.NavigationController.NavigationBar.Hidden = false;
+			if (NewCustomListToRefresh == -1) {
+                //BTProgressHUD.Show ();
 
-			if (NewCustomListToRefresh == -1) 
-			{
-				//BTProgressHUD.Show ();
-               
-				if (ColorExtensions.CurrentUser.suggestmovies)
-                      		    GetCollectionData ();
-				LoadCollectionViewControllers ();
-				UpdateCustomViews ();
-				FavoritesDisplay ();
-				NewCustomListToRefresh = 0;
-				//BTProgressHUD.Dismiss ();
-			}
+                if (ColorExtensions.CurrentUser.suggestmovies)
+                    GetCollectionData ();
+                LoadCollectionViewControllers ();
+                UpdateCustomViews ();
+                FavoritesDisplay ();
+                NewCustomListToRefresh = 0;
+                //BTProgressHUD.Dismiss ();
+            }
 
-			SidebarController.Disabled = false;
-			if (NewCustomListToRefresh > 1) 
-			{
-				LoadCollectionViewControllers ();
-			}
-			if (NewCustomListToRefresh > 0)// 0 means nothing has changed and i don't have to refresh lists
-				FavoritesDisplay ();
-			
-			LoadViews ();
+            SidebarController.Disabled = false;
+            if (NewCustomListToRefresh > 1) {
+                LoadCollectionViewControllers ();
+            }
+            if (NewCustomListToRefresh > 0)// 0 means nothing has changed and i don't have to refresh lists
+                FavoritesDisplay ();
+
+            LoadViews ();
+			NewsFeedTableSource.ShowTabBar ((UIApplication.SharedApplication.Delegate as AppDelegate).rootViewController.TabController);
+
+
 
 		}
-
 		void UpdateCustomListMovies (int cnt)
 		{
 			var watch = System.Diagnostics.Stopwatch.StartNew ();
@@ -276,18 +276,11 @@ namespace FavoriteMovies
 
 		}
 
-		void DeleteAllSubviews (UIScrollView view)
-		{
-			foreach (UIView subview in view.Subviews) {
-				subview.RemoveFromSuperview ();
-			}
-
-		}
-
+		
 		void FavoritesDisplay ()
 		{
 			var watch = System.Diagnostics.Stopwatch.StartNew ();
-			DeleteAllSubviews (scrollView);
+			View.DeleteAllSubviews (scrollView);
 			//horizontalLine.Frame = new CGRect ();
 			velvetRopes.Frame = new CGRect ();
 			customLists = GetCustomLists ();
@@ -625,18 +618,14 @@ namespace FavoriteMovies
 				}
 			}
 		}
-		public override void ViewDidDisappear (bool animated)
-		{
-			base.ViewDidDisappear (animated);
-
-		}
+		
 		public override  void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
-
+            this.TabBarItem.Title = "Movies";
 			// Creates an instance of a custom View Controller that holds the results
 			searchResultsController = new SearchResultsViewController ();
-
+           
 			//Creates a search controller updater
 			var searchUpdater = new SearchResultsUpdator ();
 			searchUpdater.UpdateSearchResults += searchResultsController.Search;
@@ -681,7 +670,9 @@ namespace FavoriteMovies
 			//				SidebarController.ToggleMenu ();
 
 			//			}), true);
-
+			NavigationController.NavigationBar.Translucent = false;
+			NavigationController.NavigationBar.Hidden = true;
+			TabController.NavigationController.NavigationBar.Hidden = false;
 		}
 
 

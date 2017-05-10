@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -29,10 +29,18 @@ namespace FavoriteMovies
 			this.movieDetail = movieDetail;
 			this.fromAddList = fromAddList;
 		}
-
+         
+        public override void ViewDidAppear (bool animated)
+        {
+            base.ViewDidAppear (animated);
+           
+		}
 		public override void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
+			
+			//NavigationController.NavigationBar.Translucent = false;
+
 			var name = new NSString (Constants.CustomListChange);
 			NSNotificationCenter.DefaultCenter.AddObserver (this, new Selector (Constants.CustomListChangeReceived), name, null);
 			tableItems = GetMovieList ();
@@ -107,9 +115,8 @@ namespace FavoriteMovies
 			}
 
 			Add (table);
-
 		}
-
+       
 		[Export ("CustomListChangeReceived:")]
 		public async void CustomListChangeReceived (NSNotification n)
 		{ 
@@ -122,7 +129,7 @@ namespace FavoriteMovies
 		}
 
 
-		public void UpdateCustomAndMovieList (int? Id, bool upDateMovieDetail, List<ICustomList> tableItems, string cloudid=null)
+        public void UpdateCustomAndMovieList (int? Id, bool upDateMovieDetail, List<ICustomList> items, string cloudid=null)
 		{
 			BTProgressHUD.Show ();
 			Task.Run (async () => {
@@ -146,7 +153,7 @@ namespace FavoriteMovies
 						//await postService.DeleteAll (ColorExtensions.CurrentUser.Id);
 						if (Id == null) //creating a new list
 						{
-							var lis = tableItems.Where (x => x.cloudId == cloudid);
+							var lis = items.Where (x => x.cloudId == cloudid);
 							custlistCloud = new CustomListCloud ();
 							custlistCloud.Name = lis.FirstOrDefault ().name;
 							custlistCloud.order = lis.FirstOrDefault ().order;
@@ -154,11 +161,11 @@ namespace FavoriteMovies
 							custlistCloud.UserId = ColorExtensions.CurrentUser.Id;
 							await postService.InsertCustomListAsync (custlistCloud);
 						}
-						for (var list = 0; list < tableItems.Count; list++) 
+						for (var list = 0; list < items.Count; list++) 
 						{
-							if (tableItems [list].name != "add new") 
+							if (items [list].name != "add new") 
 							{
-								var item = tableItems [list] as CustomList;
+								var item = items [list] as CustomList;
 								if (custlistCloud.Id != null)
 									item.cloudId = custlistCloud.Id;
 								
@@ -166,11 +173,11 @@ namespace FavoriteMovies
 									db.InsertOrReplace (item, typeof (CustomList));
 
 								} else {
-									db.Insert (tableItems [list], typeof (Movie));
+									db.Insert (items [list], typeof (Movie));
 								}
 							}
 
-							if (movieDetail != null && (tableItems [list].id == Id)) {
+							if (movieDetail != null && (items [list].id == Id)) {
 								//get id of last inserted row
 								string sql = "select last_insert_rowid()";
 								var scalarValue = db.ExecuteScalar<string> (sql);
@@ -234,31 +241,31 @@ namespace FavoriteMovies
 						//var query = db.Table<CustomList> ();
 						AzureTablesService postService = AzureTablesService.DefaultService;
 						await postService.InitializeStoreAsync ();
-						foreach (var item in tableItems) {
+						foreach (var item in items) {
 							if (movieDetail.CustomListID == item.id)
 								return;
 						}
 
 						DeleteAll ();
 						await postService.DeleteAll (ColorExtensions.CurrentUser.Id);
-						for (var list = 0; list < tableItems.Count; list++) {
+						for (var list = 0; list < items.Count; list++) {
 
-							if (tableItems [list].name != "add new") {
-								var item = tableItems [list] as CustomList;
+							if (items [list].name != "add new") {
+								var item = items [list] as CustomList;
 								if (item != null) {
-									db.Insert (tableItems [list], typeof (CustomList));
-									custlistCloud.Name = tableItems [list].name;
-									custlistCloud.order = tableItems [list].order;
-									custlistCloud.shared = tableItems [list].shared;
+									db.Insert (items [list], typeof (CustomList));
+									custlistCloud.Name = items [list].name;
+									custlistCloud.order = items [list].order;
+									custlistCloud.shared = items [list].shared;
 									custlistCloud.UserId = ColorExtensions.CurrentUser.Id;
 									await postService.InsertCustomListAsync (custlistCloud);
 								} else {
 
-									db.Insert (tableItems [list], typeof (Movie));
+									db.Insert (items [list], typeof (Movie));
 								}
 							}
 
-							if (upDateMovieDetail && (tableItems [list].id == Id)) {
+							if (upDateMovieDetail && (items [list].id == Id)) {
 
 								//get id of last inserted row
 								string sql = "select last_insert_rowid()";
@@ -555,13 +562,10 @@ namespace FavoriteMovies
 				// insert the 'ADD NEW' row at the end of table display
 				tableView.InsertRows (new NSIndexPath []
 				{
-						NSIndexPath.FromRowSection (tableView.NumberOfRowsInSection (0), 0)
-				}, UITableViewRowAnimation.Fade);
-				// create a new item and add it to our underlying data (it is not intended to be permanent)
-				//if(tableItems.Equals(typeof(List<CustomList>)))
-				tableItems.Add (new CustomList () { name = "add new" });
-				//else
-				//	tableItems.Add (new Movie () { Name = "add new" });
+					NSIndexPath.FromRowSection (tableView.NumberOfRowsInSection (0), 0)
+				}, UITableViewRowAnimation.Automatic);
+				// create a new item and add it to our underlying data (it is not intended to be permanent)		
+				tableItems.Add (new CustomList () { name = "add new" });				
 				tableView.EndUpdates (); // applies the changes
 			} catch (Exception ex) { Debug.Write (ex.Message); }
 		}
@@ -695,9 +699,7 @@ namespace FavoriteMovies
 									listItem.order = 0;
 									listItem.custom = true;
 									listItem.name = textInputAlertController.TextFields [0].Text;
-									tableItems.Insert (0, listItem);
-									tableView.EndUpdates (); // applies the changes
-									tableView.ReloadData ();
+									tableItems.Insert (0, listItem);						
 									ArrangeCustomList (true);
 									var item = tableItems [(int)indexPath.Row] as CustomList;
 									if (item is CustomList) {
@@ -705,6 +707,8 @@ namespace FavoriteMovies
 									} else {
 										Owner.UpdateCustomAndMovieList (((Movie)tableItems [(int)tableView.NumberOfRowsInSection (0) - 1]).id, true, tableItems);
 									}
+                                    tableView.ReloadData ();
+                                    tableView.EndUpdates (); // applies the changes
 								}
 							} else {
 								new UIAlertView ("Duplicate!"

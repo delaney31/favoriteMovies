@@ -188,6 +188,7 @@ namespace FavoriteMovies
 				Console.WriteLine (@"Error{0}", e.Message + " No internet connection");
 				ShowAlert ("Limited Internet", "Your internet connection is down. Some items will not be available.", "Ok");
 				ColorExtensions.NoInternet = true;
+				ColorExtensions.CurrentUser.suggestmovies = false;
 			} catch (Exception e) 
 			{
 				Console.WriteLine (@"Error{0}", e.Message);

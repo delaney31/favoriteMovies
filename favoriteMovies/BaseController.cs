@@ -36,16 +36,7 @@ namespace FavoriteMovies
 		}
 
 
-
-		public BaseController ()
-		{
-		}
-
-		public override void ViewDidAppear (bool animated)
-		{
-			base.ViewDidAppear (animated);
-
-		}
+	
 		public override void ViewWillAppear (bool animated)
 		{
 			base.ViewWillAppear (animated);
@@ -53,18 +44,11 @@ namespace FavoriteMovies
 			NavController.NavigationBar.Frame = new CGRect () { X = 0, Y = 20, Width = 320, Height = 44 };
 			//loadPop.Hide ();
 			if ((UIApplication.SharedApplication.Delegate as AppDelegate).rootViewController.TabController != null)
-				NewsFeedTableSource.ShowTabBar ((UIApplication.SharedApplication.Delegate as AppDelegate).rootViewController.TabController ?? null);
+			   NewsFeedTableSource.ShowTabBar ((UIApplication.SharedApplication.Delegate as AppDelegate).rootViewController.TabController ?? null);
 
 		}
 
-		public override void ViewDidLoad ()
-		{
-			base.ViewDidLoad ();
-
-				
-
-
-		}
+		
 	}
 
 }
