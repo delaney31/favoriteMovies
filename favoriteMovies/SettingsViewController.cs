@@ -17,7 +17,7 @@ namespace FavoriteMovies
 	{
 
 		public AzureTablesService postService = AzureTablesService.DefaultService;
-		public static string ProductId = "com.jadesystemsinc.favoritemovies.productid";
+		public static string ProductId = "com.jadesystemsinc.favoritemovies.product";
 		UIImageView userProfileImage;
 		UIImagePickerController imagePicker;
 		static UIImage signUpImage;
