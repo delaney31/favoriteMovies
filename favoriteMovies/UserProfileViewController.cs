@@ -72,7 +72,7 @@ namespace FavoriteMovies
 			CGRect lastLabelFrame = new CGRect ();
 			CGRect lastCollectionFrame = new CGRect ();
             nfloat lastViewPostion = 0;
-
+        	NavigationController.NavigationBar.Translucent = true;
 			BTProgressHUD.Dismiss ();
 			if (this.profileImage.Image == null) {
 				profileImage.Image = UIImage.FromBundle ("blank.png");

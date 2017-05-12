@@ -85,11 +85,15 @@ namespace FavoriteMovies
 			return feedItemsList;
 		}
 
-		internal async static Task<List<MDCard>> GetMDCardItems ()
+		internal  static List<MDCard> GetMDCardItems ()
 		{
 			List<MDCard> feedItemsList = new List<MDCard> ();
 			AzureTablesService postService = AzureTablesService.DefaultService;
-			await postService.InitializeStoreAsync ();
+			List<PostItem> result = new List<PostItem> ();
+			//postService = AzureTablesService.DefaultService;
+			Task.Run (async () => {
+				await postService.InitializeStoreAsync ();
+			}).Wait ();
 			try {
 				WebRequest webRequest = WebRequest.Create (url);
 				WebResponse webResponse = webRequest.GetResponse ();
@@ -169,8 +173,11 @@ namespace FavoriteMovies
 						feed.Content = feedItem.Description;
 					}
 
+					Task.Run (async () => 
+					{
+						result = await postService.GetCloudLike (feed.Title);
+					}).Wait ();
 
-					var result = await postService.GetCloudLike (feed.Title);
 
 					if (result.Count > 0) {
 						feedItem.likeLabel.Text = result.Where (x => x.UserId == ColorExtensions.CurrentUser.Id).Count () > 0 ? "Unlike" : "Like";
@@ -186,9 +193,9 @@ namespace FavoriteMovies
 			} catch (WebException e) 
 			{
 				Console.WriteLine (@"Error{0}", e.Message + " No internet connection");
-				ShowAlert ("Limited Internet", "Your internet connection is down. Some items will not be available.", "Ok");
+				ShowAlert ("Limited Internet", "Your internet connection is down. Many items will not be available.", "Ok");
 				ColorExtensions.NoInternet = true;
-				ColorExtensions.CurrentUser.suggestmovies = false;
+				//ColorExtensions.CurrentUser.suggestmovies = false;
 			} catch (Exception e) 
 			{
 				Console.WriteLine (@"Error{0}", e.Message);
@@ -246,10 +253,10 @@ namespace FavoriteMovies
 
 					//foreach (var list in feedItemsList) {
 
-						if (feedItem.Title != null) 
-						{
-							db.InsertOrReplace (feedItem, typeof (FeedItem));
-						}
+					if (feedItem.Title != null) 
+					{
+						db.InsertOrReplace (feedItem, typeof (FeedItem));
+					}
 
 					string sql = "select last_insert_rowid()";
 					var scalarValue = db.ExecuteScalar<string> (sql);

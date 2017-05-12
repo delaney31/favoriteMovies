@@ -26,13 +26,19 @@ namespace FavoriteMovies
 			tableSource = new ConnectCloudTableSource (tableItems, this);
 
 			table.Source = tableSource;
+
+			table.BackgroundColor =  UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f) ;
+
 			await ((ConnectCloudTableSource)tableSource).updateImages ();
-			table.ContentInset = new UIEdgeInsets (64, 0, 49, 0);
 			View.Add (table);
-			//NavigationController.NavigationBar.Translucent = false;
+			
 		 	
 		}
-
+		public override void ViewDidAppear (bool animated)
+		{
+			base.ViewDidAppear (animated);
+            NavigationController.NavigationBar.Translucent = false;
+		}
 
 
 

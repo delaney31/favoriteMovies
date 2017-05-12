@@ -32,16 +32,16 @@ namespace FavoriteMovies
 		static int SeparationBuffer = 20;
 		static int SpaceBetweenListTypes = 50;
 		static int MinimumLineSpacing = 10;
-		static int DefaultYPositionTopRatedLabel = 10;
-		static int DefaultYPositionTopRatedController = 30;
-		static int DefaultYPositionNowPlayingLabel = 270;
-		static int DefaultYPositionPopularLabel = 530;
-		static int DefaultYPositionMovieLatestLabel = 790;
+		static int DefaultYPositionTopRatedLabel = 50;
+		static int DefaultYPositionTopRatedController = 70;
+		static int DefaultYPositionNowPlayingLabel = 310;
+		static int DefaultYPositionPopularLabel = 570;
+		static int DefaultYPositionMovieLatestLabel = 830;
 		public static int NewCustomListToRefresh = -1;
 		//public static int OldCustomListToRefresh;
 		//static CGSize ItemSize = new CGSize (153, 205);
 		//static CGSize ItemSize = new CGSize (133, 185);
-		static CGRect FavoriteLabelFrame = new CGRect (7, 10, 180, 20);
+		static CGRect FavoriteLabelFrame = new CGRect (7, 50, 180, 20);
 		static CGRect TopRatedLabelFrame = new CGRect (7, 205, 180, 20);
 		static CGRect NowPlayingLabelFrame = new CGRect (7, 400, 180, 20);
 		static CGRect PopularLabelFrame = new CGRect (7, 595, 180, 20);
@@ -79,9 +79,6 @@ namespace FavoriteMovies
 		//static UIView horizontalLine = new UIView();
 		static UIImageView velvetRopes = new UIImageView ();
 
-		private bool needLogin = true;
-
-
 		//	public MainViewController (ObservableCollection<Movie> topRated, ObservableCollection<Movie> nowPlaying, ObservableCollection<Movie> popular, ObservableCollection<Movie> movieLatest,int page)
 		public MainViewController ()
 		{
@@ -91,10 +88,11 @@ namespace FavoriteMovies
 				ScrollDirection = UICollectionViewScrollDirection.Horizontal,
 				MinimumInteritemSpacing = MinimumInteritemSpacing, // minimum spacing between cells
 				MinimumLineSpacing = MinimumLineSpacing, // minimum spacing between rows if ScrollDirection is Vertical or between columns if Horizontal
-				ItemSize = ColorExtensions.CurrentSize
+				ItemSize = ColorExtensions.CurrentSize,
 				//SectionInset = new UIEdgeInsets (80, -40, 97, 127)
 			};
-
+            if (ColorExtensions.CurrentUser.suggestmovies)
+                    GetCollectionData ();
 
 		}
 
@@ -123,30 +121,33 @@ namespace FavoriteMovies
 		public  override void  ViewDidAppear (bool animated)
 		{
 			base.ViewDidAppear (animated);
+            var screenSize = UIScreen.MainScreen.Bounds;
+            View.Frame = screenSize;
+            TabController.View.Frame = screenSize;
+            TabController.NavigationController.View.Frame = screenSize;
 
-			needLogin = ColorExtensions.CurrentUser.username == null;
+			//NewsFeedTableSource.ShowTabBar (TabController);
 
-			if (needLogin) 
-			{
-				LoginScreenControl<CredentialsProvider>.Activate (this);
-				needLogin = false;
-
-				SideMenuController.ShowTipsController ();
-			}
-
-
-            //NewsFeedTableSource.ShowTabBar (TabController);
-
-			UIApplication.SharedApplication.SetStatusBarHidden (false, true);
-            TabController.NavigationController.NavigationBar.Hidden = false;
+			//UIApplication.SharedApplication.SetStatusBarHidden (false, true);
+			//TabController.NavigationController.NavigationBar.Hidden = false;
 			//searchResultsController.TableView.ContentInset = new UIEdgeInsets (80, 0, 0, 0);
-			//HACK until i find out why when you open a movie details and come back the view.height changes.
-			if (View.Frame.Height == 504) {
+			//HACK until i find out why when you open a movie details and come back the view.height changes. NavigationController.NavigationBar.Frame.Y += 20;
 
-				scrollView.ContentSize = new CGSize (View.Frame.Width, View.Frame.Height);
+
+
+			if (View.Frame.Height == 504) 
+			{
+
+					//For scrolling to work the scrollview Content size has to be bigger than the View.Frame.Height
+				if (ColorExtensions.CurrentUser.suggestmovies)
+					scrollView.ContentSize = new CGSize (View.Frame.Width, MovieLatestController.CollectionView.Frame.Y + MovieLatestController.CollectionView.Frame.Height + SpaceBetweenContainers + SeparationBuffer);
+				else 
+				{
+					if(customLists.Count>0)
+					   scrollView.ContentSize = new CGSize (View.Frame.Width, customControllers [customLists.Count - 1].CollectionView.Frame.Y + customControllers [customLists.Count - 1].CollectionView.Frame.Height + SpaceBetweenContainers + SeparationBuffer);
+				}
 
 			}
-
 			////*****this fixes a problem with the uitableview adding space at the top after each selection*****
 			//Debug.Write (searchResultsController.TableView.ContentInset);
 			// adding label views to View. 
@@ -225,29 +226,33 @@ namespace FavoriteMovies
         public override void ViewWillAppear (bool animated)
         {
             base.ViewWillAppear (animated);
-		    TabController.NavigationController.NavigationBar.Hidden = false;
+			View.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha);
 			if (NewCustomListToRefresh == -1) {
-                //BTProgressHUD.Show ();
+                BTProgressHUD.Show ();
 
-                if (ColorExtensions.CurrentUser.suggestmovies)
-                    GetCollectionData ();
-                LoadCollectionViewControllers ();
-                UpdateCustomViews ();
-                FavoritesDisplay ();
-                NewCustomListToRefresh = 0;
-                //BTProgressHUD.Dismiss ();
+                //if (ColorExtensions.CurrentUser.suggestmovies)
+                //    GetCollectionData ();
+
+				LoadCollectionViewControllers ();
+
+				UpdateCustomViews ();
+
+				FavoritesDisplay ();
+				NewCustomListToRefresh = 0;
+                BTProgressHUD.Dismiss ();
             }
 
-            SidebarController.Disabled = false;
+            SidebarController.Disabled = true;
             if (NewCustomListToRefresh > 1) {
-                LoadCollectionViewControllers ();
+
+				LoadCollectionViewControllers ();
             }
             if (NewCustomListToRefresh > 0)// 0 means nothing has changed and i don't have to refresh lists
-                FavoritesDisplay ();
 
-            LoadViews ();
-			NewsFeedTableSource.ShowTabBar ((UIApplication.SharedApplication.Delegate as AppDelegate).rootViewController.TabController);
+				FavoritesDisplay ();
 
+
+			LoadViews ();
 
 
 		}
@@ -317,7 +322,7 @@ namespace FavoriteMovies
 				//}
 
 				velvetRopes.Image = UIImage.FromBundle ("Divider_large_red_large.png");
-				velvetRopes.Frame =new CGRect () { X = 0, Y = TopRatedLabelFrame.Y + (SpaceBetweenLabelsAndFrames * (customLists.Count - 1) + SpaceBetweenContainers + SeparationBuffer + SpaceBetweenListTypes) - 40, Width =View.Bounds.Width, Height = 20};
+				velvetRopes.Frame =new CGRect () { X = 0, Y = TopRatedLabelFrame.Y + (SpaceBetweenLabelsAndFrames * (customLists.Count - 1) + SpaceBetweenContainers + SeparationBuffer + SpaceBetweenListTypes) - 20, Width =View.Bounds.Width, Height = 20};
 
 
 			}
@@ -625,7 +630,7 @@ namespace FavoriteMovies
             this.TabBarItem.Title = "Movies";
 			// Creates an instance of a custom View Controller that holds the results
 			searchResultsController = new SearchResultsViewController ();
-           
+			NewCustomListToRefresh = -1;
 			//Creates a search controller updater
 			var searchUpdater = new SearchResultsUpdator ();
 			searchUpdater.UpdateSearchResults += searchResultsController.Search;

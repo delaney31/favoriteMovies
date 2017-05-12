@@ -40,7 +40,6 @@ namespace FavoriteMovies
 			base.ViewWillAppear (animated);
 
 
-         
 
 			// Perform any additional setup after loading the view, typically from a nib.
 			NavigationItem.Title = "Profile";
@@ -88,8 +87,6 @@ namespace FavoriteMovies
 
 				 if (!isEmail)
 					{
-
-
 						InvokeOnMainThread ( () =>
 						{
 							txtEmail.Layer.BorderColor =UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f).CGColor;
@@ -106,10 +103,11 @@ namespace FavoriteMovies
 				};
 		}
 
-		public override async void ViewDidLoad ()
+		public override  void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
-
+			View.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1);
+         
 		}
 		void Handle_Canceled (object sender, EventArgs e)
 		{
@@ -229,7 +227,7 @@ namespace FavoriteMovies
 
 		void SwitchSuggestions_ValueChanged (object sender, EventArgs e)
 		{
-			ColorExtensions.CurrentUser.suggestmovies = !ColorExtensions.CurrentUser.suggestmovies;
+            ColorExtensions.CurrentUser.suggestmovies = switchSuggestions.On;
 			MainViewController.NewCustomListToRefresh = -1;
 		}
 

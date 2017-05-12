@@ -40,11 +40,19 @@ namespace FavoriteMovies
 		public override void ViewWillAppear (bool animated)
 		{
 			base.ViewWillAppear (animated);
-			//this fixes problem when coming out of full screen after watching a trailer
-			NavController.NavigationBar.Frame = new CGRect () { X = 0, Y = 20, Width = 320, Height = 44 };
-			//loadPop.Hide ();
-			if ((UIApplication.SharedApplication.Delegate as AppDelegate).rootViewController.TabController != null)
-			   NewsFeedTableSource.ShowTabBar ((UIApplication.SharedApplication.Delegate as AppDelegate).rootViewController.TabController ?? null);
+			var screenSize = UIScreen.MainScreen.Bounds;
+			View.Frame = screenSize;
+			TabController.View.Frame = screenSize;
+			TabController.NavigationController.View.Frame = screenSize;
+
+			////this fixes problem when coming out of full screen after watching a trailer
+			//NavController.NavigationBar.Frame = new CGRect () { X = 0, Y = 20, Width = 320, Height = 44 };
+			////loadPop.Hide ();
+			//if ((UIApplication.SharedApplication.Delegate as AppDelegate).rootViewController.TabController != null) 
+			//{
+			//	NewsFeedTableSource.ShowTabBar ((UIApplication.SharedApplication.Delegate as AppDelegate).rootViewController.TabController ?? null);
+			//	NavController.SetNavigationBarHidden (false, true);
+			//}
 
 		}
 

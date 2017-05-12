@@ -179,7 +179,7 @@ namespace FavoriteMovies
 							await AddUserAsync (ColorExtensions.CurrentUser);
 							successCallback ();
 						}
-                        successCallback ();
+                      
 					}
 
 				} catch (Exception ex) {
@@ -245,7 +245,7 @@ namespace FavoriteMovies
 
 				}
 
-			} catch (SQLiteException e) {
+			} catch (Exception e) {
 				Debug.WriteLine (e.Message);
 
 				using (var conn = new SQLite.SQLiteConnection (MovieService.Database)) {

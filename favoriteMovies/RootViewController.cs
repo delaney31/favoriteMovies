@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Collections.Generic;
 using Foundation;
 using LoginScreen;
+using AlertView;
 
 namespace FavoriteMovies
 {
@@ -82,6 +83,11 @@ namespace FavoriteMovies
 		{
 			return UIInterfaceOrientationMask.Portrait;
 		}
+        public override void ViewDidAppear (bool animated)
+        {
+            base.ViewDidAppear (animated);
+			
+        }
 		public override void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
@@ -109,22 +115,23 @@ namespace FavoriteMovies
 			};
 
 			var mainView = new MainViewController ();
-
+			mainView.Title = "Movies";
 			mainView.TabBarItem.SetFinishedImages (UIImage.FromBundle ("ic_movie.png"), UIImage.FromBundle ("ic_movie.png"));
 
 
 			var uinc1 = new UINavigationController (mainView);
 			uinc1.NavigationBar.BarTintColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f);
 			uinc1.NavigationBar.TintColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
+			uinc1.NavigationBar.TopItem.Title = "Home";
 			//uinc2.NavigationBar.Translucent = true;
 			uinc1.NavigationBar.TitleTextAttributes = new UIStringAttributes () {
 				ForegroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f)
 			};
 
 			var tab2 = new NewsFeedViewController ();
-			tab2.Title = "News";
+			tab2.Title = "Home";
 			tab2.View.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
-			tab2.TabBarItem.SetFinishedImages (UIImage.FromBundle ("ic_whatshot.png"), UIImage.FromBundle ("ic_whatshot.png"));
+			tab2.TabBarItem.SetFinishedImages (UIImage.FromBundle ("home-7.png"), UIImage.FromBundle ("home-7.png"));
 
 			var uinc2 = new UINavigationController (tab2);
 			uinc2.NavigationBar.BarTintColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f);
@@ -218,7 +225,7 @@ namespace FavoriteMovies
 			//LoginScreenControl<CredentialsProvider>.Activate (this);
 			var tabs = new UIViewController []
 			{
-				uinc1,uinc4,uinc5,uinc3,uinc2,uinc6,uinc7,uinc8,uinc9
+				uinc2,uinc1,uinc4,uinc5,uinc3,uinc6,uinc7,uinc8,uinc9
 			};
 			//var customizableControllers = new UIViewController [] 
 			//{
@@ -246,7 +253,7 @@ namespace FavoriteMovies
 			try {
 
 				TabController.ViewControllers = tabs;
-				TabController.SelectedViewController = uinc1;
+				//TabController.SelectedViewController = uinc2;
 
 			} catch (Exception ex) {
 				Debug.Write (ex.Message);
@@ -282,6 +289,7 @@ namespace FavoriteMovies
 					NSUserDefaults.StandardUserDefaults ["tabBarOrder"] = arr;
 				}
 			};
+
 			NavController.PushViewController (TabController, true);
 
 			SidebarController = new SidebarController (this, NavController, new SideMenuController ());

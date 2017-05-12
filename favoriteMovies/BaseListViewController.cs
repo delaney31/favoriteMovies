@@ -33,7 +33,16 @@ namespace FavoriteMovies
         public override void ViewDidAppear (bool animated)
         {
             base.ViewDidAppear (animated);
+			NavigationController.NavigationBar.Translucent = false;
+			// TabController.NavigationController.NavigationBar.Hidden = false;
            
+		}
+		public override void ViewWillAppear (bool animated)
+		{
+			base.ViewWillAppear (animated);
+
+			if (fromAddList)
+				NavigationItem.Title = "Select List";
 		}
 		public override void ViewDidLoad ()
 		{
@@ -49,70 +58,70 @@ namespace FavoriteMovies
 			tableSource = new TableSource<ICustomList> (tableItems, this);
 			table.Source = tableSource;
 			table.AllowsSelectionDuringEditing = true;
-			NavigationItem.Title = "Movie List";
-			if (!fromAddList) {
-				done = new UIBarButtonItem (UIBarButtonSystemItem.Done, (s, e) => {
-					table.SetEditing (false, true);
-					NavigationItem.RightBarButtonItem = edit;
-					tableSource.DidFinishTableEditing (table);
-				});
-				edit = new UIBarButtonItem (UIBarButtonSystemItem.Edit, (s, e) => {
-					if (table.Editing)
-						table.SetEditing (false, true); // if we've half-swiped a row
-					tableSource.WillBeginTableEditing (table);
-					table.SetEditing (true, true);
-					NavigationItem.LeftBarButtonItem = null;
-					NavigationItem.RightBarButtonItem = done;
-					SidebarController.Disabled = true;
-					MainViewController.NewCustomListToRefresh = 1;
-				});
+			NavigationItem.Title = "Share My Movie Lists";
+		
+			done = new UIBarButtonItem (UIBarButtonSystemItem.Done, (s, e) => {
+				table.SetEditing (false, true);
 				NavigationItem.RightBarButtonItem = edit;
-			} else {
-				add = new UIBarButtonItem (UIBarButtonSystemItem.Add, (s, e) => {
-					//Create Alert
-					var textInputAlertController = UIAlertController.Create ("Create Movie List", "List Name", UIAlertControllerStyle.Alert);
+				tableSource.DidFinishTableEditing (table);
+			});
+			edit = new UIBarButtonItem (UIBarButtonSystemItem.Edit, (s, e) => {
+				if (table.Editing)
+					table.SetEditing (false, true); // if we've half-swiped a row
+				tableSource.WillBeginTableEditing (table);
+				table.SetEditing (true, true);
+				NavigationItem.LeftBarButtonItem = null;
+				NavigationItem.RightBarButtonItem = done;
+				SidebarController.Disabled = true;
+				MainViewController.NewCustomListToRefresh = 1;
+			});
+			NavigationItem.RightBarButtonItem = edit;
+			//}// else {
+			//	add = new UIBarButtonItem (UIBarButtonSystemItem.Add, (s, e) => {
+			//		//Create Alert
+			//		var textInputAlertController = UIAlertController.Create ("Create Movie List", "List Name", UIAlertControllerStyle.Alert);
 
-					//Add Text Input
-					textInputAlertController.AddTextField (textField => { });
+			//		//Add Text Input
+			//		textInputAlertController.AddTextField (textField => { });
 
-					//Add Actions
-					var cancelAction = UIAlertAction.Create ("Cancel", UIAlertActionStyle.Cancel, alertAction => {
-						Console.WriteLine ("Cancel was Pressed");
-					});
-					var okayAction = UIAlertAction.Create ("Okay", UIAlertActionStyle.Default, alertAction => {
-						Console.WriteLine ("The user entered '{0}'", textInputAlertController.TextFields [0].Text);
-						if (tableSource.ValueUnique (textInputAlertController.TextFields [0].Text)) {
-							BTProgressHUD.Show ();
-							tableSource.ArrangeCustomList (false);
-							var listItem = new CustomList ();
-							listItem.order = 0;
-							listItem.custom = true;
-							listItem.shared = true;
-							listItem.name = textInputAlertController.TextFields [0].Text;
-							tableItems.Insert (0, listItem);
-							table.EndUpdates (); // applies the changes
-							table.ReloadData ();
-							tableSource.ArrangeCustomList (true);
-							UpdateCustomAndMovieList (tableItems [0].id, true, tableItems);
-							MainViewController.NewCustomListToRefresh = 1;
-							NavigationController.PopToRootViewController (true);
-						} else {
-							new UIAlertView ("Duplicate!"
-							, "List already exist", null, "OK", null).Show ();
-						}
-						BTProgressHUD.Dismiss ();
-					});
+			//		//Add Actions
+			//		var cancelAction = UIAlertAction.Create ("Cancel", UIAlertActionStyle.Cancel, alertAction => {
+			//			Console.WriteLine ("Cancel was Pressed");
+			//		});
+			//		var okayAction = UIAlertAction.Create ("Okay", UIAlertActionStyle.Default, alertAction => {
+			//			Console.WriteLine ("The user entered '{0}'", textInputAlertController.TextFields [0].Text);
+			//			if (tableSource.ValueUnique (textInputAlertController.TextFields [0].Text)) {
+			//				BTProgressHUD.Show ();
+			//				tableSource.ArrangeCustomList (false);
+			//				var listItem = new CustomList ();
+			//				listItem.order = 0;
+			//				listItem.custom = true;
+			//				listItem.shared = true;
+			//				listItem.name = textInputAlertController.TextFields [0].Text;
+			//				tableItems.Insert (0, listItem);
+			//				table.EndUpdates (); // applies the changes
+			//				table.ReloadData ();
+			//				tableSource.ArrangeCustomList (true);
+			//				UpdateCustomAndMovieList (tableItems [0].id, true, tableItems);
+			//				MainViewController.NewCustomListToRefresh = 1;
+			//				NavigationController.PopToRootViewController (true);
+			//			} else {
+			//				new UIAlertView ("Duplicate!"
+			//				, "List already exist", null, "OK", null).Show ();
+			//			}
+			//			BTProgressHUD.Dismiss ();
+			//		});
 
-					textInputAlertController.AddAction (cancelAction);
-					textInputAlertController.AddAction (okayAction);
+			//		textInputAlertController.AddAction (cancelAction);
+			//		textInputAlertController.AddAction (okayAction);
 
-					//Present Alert
-					PresentViewController (textInputAlertController, true, null);
+			//		//Present Alert
+			//		PresentViewController (textInputAlertController, true, null);
 
-				});
+			//	});
 
-				NavigationItem.RightBarButtonItem = add;
-			}
+			//	NavigationItem.RightBarButtonItem = add;
+			//}
 
 			Add (table);
 		}
@@ -120,12 +129,16 @@ namespace FavoriteMovies
 		[Export ("CustomListChangeReceived:")]
 		public async void CustomListChangeReceived (NSNotification n)
 		{ 
-			tableItems = GetMovieList ();
-			//table = new UITableView (View.Bounds);
 
+			tableItems = GetMovieList ();
+			table.RemoveFromSuperview ();
+			table = new UITableView (View.Bounds);
 			tableSource = new TableSource<ICustomList> (tableItems, this);
 			table.Source = tableSource;
+			table.AllowsSelectionDuringEditing = true;
 			table.ReloadData ();
+
+            Add (table);
 		}
 
 
@@ -177,7 +190,7 @@ namespace FavoriteMovies
 								}
 							}
 
-							if (movieDetail != null && (items [list].id == Id)) {
+							if (upDateMovieDetail && (items [list].id == Id)) {
 								//get id of last inserted row
 								string sql = "select last_insert_rowid()";
 								var scalarValue = db.ExecuteScalar<string> (sql);
@@ -560,12 +573,13 @@ namespace FavoriteMovies
 			try {
 				tableView.BeginUpdates ();
 				// insert the 'ADD NEW' row at the end of table display
+				tableItems.Add (new CustomList () {id= -1, name = "add new" });	
 				tableView.InsertRows (new NSIndexPath []
 				{
 					NSIndexPath.FromRowSection (tableView.NumberOfRowsInSection (0), 0)
 				}, UITableViewRowAnimation.Automatic);
 				// create a new item and add it to our underlying data (it is not intended to be permanent)		
-				tableItems.Add (new CustomList () { name = "add new" });				
+							
 				tableView.EndUpdates (); // applies the changes
 			} catch (Exception ex) { Debug.Write (ex.Message); }
 		}
@@ -578,16 +592,20 @@ namespace FavoriteMovies
 																					// remove the row from the table display
 				tableView.DeleteRows (new NSIndexPath [] { NSIndexPath.FromRowSection (tableView.NumberOfRowsInSection (0) - 1, 0) }, UITableViewRowAnimation.Fade);
 				tableView.EndUpdates (); // applies the changes
-				if (tableView.NumberOfRowsInSection (0) > 0) {
+
+				if (tableView.NumberOfRowsInSection (0) > 0) 
+				{
 					var item = tableItems [(int)tableView.NumberOfRowsInSection (0) - 1] as CustomList;
-					if (item is CustomList) {
+					if (item is CustomList) 
+                    {
 						Owner.UpdateCustomAndMovieList (((CustomList)tableItems [(int)tableView.NumberOfRowsInSection (0) - 1]).id, false, tableItems, ((CustomList)tableItems [(int)tableView.NumberOfRowsInSection (0) - 1]).cloudId);
 					} else {
 						Owner.UpdateCustomAndMovieList (((Movie)tableItems [(int)tableView.NumberOfRowsInSection (0) - 1]).CustomListID, true, tableItems);
 					}
+
 				} else
 					BaseListViewController.DeleteAll ();
-			} catch (Exception ex) { Debug.Write (ex.Message); }
+				} catch (Exception ex) { Debug.Write (ex.Message); }
 		}
 
 		public override NSIndexPath CustomizeMoveTarget (UITableView tableView, NSIndexPath sourceIndexPath, NSIndexPath proposedIndexPath)
@@ -701,14 +719,10 @@ namespace FavoriteMovies
 									listItem.name = textInputAlertController.TextFields [0].Text;
 									tableItems.Insert (0, listItem);						
 									ArrangeCustomList (true);
-									var item = tableItems [(int)indexPath.Row] as CustomList;
-									if (item is CustomList) {
-										Owner.UpdateCustomAndMovieList (((CustomList)tableItems [(int)tableView.NumberOfRowsInSection (0) - 1]).id, false, tableItems,((CustomList)tableItems [(int)tableView.NumberOfRowsInSection (0) - 1]).cloudId);
-									} else {
-										Owner.UpdateCustomAndMovieList (((Movie)tableItems [(int)tableView.NumberOfRowsInSection (0) - 1]).id, true, tableItems);
-									}
-                                    tableView.ReloadData ();
+									tableView.ReloadData ();
                                     tableView.EndUpdates (); // applies the changes
+
+                                   
 								}
 							} else {
 								new UIAlertView ("Duplicate!"
@@ -728,7 +742,7 @@ namespace FavoriteMovies
 					//Debug.Write (tableItems [(int)tableView.NumberOfRowsInSection (0) - 1].GetType());
 					var item = tableItems [(int)indexPath.Row] as CustomList;
 					if (item is CustomList) {
-						Owner.UpdateCustomAndMovieList (((CustomList)tableItems [indexPath.Row]).id, false, tableItems,((CustomList)tableItems [(int)tableView.NumberOfRowsInSection (0) - 1]).cloudId);
+						Owner.UpdateCustomAndMovieList (((CustomList)tableItems [indexPath.Row]).id, true, tableItems,((CustomList)tableItems [(int)tableView.NumberOfRowsInSection (0) - 1]).cloudId);
 					} else {
 						//Owner.UpdateCustomAndMovieList (((Movie)tableItems [(int)indexPath.Row]).Id, Owner.fromAddList, tableItems);
 						Owner.NavigationController.PushViewController (new MovieDetailViewController (tableItems [indexPath.Row] as Movie, true), true);
@@ -736,7 +750,7 @@ namespace FavoriteMovies
 					MainViewController.NewCustomListToRefresh = 1;
 
 					if (Owner.fromAddList)
-						Owner.NavigationController.PopToRootViewController (true);
+						Owner.NavigationController.PopToViewController(Owner.NavigationController.ViewControllers[0],true);
 					else if (item is CustomList)
 						Owner.NavigationController.PushViewController (new MovieListViewContoller (null, tableItems [indexPath.Row], Owner.fromAddList), true);
 
@@ -797,21 +811,27 @@ namespace FavoriteMovies
 				var switchView = (UISwitch)cell.AccessoryView;
 				if (switchView == null) {
 					switchView = new UISwitch ();
-					switchView.AddTarget (async (sender, e) => {
-						var custCloud = new CustomListCloud ();
-						custCloud.Id = ((CustomList)tableItems [indexPath.Row]).cloudId;
-						custCloud.Name = ((CustomList)tableItems [indexPath.Row]).name;
-						custCloud.UserId = ColorExtensions.CurrentUser.Id;
+					switchView.AddTarget (async (sender, e) => 
+					{
+						try {
+							var custCloud = new CustomListCloud ();
+							custCloud.Id = ((CustomList)tableItems [indexPath.Row]).cloudId;
+							custCloud.Name = ((CustomList)tableItems [indexPath.Row]).name;
+							custCloud.UserId = ColorExtensions.CurrentUser.Id;
 
-						if (((UISwitch)sender).On) {
-							tableItems [indexPath.Row].shared = true;
-							custCloud.shared = true;
-						} else {
-							tableItems [indexPath.Row].shared = false;
-							custCloud.shared = false;
+							if (((UISwitch)sender).On) {
+								tableItems [indexPath.Row].shared = true;
+								custCloud.shared = true;
+							} else {
+								tableItems [indexPath.Row].shared = false;
+								custCloud.shared = false;
+							}
+							await postService.UpdatedShared (custCloud);
+							Owner.UpdateCustomAndMovieList (((CustomList)tableItems [indexPath.Row]).id, false, tableItems, ((CustomList)tableItems [(int)tableView.NumberOfRowsInSection (0) - 1]).cloudId);
+						}catch(Exception ex)
+						{
+							Debug.WriteLine ("Error in List sharing switchView:" + ex.Message);
 						}
-						await postService.UpdatedShared (custCloud);
-						Owner.UpdateCustomAndMovieList (((CustomList)tableItems [indexPath.Row]).id, false, tableItems,((CustomList)tableItems [(int)tableView.NumberOfRowsInSection (0) - 1]).cloudId);
 
 					}, UIControlEvent.ValueChanged);
 				}

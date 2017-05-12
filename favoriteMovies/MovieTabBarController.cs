@@ -2,6 +2,8 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using AlertView;
+using BigTed;
 using CoreGraphics;
 using FavoriteMoviesPCL;
 using Foundation;
@@ -22,13 +24,16 @@ namespace FavoriteMovies
 		}
 		public override void ViewDidAppear (bool animated)
 		{
+			
 			base.ViewDidAppear (animated);
+			TabBar.Items [0].BadgeValue = "";
+
 		
 		}
 		public override void ViewWillAppear (bool animated)
 		{
+			
 			base.ViewWillAppear (animated);
-
 
 		}
 
@@ -36,20 +41,28 @@ namespace FavoriteMovies
 		{
 			base.ViewDidLoad ();
 
-
+			NavigationItem.Title = "Latest Movie News";
+		
 			this.ViewControllerSelected += (sender, e) => 
 			{
-				MainViewController.NewCustomListToRefresh = 1;
+				
                 // Take action based on the tab being selected
                 //Important fact** NavigationalController is only available for the selectedViewController!!
-                if (TabBar.SelectedItem.Title == "Movies") {
+                if (TabBar.SelectedItem.Title == "Movies") 
+				{
+					MainViewController.NewCustomListToRefresh = 1;
                     NavigationController.NavigationBar.Hidden = false;
 
-                } else 
+                } else if(TabBar.SelectedItem.Title == "Home")
+                {
+					NavigationController.NavigationBar.Hidden = true;
+                    TabBar.Items [0].BadgeValue = null;
+
+				}else 
                 {
                     NavigationController.NavigationBar.Hidden = true;
-                   
-                }
+
+				}
 			};
 		}
 	}

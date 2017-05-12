@@ -34,13 +34,14 @@ namespace FavoriteMovies
 			loading = new UILabel () { Frame = new CoreGraphics.CGRect () { X = 115, Y = 155, Width = 100, Height = 100 } };
 			loading.Text = "Loading...";
 		}
+
 		public override void ViewDidLoad ()
 		{
 			
 			base.ViewDidLoad ();
 			View.Add (loading);
 			//Title = "Connect";
-
+			View.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha);
 			//tableView.EstimatedRowHeight = 100;
 		
 			// Creates an instance of a custom View Controller that holds the results

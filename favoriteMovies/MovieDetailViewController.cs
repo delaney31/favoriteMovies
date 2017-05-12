@@ -13,12 +13,23 @@ using Facebook.AudienceNetwork;
 using FavoriteMoviesPCL;
 using Foundation;
 using MovieFriends;
+using ObjCRuntime;
 using SDWebImage;
 using UIKit;
 
 
 namespace FavoriteMovies
 {
+	public class WebViewController:UIViewController
+	{
+		
+
+		public override void ViewDidLoad ()
+		{
+			base.ViewDidLoad ();
+
+		}
+	}
 	public class MovieDetailViewController : BaseController, IAdViewDelegate
 	{
 
@@ -358,11 +369,15 @@ namespace FavoriteMovies
 			base.ViewWillDisappear (animated);
 			updateMovie (movieDetail);
 			NewsFeedTableSource.ShowTabBar ((UIApplication.SharedApplication.Delegate as AppDelegate).rootViewController.TabController);
+			NavigationController.NavigationBar.Frame = new CGRect { X = 0, Y = 20, Width = 320, Height = 44 };
 
 		}
+	
+
 		public override void ViewDidAppear (bool animated)
 		{
 			base.ViewDidAppear (animated);
+			NewsFeedTableSource.HideTabBar ((UIApplication.SharedApplication.Delegate as AppDelegate).rootViewController.TabController, View.BackgroundColor);
 			nfloat lastViewPostion=0;
 			if (similarMovies.Count > 0) 
 			{
@@ -596,7 +611,7 @@ namespace FavoriteMovies
 			return UIInterfaceOrientationMask.Portrait;
 		}
 
-	
+	    
 		void HandleAction ()
 		{
 			URL = _youTubeURl + _embededMoveId;
@@ -610,7 +625,7 @@ namespace FavoriteMovies
 				AutoresizingMask = UIViewAutoresizing.FlexibleHeight | UIViewAutoresizing.FlexibleWidth,
 				BackgroundColor = UIColor.White 
 			};
-			var viewController = new UIViewController ();
+			var viewController = new WebViewController ();
 
 			var sb = new StringBuilder ();
 			sb.Append ("<html><head>");
@@ -628,8 +643,9 @@ namespace FavoriteMovies
 			webView.LoadHtmlString (sb.ToString (), null);
 			viewController.View.Add (webView);
 			//this.View.AddSubview (webView);
-			NavigationController.PushViewController (viewController, true);
 
+			NavigationController.PushViewController (viewController, true);
+	
 			//NavigationController.PushViewController (controller, true);
 
 		}

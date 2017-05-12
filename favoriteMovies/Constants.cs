@@ -7,6 +7,8 @@ namespace FavoriteMovies
 		public const string ConnectionString = "Endpoint=sb://moviefriendsnamespace.servicebus.windows.net/;SharedAccessKeyName=DefaultFullSharedAccessSignature;SharedAccessKey=g73Rc6nUEr2QRIKW0M2OfI/p+tekd236g5x2ITGgvRA=";
 		public const string NotificationHubPath = "moviefriends";
 		public const string ModifyFollowerNotification = "FollowerModifiedNotification";
+		public const string ChangedOrientationToLandscape = "ChangedOrientationToLandscape";
+		public const string ChangedOrientationToLandscapeReceived = "ChangedOrientationToLandscapeReceived";
 		public const string CurrentUserSetNotification = "CurrentUserSetNotification";
 		public const string CurrentUserSetNotificationReceived = "CurrentUserSetNotificationReceived:";
 		public const string ModifyFollowerNotificationReceived = "FollowerModifiedNotificationReceived:";

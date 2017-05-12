@@ -55,7 +55,7 @@ namespace FavoriteMovies
 			table.RowHeight = 55;
 			table.AllowsSelectionDuringEditing = true;
 			NavigationController.NavigationBar.Translucent = false;
-			View.BackgroundColor = UIColor.White;//UIColor.Clear.FromHexString ("#e9755e", 1.0f);
+			View.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 			var name = new NSString (Constants.ModifyFollowerNotification);
 			NSNotificationCenter.DefaultCenter.AddObserver (this, new Selector (Constants.ModifyFollowerNotificationReceived), name, null);
 		}

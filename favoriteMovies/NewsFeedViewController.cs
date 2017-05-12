@@ -1,72 +1,76 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
-using System.Threading.Tasks;
+using AlertView;
 using CoreGraphics;
 using FavoriteMoviesPCL;
 using Foundation;
+using LoginScreen;
 using MovieFriends;
 using UIKit;
 
 namespace FavoriteMovies
 {
 
-	public class NewsFeedViewController : UIViewController
+    public class NewsFeedViewController : UIViewController
 	{
 
 		List<MDCard> tableItems = new List<MDCard> ();
 		UITableView table;
 		NewsFeedTableSource tableSource;
-		UIBarButtonItem add;
-		UILabel loading;
 		public AzureTablesService postService;
-
-		public NewsFeedViewController ()
+        private bool needLogin = true;
+		public override void ViewDidAppear (bool animated)
 		{
-			loading = new UILabel () { Frame = new CoreGraphics.CGRect () { X = 115, Y = 155, Width = 100, Height = 100 } };
-			loading.Text = "Loading...";
-			postService = AzureTablesService.DefaultService;
-
-		}
-		public override void ViewWillAppear (bool animated)
-		{
-			base.ViewWillAppear (animated);
-			NavigationController.NavigationBar.Translucent = true;
-		}
-		public override async void ViewDidLoad ()
-		{
-			base.ViewDidLoad ();
-			View.Add (loading);
-			//postService = AzureTablesService.DefaultService;
-			await postService.InitializeStoreAsync ();
-			View.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
-			tableItems = await MovieNewsFeedService.GetMDCardItems ();
-
-			table = new UITableView (View.Bounds);
-			table.BackgroundColor =  UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
-			table.AutoresizingMask = UIViewAutoresizing.All;
-			table.SeparatorStyle = UITableViewCellSeparatorStyle.None;
+			
+			base.ViewDidAppear (animated);
+			if (tableItems.Count > 0) { return; }
+				tableItems =  MovieNewsFeedService.GetMDCardItems ();
 			tableSource = new NewsFeedTableSource (tableItems, this);
 
 			table.Source = tableSource;
-			table.AllowsSelectionDuringEditing = true;
-
-		//	NavigationItem.Title = "Add Movie Meme";
-
-			//add = new UIBarButtonItem (UIBarButtonSystemItem.Add, (s, e) => {
-
-			//	var newPost = new UINavigationController (new NewFeedPostViewController ());
-
-			//	newPost.View.Frame = new CGRect () { X = 10, Y = 15, Width = 300, Height = 300 };
-			//	NavigationController.PresentViewController (newPost, true, null);
-			//});
-
-
-		//	NavigationItem.RightBarButtonItem = add;
-
-			loading.RemoveFromSuperview ();
+           
 			View.Add (table);
+           
+		}
+		public override void ViewWillAppear (bool animated)
+		{
+			needLogin = ColorExtensions.CurrentUser.username == null;
 
+			if (needLogin) {
+				LoginScreenControl<CredentialsProvider>.Activate (this);
+				needLogin = false;
+
+				SideMenuController.ShowTipsController ();
+			}
+
+			if (tableItems.Count == 0) 
+            {
+                MBHUDView.HudWithBody (
+                body: "Loading",
+                aType: MBAlertViewHUDType.ActivityIndicator,
+                delay: 4.0f,
+                showNow: true
+                );
+            }
+          
+			base.ViewWillAppear (animated);
+		    NavigationItem.Title = "Latest Movie News";
+			
+		}
+
+
+		public override  void ViewDidLoad ()
+		{
+			base.ViewDidLoad ();
+			table = new UITableView (View.Bounds);
+			View.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
+			table.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
+			table.AutoresizingMask = UIViewAutoresizing.All;
+			table.SeparatorStyle = UITableViewCellSeparatorStyle.None;
+			table.AllowsSelectionDuringEditing = true;
+			
 		}
 
 
@@ -83,14 +87,14 @@ namespace FavoriteMovies
 		public override void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
-
+            
 			View.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 
 			close = new UIBarButtonItem (UIBarButtonSystemItem.Cancel, (s, e) => {
 
 				this.DismissViewController (true, null);
 			});
-
+          
 
 			comment = new UITextView (new RectangleF (20, 0, 270, 400));
 			comment.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, 15);
@@ -143,6 +147,7 @@ namespace FavoriteMovies
 			NavigationItem.LeftBarButtonItem = post;
 
 			View.Add (comment);
+            this.TabBarItem.Title = "Home";
 		}
 
 		void Handle_Canceled (object sender, EventArgs e)
@@ -254,6 +259,7 @@ namespace FavoriteMovies
 
 		public static void ShowTabBar (UIViewController tab)
 		{
+			
 			var screenRect = UIScreen.MainScreen.Bounds;
 			
 			nfloat fHeight = screenRect.Height - 49f;
@@ -311,6 +317,8 @@ namespace FavoriteMovies
 				AutoresizingMask = UIViewAutoresizing.FlexibleHeight | UIViewAutoresizing.FlexibleWidth,
 				BackgroundColor = UIColor.Black,
 			};
+            webView.AllowsInlineMediaPlayback = true;
+            webView.MediaPlaybackRequiresUserAction = true;
 			var viewController = new UIViewController ();
 
 			webView.Frame = new CGRect (0, 0, (float)newsFeedViewController.View.Frame.Width, (float)newsFeedViewController.View.Frame.Height);
@@ -363,44 +371,53 @@ namespace FavoriteMovies
 
 		public override UITableViewCell GetCell (UITableView tableView, NSIndexPath indexPath)
 		{
-			//const string CellIdentifier = @"CardCell";
-			//var cell = (MDCard)tableView.DequeueReusableCell (CellIdentifier);
 			var cell = tableItems [indexPath.Row];
 
-			cell.Tag = indexPath.Row;
-			var likepress = new UITapGestureRecognizer ();
-			likepress.AddTarget ((obj) => HandleAction (cell));
-			cell.likeLabel.AddGestureRecognizer (likepress);
-			cell.likeLabel.UserInteractionEnabled = true;
+			try {
+                //const string CellIdentifier = @"CardCell";
+                //var cell = (MDCard)tableView.DequeueReusableCell (CellIdentifier);
+
+                cell.Tag = indexPath.Row;
+                var likepress = new UITapGestureRecognizer ();
+                likepress.AddTarget ((obj) => HandleAction (cell));
+                cell.likeLabel.AddGestureRecognizer (likepress);
+                cell.likeLabel.UserInteractionEnabled = true;
 
 
-			//Console.WriteLine (tableItems [indexPath.Row].Title);
-			//cell.profileImage.Image = MovieCell.GetImageUrl (tableItems [indexPath.Row].ImageLink);
-			var backGroundColor = MovieDetailViewController.averageColor (cell.profileImage.Image);
-			//cell.titleLabel.Text = tableItems [indexPath.Row].Title;
-			cell.titleLabel.TextColor = MovieDetailViewController.IsDarkColor (backGroundColor) ? UIColor.White : UIColor.Black;
-			//cell.titleLabel.TextColor = UIColor.Black;
-			cell.nameLabel.Text = tableItems [indexPath.Row].Creator;
-			cell.nameLabel.TextColor = MovieDetailViewController.IsDarkColor (backGroundColor) ? UIColor.White  : UIColor.Black;
-			//cell.nameLabel.TextColor = UIColor.Black;
-			//cell.descriptionLabel.Text = tableItems [indexPath.Row].Description;
-			cell.descriptionLabel.TextColor = MovieDetailViewController.IsDarkColor (backGroundColor) ? UIColor.White  : UIColor.Black;
-			//cell.descriptionLabel.TextColor = UIColor.Black;
-			//cell.likeLabel.Text = tableItems [indexPath.Row].like;
-			cell.cardView.BackgroundColor = backGroundColor;
-			cell.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f) ;
-			// My father is an English teacher
-			if (tableItems [(int)cell.Tag].likes > 0)
-				cell.numberLikes.Text = tableItems [(int)cell.Tag].likes == 1 ? tableItems [(int)cell.Tag].likes + " Like" : tableItems [(int)cell.Tag].likes + " Likes";
-			else
-				cell.numberLikes.Text = "";
-			cell.likeLabel.BackgroundColor = backGroundColor;
-			//cell.likeButton.BackgroundColor = backGroundColor;
-			cell.likeLabel.TextColor = MovieDetailViewController.IsDarkColor (backGroundColor) ? UIColor.White  : UIColor.Black;
-			cell.numberLikes.TextColor = MovieDetailViewController.IsDarkColor (backGroundColor) ? UIColor.White  : UIColor.Black;
+                //Console.WriteLine (tableItems [indexPath.Row].Title);
+                //cell.profileImage.Image = MovieCell.GetImageUrl (tableItems [indexPath.Row].ImageLink);
+                var backGroundColor = MovieDetailViewController.averageColor (cell.profileImage.Image);
+                //cell.titleLabel.Text = tableItems [indexPath.Row].Title;
+                cell.titleLabel.TextColor = MovieDetailViewController.IsDarkColor (backGroundColor) ? UIColor.White : UIColor.Black;
+                //cell.titleLabel.TextColor = UIColor.Black;
+                cell.nameLabel.Text = tableItems [indexPath.Row].Creator;
+                cell.nameLabel.TextColor = MovieDetailViewController.IsDarkColor (backGroundColor) ? UIColor.White : UIColor.Black;
+                //cell.nameLabel.TextColor = UIColor.Black;
+                //cell.descriptionLabel.Text = tableItems [indexPath.Row].Description;
+                cell.descriptionLabel.TextColor = MovieDetailViewController.IsDarkColor (backGroundColor) ? UIColor.White : UIColor.Black;
+                //cell.descriptionLabel.TextColor = UIColor.Black;
+                //cell.likeLabel.Text = tableItems [indexPath.Row].like;
+                cell.cardView.BackgroundColor = backGroundColor;
+                cell.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
+                // My father is an English teacher
+                if (tableItems [(int)cell.Tag].likes > 0)
+                    cell.numberLikes.Text = tableItems [(int)cell.Tag].likes == 1 ? tableItems [(int)cell.Tag].likes + " Like" : tableItems [(int)cell.Tag].likes + " Likes";
+                else
+                    cell.numberLikes.Text = "";
+                cell.likeLabel.BackgroundColor = backGroundColor;
+                //cell.likeButton.BackgroundColor = backGroundColor;
+                cell.likeLabel.TextColor = MovieDetailViewController.IsDarkColor (backGroundColor) ? UIColor.White : UIColor.Black;
+                cell.numberLikes.TextColor = MovieDetailViewController.IsDarkColor (backGroundColor) ? UIColor.White : UIColor.Black;
 
-			//cell.likeButton.Image= cell.likeButton.Image.WithColor(MovieDetailViewController.IsDarkColor (backGroundColor) ? UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f) : UIColor.Black).ImageWithRenderingMode (UIImageRenderingMode.AlwaysOriginal);
-			return cell;
+                //cell.likeButton.Image= cell.likeButton.Image.WithColor(MovieDetailViewController.IsDarkColor (backGroundColor) ? UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f) : UIColor.Black).ImageWithRenderingMode (UIImageRenderingMode.AlwaysOriginal);
+                return cell;
+            }
+            catch(Exception ex)
+            {
+                Debug.WriteLine ("Error in GetCell NewsFeedController: " + ex.Message);
+                return cell;
+            }
+
 		}
 	}
 }

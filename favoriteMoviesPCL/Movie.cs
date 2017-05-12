@@ -210,14 +210,14 @@ namespace FavoriteMoviesPCL
 		public bool Friend { get; set; }
 	}
 
-	public class Settings
-	{
+	
+    [Table ("Contact")]
+    public class Contact
+    {
+		[PrimaryKey]
+		public string Id { get; set; }
+        public string Email { get; set; }
 
-		//bool FamilyFriendly { get; set; }
-		bool DarkTheme { get; set; }
-		//string TileSize { get; set; }
-		bool MovieSuggestions { get; set;}
-
-	}
+    }
 }
 

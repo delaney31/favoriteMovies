@@ -218,6 +218,9 @@
     <Reference Include="Microsoft.Rest.ClientRuntime">
       <HintPath>..\packages\Microsoft.Rest.ClientRuntime.2.3.7\lib\netstandard1.4\Microsoft.Rest.ClientRuntime.dll</HintPath>
     </Reference>
+    <Reference Include="AlertView">
+      <HintPath>..\Components\mbalertview-1.3.1.0\lib\ios-unified\AlertView.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Contents.json" />
@@ -438,6 +441,10 @@
     </XamarinComponentReference>
     <XamarinComponentReference Include="xamarin.inapppurchase">
       <Version>2.8</Version>
+      <Visible>False</Visible>
+    </XamarinComponentReference>
+    <XamarinComponentReference Include="mbalertview">
+      <Version>1.3.1.0</Version>
       <Visible>False</Visible>
     </XamarinComponentReference>
   </ItemGroup>
