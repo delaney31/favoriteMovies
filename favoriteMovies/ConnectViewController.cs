@@ -527,7 +527,7 @@ namespace FavoriteMovies
 				//*****this fixes a problem with the uitableview adding space at the top after each selection*****
 
 				Debug.Write (this.TableView.ContentInset);
-			//	this.TableView.ContentInset = new UIEdgeInsets (64, 0, 49, 0);
+				this.TableView.ContentInset = new UIEdgeInsets (64, 0, 49, 0);
 
 				//this.searchController.Active = true;
 			} catch (Exception e) {

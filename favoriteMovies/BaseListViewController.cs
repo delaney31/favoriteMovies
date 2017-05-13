@@ -736,24 +736,30 @@ namespace FavoriteMovies
 						//Present Alert
 						Owner.PresentViewController (textInputAlertController, true, null);
 					}
-				} else {
+				} else 
+                {
 
-					ArrangeCustomList (true);
-					//Debug.Write (tableItems [(int)tableView.NumberOfRowsInSection (0) - 1].GetType());
-					var item = tableItems [(int)indexPath.Row] as CustomList;
-					if (item is CustomList) {
-						Owner.UpdateCustomAndMovieList (((CustomList)tableItems [indexPath.Row]).id, true, tableItems,((CustomList)tableItems [(int)tableView.NumberOfRowsInSection (0) - 1]).cloudId);
-					} else {
-						//Owner.UpdateCustomAndMovieList (((Movie)tableItems [(int)indexPath.Row]).Id, Owner.fromAddList, tableItems);
-						Owner.NavigationController.PushViewController (new MovieDetailViewController (tableItems [indexPath.Row] as Movie, true), true);
-					}
-					MainViewController.NewCustomListToRefresh = 1;
-
+               
+                    ArrangeCustomList (true);
+                    //Debug.Write (tableItems [(int)tableView.NumberOfRowsInSection (0) - 1].GetType());
+                    var item = tableItems [(int)indexPath.Row] as CustomList;
+                     if (Owner.fromAddList) 
+                    {
+                        if (item is CustomList) {
+                            Owner.UpdateCustomAndMovieList (((CustomList)tableItems [indexPath.Row]).id, true, tableItems, ((CustomList)tableItems [(int)tableView.NumberOfRowsInSection (0) - 1]).cloudId);
+							MainViewController.NewCustomListToRefresh = 1;
+                        } 
+                       
+                    }
 					if (Owner.fromAddList)
 						Owner.NavigationController.PopToViewController(Owner.NavigationController.ViewControllers[0],true);
 					else if (item is CustomList)
 						Owner.NavigationController.PushViewController (new MovieListViewContoller (null, tableItems [indexPath.Row], Owner.fromAddList), true);
-
+					else 
+                    {
+						//Owner.UpdateCustomAndMovieList (((Movie)tableItems [(int)indexPath.Row]).Id, Owner.fromAddList, tableItems);
+						Owner.NavigationController.PushViewController (new MovieDetailViewController (tableItems [indexPath.Row] as Movie, true), true);
+					}
 				}
 				tableView.DeselectRow (indexPath, true);
 			} catch (Exception ex) {

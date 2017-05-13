@@ -17,18 +17,19 @@ namespace FavoriteMovies
 	{
 
 		List<MDCard> tableItems = new List<MDCard> ();
-		UITableView table;
+		public UITableView table;
 		NewsFeedTableSource tableSource;
-		public AzureTablesService postService;
+		public AzureTablesService postService= AzureTablesService.DefaultService;
         private bool needLogin = true;
+    
 		public override void ViewDidAppear (bool animated)
 		{
 			
 			base.ViewDidAppear (animated);
 			if (tableItems.Count > 0) { return; }
-				tableItems =  MovieNewsFeedService.GetMDCardItems ();
+			tableItems =  MovieNewsFeedService.GetMDCardItems ();
 			tableSource = new NewsFeedTableSource (tableItems, this);
-
+			(UIApplication.SharedApplication.Delegate as AppDelegate).rootViewController.TabController.TabBar.Items [0].BadgeValue = "";
 			table.Source = tableSource;
            
 			View.Add (table);

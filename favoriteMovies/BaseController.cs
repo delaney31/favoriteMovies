@@ -40,11 +40,7 @@ namespace FavoriteMovies
 		public override void ViewWillAppear (bool animated)
 		{
 			base.ViewWillAppear (animated);
-			var screenSize = UIScreen.MainScreen.Bounds;
-			View.Frame = screenSize;
-			TabController.View.Frame = screenSize;
-			TabController.NavigationController.View.Frame = screenSize;
-
+			
 			////this fixes problem when coming out of full screen after watching a trailer
 			//NavController.NavigationBar.Frame = new CGRect () { X = 0, Y = 20, Width = 320, Height = 44 };
 			////loadPop.Hide ();

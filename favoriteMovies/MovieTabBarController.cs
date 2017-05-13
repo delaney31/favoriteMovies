@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AlertView;
 using BigTed;
 using CoreGraphics;
+using Facebook.AudienceNetwork;
 using FavoriteMoviesPCL;
 using Foundation;
 using SDWebImage;
@@ -12,12 +13,15 @@ using UIKit;
 
 namespace FavoriteMovies
 {
-	public class MovieTabBarController : UITabBarController
+	public class MovieTabBarController : UITabBarController, IInterstitialAdDelegate
 	{
 		
 		protected static SearchResultsViewController searchResultsController;
 		protected UISearchController searchController;
 		protected const float BackGroundColorAlpha = 1.0f;
+		// Generate your own Placement ID on the Facebook app settings
+		const string YourPlacementId = "696067800580326_696647140522392";
+		InterstitialAd interstitialAd;
 		public MovieTabBarController ():base ((string)null, null)
 		{
 			
@@ -26,7 +30,8 @@ namespace FavoriteMovies
 		{
 			
 			base.ViewDidAppear (animated);
-			TabBar.Items [0].BadgeValue = "";
+
+			
 
 		
 		}
@@ -40,12 +45,32 @@ namespace FavoriteMovies
 		public override void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
-
+           
 			NavigationItem.Title = "Latest Movie News";
 		
 			this.ViewControllerSelected += (sender, e) => 
 			{
-				
+
+				if (!ColorExtensions.CurrentUser.removeAds && ColorExtensions.CurrentUser.username != null) {
+					// Create a banner's ad view with a unique placement ID (generate your own on the Facebook app settings).
+					// Use different ID for each ad placement in your app.
+					interstitialAd = new InterstitialAd (YourPlacementId) {
+						Delegate = this
+					};
+
+					// When testing on a device, add its hashed ID to force test ads.
+					// The hash ID is printed to console when running on a device.
+					AdSettings.AddTestDevice (AdSettings.TestDeviceHash);
+
+					// Initiate a request to load an ad.
+					interstitialAd.LoadAd ();
+
+					// Verify if the ad is ready to be shown, if not, you will need to check later somehow (with a button, timer, delegate, etc.)
+					if (interstitialAd.IsAdValid) {
+						// Ad is ready, present it!
+						interstitialAd.ShowAdFromRootViewController (this);
+					}
+				}
                 // Take action based on the tab being selected
                 //Important fact** NavigationalController is only available for the selectedViewController!!
                 if (TabBar.SelectedItem.Title == "Movies") 
@@ -57,7 +82,14 @@ namespace FavoriteMovies
                 {
 					NavigationController.NavigationBar.Hidden = true;
                     TabBar.Items [0].BadgeValue = null;
-
+                    var indexpath = NSIndexPath.FromRowSection (0, 0);
+                    try 
+                    {
+                        ((NewsFeedViewController)((UINavigationController)SelectedViewController).TopViewController).table.ScrollToRow (indexpath, UITableViewScrollPosition.Top, true);
+                    }catch(Exception ex)
+                    {
+                        //swallow this exception.
+                    }
 				}else 
                 {
                     NavigationController.NavigationBar.Hidden = true;
@@ -65,6 +97,43 @@ namespace FavoriteMovies
 				}
 			};
 		}
+		#region IInterstitialAdDelegate
+
+		[Export ("interstitialAdDidLoad:")]
+		public void InterstitialAdDidLoad (InterstitialAd interstitialAd)
+		{
+			// Handle when the ad is loaded and ready to be shown
+			if (interstitialAd.IsAdValid) {
+				// Ad is ready, present it!
+				interstitialAd.ShowAdFromRootViewController (this);
+			}
+		}
+
+		[Export ("interstitialAd:didFailWithError:")]
+		public void IntersitialDidFail (InterstitialAd interstitialAd, NSError error)
+		{
+			// Handle if the ad is not loaded correctly
+		}
+
+		[Export ("interstitialAdDidClick:")]
+		public void InterstitialAdDidClick (InterstitialAd interstitialAd)
+		{
+			// Handle when the user tap the ad
+		}
+
+		[Export ("interstitialAdDidClose:")]
+		public void InterstitialAdDidClose (InterstitialAd interstitialAd)
+		{
+			// Handle when the user close the ad
+		}
+
+		[Export ("interstitialAdWillClose:")]
+		public void InterstitialAdWillClose (InterstitialAd interstitialAd)
+		{
+			// Handle before the ad is closed
+		}
+
+		#endregion
 	}
 	public class SearchResultsUpdator : UISearchResultsUpdating
 	{

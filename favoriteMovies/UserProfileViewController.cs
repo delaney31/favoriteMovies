@@ -63,7 +63,11 @@ namespace FavoriteMovies
 				numFollowers.Text = await postService.GetFollowersAsync (user.id);
 			});
 		}
-
+        public override void ViewDidAppear (bool animated)
+        {
+            base.ViewDidAppear (animated);
+            NavigationController.NavigationBar.Translucent = true;
+        }
 		public override  void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
@@ -72,7 +76,7 @@ namespace FavoriteMovies
 			CGRect lastLabelFrame = new CGRect ();
 			CGRect lastCollectionFrame = new CGRect ();
             nfloat lastViewPostion = 0;
-        	NavigationController.NavigationBar.Translucent = true;
+        	
 			BTProgressHUD.Dismiss ();
 			if (this.profileImage.Image == null) {
 				profileImage.Image = UIImage.FromBundle ("blank.png");
@@ -173,15 +177,16 @@ namespace FavoriteMovies
 					viewController.CollectionView.BackgroundColor = View.BackgroundColor;
 					viewController.CollectionView.RegisterClassForCell (typeof (MovieCell), UserCollectionViewController.movieCellId);
                     if (cnt == 0) {
-                        viewController.CollectionView.Frame = new CGRect (-35, custlistName.Frame.Y + custlistName.Frame.Height + 5, 345, 150);
-                        lastViewPostion = viewController.CollectionView.Frame.Y + viewController.CollectionView.Frame.Height;
+                        viewController.CollectionView.Frame = new CGRect (-35, custlistName.Frame.Y + custlistName.Frame.Height + 5, 375, 205);
+                        lastViewPostion += viewController.CollectionView.Frame.Y + viewController.CollectionView.Frame.Height;
                     } else 
                     {
-                        viewController.CollectionView.Frame = new CGRect (-35, lastCollectionFrame.Y + lastCollectionFrame.Height + 45, 345, 150);
-						lastViewPostion = lastViewPostion + viewController.CollectionView.Frame.Height;
+                        viewController.CollectionView.Frame = new CGRect (-35, lastCollectionFrame.Y + lastCollectionFrame.Height + 45, 375, 205);
+						lastViewPostion += viewController.CollectionView.Frame.Height;
                     }
                   
 					lastCollectionFrame = viewController.CollectionView.Frame;
+
 					scrollView.AddSubview (custlistName);
 					scrollView.AddSubview (viewController.CollectionView);
 					cnt++;
@@ -192,8 +197,9 @@ namespace FavoriteMovies
 
 			//scrollView.SizeToFit ();
 			scrollView.Frame = new CGRect () { X = View.Frame.X, Y = 60, Width = View.Frame.Width, Height = View.Frame.Height };
-			//For scrolling to work the scrollview Content size has to be bigger than the View.Frame.Height
-			scrollView.ContentSize = new CGSize (320, lastViewPostion + 250);
+            //For scrolling to work the scrollview Content size has to be bigger than the View.Frame.Height
+           
+            scrollView.ContentSize = new CGSize (320, lastCollectionFrame.Height * (userMovies!=null?userMovies.Count: 1)+ 300);
 			//scrollView.ContentOffset = new CGPoint (0, -scrollView.ContentInset.Top);
 			scrollView.Bounces = true;
 

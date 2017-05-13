@@ -159,7 +159,7 @@ namespace FavoriteMovies
 
 					await BlobUpload.createContainerAndUpload (byteArray);
 				});
-				TimeSpan ts = TimeSpan.FromMilliseconds (500);
+				TimeSpan ts = TimeSpan.FromMilliseconds (1500);
 				task.Wait (ts);
 				if (!task.Wait (ts))
 					Console.WriteLine ("The timeout interval elapsed uploading Profile image.");

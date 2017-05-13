@@ -376,13 +376,13 @@ namespace FavoriteMovies
 
 		public override void ViewDidAppear (bool animated)
 		{
+			
 			base.ViewDidAppear (animated);
 			NewsFeedTableSource.HideTabBar ((UIApplication.SharedApplication.Delegate as AppDelegate).rootViewController.TabController, View.BackgroundColor);
 			nfloat lastViewPostion=0;
 			if (similarMovies.Count > 0) 
 			{
-
-
+                
 				//similar movies
 				similarMoviesLabel = new UILabel () {
 					TextColor = IsDarkColor (backGroundColor) ? UIColor.White : UIColor.Black, Frame = new CGRect (16, descReview.Frame.Y + descReview.Frame.Height + userName.Frame.Height, 180, 20),

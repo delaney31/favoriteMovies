@@ -1,4 +1,4 @@
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">iPhoneSimulator</Platform>
@@ -286,11 +286,11 @@
     <Compile Include="MovieChatViewController.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="MessageFactory.cs" />
+    <Compile Include="MovieFriendsViewController.cs" />
     <Compile Include="BaseBasicListViewController.cs" />
     <Compile Include="UserCloudListViewController.cs" />
     <Compile Include="BlobUpload.cs" />
     <Compile Include="MovieFriendsBaseViewController.cs" />
-    <Compile Include="MovieFriendsViewController.cs" />
     <Compile Include="ConnectViewController.cs" />
     <Compile Include="UserProfileViewController.cs" />
     <Compile Include="clTable.cs" />

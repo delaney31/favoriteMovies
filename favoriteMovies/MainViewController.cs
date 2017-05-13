@@ -14,18 +14,16 @@ using LoginScreen;
 using MovieFriends;
 using SDWebImage;
 using BigTed;
-using Facebook.AudienceNetwork;
+
 
 namespace FavoriteMovies
 {/// <summary>
  /// This is the Main View controller for the application. It serves as the Top Rated collection of movies and creates the Now Playing 
  /// Poplular scrollable collections.
  /// </summary>
-	public class MainViewController : BaseController, IInterstitialAdDelegate
+	public class MainViewController : BaseController
 	{
-		// Generate your own Placement ID on the Facebook app settings
-		const string YourPlacementId = "696067800580326_696647140522392";
-		InterstitialAd interstitialAd;
+		
 		static CGSize HeaderReferenceSize = new CGSize (50, 50);
 		static int MinimumInteritemSpacing = 30;
 		static int SpaceBetweenContainers = 30;
@@ -227,9 +225,10 @@ namespace FavoriteMovies
         {
             base.ViewWillAppear (animated);
 			View.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, BackGroundColorAlpha);
-			if (NewCustomListToRefresh == -1) {
+			if (NewCustomListToRefresh == -1) 
+            {
                 BTProgressHUD.Show ();
-
+				
                 //if (ColorExtensions.CurrentUser.suggestmovies)
                 //    GetCollectionData ();
 
@@ -601,27 +600,7 @@ namespace FavoriteMovies
 				scrollView.AddSubview (velvetRopes);
 			}
 			View.AddSubview (scrollView);
-			if (!ColorExtensions.CurrentUser.removeAds && ColorExtensions.CurrentUser.username!=null) 
-			{
-				// Create a banner's ad view with a unique placement ID (generate your own on the Facebook app settings).
-				// Use different ID for each ad placement in your app.
-				interstitialAd = new InterstitialAd (YourPlacementId) {
-					Delegate = this
-				};
-
-				// When testing on a device, add its hashed ID to force test ads.
-				// The hash ID is printed to console when running on a device.
-				AdSettings.AddTestDevice (AdSettings.TestDeviceHash);
-
-				// Initiate a request to load an ad.
-				interstitialAd.LoadAd ();
-
-				// Verify if the ad is ready to be shown, if not, you will need to check later somehow (with a button, timer, delegate, etc.)
-				if (interstitialAd.IsAdValid) {
-					// Ad is ready, present it!
-					interstitialAd.ShowAdFromRootViewController (this);
-				}
-			}
+			
 		}
 		
 		public override  void ViewDidLoad ()
@@ -722,43 +701,7 @@ namespace FavoriteMovies
 			base.ViewWillDisappear (animated);
 		}
 
-		#region IInterstitialAdDelegate
-
-		[Export ("interstitialAdDidLoad:")]
-		public void InterstitialAdDidLoad (InterstitialAd interstitialAd)
-		{
-			// Handle when the ad is loaded and ready to be shown
-			if (interstitialAd.IsAdValid) {
-				// Ad is ready, present it!
-				interstitialAd.ShowAdFromRootViewController (this);
-			}
-		}
-
-		[Export ("interstitialAd:didFailWithError:")]
-		public void IntersitialDidFail (InterstitialAd interstitialAd, NSError error)
-		{
-			// Handle if the ad is not loaded correctly
-		}
-
-		[Export ("interstitialAdDidClick:")]
-		public void InterstitialAdDidClick (InterstitialAd interstitialAd)
-		{
-			// Handle when the user tap the ad
-		}
-
-		[Export ("interstitialAdDidClose:")]
-		public void InterstitialAdDidClose (InterstitialAd interstitialAd)
-		{
-			// Handle when the user close the ad
-		}
-
-		[Export ("interstitialAdWillClose:")]
-		public void InterstitialAdWillClose (InterstitialAd interstitialAd)
-		{
-			// Handle before the ad is closed
-		}
-
-		#endregion
+		
 	}
 
 	public class MovieCell : UICollectionViewCell
