@@ -29,7 +29,7 @@ namespace FavoriteMovies
 			table.AutoresizingMask = UIViewAutoresizing.All;
 			table.RowHeight = 55;
 			table.AllowsSelectionDuringEditing = true;
-
+           
 
 		}
 

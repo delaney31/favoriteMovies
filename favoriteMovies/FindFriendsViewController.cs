@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Linq;
 using BigTed;
+using CoreGraphics;
 using Foundation;
 using ObjCRuntime;
 using UIKit;
@@ -26,10 +27,11 @@ namespace FavoriteMovies
 			tableSource = new ConnectCloudTableSource (tableItems, this);
 
 			table.Source = tableSource;
-
+			
 			table.BackgroundColor =  UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f) ;
 
 			await ((ConnectCloudTableSource)tableSource).updateImages ();
+            table.ContentInset = new UIEdgeInsets ( 0, 0, 66, 0 );
 			View.Add (table);
 			
 		 	
