@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using BigTed;
 using CoreGraphics;
 using Foundation;
@@ -11,15 +13,20 @@ namespace FavoriteMovies
 {
 	public class FindFriendsViewController:ConnectViewController
 	{
-		public FindFriendsViewController ()
+       
+        public FindFriendsViewController ()
 		{
 		}
 
-		public override async void ViewDidLoad ()
+       
+        public override async void ViewDidLoad ()
 		{
-			base.ViewDidLoad ();	
-		
+			base.ViewDidLoad ();
+
+			if(users==null)
+               users = await postService.GetUserCloud ();
 			tableItems = await GetUserContactsAsync ();
+		
 			var name = new NSString (Constants.CustomListChange);
 			NSNotificationCenter.DefaultCenter.AddObserver (this, new Selector (Constants.CustomListChangeReceived), name, null);
 
@@ -31,15 +38,20 @@ namespace FavoriteMovies
 			table.BackgroundColor =  UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f) ;
 
 			await ((ConnectCloudTableSource)tableSource).updateImages ();
-            table.ContentInset = new UIEdgeInsets ( 0, 0, 66, 0 );
+           
 			View.Add (table);
 			
 		 	
 		}
-		public override void ViewDidAppear (bool animated)
+
+      
+
+        public override void ViewDidAppear (bool animated)
 		{
-			base.ViewDidAppear (animated);
+			base.ViewDidAppear (animated);	
             NavigationController.NavigationBar.Translucent = false;
+			table.Frame = new CGRect () { X = 0.0f, Y = 0.0f, Width = View.Layer.Frame.Width, Height = View.Layer.Frame.Height };
+            table.ContentInset = new UIEdgeInsets (0, 0, 66, 0);
 		}
 
 
@@ -49,6 +61,7 @@ namespace FavoriteMovies
 		{
 			try {
 				BTProgressHUD.Show ();
+                users = await postService.GetUserCloud ();
 				tableItems = await GetUserContactsAsync ();
 				tableSource = new ConnectCloudTableSource (tableItems, this);
 

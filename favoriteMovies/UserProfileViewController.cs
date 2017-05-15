@@ -89,7 +89,7 @@ namespace FavoriteMovies
 			name.Font = UIFont.FromName (ColorExtensions.PROFILE_NAME, 20);
 			name.TextColor = UIColor.Black;
 
-			followers.Frame = new CGRect () { X = 15, Y = 170, Width = View.Bounds.Width, Height = 120 };
+			followers.Frame = new CGRect () { X = 15, Y = 170, Width = 180, Height = 120 };
 			followers.Text = "Follower(s)".ToUpper ();
 			followers.TextAlignment = UITextAlignment.Left;
 			followers.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, 10);
@@ -112,7 +112,7 @@ namespace FavoriteMovies
 			numSharedLists.TextColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 			numSharedLists.Font = UIFont.FromName (ColorExtensions.PROFILE_NAME, 25);
 
-			following.Frame = new CGRect () { X = 10, Y = 170, Width = View.Bounds.Width - 25, Height = 120 };
+			following.Frame = new CGRect () { X = 130, Y = 170, Width = 180, Height = 120 };
 			following.Text = "Following".ToUpper ();
 			following.TextAlignment = UITextAlignment.Right;
 			following.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, 10);
@@ -142,6 +142,26 @@ namespace FavoriteMovies
 			profileImage.Layer.MasksToBounds = true;
 			profileImage.Layer.BorderColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f).CGColor;
 
+            //make followers and following clickable for yourself
+            if (user.id == ColorExtensions.CurrentUser.Id)
+            {
+               
+
+                followers.UserInteractionEnabled = true;
+                followers.TextColor = UIColor.FromRGB (74, 212, 231);
+				var followersGesture = new UITapGestureRecognizer ();
+                followersGesture.AddTarget (() => { GetFollowers (); });
+                followers.AddGestureRecognizer (followersGesture);
+
+
+				following.UserInteractionEnabled = true;
+                following.TextColor = UIColor.FromRGB (74, 212, 231);
+				var followingGesture = new UITapGestureRecognizer ();
+				followingGesture.AddTarget (() => { GetFollowing (); });
+
+				following.AddGestureRecognizer (followingGesture);
+
+			}
 			if (customLists.Count > 0) {
 				foreach (var list in customLists) 
 				{
@@ -217,11 +237,28 @@ namespace FavoriteMovies
 			View.AddSubview (scrollView);
 		}
 
+        private void GetFollowers ()
+        {
+			var followr = new FindFriendsViewController ();
+			Task.Run (async () => {
+					followr.users= await postService.GetFollowersAccountsAsync (user.id);
+				}).Wait();
 
+            if (followr.users.Count>0)
+			   NavigationController.PushViewController (followr, true);
+        }
 
-
-
-	}
+        private void GetFollowing ()
+        {
+			var followng= new FindFriendsViewController ();
+			Task.Run (async () => {
+					followng.users= await postService.GetFollowingAccountAsync (user.id);
+				}).Wait();
+            if (followng.users.Count>0)
+			   NavigationController.PushViewController (followng, true);
+     
+        }
+    }
 
 
 

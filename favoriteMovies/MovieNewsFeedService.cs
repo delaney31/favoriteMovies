@@ -90,7 +90,7 @@ namespace FavoriteMovies
 			List<MDCard> feedItemsList = new List<MDCard> ();
 			AzureTablesService postService = AzureTablesService.DefaultService;
 			List<PostItem> result = new List<PostItem> ();
-			//postService = AzureTablesService.DefaultService;
+			
 			Task.Run (async () => {
 				await postService.InitializeStoreAsync ();
 			}).Wait ();

@@ -24,7 +24,7 @@ namespace FavoriteMovies
 		protected List<ContactCard> tableItems;
 		//UIBarButtonItem following;
 		const string cellIdentifier = "UserCloudCells";
-		protected List<UserCloud> users;
+		public List<UserCloud> users;
 		protected List<UserFriendsCloud> friends;
 		UILabel loading;
 		public AzureTablesService postService = AzureTablesService.DefaultService;
@@ -80,30 +80,30 @@ namespace FavoriteMovies
 			//Ensure the searchResultsController is presented in the current View Controller 
 			DefinesPresentationContext = true;
 
-			if (tableItems == null) // this means async viewdidload  not finished yet
-				BTProgressHUD.Show ();
+			//if (tableItems == null) // this means async viewdidload  not finished yet
+				//BTProgressHUD.Show ();
 
 
 		}
-
+		
 		protected async Task<List<ContactCard>> GetUserContactsAsync ()
 		{
 			//if(tableItems == null)
-			 
+			
 			var watch = System.Diagnostics.Stopwatch.StartNew ();
-
+			//users = await postService.GetUserCloud ();
 			const string cellId = "UserContacts";
 			List<ContactCard> results = new List<ContactCard> ();
 
 			//table.TableHeaderView = new UIView () {
 			//	Frame = new CGRect () { X = 0.0f, Y = 0.0f, Width = View.Layer.Frame.Width, Height = 20f }
 			//};
-			users = await postService.GetUserCloud ();
+			
 
 			foreach (var user in users) 
 			{
-				if (user.Id != ColorExtensions.CurrentUser.Id)
-				{
+				//if (user.Id != ColorExtensions.CurrentUser.Id)
+				//{
 					var result = new ContactCard (UITableViewCellStyle.Default, cellId);
 					result.nameLabel.Text = user.username;
 					result.connection = user.connection;
@@ -112,7 +112,7 @@ namespace FavoriteMovies
 					result.location = user.city + " " + user.state + " " + user.country;
 					results.Add (result);
 					Console.WriteLine (user.Id	);
-				}
+				//}
 
 			}
 

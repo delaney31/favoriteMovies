@@ -52,28 +52,120 @@ namespace MovieFriends
 		private IMobileServiceTable<CustomListCloud> clTable;
 		private IMobileServiceTable<MovieCloud> mfTable;
 
+
+        internal async Task<List<UserCloud>>GetFollowingAccountAsync(string id)
+        {
+			try {
+
+				var friends = await ufTable.Where (item => item.userid == id).ToListAsync ();
+				
+                var userfriends = from s in await userTable.ToListAsync ()
+								  join f in friends on s.Id equals f.friendid
+
+								  select new UserCloud () {
+									  username = s.username,
+									  state = s.state,
+									  city = s.city,
+									  country = s.country,
+									  connection = true,
+									  Id = s.Id
+								  };
+
+
+
+
+				return userfriends.Take (50).ToList ();
+
+
+
+			} catch (Exception e) {
+				Console.Error.WriteLine (@"ERROR {0}", e.Message);
+				return new List<UserCloud> ();
+			}
+
+		}
+
+
+		
 		internal async Task<string> GetFollowingAsync (string id)
 		{
 			try 
 			{
 
-				var following = await ufTable.Where (item => item.userid == id).ToListAsync ();
-				return following.Count().ToString();
 
-			} catch (Exception e) {
+				var friends = await ufTable.Where (item => item.userid == id).ToListAsync ();
+
+				var userfriends = from s in await userTable.ToListAsync ()
+								  join f in friends on s.Id equals f.friendid
+
+								  select new UserCloud () {
+									  username = s.username,
+									  state = s.state,
+									  city = s.city,
+									  country = s.country,
+									  connection = true,
+									  Id = s.Id
+								  };
+
+                return userfriends.Count ().ToString ();
+
+			} catch (Exception e) 
+            {
 				Console.Error.WriteLine (@"ERROR {0}", e.Message);
 				return "0";
 			}
 		}
-
-		internal async  Task<string> GetFollowersAsync (string id)
+		internal async Task<List<UserCloud>> GetFollowersAccountsAsync (string id)
 		{
 			try {
 
-				var followers = await ufTable.Where (item => item.friendid == id).ToListAsync ();
-				return followers.Count ().ToString ();
+
+				var friends = await ufTable.Where (item => item.friendid == id).ToListAsync ();
+
+				var userfriends = from s in await userTable.ToListAsync ()
+								  join f in friends on s.Id equals f.userid
+
+								  select new UserCloud () {
+									  username = s.username,
+									  state = s.state,
+									  city = s.city,
+									  country = s.country,
+									  connection = true,
+									  Id = s.Id
+								  };
+
+
+				return userfriends.Take (50).ToList ();
+
+
 
 			} catch (Exception e) {
+				Console.Error.WriteLine (@"ERROR {0}", e.Message);
+				return new List<UserCloud> ();
+			}
+		}
+		internal async  Task<string> GetFollowersAsync (string id)
+		{
+			try 
+           {
+
+				var friends = await ufTable.Where (item => item.friendid == id).ToListAsync ();
+
+				var userfriends = from s in await userTable.ToListAsync ()
+								  join f in friends on s.Id equals f.userid
+
+								  select new UserCloud () {
+									  username = s.username,
+									  state = s.state,
+									  city = s.city,
+									  country = s.country,
+									  connection = true,
+									  Id = s.Id
+								  };
+
+                return userfriends.Count ().ToString ();
+			} catch (Exception e) 
+            {
 				Console.Error.WriteLine (@"ERROR {0}", e.Message);
 				return "0";
 			}
@@ -691,7 +783,7 @@ namespace MovieFriends
 
 				var userfriends =
 					from u in await userTable.ToListAsync ()                        
-					let friend = friends.Count (x => x.friendid == u.Id && x.userid == ColorExtensions.CurrentUser.Id) >0
+					let friend = friends.Any (x => x.friendid == u.Id && x.userid == ColorExtensions.CurrentUser.Id)
 					select new UserCloud ()
 					{ 
 						username = u.username, 

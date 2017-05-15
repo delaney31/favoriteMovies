@@ -9,6 +9,8 @@ using SidebarNavigation;
 using UIKit;
 using WindowsAzure.Messaging;
 using Pushwoosh;
+using Flurry.Analytics;
+
 namespace FavoriteMovies
 {
 	// The UIApplicationDelegate for the application. This class is responsible for launching the
@@ -43,6 +45,11 @@ namespace FavoriteMovies
 			// Override point for customization after application launch.
 			// If not required for your application you can safely delete this method
 			Window = new UIWindow (UIScreen.MainScreen.Bounds);
+			// start Flurry
+			FlurryAgent.StartSession ("C62Q3TTD7XY44X685XDT");
+
+			FlurryAgent.SetDebugLogEnabled (true);
+			FlurryAgent.SetLogLevel (FlurryLogLevel.All);
 
 			// make the window visible
 			Window.MakeKeyAndVisible ();
