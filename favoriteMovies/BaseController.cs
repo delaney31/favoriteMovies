@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Drawing;
 using CoreGraphics;
 using Foundation;
@@ -14,6 +15,7 @@ namespace FavoriteMovies
 		protected const float BackGroundColorAlpha = 1.0f;
 		// provide access to the sidebar controller to all inheriting controllers
 		protected static UIScrollView scrollView = new UIScrollView ();
+        protected static UIWindow Window = (UIApplication.SharedApplication.Delegate as AppDelegate).Window;
 		public SidebarNavigation.SidebarController SidebarController {
 			get {
 				//return (UIApplication.SharedApplication.Delegate as AppDelegate).NavController.SidebarController;
@@ -35,11 +37,16 @@ namespace FavoriteMovies
 			}
 		}
 
-
+        public override void ViewDidLoad ()
+        {
+            base.ViewDidLoad ();
+			
+        }
 	
 		public override void ViewWillAppear (bool animated)
 		{
 			base.ViewWillAppear (animated);
+
 			
 			////this fixes problem when coming out of full screen after watching a trailer
 			//NavController.NavigationBar.Frame = new CGRect () { X = 0, Y = 20, Width = 320, Height = 44 };

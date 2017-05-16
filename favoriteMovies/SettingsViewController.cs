@@ -39,7 +39,7 @@ namespace FavoriteMovies
 		{
 			base.ViewWillAppear (animated);
 
-
+			Initialize ();
 
 			// Perform any additional setup after loading the view, typically from a nib.
 			NavigationItem.Title = "Profile";
@@ -54,7 +54,7 @@ namespace FavoriteMovies
 			txtEmail.Text = ColorExtensions.CurrentUser.email;
 			switchRemoveAds.On = ColorExtensions.CurrentUser.removeAds;
 			switchRemoveAds.ValueChanged += SwitchRemoveAds_ValueChanged;
-			lblVersion.Text = "Version " + NSBundle.MainBundle.InfoDictionary ["CFBundleShortVersionString"];
+            lblVersion.Text = "(Version " + NSBundle.MainBundle.InfoDictionary ["CFBundleShortVersionString"] + ")";
 			segmentTileSize.SelectedSegment = ColorExtensions.CurrentTileSize;
 			segmentTileSize.ValueChanged += SegmentTileSize_ValueChanged;
 			userProfileImage = new UIImageView ();
@@ -65,7 +65,7 @@ namespace FavoriteMovies
 			if (signUpImage != null)
 				userProfileImage.Image = signUpImage;
 			userProfileImage.BackgroundColor = UIColor.Clear;
-			userProfileImage.Frame = new RectangleF (105, 65, 120, 120);
+			userProfileImage.Frame = new RectangleF (103, 65, 120, 120);
 			userProfileImage.ContentMode = UIViewContentMode.ScaleAspectFill;
 			//userProfileImage.Layer.BorderWidth = 2;
 			userProfileImage.Layer.CornerRadius = userProfileImage.Frame.Size.Width / 2;
@@ -102,12 +102,54 @@ namespace FavoriteMovies
 					}
 				};
 		}
-
+		void Initialize ()
+		{
+            
+			InvokeOnMainThread (async () => {
+				lbNumFollowing.Text = await postService.GetFollowingAsync (ColorExtensions.CurrentUser.Id);
+				lblNumFollowers.Text = await postService.GetFollowersAsync (ColorExtensions.CurrentUser.Id);
+			});
+		}
 		public override  void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
 			View.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1);
-         
+            lbNumFollowing.TextColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1);
+            lblNumFollowers.TextColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1);
+            lblFollowers.TextColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1);
+            lblFollowing.TextColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1);
+            lblFollowers.AddGestureRecognizer (new UITapGestureRecognizer(() =>                                    
+            {
+                GetFollowers ();
+            }));
+			lblFollowing.AddGestureRecognizer (new UITapGestureRecognizer (() => {
+				GetFollowing ();
+			}));
+		
+		}
+
+		private void GetFollowers ()
+		{
+            var followr = new FindFriendsViewController ();
+
+			Task.Run (async () => {
+				followr.users = await postService.GetFollowersAccountsAsync (ColorExtensions.CurrentUser.Id);
+			}).Wait ();
+
+			if (followr.users.Count > 0)
+				NavigationController.PushViewController (followr, true);
+		}
+
+		private void GetFollowing ()
+		{
+			var followng = new FindFriendsViewController ();
+          
+			Task.Run (async () => {
+				followng.users = await postService.GetFollowingAccountAsync (ColorExtensions.CurrentUser.Id);
+			}).Wait ();
+			if (followng.users.Count > 0)
+				NavigationController.PushViewController (followng, true);
+
 		}
 		void Handle_Canceled (object sender, EventArgs e)
 		{

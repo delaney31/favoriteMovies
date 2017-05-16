@@ -40,31 +40,28 @@ namespace FavoriteMovies
 
 		}
 		[Export ("CurrentUserSetNotificationReceived:")]
-		public async void CurrentUserSetNotificationReceived (NSNotification n)
+		public void CurrentUserSetNotificationReceived (NSNotification n)
 		{
-			InvokeOnMainThread (async () => 
-			{
-				title.SetTitle (ColorExtensions.CurrentUser.username, UIControlState.Normal);
-				var locationIcon = new UIImageView () { Image = UIImage.FromBundle ("location-100.png") };
-				if (ColorExtensions.CurrentUser.city != null) 
-				{
-					
-					locationIcon.Frame = new CGRect () { X = 110, Y = 243, Width = 10, Height = 10 };
-					location = new UIButton (new RectangleF (20, 220, 192, 20));
-					location.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, 13);
-					//title.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.NAV_BAR_COLOR, 1.0f);
-					location.HorizontalAlignment = UIControlContentHorizontalAlignment.Center;
-					location.SetTitleColor (UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f), UIControlState.Normal);
-					location.SetTitle (ColorExtensions.CurrentUser.city + " " + ColorExtensions.CurrentUser.state + " " + ColorExtensions.CurrentUser.country, UIControlState.Normal);
-					location.TouchUpInside += (sender, e) => 
-					{
-						NavController.PopToRootViewController (false);
-						SidebarController.CloseMenu ();
-					};
-					View.Add (location);
-					View.Add (locationIcon);
-				}
-			});
+			InvokeOnMainThread (() => {
+                title.SetTitle (ColorExtensions.CurrentUser.username, UIControlState.Normal);
+                var locationIcon = new UIImageView () { Image = UIImage.FromBundle ("location-100.png") };
+                if (ColorExtensions.CurrentUser.city != null) {
+
+                    locationIcon.Frame = new CGRect () { X = 110, Y = 243, Width = 10, Height = 10 };
+                    location = new UIButton (new RectangleF (20, 220, 192, 20));
+                    location.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, 13);
+                    //title.BackgroundColor = UIColor.Clear.FromHexString (UIColorExtensions.NAV_BAR_COLOR, 1.0f);
+                    location.HorizontalAlignment = UIControlContentHorizontalAlignment.Center;
+                    location.SetTitleColor (UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f), UIControlState.Normal);
+                    location.SetTitle (ColorExtensions.CurrentUser.city + " " + ColorExtensions.CurrentUser.state + " " + ColorExtensions.CurrentUser.country, UIControlState.Normal);
+                    location.TouchUpInside += (sender, e) => {
+                        NavController.PopToRootViewController (false);
+                        SidebarController.CloseMenu ();
+                    };
+                    View.Add (location);
+                    View.Add (locationIcon);
+                }
+            });
 		}
 
 		public override async void ViewDidAppear (bool animated)

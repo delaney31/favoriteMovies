@@ -29,6 +29,33 @@ using Microsoft.WindowsAzure.MobileServices.Sync;         // offline sync
 
 namespace MovieFriends
 {
+	public static class TableLoadAllExtensions
+	{
+		public static Task<List<T>> LoadAllAsync<T> (this IMobileServiceTable<T> table, int bufferSize = 1000)
+		{
+			return table.CreateQuery ().LoadAllAsync (bufferSize);
+		}
+
+		public async static Task<List<T>> LoadAllAsync<T> (this IMobileServiceTableQuery<T> query, int bufferSize = 1000)
+		{
+			query = query.IncludeTotalCount ();
+			var results = await query.ToListAsync ();
+			long count = ((ITotalCountProvider)results).TotalCount;
+			if (count < 0 || (results != null && results.Count == count)) {
+				// Already have everything we need, or don't have the count
+				return results;
+			}
+
+			var allItems = new List<T> ();
+			allItems.AddRange (results); // insert the first few items
+			while (allItems.Count < count) {
+				var next = await query.Skip (allItems.Count).Take (bufferSize).ToListAsync ();
+				allItems.AddRange (next);
+			}
+
+			return allItems;
+		}
+	}
 	public class AzureTablesService
 	{
 		static AzureTablesService instance = new AzureTablesService ();
@@ -206,8 +233,8 @@ namespace MovieFriends
 			}
 		}
 
-		public async Task InitializeStoreAsync ()
-		{
+        public void InitializeStore ()
+        {
 #if OFFLINE_SYNC_ENABLED
 			var store = new MobileServiceSQLiteStore (MovieService.Database);
 			store.DefineTable<PostItem> ();
@@ -222,10 +249,10 @@ namespace MovieFriends
 
 			await client.SyncContext.InitializeAsync (store);
 #endif
-		}
+        }
 
-		public async Task PostSyncAsync (bool pullData = false)
-		{
+        public void PostSync (bool pullData = false)
+        {
 
 #if OFFLINE_SYNC_ENABLED
 			try {
@@ -239,9 +266,9 @@ namespace MovieFriends
 				Console.Error.WriteLine (@"Sync Failed: {0}", e.Message);
 			}
 #endif
-		}
+        }
 
-		internal async Task<List<NotificationsCloud>> GetNotifications ()
+        internal async Task<List<NotificationsCloud>> GetNotifications ()
 		{
 			try {
 
@@ -262,8 +289,8 @@ namespace MovieFriends
 			}
 		}
 
-		public async Task UserSyncAsync (bool pullData = false)
-		{
+        public void UserSync (bool pullData = false)
+        {
 #if OFFLINE_SYNC_ENABLED
 			try {
 				await client.SyncContext.PushAsync ();
@@ -276,9 +303,9 @@ namespace MovieFriends
 				Console.Error.WriteLine (@"Sync Failed: {0}", e.Message);
 			}
 #endif
-		}
-		public async Task UserFriendsSyncAsync (bool pullData = false)
-		{
+        }
+        public void UserFriendsSync (bool pullData = false)
+        {
 #if OFFLINE_SYNC_ENABLED
 			try {
 				await client.SyncContext.PushAsync ();
@@ -292,10 +319,10 @@ namespace MovieFriends
 				Console.Error.WriteLine (@"Sync Failed: {0}", e.Message);
 			}
 #endif
-		}
+        }
 
-		public async Task MovieSyncAsync (bool pullData = false)
-		{
+        public void MovieSync (bool pullData = false)
+        {
 #if OFFLINE_SYNC_ENABLED
 			try {
 				await client.SyncContext.PushAsync ();
@@ -308,10 +335,10 @@ namespace MovieFriends
 				Console.Error.WriteLine (@"Sync Failed: {0}", e.Message);
 			}
 #endif
-		}
+        }
 
-		public async Task CustomListSyncAsync (bool pullData = false)
-		{
+        public void CustomListSync (bool pullData = false)
+        {
 #if OFFLINE_SYNC_ENABLED
 			try {
 				await client.SyncContext.PushAsync ();
@@ -324,8 +351,8 @@ namespace MovieFriends
 				Console.Error.WriteLine (@"Sync Failed: {0}", e.Message);
 			}
 #endif
-		}
-		public async Task<List<CustomListCloud>> GetCustomList (string userId)
+        }
+        public async Task<List<CustomListCloud>> GetCustomList (string userId)
 		{
 			try {
 
@@ -773,17 +800,17 @@ namespace MovieFriends
 
 
 		}
-
+     
 		public async Task<List<UserCloud>> GetUserCloud ()
 		{
 			
 			try {
-				
-				var friends = await ufTable.ToListAsync ();
 
+                var friends = await ufTable.LoadAllAsync ();
+             
 				var userfriends =
 					from u in await userTable.ToListAsync ()                        
-					let friend = friends.Any (x => x.friendid == u.Id && x.userid == ColorExtensions.CurrentUser.Id)
+					let friend = friends.Count (x => x.friendid == u.Id && x.userid == ColorExtensions.CurrentUser.Id) > 0
 					select new UserCloud ()
 					{ 
 						username = u.username, 
@@ -795,7 +822,7 @@ namespace MovieFriends
 					};
 
 
-				return userfriends.Take(50).ToList ();
+				return userfriends.ToList ();
 
 
 

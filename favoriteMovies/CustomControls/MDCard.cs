@@ -13,7 +13,7 @@ namespace FavoriteMovies
 		public UILabel nameLabel;
 		public UILabel descriptionLabel;
 		public UILabel likeLabel;
-		UIButton commentButton ;
+		
 		//public UIImageView likeButton;
 		public UILabel numberLikes;
 
@@ -21,7 +21,7 @@ namespace FavoriteMovies
 
 		public UIView cardView;
 		public UIImageView profileImage;
-		UITableViewCellStyle @default;
+	
 
 		public bool liked { get; private set; }
 		public int likes { get;set; }
@@ -75,17 +75,6 @@ namespace FavoriteMovies
 			likeLabel.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, ColorExtensions.CAST_FONT_SIZE);
 
 
-			//likeButton = new UIImageView ();
-			//likeButton.Frame = new CGRect () { X = 0, Y = 290, Width = 50, Height = 30 };
-
-			//UIImage [] imageArray = { UIImage.FromBundle ("like.png"), UIImage.FromBundle ("unlike.png")};
-
-			//likeButton.AnimationImages = imageArray;
-			//likeButton.ContentMode = UIViewContentMode.ScaleAspectFit;
-
-			//likeButton.Image = UIImage.FromBundle ("like.png");
-			//likeButton.
-
 			cardView = new UIView ();
 			cardView.AddSubviews (profileImage, likeLabel, descriptionLabel, nameLabel, titleLabel, numberLikes);
 			//cardView.BringSubviewToFront (likeButton);
@@ -122,9 +111,6 @@ namespace FavoriteMovies
 			UIBezierPath path = UIBezierPath.FromRect (cardView.Bounds);
 			this.cardView.Layer.ShadowPath = path.CGPath;
 
-			//	this.BackgroundColor = UIColor.FromRGBA (.9f, .9f, .9f, 1);
-			//this.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
-			//BackgroundColor = MovieDetailViewController.averageColor (profileImage.Image);
 		}
 
 		void imageSetup ()

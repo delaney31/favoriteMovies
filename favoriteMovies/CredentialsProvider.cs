@@ -97,7 +97,7 @@ namespace FavoriteMovies
 					{
 						
                         try {
-							await postService.InitializeStoreAsync ();
+							postService.InitializeStore ();
                             var locator = CrossGeolocator.Current;
                             locator.DesiredAccuracy = 50;
 

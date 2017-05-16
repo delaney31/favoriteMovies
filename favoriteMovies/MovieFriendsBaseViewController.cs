@@ -140,7 +140,7 @@ namespace FavoriteMovies
 				UIApplication.SharedApplication.NetworkActivityIndicatorVisible = true;
 				// perform search
 				AzureTablesService userFriendsService = AzureTablesService.DefaultService;
-				await userFriendsService.InitializeStoreAsync ();
+                userFriendsService.InitializeStore ();
 
 				userFriends = await userFriendsService.GetSearchUserFriends (forSearchString);
 				TableView.ReloadData ();

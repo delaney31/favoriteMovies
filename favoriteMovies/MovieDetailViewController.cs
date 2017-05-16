@@ -5,13 +5,14 @@ using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Drawing;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BigTed;
 using CoreGraphics;
-using Facebook.AudienceNetwork;
 using FavoriteMoviesPCL;
 using Foundation;
+using Google.MobileAds;
 using MovieFriends;
 using ObjCRuntime;
 using SDWebImage;
@@ -30,7 +31,7 @@ namespace FavoriteMovies
 
 		}
 	}
-	public class MovieDetailViewController : BaseController, IAdViewDelegate
+	public class MovieDetailViewController : BaseController,IBannerViewDelegate
 	{
 
 		UILabel dateOpenView = new UILabel ();
@@ -43,13 +44,13 @@ namespace FavoriteMovies
 		UIImageView IMDB = new UIImageView ();
 		UILabel voteResultText = new UILabel ();
 		UILabel userResultText = new UILabel ();
-
+        BannerView adViewWindow;
+        bool viewOnScreen = false;
+        const string bannerId = "ca-app-pub-3328591715743369/4839968731";
 		/// <summary>
 		/// This is the view controller for the movie details page. In addition it allows you to save and clear favorite movies
 		/// </summary>
 		// Generate your own Placement ID on the Facebook app settings
-		const string PlacementId = "696067800580326_696071757246597";
-		AdView adView;
 		//static string _googleApiKey = "AIzaSyCu634TJuZR_0iUhJQ6D8E9xr2a3VbU3_M";
 		static string _youTubeURl = "https://www.youtube.com/embed/";
 		static string _embededMoveId;
@@ -102,8 +103,56 @@ namespace FavoriteMovies
 		{
 			this.text = text;
 		}
+		public void AddBanner ()
+		{
+            if (adViewWindow == null) 
+            {
 
-		void Initialize ()
+				// Setup your GADBannerView, review AdSizeCons class for more Ad sizes. 
+				adViewWindow = new BannerView (size: AdSizeCons.SmartBannerPortrait,
+											   origin: new CGPoint (0, UIScreen.MainScreen.Bounds.Size.Height - AdSizeCons.Banner.Size.Height)) {
+					AdUnitID = bannerId,
+					RootViewController = NavigationController
+				};
+
+				// Wire AdReceived event to know when the Ad is ready to be displayed
+				adViewWindow.AdReceived += (object sender, EventArgs e) => 
+                    {
+				
+						NavigationController.View.Subviews.First ().Frame = new CGRect (0, 0, UIScreen.MainScreen.Bounds.Width, UIScreen.MainScreen.Bounds.Height - 50);
+						NavigationController.View.AddSubview (adViewWindow);
+						
+					
+				    };
+			}
+			adViewWindow.LoadRequest (GetRequest ());
+		}
+		void RemoveAdFromWindow ()
+		{
+			if (adViewWindow != null) 
+            {
+				
+					NavigationController.View.Subviews.First ().Frame = new CGRect (0, 0, UIScreen.MainScreen.Bounds.Width, UIScreen.MainScreen.Bounds.Height);
+					adViewWindow.RemoveFromSuperview ();
+				
+			
+
+				// You need to explicitly Dispose BannerView when you dont need it anymore
+				// to avoid crashes if pending request are in progress
+				adViewWindow.Dispose ();
+				adViewWindow = null;
+			}
+		}
+		Request GetRequest ()
+		{
+			var request = Request.GetDefaultRequest ();
+			// Requests test ads on devices you specify. Your test device ID is printed to the console when
+			// an ad request is made. GADBannerView automatically returns test ads when running on a
+			// simulator. After you get your device ID, add it here
+			//request.TestDevices = new [] { Request.SimulatorId.ToString (),"95ca7f0007da8e712049d4673c0627da"};
+			return request;
+		}
+        void Initialize ()
 		{
 			try {
 
@@ -127,7 +176,8 @@ namespace FavoriteMovies
 		public override void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
-
+            if (!ColorExtensions.CurrentUser.removeAds && ColorExtensions.CurrentUser.username != null)
+				AddBanner ();
 			//NewsFeedTableSource.HideTabBar ((UIApplication.SharedApplication.Delegate as AppDelegate).rootViewController.TabController,View.BackgroundColor);
 
 			const string baseUrl = "https://image.tmdb.org/t/p/w300/";
@@ -370,7 +420,8 @@ namespace FavoriteMovies
 			updateMovie (movieDetail);
 			NewsFeedTableSource.ShowTabBar ((UIApplication.SharedApplication.Delegate as AppDelegate).rootViewController.TabController);
 			NavigationController.NavigationBar.Frame = new CGRect { X = 0, Y = 20, Width = 320, Height = 44 };
-
+            if (!ColorExtensions.CurrentUser.removeAds && ColorExtensions.CurrentUser.username != null)
+				RemoveAdFromWindow ();
 		}
 	
 
@@ -542,26 +593,6 @@ namespace FavoriteMovies
 				}
 				if (!ColorExtensions.CurrentUser.removeAds) 
 				{
-					// Create a banner's ad view with a unique placement ID (generate your own on the Facebook app settings).
-					// Use different ID for each ad placement in your app.
-					adView = new AdView (PlacementId, AdSizes.BannerHeight50, this) {
-						Delegate = this
-					};
-					AdSettings.AddTestDevice (AdSettings.TestDeviceHash);
-
-
-					// Initiate a request to load an ad.
-					adView.LoadAd ();
-
-					// Reposition the adView to the bottom of the screen
-					var viewSize = View.Bounds.Size;
-					var bottomAlignedY = viewSize.Height - AdSizes.BannerHeight50.Size.Height;
-
-					adView.Frame = new CGRect (0, bottomAlignedY, viewSize.Width, AdSizes.BannerHeight50.Size.Height);
-
-					// Add adView to the view hierarchy.
-					View.AddSubview (adView);
-					View.BringSubviewToFront (adView);
 				}
 		}
 
@@ -773,33 +804,6 @@ namespace FavoriteMovies
 			// Release any cached data, images, etc that aren't in use.
 		}
 
-		#region IAdViewDelegate
-
-		[Export ("adViewDidClick:")]
-		public void AdViewDidClick (AdView adView)
-		{
-			// Handle when the banner is clicked
-		}
-
-		[Export ("adViewDidFinishHandlingClick:")]
-		public void AdViewDidFinishHandlingClick (AdView adView)
-		{
-			// Handle when the window that is opened by the click is closed);
-		}
-
-		[Export ("adViewDidLoad:")]
-		public void AdViewDidLoad (AdView adView)
-		{
-			// Handle when the ad on the banner is loaded
-		}
-
-		[Export ("adView:didFailWithError:")]
-		public void AdViewDidFail (AdView adView, NSError error)
- 		{
-			// Handle if the ad is not loaded correctly
-		}
-
-		#endregion
 	}
 
 

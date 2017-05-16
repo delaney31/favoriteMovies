@@ -14,7 +14,7 @@ using LoginScreen;
 using MovieFriends;
 using SDWebImage;
 using BigTed;
-
+using Google.MobileAds;
 
 namespace FavoriteMovies
 {/// <summary>
@@ -73,10 +73,11 @@ namespace FavoriteMovies
 		static UILabel TopRatedLabel;
 		static UILabel PlayingNowLabel;
 		static UILabel PopularLabel;
-		static UILabel MovieLatestLabel;
+        static UILabel MovieLatestLabel;
+        Interstitial adInterstitial;
 		//static UIView horizontalLine = new UIView();
 		static UIImageView velvetRopes = new UIImageView ();
-
+        const string intersitialId = "ca-app-pub-3328591715743369/1886502337";
 		//	public MainViewController (ObservableCollection<Movie> topRated, ObservableCollection<Movie> nowPlaying, ObservableCollection<Movie> popular, ObservableCollection<Movie> movieLatest,int page)
 		public MainViewController ()
 		{
@@ -115,7 +116,29 @@ namespace FavoriteMovies
 			return UIInterfaceOrientationMask.Portrait;
 		}
 
-
+		void CreateAndRequestInterstitial ()
+		{
+			adInterstitial = new Interstitial (intersitialId);
+			adInterstitial.ScreenDismissed += (sender, e) => {
+				// Interstitial is a one time use object. That means once an interstitial is shown, HasBeenUsed 
+				// returns true and the interstitial can't be used to load another ad. 
+				// To request another interstitial, you'll need to create a new Interstitial object.
+				adInterstitial.Dispose ();
+				adInterstitial = null;
+				CreateAndRequestInterstitial ();
+			};
+			adInterstitial.LoadRequest (GetRequest ());
+		}
+	
+		Request GetRequest ()
+		{
+			var request = Request.GetDefaultRequest ();
+			// Requests test ads on devices you specify. Your test device ID is printed to the console when
+			// an ad request is made. GADBannerView automatically returns test ads when running on a
+			// simulator. After you get your device ID, add it here
+			request.TestDevices = new [] { Request.SimulatorId.ToString (), "95ca7f0007da8e712049d4673c0627da" };
+			return request;
+		}
 		public  override void  ViewDidAppear (bool animated)
 		{
 			base.ViewDidAppear (animated);
@@ -124,34 +147,19 @@ namespace FavoriteMovies
             TabController.View.Frame = screenSize;
             TabController.NavigationController.View.Frame = screenSize;
 
-			//NewsFeedTableSource.ShowTabBar (TabController);
-
-			//UIApplication.SharedApplication.SetStatusBarHidden (false, true);
-			//TabController.NavigationController.NavigationBar.Hidden = false;
-			//searchResultsController.TableView.ContentInset = new UIEdgeInsets (80, 0, 0, 0);
-			//HACK until i find out why when you open a movie details and come back the view.height changes. NavigationController.NavigationBar.Frame.Y += 20;
-
-
-
-			if (View.Frame.Height == 504) 
-			{
-
-					//For scrolling to work the scrollview Content size has to be bigger than the View.Frame.Height
-				if (ColorExtensions.CurrentUser.suggestmovies)
-					scrollView.ContentSize = new CGSize (View.Frame.Width, MovieLatestController.CollectionView.Frame.Y + MovieLatestController.CollectionView.Frame.Height + SpaceBetweenContainers + SeparationBuffer);
-				else 
-				{
-					if(customLists.Count>0)
-					   scrollView.ContentSize = new CGSize (View.Frame.Width, customControllers [customLists.Count - 1].CollectionView.Frame.Y + customControllers [customLists.Count - 1].CollectionView.Frame.Height + SpaceBetweenContainers + SeparationBuffer);
-				}
-
-			}
-			////*****this fixes a problem with the uitableview adding space at the top after each selection*****
-			//Debug.Write (searchResultsController.TableView.ContentInset);
-			// adding label views to View. 
-			
+            if (!ColorExtensions.CurrentUser.removeAds && ColorExtensions.CurrentUser.username != null) 
+            {
+                
+                AddToView ();
+            }
 		}
+		void AddToView ()
+		{
+			if (!adInterstitial.IsReady)
+				return;
 
+			adInterstitial.PresentFromRootViewController (NavigationController);
+		}
 		public static void getUser ()
 		{
 			
@@ -606,6 +614,7 @@ namespace FavoriteMovies
 		public override  void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
+            CreateAndRequestInterstitial ();
             this.TabBarItem.Title = "Movies";
 			// Creates an instance of a custom View Controller that holds the results
 			searchResultsController = new SearchResultsViewController ();

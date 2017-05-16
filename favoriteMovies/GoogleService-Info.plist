@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>AD_UNIT_ID_FOR_BANNER_TEST</key>
+	<string>ca-app-pub-3940256099942544/2934735716</string>
+	<key>AD_UNIT_ID_FOR_INTERSTITIAL_TEST</key>
+	<string>ca-app-pub-3940256099942544/4411468910</string>
+	<key>CLIENT_ID</key>
+	<string>524356376007-2b8f28m96nv7gj8rrgt2knqkfehpc231.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.524356376007-2b8f28m96nv7gj8rrgt2knqkfehpc231</string>
+	<key>API_KEY</key>
+	<string>AIzaSyBW0RJrgH69ktQ0KcGfztERHmpDb8-KUQg</string>
+	<key>GCM_SENDER_ID</key>
+	<string>524356376007</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.jadesystemsinc.favoritemovies</string>
+	<key>PROJECT_ID</key>
+	<string>movie-friends-e696a</string>
+	<key>STORAGE_BUCKET</key>
+	<string>movie-friends-e696a.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<true/>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false/>
+	<key>IS_APPINVITE_ENABLED</key>
+	<false/>
+	<key>IS_GCM_ENABLED</key>
+	<true/>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true/>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:524356376007:ios:9a57da3bd439562f</string>
+	<key>DATABASE_URL</key>
+	<string>https://movie-friends-e696a.firebaseio.com</string>
+</dict>
+</plist>

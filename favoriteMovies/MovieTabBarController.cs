@@ -1,32 +1,21 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Threading.Tasks;
-using AlertView;
-using BigTed;
 using CoreGraphics;
-using Facebook.AudienceNetwork;
 using FavoriteMoviesPCL;
-using Flurry.Ads;
-using Flurry.Ads.Interstitial;
 using Foundation;
-using iAd;
 using SDWebImage;
 using UIKit;
 
 namespace FavoriteMovies
 {
-	public class MovieTabBarController : UITabBarController//, IInterstitialAdDelegate
+    public class MovieTabBarController : UITabBarController//,IFlurryAdInterstitialDelegate //,IInterstitialAdDelegate 
 	{
 		
 		protected static SearchResultsViewController searchResultsController;
 		protected UISearchController searchController;
 		protected const float BackGroundColorAlpha = 1.0f;
-		// Generate your own Placement ID on the Facebook app settings
-		const string YourPlacementId = "696067800580326_696647140522392";
-		InterstitialAd interstitialAd;
-		ADBannerView _adBannerView;
-		private FlurryAdInterstitial adInterstitial;
+		
 		public MovieTabBarController ():base ((string)null, null)
 		{
 			
@@ -35,7 +24,7 @@ namespace FavoriteMovies
 		{
 			
 			base.ViewDidAppear (animated);
-
+			//adInterstitial.AdDelegate = this;
 			
 
 		
@@ -50,31 +39,16 @@ namespace FavoriteMovies
 		public override void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
-			adInterstitial = new FlurryAdInterstitial ("Movie_Main_Page");
-			#if DEBUG
-						// enable test ads
-						var targeting = FlurryAdTargeting.Targeting;
-						targeting.TestAdsEnabled = true;
-						adInterstitial.Targeting = targeting;
-			#endif
+			//adInterstitial = new FlurryAdInterstitial ("MAIN_SCREEN_INTERSTITIAL");
+          
+			//#if DEBUG
+			//			// enable test ads
+			//			var targeting = FlurryAdTargeting.Targeting;
+			//			targeting.TestAdsEnabled = true;
+			//			adInterstitial.Targeting = targeting;
+			//#endif
 
-			//// Hook in the iAd component
-			//_adBannerView = new ADBannerView (iAd.ADAdType.Banner) 
-			//         {
-			//	Hidden = true
-			//};
-
-
-			//_adBannerView.FailedToReceiveAd += (object sender, AdErrorEventArgs e) => {
-			//	Console.WriteLine ("********** Failed to load ad: " + e.Error.LocalizedDescription);
-
-			//};
-
-			//_adBannerView.AdLoaded += (sender, args) => {
-			//	Console.WriteLine ("********** Successfully loaded ad.");
-			//	_adBannerView.Hidden = false;
-			//	View.AddSubview (_adBannerView);
-			//};
+			
 			NavigationItem.Title = "Latest Movie News";
 		
 			this.ViewControllerSelected += (sender, e) => 
@@ -87,45 +61,7 @@ namespace FavoriteMovies
 				{
 					MainViewController.NewCustomListToRefresh = 1;
                     NavigationController.NavigationBar.Hidden = false;
-					if (!ColorExtensions.CurrentUser.removeAds && ColorExtensions.CurrentUser.username != null) 
-                    {
-
-						// create the ad instance
-					   
-						adInterstitial.DidFetchAd += delegate 
-                        {
-							// display the ad
-							adInterstitial.Present (this);
-						};
-
-						adInterstitial.Error += (_, r) => {
-                            Debug.WriteLine ( string.Format (" [{0}] Did Fail to Receive Ad with error [{1}] ", adInterstitial.Space, r.ErrorDescription));
-						};
-						// fetch the ad
-						adInterstitial.FetchAd ();
-
-
-
-					//	// Create a banner's ad view with a unique placement ID (generate your own on the Facebook app settings).
-					//	// Use different ID for each ad placement in your app.
-					//	interstitialAd = new InterstitialAd (YourPlacementId) {
-					//		Delegate = this
-					//	};
-
-					//	// When testing on a device, add its hashed ID to force test ads.
-					//	// The hash ID is printed to console when running on a device.
-					//	//AdSettings.AddTestDevice (AdSettings.TestDeviceHash);
-
-					//	// Initiate a request to load an ad.
-					//	interstitialAd.LoadAd ();
-
-					//	// Verify if the ad is ready to be shown, if not, you will need to check later somehow (with a button, timer, delegate, etc.)
-					//	if (interstitialAd.IsAdValid) {
-					//		// Ad is ready, present it!
-					//		interstitialAd.ShowAdFromRootViewController (this);
-					//	}
-					}
-
+					
                 } else if(TabBar.SelectedItem.Title == "Home")
                 {
 					NavigationController.NavigationBar.Hidden = true;
@@ -145,43 +81,6 @@ namespace FavoriteMovies
 				}
 			};
 		}
-		//#region IInterstitialAdDelegate
-
-		//[Export ("interstitialAdDidLoad:")]
-		//public void InterstitialAdDidLoad (InterstitialAd interstitialAd)
-		//{
-		//	// Handle when the ad is loaded and ready to be shown
-		//	if (interstitialAd.IsAdValid) {
-		//		// Ad is ready, present it!
-		//		interstitialAd.ShowAdFromRootViewController (this);
-		//	}
-		//}
-
-		//[Export ("interstitialAd:didFailWithError:")]
-		//public void IntersitialDidFail (InterstitialAd interstitialAd, NSError error)
-		//{
-		//	// Handle if the ad is not loaded correctly
-		//}
-
-		//[Export ("interstitialAdDidClick:")]
-		//public void InterstitialAdDidClick (InterstitialAd interstitialAd)
-		//{
-		//	// Handle when the user tap the ad
-		//}
-
-		//[Export ("interstitialAdDidClose:")]
-		//public void InterstitialAdDidClose (InterstitialAd interstitialAd)
-		//{
-		//	// Handle when the user close the ad
-		//}
-
-		//[Export ("interstitialAdWillClose:")]
-		//public void InterstitialAdWillClose (InterstitialAd interstitialAd)
-		//{
-		//	// Handle before the ad is closed
-		//}
-
-		//#endregion
 	}
 	public class SearchResultsUpdator : UISearchResultsUpdating
 	{

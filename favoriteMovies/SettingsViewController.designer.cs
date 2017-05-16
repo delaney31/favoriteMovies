@@ -16,7 +16,23 @@ namespace FavoriteMovies
     {
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
+        UIKit.UILabel lblFollowers { get; set; }
+
+        [Outlet]
+        [GeneratedCode ("iOS Designer", "1.0")]
+        UIKit.UILabel lblFollowing { get; set; }
+
+        [Outlet]
+        [GeneratedCode ("iOS Designer", "1.0")]
+        UIKit.UILabel lblNumFollowers { get; set; }
+
+        [Outlet]
+        [GeneratedCode ("iOS Designer", "1.0")]
         UIKit.UILabel lblVersion { get; set; }
+
+        [Outlet]
+        [GeneratedCode ("iOS Designer", "1.0")]
+        UIKit.UILabel lbNumFollowing { get; set; }
 
         [Outlet]
         [GeneratedCode ("iOS Designer", "1.0")]
@@ -52,9 +68,29 @@ namespace FavoriteMovies
 
         void ReleaseDesignerOutlets ()
         {
+            if (lblFollowers != null) {
+                lblFollowers.Dispose ();
+                lblFollowers = null;
+            }
+
+            if (lblFollowing != null) {
+                lblFollowing.Dispose ();
+                lblFollowing = null;
+            }
+
+            if (lblNumFollowers != null) {
+                lblNumFollowers.Dispose ();
+                lblNumFollowers = null;
+            }
+
             if (lblVersion != null) {
                 lblVersion.Dispose ();
                 lblVersion = null;
+            }
+
+            if (lbNumFollowing != null) {
+                lbNumFollowing.Dispose ();
+                lbNumFollowing = null;
             }
 
             if (segmentTileSize != null) {

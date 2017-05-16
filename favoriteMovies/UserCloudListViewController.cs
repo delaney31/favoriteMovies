@@ -116,7 +116,7 @@ namespace FavoriteMovies
 						//tableItems [indexPath.Row].shared = true;
 						switchView.On = true;
                         //var emailMessenger = CrossMessaging.Current.EmailMessenger;
-                        if (await SendEmailToContact (cell));
+                        if (SendEmailToContact (cell))
                             await AddContactToLocalDB (cell);
 						//if (emailMessenger.CanSendEmail) 
 						//{
@@ -210,21 +210,19 @@ namespace FavoriteMovies
 			}
         }
 
-        async Task<bool> SendEmailToContact (ContactCard cell)
-		{
-			TimeSpan ts = TimeSpan.FromMilliseconds (1500);
-		    var task = Task.Run ( () => 
-            {
-				try 
-                {
-					MailMessage mail = new MailMessage ();
-					mail.IsBodyHtml = true;
-					SmtpClient SmtpServer = new SmtpClient ("smtp-mail.outlook.com");
-					mail.From = new MailAddress ("tim@moviefriendsapp.com");
+        bool SendEmailToContact (ContactCard cell)
+        {
+            TimeSpan ts = TimeSpan.FromMilliseconds (1500);
+            var task = Task.Run (() => {
+                try {
+                    MailMessage mail = new MailMessage ();
+                    mail.IsBodyHtml = true;
+                    SmtpClient SmtpServer = new SmtpClient ("smtp-mail.outlook.com");
+                    mail.From = new MailAddress ("tim@moviefriendsapp.com");
 
-					mail.To.Add (cell.email);
-					mail.Subject = "Movie Friends App Invitation";
-					mail.Body = "<html xmlns=\"http://www.w3.org/1999/xhtml\" xmlns:v=\"urn:schemas-microsoft-com:vml\" xmlns:o=\"urn:schemas-microsoft-com:office:office\">\n <head>\n    " +
+                    mail.To.Add (cell.email);
+                    mail.Subject = "Movie Friends App Invitation";
+                    mail.Body = "<html xmlns=\"http://www.w3.org/1999/xhtml\" xmlns:v=\"urn:schemas-microsoft-com:vml\" xmlns:o=\"urn:schemas-microsoft-com:office:office\">\n <head>\n    " +
                         "\t<!-- NAME: ELEGANT -->\n <!--[if gte mso 15]>\n\t\t<xml>\n\t\t\t<o:OfficeDocumentSettings>\n\t\t\t<o:AllowPNG/>\n\t\t\t<o:PixelsPerInch>96</o:PixelsPerInch>\n\t\t\t</o:OfficeDocumentSettings>\n\t\t</xml>\n\t\t<![endif]-->\n\t\t<meta charset=\"UTF-8\">\n        " +
                         "<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\n        <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n\t\t<title>*|MC:SUBJECT|*</title>\n        \n    " +
                         "<style type=\"text/css\">\n\t\tp{\n\t\t\tmargin:10px 0;\n\t\t\tpadding:0;\n\t\t}\n\t\ttable{\n\t\t\tborder-collapse:collapse;\n\t\t}\n\t\th1,h2,h3,h4,h5,h6{\n\t\t\tdisplay:block;\n\t\t\tmargin:0;" +
@@ -394,28 +392,26 @@ namespace FavoriteMovies
                         "                                        </tr>\n                                    </table>\n                                    <!-- // END FOOTER -->\n                                </td>\n " +
                         "                           </tr>\n                        </table>\n                        <!-- // END TEMPLATE -->\n                    </td>\n                </tr>\n            </table>\n" +
                         "        </center>\n    </body>\n</html>";
-					SmtpServer.Port = 587;
-					SmtpServer.Credentials = new NetworkCredential ("tdelaney@outlook.com", "Hacimdel44");
-					SmtpServer.EnableSsl = true;
-					ServicePointManager.ServerCertificateValidationCallback = delegate (object send, X509Certificate certificate, X509Chain chain, System.Net.Security.SslPolicyErrors sslPolicyErrors) 
-                    {
-                        return true ;
-					};
-					SmtpServer.Send (mail);
+                    SmtpServer.Port = 587;
+                    SmtpServer.Credentials = new NetworkCredential ("tdelaney@outlook.com", "Hacimdel44");
+                    SmtpServer.EnableSsl = true;
+                    ServicePointManager.ServerCertificateValidationCallback = delegate (object send, X509Certificate certificate, X509Chain chain, System.Net.Security.SslPolicyErrors sslPolicyErrors) {
+                        return true;
+                    };
+                    SmtpServer.Send (mail);
                     return true;
-				} catch (Exception ex) 
-                {
+                } catch (Exception ex) {
                     Debug.WriteLine ("Error sending email:" + ex.Message);
                     return false;
-					// Toast.MakeText(Application.Context,ex.ToString(),ToastLength.Long);
-				}
-				
-			});
+                    // Toast.MakeText(Application.Context,ex.ToString(),ToastLength.Long);
+                }
+
+            });
             task.Wait (ts);
             return true;
-		}
+        }
 
-		public override nint RowsInSection (UITableView tableview, nint section)
+        public override nint RowsInSection (UITableView tableview, nint section)
 		{
 
 			return listItems != null ? listItems.Count : 0;

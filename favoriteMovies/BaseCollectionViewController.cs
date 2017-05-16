@@ -63,7 +63,7 @@ namespace FavoriteMovies
 			BTProgressHUD.Show ();
 			AzureTablesService postService = AzureTablesService.DefaultService;
 			bool accepted = false;
-			await postService.InitializeStoreAsync ();
+			postService.InitializeStore ();
 			try {
 				var p = lpgr.LocationInView (CollectionView);
 
@@ -112,7 +112,7 @@ namespace FavoriteMovies
 					//if (isCustomList) 
 					//{
 					MainViewController.NewCustomListToRefresh = 1;
-					viewController.ViewWillAppear (true);
+					viewController.ViewWillAppear(true);
 					//}
 					BTProgressHUD.Dismiss ();
 				}

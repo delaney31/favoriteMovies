@@ -92,7 +92,7 @@ namespace FavoriteMovies
 			List<PostItem> result = new List<PostItem> ();
 			
 			Task.Run (async () => {
-				await postService.InitializeStoreAsync ();
+				postService.InitializeStore ();
 			}).Wait ();
 			try {
 				WebRequest webRequest = WebRequest.Create (url);

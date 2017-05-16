@@ -1,7 +1,4 @@
-using System;
-using System.Collections.ObjectModel;
 using System.IO;
-using System.Threading.Tasks;
 using CoreGraphics;
 using FavoriteMoviesPCL;
 using Foundation;
@@ -9,13 +6,14 @@ using SidebarNavigation;
 using UIKit;
 using WindowsAzure.Messaging;
 using Pushwoosh;
-using Flurry.Analytics;
+using Firebase.Analytics;
+using Google.MobileAds;
 
 namespace FavoriteMovies
 {
-	// The UIApplicationDelegate for the application. This class is responsible for launching the
-	// User Interface of the application, as well as listening (and optionally responding) to application events from iOS.
-	[Register ("AppDelegate")]
+    // The UIApplicationDelegate for the application. This class is responsible for launching the
+    // User Interface of the application, as well as listening (and optionally responding) to application events from iOS.
+    [Register ("AppDelegate")]
 	public class AppDelegate : UIApplicationDelegate
 	{
 		// class-level declarations
@@ -40,42 +38,37 @@ namespace FavoriteMovies
 		{
 			PushNotificationManager.PushManager.HandlePushReceived (userInfo);
 		}
-		public override bool FinishedLaunching (UIApplication application, NSDictionary launchOptions)
-		{
-			// Override point for customization after application launch.
-			// If not required for your application you can safely delete this method
-			Window = new UIWindow (UIScreen.MainScreen.Bounds);
-			// start Flurry
-			FlurryAgent.StartSession ("C62Q3TTD7XY44X685XDT");
+        public override bool FinishedLaunching (UIApplication application, NSDictionary launchOptions)
+        {
+            
+            App.Configure ();
 
-			FlurryAgent.SetDebugLogEnabled (true);
-			FlurryAgent.SetLogLevel (FlurryLogLevel.All);
-
-			// make the window visible
-			Window.MakeKeyAndVisible ();
+			// Get your Application Id here: https://apps.admob.com/#account/appmgmt:
+			MobileAds.Configure ("ca-app-pub-3328591715743369~6456302736");
+		
 			MovieService.Database = Path.Combine (FileHelper.GetLocalStoragePath (), "MovieEntries.db3");
 
-			MainViewController.getUser ();
-			ColorExtensions.DarkTheme = ColorExtensions.CurrentUser.darktheme;
-			ColorExtensions.CurrentTileSize = ColorExtensions.CurrentUser.tilesize;
-			rootViewController = new RootViewController ();
-			var settings = UIUserNotificationSettings.GetSettingsForTypes (
-  			UIUserNotificationType.Alert | UIUserNotificationType.Badge | UIUserNotificationType.Sound
-  			, null);
-			UIApplication.SharedApplication.RegisterUserNotificationSettings (settings);
-		
-			//UIApplication.SharedApplication.ApplicationIconBadgeNumber = 0;
+            MainViewController.getUser ();
+            ColorExtensions.DarkTheme = ColorExtensions.CurrentUser.darktheme;
+            ColorExtensions.CurrentTileSize = ColorExtensions.CurrentUser.tilesize;
+            rootViewController = new RootViewController ();
+            var settings = UIUserNotificationSettings.GetSettingsForTypes (
+              UIUserNotificationType.Alert | UIUserNotificationType.Badge | UIUserNotificationType.Sound
+              , null);
+            UIApplication.SharedApplication.RegisterUserNotificationSettings (settings);
 
 
-			Window.RootViewController = rootViewController;
-			//if (ColorExtensions.CurrentUser.username == null)
-			//{
-			//	var tipsPage = new TipsViewController ();
-			//	Window.RootViewController.AddChildViewController (tipsPage);
-			//	//Window.AddSubview (tipsPage.View);
-			//	tipsPage.DidMoveToParentViewController (Window.RootViewController);
-			//}
-				
+
+
+            // make the window visible
+            Window = new UIWindow (UIScreen.MainScreen.Bounds);
+            Window.RootViewController = rootViewController;
+
+            var frame = UIScreen.MainScreen.Bounds;
+            Window.Frame = new CGRect () { X = 0, Y = 0, Width = frame.Size.Width + 0.000001f, Height = frame.Size.Height + 0.000001f } ;
+      
+			Window.MakeKeyAndVisible ();
+			
 			
 			// check for a local notification
 			if (launchOptions != null) {
@@ -152,28 +145,7 @@ namespace FavoriteMovies
 				}
 			}
 		}
-		//public override void ReceivedRemoteNotification (UIApplication application, NSDictionary userInfo)
-		//{
-		//	ProcessNotification (userInfo, false);
-
-		//}
-		//public override void RegisteredForRemoteNotifications (UIApplication application, NSData deviceToken)
-		//{
-		//	Hub = new SBNotificationHub (Constants.ConnectionString, Constants.NotificationHubPath);
-
-		//	Hub.UnregisterAllAsync (deviceToken, (error) => {
-		//		if (error != null) {
-		//			Console.WriteLine ("Error calling Unregister: {0}", error.ToString ());
-		//			return;
-		//		}
-
-		//		NSSet tags = null; // create tags if you want
-		//		Hub.RegisterNativeAsync (deviceToken, tags, (errorCallback) => {
-		//			if (errorCallback != null)
-		//				Console.WriteLine ("RegisterNativeAsync error: " + errorCallback.ToString ());
-		//		});
-		//	});
-		//}
+		
 		public override void OnResignActivation (UIApplication application)
 		{
 			// Invoked when the application is about to move from active to inactive state.
@@ -224,16 +196,6 @@ namespace FavoriteMovies
 		public NavController NavController { get; private set; }
 
 
-		//public override bool ShouldAutorotate ()
-		//{
-		//	return this.VisibleViewController.ShouldAutorotate (); ;
-
-		//}
-
-		//public override UIInterfaceOrientationMask GetSupportedInterfaceOrientations ()
-		//{
-		//	return this.VisibleViewController.GetSupportedInterfaceOrientations ();
-		//}
 
 		public override void ViewDidLoad ()
 		{

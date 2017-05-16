@@ -153,7 +153,7 @@ namespace FavoriteMovies
 
 					using (var db = new SQLiteConnection (MovieService.Database)) {
 						AzureTablesService postService = AzureTablesService.DefaultService;
-						await postService.InitializeStoreAsync ();
+                        postService.InitializeStore ();
 						if (Id != null) {
 							if (movieDetail != null) //first customlist
 							{
@@ -253,7 +253,7 @@ namespace FavoriteMovies
 					using (var db = new SQLiteConnection (MovieService.Database)) {
 						//var query = db.Table<CustomList> ();
 						AzureTablesService postService = AzureTablesService.DefaultService;
-						await postService.InitializeStoreAsync ();
+						postService.InitializeStore ();
 						foreach (var item in items) {
 							if (movieDetail.CustomListID == item.id)
 								return;

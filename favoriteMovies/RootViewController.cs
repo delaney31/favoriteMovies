@@ -9,8 +9,9 @@ using AlertView;
 
 namespace FavoriteMovies
 {
-	public class LogOutController : UIViewController
+	public class LogOutController : BaseController
 	{
+		
 		public LogOutController ()
 		{
 
@@ -91,6 +92,8 @@ namespace FavoriteMovies
 		public override void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
+          
+
 			//// create a slideout navigation controller with the top navigation controller and the menu view controller
 			NavController = new UINavigationController ();
 			NavController.NavigationBar.BarTintColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f);
@@ -264,7 +267,7 @@ namespace FavoriteMovies
 
 			if (moreList.Subviews.Length > 0) {
 				foreach (UITableViewCell view in moreList.VisibleCells) {
-					view.TextLabel.Font = UIFont.FromName (ColorExtensions.TITLE_FONT, ColorExtensions.HEADER_FONT_SIZE);
+                    view.TextLabel.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, ColorExtensions.HEADER_FONT_SIZE);
 				}
 			}
 

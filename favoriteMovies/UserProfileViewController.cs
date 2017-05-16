@@ -31,6 +31,7 @@ namespace FavoriteMovies
 		UILabel sharedLists = new UILabel ();
 		UILabel numSharedLists = new UILabel ();
 		UIScrollView scrollView = new UIScrollView ();
+        UISwipeGestureRecognizer swipeGesture = new UISwipeGestureRecognizer ();
 		List<CustomListCloud> customLists = new List<CustomListCloud> ();
 		UILabel custlistName;
 		ContactCard user;
@@ -39,17 +40,33 @@ namespace FavoriteMovies
 		static int MinimumInteritemSpacing = 30;
 		static int MinimumLineSpacing = 5;
 		static CGSize ItemSize = new CGSize (100, 150);
+        protected UIBarButtonItem follow, unfollow;
 		ObservableCollection<Movie> userMovies;
 
 		public AzureTablesService postService = AzureTablesService.DefaultService;
-		public UserProfileViewController (ContactCard user)
-		{
-			this.user = user;
-			this.profileImage.Image = user.profileImage.Image;
+      
+        private List<ContactCard> contactList;
+        private int currentRow;
 
-		}
+        public UserProfileViewController (ContactCard user)
+        {
+            this.user = user;
+            this.profileImage.Image = user.profileImage.Image;
 
-		void Initialize ()
+        }
+
+       
+        public UserProfileViewController (ContactCard user, List<ContactCard> list) : this (user)
+        {
+            this.contactList = list;
+        }
+
+        public UserProfileViewController (ContactCard user, List<ContactCard> list, int row) : this (user, list)
+        {
+            this.currentRow = row;
+        }
+
+        void Initialize ()
 		{
 
 			Task.Run (async () =>  {
@@ -63,15 +80,98 @@ namespace FavoriteMovies
 				numFollowers.Text = await postService.GetFollowersAsync (user.id);
 			});
 		}
+
+        public override void ViewWillAppear (bool animated)
+        {
+            base.ViewWillAppear (animated);
+			NavigationItem.Title = "Swipe To See More >";
+        }
         public override void ViewDidAppear (bool animated)
         {
             base.ViewDidAppear (animated);
             NavigationController.NavigationBar.Translucent = true;
-        }
+			var screenSize = UIScreen.MainScreen.Bounds;
+			View.Frame = screenSize;
+			TabController.View.Frame = screenSize;
+			TabController.NavigationController.View.Frame = screenSize;
+            //this has to be disabled or Swipe Gesture will not work
+			SidebarController.Disabled = true;
+
+		}
 		public override  void ViewDidLoad ()
 		{
+
+            follow = new UIBarButtonItem ("Follow",UIBarButtonItemStyle.Plain, (s, e) => 
+            {
+				bool inserted = false;
+				var userfriend = new UserFriendsCloud ();
+				userfriend.userid = ColorExtensions.CurrentUser.Id;
+				userfriend.friendid = user.id;
+				userfriend.friendusername = user.nameLabel.Text;
+                InvokeOnMainThread (async () => {
+                    inserted = await postService.InsertUserFriendAsync (userfriend);
+
+                    if (inserted) {
+						NavigationItem.RightBarButtonItem = unfollow;
+                        user.connection = true;
+                        BTProgressHUD.ShowToast ("Following " + user.nameLabel.Text, false);
+                        var notification = NSNotification.FromName (Constants.ModifyFollowerNotification, new NSObject ());
+                        NSNotificationCenter.DefaultCenter.PostNotification (notification);
+                       
+                    }
+
+                });
+			});
+            unfollow = new UIBarButtonItem ("Unfollow",UIBarButtonItemStyle.Plain, (s, e) => 
+            {
+
+				var userfriend = new UserFriendsCloud ();
+				userfriend.userid = ColorExtensions.CurrentUser.Id;
+				userfriend.friendid = user.id;
+				userfriend.friendusername = user.nameLabel.Text;
+				bool deleted = false;
+				InvokeOnMainThread (async () => {
+					bool accepted = await BaseCollectionViewController.ShowAlert ("Confirm", "Are you sure you want to remove this friend?");
+					Console.WriteLine ("Selected button {0}", accepted ? "Accepted" : "Canceled");
+					if (accepted) {
+						deleted = await postService.DeleteItemAsync (userfriend);
+						if (deleted) {
+							NavigationItem.RightBarButtonItem = follow;
+							BTProgressHUD.ShowToast ("Unfollowing " + user.nameLabel.Text, false);
+							var notification = NSNotification.FromName (Constants.ModifyFollowerNotification, new NSObject ());
+							NSNotificationCenter.DefaultCenter.PostNotification (notification);
+							
+						}
+					}
+				});
+               
+			});
+
+			follow.SetTitleTextAttributes (new UITextAttributes () 
+            {
+				Font = UIFont.FromName (ColorExtensions.TITLE_FONT, ColorExtensions.CAST_FONT_SIZE)
+            },UIControlState.Normal);
+
+			unfollow.SetTitleTextAttributes (new UITextAttributes () {
+				Font = UIFont.FromName (ColorExtensions.TITLE_FONT, ColorExtensions.CAST_FONT_SIZE)
+			}, UIControlState.Normal);
+
+
+			NavigationItem.RightBarButtonItem = (bool)user.connection ? unfollow : follow;
+			swipeGesture = new UISwipeGestureRecognizer (() => {
+				if (contactList != null && contactList.Count > currentRow + 1)
+					NavigationController.PushViewController (new UserProfileViewController (contactList [currentRow + 1], contactList, currentRow + 1), true);
+				else if (contactList != null)
+					NavigationController.PushViewController (new UserProfileViewController (contactList [0], contactList, 0), true);
+			});
+			swipeGesture.Direction = UISwipeGestureRecognizerDirection.Left;
+			View.UserInteractionEnabled = true;
+			View.AddGestureRecognizer (swipeGesture);
+
 			base.ViewDidLoad ();
 			Initialize ();
+           
+           
 			int cnt = 0;
 			CGRect lastLabelFrame = new CGRect ();
 			CGRect lastCollectionFrame = new CGRect ();
@@ -87,7 +187,7 @@ namespace FavoriteMovies
 			name.Text = user.nameLabel.Text;
 			name.TextAlignment = UITextAlignment.Center;
 			name.Font = UIFont.FromName (ColorExtensions.PROFILE_NAME, 20);
-			name.TextColor = UIColor.Black;
+            name.TextColor = ColorExtensions.DarkTheme ? UIColor.White : UIColor.Black;
 
 			followers.Frame = new CGRect () { X = 15, Y = 170, Width = 180, Height = 120 };
 			followers.Text = "Follower(s)".ToUpper ();
@@ -128,7 +228,7 @@ namespace FavoriteMovies
 			location.Text = user.location;
 			location.TextAlignment = UITextAlignment.Center;
 			location.Font = UIFont.FromName (ColorExtensions.CONTENT_FONT, 10);
-			location.TextColor = UIColor.Black;
+			location.TextColor = ColorExtensions.DarkTheme ? UIColor.White : UIColor.Black;
 
 			background.Frame = new CGRect () { X = 0, Y = 190, Width = View.Bounds.Width, Height = 50 };
 			background.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f);
@@ -142,26 +242,7 @@ namespace FavoriteMovies
 			profileImage.Layer.MasksToBounds = true;
 			profileImage.Layer.BorderColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f).CGColor;
 
-            //make followers and following clickable for yourself
-            if (user.id == ColorExtensions.CurrentUser.Id)
-            {
-               
 
-                followers.UserInteractionEnabled = true;
-                followers.TextColor = UIColor.FromRGB (74, 212, 231);
-				var followersGesture = new UITapGestureRecognizer ();
-                followersGesture.AddTarget (() => { GetFollowers (); });
-                followers.AddGestureRecognizer (followersGesture);
-
-
-				following.UserInteractionEnabled = true;
-                following.TextColor = UIColor.FromRGB (74, 212, 231);
-				var followingGesture = new UITapGestureRecognizer ();
-				followingGesture.AddTarget (() => { GetFollowing (); });
-
-				following.AddGestureRecognizer (followingGesture);
-
-			}
 			if (customLists.Count > 0) {
 				foreach (var list in customLists) 
 				{
@@ -174,7 +255,7 @@ namespace FavoriteMovies
 					if (cnt == 0) {
 
 						custlistName = new UILabel () {
-							TextColor = ColorExtensions.DarkTheme ? UIColor.White : UIColor.Black, Frame = new CGRect (16, background.Frame.Y + 70, 180, 20),
+							TextColor = ColorExtensions.DarkTheme ? UIColor.White : UIColor.Black, Frame = new CGRect (16, location.Frame.Y + location.Frame.Height + 20, 180, 20),
 							//BackgroundColor = View.BackgroundColor,
 							Font = UIFont.FromName (ColorExtensions.TITLE_FONT, 15),
 							Text = list.Name
@@ -182,7 +263,7 @@ namespace FavoriteMovies
 
 					} else {
 						custlistName = new UILabel () {
-							TextColor = ColorExtensions.DarkTheme ? UIColor.White : UIColor.Black, Frame = new CGRect (16, lastLabelFrame.Y + viewController.CollectionView.Frame.Height + 45, 180, 20),
+							TextColor = ColorExtensions.DarkTheme ? UIColor.White : UIColor.Black, Frame = new CGRect (16, custlistName.Frame.Y + custlistName.Frame.Height +  viewController.CollectionView.Frame.Height + 45, 180, 20),
 							Font = UIFont.FromName (ColorExtensions.TITLE_FONT, 15),
 							Text = list.Name
 						};
@@ -223,6 +304,13 @@ namespace FavoriteMovies
 			//scrollView.ContentOffset = new CGPoint (0, -scrollView.ContentInset.Top);
 			scrollView.Bounces = true;
 
+			
+
+			//swipeGesture.AddTarget (() => { SwipeViewLeft (); });
+
+			//profileImage.UserInteractionEnabled = true;
+			//profileImage.AddGestureRecognizer (swipeGesture);
+
 			scrollView.AddSubview (background);
 			scrollView.AddSubview (name);
 			scrollView.AddSubview (profileImage);
@@ -235,8 +323,11 @@ namespace FavoriteMovies
 			scrollView.AddSubview (numSharedLists);
 
 			View.AddSubview (scrollView);
+			
+			
 		}
 
+       
         private void GetFollowers ()
         {
 			var followr = new FindFriendsViewController ();

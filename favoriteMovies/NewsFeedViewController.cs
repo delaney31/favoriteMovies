@@ -35,7 +35,7 @@ namespace FavoriteMovies
 			View.Add (table);
            
 		}
-		public override void ViewWillAppear (bool animated)
+		public override void ViewWillAppear(bool animated)
 		{
 			needLogin = ColorExtensions.CurrentUser.username == null;
 

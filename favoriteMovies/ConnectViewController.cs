@@ -102,8 +102,8 @@ namespace FavoriteMovies
 
 			foreach (var user in users) 
 			{
-				//if (user.Id != ColorExtensions.CurrentUser.Id)
-				//{
+				if (user.Id != ColorExtensions.CurrentUser.Id)
+				{
 					var result = new ContactCard (UITableViewCellStyle.Default, cellId);
 					result.nameLabel.Text = user.username;
 					result.connection = user.connection;
@@ -112,7 +112,7 @@ namespace FavoriteMovies
 					result.location = user.city + " " + user.state + " " + user.country;
 					results.Add (result);
 					Console.WriteLine (user.Id	);
-				//}
+				}
 
 			}
 
@@ -242,7 +242,8 @@ namespace FavoriteMovies
 
 				//cell.id = listItems [indexPath.Row].id;
 				var tapGesture = new UITapGestureRecognizer ();
-				if (cell.connection != null) {
+				if (cell.connection != null) 
+                {
 					if ((bool)cell.connection)
 						cell.addRemove.Image = UIImage.FromBundle ("ic_remove_circle_outline.png");
 					else
@@ -340,7 +341,7 @@ namespace FavoriteMovies
 				}
 
 				var userProfile = new UITapGestureRecognizer ();
-				var profile = new UserProfileViewController (listItems [indexPath.Row]);
+                var profile = new UserProfileViewController (listItems [indexPath.Row],listItems.Count() > indexPath.Row+1 ? listItems:null, indexPath.Row) ;
 
 				userProfile.AddTarget (() => {
 
