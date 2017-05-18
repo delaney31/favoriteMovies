@@ -57,7 +57,7 @@ namespace FavoriteMovies
             }
           
 			base.ViewWillAppear (animated);
-		    NavigationItem.Title = "Latest Movie News";
+		    NavigationItem.Title = "Movie Posts";
 			
 		}
 

@@ -9,12 +9,17 @@ using Pushwoosh;
 using Firebase.Analytics;
 using Google.MobileAds;
 
+using System;
+using Firebase.CloudMessaging;
+using UserNotifications;
+using AlertView;
+
 namespace FavoriteMovies
 {
     // The UIApplicationDelegate for the application. This class is responsible for launching the
     // User Interface of the application, as well as listening (and optionally responding) to application events from iOS.
     [Register ("AppDelegate")]
-	public class AppDelegate : UIApplicationDelegate
+	public class AppDelegate : UIApplicationDelegate,IUNUserNotificationCenterDelegate, IMessagingDelegate
 	{
 		// class-level declarations
 		private SBNotificationHub Hub { get; set; }
@@ -24,20 +29,20 @@ namespace FavoriteMovies
 			set;
 		}
 
-		public override void RegisteredForRemoteNotifications (UIApplication application, NSData deviceToken)
-		{
-			PushNotificationManager.PushManager.HandlePushRegistration (deviceToken);
-		}
+		//public override void RegisteredForRemoteNotifications (UIApplication application, NSData deviceToken)
+		//{
+		//	PushNotificationManager.PushManager.HandlePushRegistration (deviceToken);
+		//}
 
-		public override void FailedToRegisterForRemoteNotifications (UIApplication application, NSError error)
-		{
-			PushNotificationManager.PushManager.HandlePushRegistrationFailure (error);
-		}
+		//public override void FailedToRegisterForRemoteNotifications (UIApplication application, NSError error)
+		//{
+		//	PushNotificationManager.PushManager.HandlePushRegistrationFailure (error);
+		//}
 
-		public override void ReceivedRemoteNotification (UIApplication application, NSDictionary userInfo)
-		{
-			PushNotificationManager.PushManager.HandlePushReceived (userInfo);
-		}
+		//public override void ReceivedRemoteNotification (UIApplication application, NSDictionary userInfo)
+		//{
+		//	PushNotificationManager.PushManager.HandlePushReceived (userInfo);
+		//}
         public override bool FinishedLaunching (UIApplication application, NSDictionary launchOptions)
         {
             
@@ -52,10 +57,10 @@ namespace FavoriteMovies
             ColorExtensions.DarkTheme = ColorExtensions.CurrentUser.darktheme;
             ColorExtensions.CurrentTileSize = ColorExtensions.CurrentUser.tilesize;
             rootViewController = new RootViewController ();
-            var settings = UIUserNotificationSettings.GetSettingsForTypes (
-              UIUserNotificationType.Alert | UIUserNotificationType.Badge | UIUserNotificationType.Sound
-              , null);
-            UIApplication.SharedApplication.RegisterUserNotificationSettings (settings);
+            //var settingsBadge = UIUserNotificationSettings.GetSettingsForTypes (
+            //  UIUserNotificationType.Alert | UIUserNotificationType.Badge | UIUserNotificationType.Sound
+            //  , null);
+            //UIApplication.SharedApplication.RegisterUserNotificationSettings (settingsBadge);
 
 
 
@@ -68,45 +73,72 @@ namespace FavoriteMovies
             Window.Frame = new CGRect () { X = 0, Y = 0, Width = frame.Size.Width + 0.000001f, Height = frame.Size.Height + 0.000001f } ;
       
 			Window.MakeKeyAndVisible ();
-			
-			
+
+			Messaging.SharedInstance.Connect (error => {
+				if (error != null) 
+                {
+                    Console.WriteLine ("Error connecting to FCM:{0}",error.Description);
+				} else {
+					Console.WriteLine ("Connected to FCM!");
+				}
+			});
 			// check for a local notification
-			if (launchOptions != null) {
-				if (launchOptions.ContainsKey (UIApplication.LaunchOptionsLocalNotificationKey)) {
-					var localNotification = launchOptions [UIApplication.LaunchOptionsLocalNotificationKey] as UILocalNotification;
-					if (localNotification != null) {
-						UIAlertController okayAlertController = UIAlertController.Create (localNotification.AlertAction, localNotification.AlertBody, UIAlertControllerStyle.Alert);
-						okayAlertController.AddAction (UIAlertAction.Create ("OK", UIAlertActionStyle.Default, null));
-						rootViewController.PresentViewController (okayAlertController, true, null);
+			//if (launchOptions != null) {
+			//	if (launchOptions.ContainsKey (UIApplication.LaunchOptionsLocalNotificationKey)) {
+			//		var localNotification = launchOptions [UIApplication.LaunchOptionsLocalNotificationKey] as UILocalNotification;
+			//		if (localNotification != null) {
+			//			UIAlertController okayAlertController = UIAlertController.Create (localNotification.AlertAction, localNotification.AlertBody, UIAlertControllerStyle.Alert);
+			//			okayAlertController.AddAction (UIAlertAction.Create ("OK", UIAlertActionStyle.Default, null));
+			//			rootViewController.PresentViewController (okayAlertController, true, null);
 
-						// reset our badge
-						UIApplication.SharedApplication.ApplicationIconBadgeNumber = 0;
-					}
+			//			// reset our badge
+			//			UIApplication.SharedApplication.ApplicationIconBadgeNumber = 0;
+			//		}
+			//	}
+			//}
+			//if (UIDevice.CurrentDevice.CheckSystemVersion (8, 0)) {
+			//	var pushSettings = UIUserNotificationSettings.GetSettingsForTypes (
+			//		   UIUserNotificationType.Alert | UIUserNotificationType.Badge | UIUserNotificationType.Sound,
+			//		   new NSSet ());
+
+			//	UIApplication.SharedApplication.RegisterUserNotificationSettings (pushSettings);
+			//	UIApplication.SharedApplication.RegisterForRemoteNotifications ();
+			//} else {
+			//	UIRemoteNotificationType notificationTypes = UIRemoteNotificationType.Alert | UIRemoteNotificationType.Badge | UIRemoteNotificationType.Sound;
+			//	UIApplication.SharedApplication.RegisterForRemoteNotificationTypes (notificationTypes);
+			//}
+
+			//PushNotificationManager pushmanager = PushNotificationManager.PushManager;
+			//pushmanager.Delegate = this;
+
+			//if (launchOptions != null) {
+			//	if (launchOptions.ContainsKey (UIApplication.LaunchOptionsRemoteNotificationKey)) {
+			//		pushmanager.HandlePushReceived (launchOptions);
+			//	}
+			//}
+			//pushmanager.StartLocationTracking ();
+			//pushmanager.RegisterForPushNotifications ();
+			// Register your app for remote notifications.
+            if (UIDevice.CurrentDevice.CheckSystemVersion (10, 0)) {
+					// iOS 10 or later
+					var authOptions = UNAuthorizationOptions.Alert | UNAuthorizationOptions.Badge | UNAuthorizationOptions.Sound;
+					UNUserNotificationCenter.Current.RequestAuthorization (authOptions, (granted, error) => {
+						Console.WriteLine (granted);
+					});
+
+					// For iOS 10 display notification (sent via APNS)
+					UNUserNotificationCenter.Current.Delegate = this;
+
+					// For iOS 10 data message (sent via FCM)
+					Messaging.SharedInstance.RemoteMessageDelegate = this;
+				} else {
+					// iOS 9 or before
+					var allNotificationTypes = UIUserNotificationType.Alert | UIUserNotificationType.Badge | UIUserNotificationType.Sound;
+					var settings = UIUserNotificationSettings.GetSettingsForTypes (allNotificationTypes, null);
+					UIApplication.SharedApplication.RegisterUserNotificationSettings (settings);
 				}
-			}
-			if (UIDevice.CurrentDevice.CheckSystemVersion (8, 0)) {
-				var pushSettings = UIUserNotificationSettings.GetSettingsForTypes (
-					   UIUserNotificationType.Alert | UIUserNotificationType.Badge | UIUserNotificationType.Sound,
-					   new NSSet ());
 
-				UIApplication.SharedApplication.RegisterUserNotificationSettings (pushSettings);
-				UIApplication.SharedApplication.RegisterForRemoteNotifications ();
-			} else {
-				UIRemoteNotificationType notificationTypes = UIRemoteNotificationType.Alert | UIRemoteNotificationType.Badge | UIRemoteNotificationType.Sound;
-				UIApplication.SharedApplication.RegisterForRemoteNotificationTypes (notificationTypes);
-			}
-
-			PushNotificationManager pushmanager = PushNotificationManager.PushManager;
-			pushmanager.Delegate = this;
-
-			if (launchOptions != null) {
-				if (launchOptions.ContainsKey (UIApplication.LaunchOptionsRemoteNotificationKey)) {
-					pushmanager.HandlePushReceived (launchOptions);
-				}
-			}
-			pushmanager.StartLocationTracking ();
-			pushmanager.RegisterForPushNotifications ();
-
+			UIApplication.SharedApplication.RegisterForRemoteNotifications ();
 		
 						// Code to start the Xamarin Test Cloud Agent
 			#if ENABLE_TEST_CLOUD
@@ -139,7 +171,7 @@ namespace FavoriteMovies
 				if (!fromFinishedLaunching) {
 					//Manually show an alert
 					if (!string.IsNullOrEmpty (alert)) {
-						UIAlertView avAlert = new UIAlertView ("Notification", alert, null, "OK", null);
+						UIAlertView avAlert = new UIAlertView ("Movie Friends", alert, null, "OK", null);
 						avAlert.Show ();
 					}
 				}
@@ -158,6 +190,8 @@ namespace FavoriteMovies
 		{
 			// Use this method to release shared resources, save user data, invalidate timers and store the application state.
 			// If your application supports background exection this method is called instead of WillTerminate when the user quits.
+			Messaging.SharedInstance.Disconnect ();
+			Console.WriteLine ("Disconnected from FCM");
 		}
 
 		public override void WillEnterForeground (UIApplication application)
@@ -169,6 +203,12 @@ namespace FavoriteMovies
 
 		}
 
+  
+        public override void DidReceiveRemoteNotification (UIApplication application, NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler)
+        {
+			ProcessNotification (userInfo, false);
+		
+        }
 		public override void OnActivated (UIApplication application)
 		{
 			// Restart any tasks that were paused (or not yet started) while the application was inactive. 
@@ -181,7 +221,13 @@ namespace FavoriteMovies
 		{
 			// Called when the application is about to terminate. Save data, if needed. See also DidEnterBackground.
 		}
-	}
+
+        public void ApplicationReceivedRemoteMessage (RemoteMessage remoteMessage)
+        {
+
+			ProcessNotification (remoteMessage.AppData, false);
+        }
+    }
 
 	/// <summary>
 	/// This is very important it delegates the orientation so that it can be changed by each View Controller.

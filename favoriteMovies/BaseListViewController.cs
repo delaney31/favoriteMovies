@@ -167,7 +167,6 @@ namespace FavoriteMovies
 						if (Id == null) //creating a new list
 						{
 							var lis = items.Where (x => x.cloudId == cloudid);
-							custlistCloud = new CustomListCloud ();
 							custlistCloud.Name = lis.FirstOrDefault ().name;
 							custlistCloud.order = lis.FirstOrDefault ().order;
 							custlistCloud.shared = lis.FirstOrDefault ().shared;

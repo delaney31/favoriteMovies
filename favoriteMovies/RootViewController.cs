@@ -100,7 +100,8 @@ namespace FavoriteMovies
 			NavController.NavigationBar.TintColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 			//NavController.NavigationBar.Translucent = true;
 			NavController.NavigationBar.TitleTextAttributes = new UIStringAttributes () {
-				ForegroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f)
+				ForegroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f),
+				Font = UIFont.FromName (ColorExtensions.TITLE_FONT, ColorExtensions.HEADER_FONT_SIZE)
 			};
 
 
@@ -114,7 +115,8 @@ namespace FavoriteMovies
 			uinc6.NavigationBar.TintColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 			//uinc2.NavigationBar.Translucent = true;
 			uinc6.NavigationBar.TitleTextAttributes = new UIStringAttributes () {
-				ForegroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f)
+				ForegroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f),
+				Font = UIFont.FromName (ColorExtensions.TITLE_FONT, ColorExtensions.HEADER_FONT_SIZE)
 			};
 
 			var mainView = new MainViewController ();
@@ -128,7 +130,8 @@ namespace FavoriteMovies
 			uinc1.NavigationBar.TopItem.Title = "Home";
 			//uinc2.NavigationBar.Translucent = true;
 			uinc1.NavigationBar.TitleTextAttributes = new UIStringAttributes () {
-				ForegroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f)
+				ForegroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f),
+				Font = UIFont.FromName (ColorExtensions.TITLE_FONT, ColorExtensions.HEADER_FONT_SIZE)
 			};
 
 			var tab2 = new NewsFeedViewController ();
@@ -141,7 +144,8 @@ namespace FavoriteMovies
 			uinc2.NavigationBar.TintColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 			//uinc2.NavigationBar.Translucent = true;
 			uinc2.NavigationBar.TitleTextAttributes = new UIStringAttributes () {
-				ForegroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f)
+				ForegroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f),
+				Font = UIFont.FromName (ColorExtensions.TITLE_FONT, ColorExtensions.HEADER_FONT_SIZE)
 			};
 			Console.WriteLine (uinc2.ViewControllers.Length);
 
@@ -156,7 +160,9 @@ namespace FavoriteMovies
 			uinc3.NavigationBar.TintColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 			uinc3.NavigationBar.Translucent = true;
 			uinc3.NavigationBar.TitleTextAttributes = new UIStringAttributes () {
-				ForegroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f)
+				ForegroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f),
+                Font =UIFont.FromName (ColorExtensions.TITLE_FONT, ColorExtensions.HEADER_FONT_SIZE)
+                                         
 			};
 			Console.WriteLine (uinc3.ViewControllers.Length);
 
@@ -171,7 +177,8 @@ namespace FavoriteMovies
 			uinc4.NavigationBar.BarTintColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f);
 			uinc4.NavigationBar.TintColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 			uinc4.NavigationBar.TitleTextAttributes = new UIStringAttributes () {
-				ForegroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f)
+				ForegroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f),
+				Font = UIFont.FromName (ColorExtensions.TITLE_FONT, ColorExtensions.HEADER_FONT_SIZE)
 			};
 
 			var tab5 = new FindFriendsViewController ();
@@ -185,7 +192,8 @@ namespace FavoriteMovies
 			uinc5.NavigationBar.TintColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 			//uinc4.NavigationBar.Translucent = true;
 			uinc5.NavigationBar.TitleTextAttributes = new UIStringAttributes () {
-				ForegroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f)
+				ForegroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f),
+				Font = UIFont.FromName (ColorExtensions.TITLE_FONT, ColorExtensions.HEADER_FONT_SIZE)
 			};
 
 
@@ -198,7 +206,8 @@ namespace FavoriteMovies
 			uinc7.NavigationBar.BarTintColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f);
 			uinc7.NavigationBar.TintColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 			uinc7.NavigationBar.TitleTextAttributes = new UIStringAttributes () {
-				ForegroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f)
+				ForegroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f),
+				Font = UIFont.FromName (ColorExtensions.TITLE_FONT, ColorExtensions.HEADER_FONT_SIZE)
 			};
 
 			var tab8 = new TipsViewController ();
@@ -210,7 +219,8 @@ namespace FavoriteMovies
 			uinc8.NavigationBar.BarTintColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f);
 			uinc8.NavigationBar.TintColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 			uinc8.NavigationBar.TitleTextAttributes = new UIStringAttributes () {
-				ForegroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f)
+				ForegroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f),
+				Font = UIFont.FromName (ColorExtensions.TITLE_FONT, ColorExtensions.HEADER_FONT_SIZE)
 			};
 
 			var tab9 = new LogOutController ();
@@ -222,7 +232,8 @@ namespace FavoriteMovies
 			uinc9.NavigationBar.BarTintColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f);
 			uinc9.NavigationBar.TintColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 			uinc9.NavigationBar.TitleTextAttributes = new UIStringAttributes () {
-				ForegroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f)
+				ForegroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f),
+				Font = UIFont.FromName (ColorExtensions.TITLE_FONT, ColorExtensions.HEADER_FONT_SIZE)
 			};
 
 			//LoginScreenControl<CredentialsProvider>.Activate (this);
@@ -242,7 +253,8 @@ namespace FavoriteMovies
 			TabController.MoreNavigationController.NavigationBar.TintColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 			//uinc4.NavigationBar.Translucent = true;
 			TabController.MoreNavigationController.NavigationBar.TitleTextAttributes = new UIStringAttributes () {
-				ForegroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f)
+				ForegroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f),
+				Font = UIFont.FromName (ColorExtensions.TITLE_FONT, ColorExtensions.HEADER_FONT_SIZE)
 			};
 
 

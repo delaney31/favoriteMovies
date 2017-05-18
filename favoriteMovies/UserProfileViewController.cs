@@ -299,8 +299,8 @@ namespace FavoriteMovies
 			//scrollView.SizeToFit ();
 			scrollView.Frame = new CGRect () { X = View.Frame.X, Y = 60, Width = View.Frame.Width, Height = View.Frame.Height };
             //For scrolling to work the scrollview Content size has to be bigger than the View.Frame.Height
-           
-            scrollView.ContentSize = new CGSize (320, lastCollectionFrame.Height * (userMovies!=null?userMovies.Count: 1)+ 300);
+            if(customLists.Count > 0)
+               scrollView.ContentSize = new CGSize (320,viewController.CollectionView.Frame.Height + 300);
 			//scrollView.ContentOffset = new CGPoint (0, -scrollView.ContentInset.Top);
 			scrollView.Bounces = true;
 

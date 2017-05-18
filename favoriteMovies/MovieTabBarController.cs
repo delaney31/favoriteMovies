@@ -49,7 +49,7 @@ namespace FavoriteMovies
 			//#endif
 
 			
-			NavigationItem.Title = "Latest Movie News";
+			
 		
 			this.ViewControllerSelected += (sender, e) => 
 			{
@@ -61,10 +61,12 @@ namespace FavoriteMovies
 				{
 					MainViewController.NewCustomListToRefresh = 1;
                     NavigationController.NavigationBar.Hidden = false;
+
 					
                 } else if(TabBar.SelectedItem.Title == "Home")
                 {
 					NavigationController.NavigationBar.Hidden = true;
+                    NavigationItem.Title = "Movie Posts";
                     TabBar.Items [0].BadgeValue = null;
                     var indexpath = NSIndexPath.FromRowSection (0, 0);
                     try 

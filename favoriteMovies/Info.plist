@@ -5,7 +5,7 @@
 	<key>CFBundleIdentifier</key>
 	<string>com.jadesystemsinc.favoritemovies</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.1</string>
+	<string>1.3</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>MinimumOSVersion</key>
@@ -70,6 +70,6 @@
 	<key>Pushwoosh_APPID</key>
 	<string>373F3-33A2A</string>
 	<key>CFBundleVersion</key>
-	<string>13</string>
+	<string>15</string>
 </dict>
 </plist>

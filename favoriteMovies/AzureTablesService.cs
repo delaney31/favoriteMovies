@@ -274,8 +274,8 @@ namespace MovieFriends
 
 				var notifications =
 
-						from notifs in await nfTable.ToListAsync ()
-						join friends in await ufTable.ToListAsync () on notifs.userid equals friends.friendid
+						from notifs in await nfTable.LoadAllAsync ()
+						join friends in await ufTable.LoadAllAsync () on notifs.userid equals friends.friendid
 						where friends.userid == ColorExtensions.CurrentUser.Id
 						select new NotificationsCloud { Id = notifs.Id, notification = notifs.notification, userid = notifs.userid };
 
@@ -396,7 +396,7 @@ namespace MovieFriends
 			{
 				var customLists =
 					from friends in await ufTable.Where (item => item.userid == userid).ToListAsync ()
-					join customlist in await clTable.ToListAsync () on friends.userid equals customlist.UserId
+					join customlist in await clTable.LoadAllAsync () on friends.userid equals customlist.UserId
 					//join movies in await mfTable.ToListAsync () on customlist.Id equals movies.CustomListID
 					where customlist.shared == true
 					select new CustomListCloud{ Id = customlist.Id, Name= customlist.Name, order = customlist.order, shared= customlist.shared };
@@ -512,8 +512,8 @@ namespace MovieFriends
 				
 				var currentUser = userMovies.Where(q=> q.CustomListID!=null);
 				var user2Movies =
-					from  movies in await mfTable.ToListAsync ()
-					join  customlist in await clTable.ToListAsync () 
+					from  movies in await mfTable.LoadAllAsync ()
+					join  customlist in await clTable.LoadAllAsync () 
 					on    movies.CustomListID equals customlist.Id
 					where customlist.UserId == user2Id && customlist.shared
 					select new { movies.OriginalId, customlist.UserId };
@@ -685,7 +685,7 @@ namespace MovieFriends
 
 
 			//cleanup
-			foreach (var item in await clTable.ToListAsync ()) 
+			foreach (var item in await clTable.LoadAllAsync ()) 
 			{
 				var orphan = await mfTable.Where (x => x.CustomListID == item.Id).ToListAsync ();
 				if (orphan.Count () == 0)

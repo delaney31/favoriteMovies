@@ -36,9 +36,6 @@ namespace FavoriteMovies
 		static int DefaultYPositionPopularLabel = 570;
 		static int DefaultYPositionMovieLatestLabel = 830;
 		public static int NewCustomListToRefresh = -1;
-		//public static int OldCustomListToRefresh;
-		//static CGSize ItemSize = new CGSize (153, 205);
-		//static CGSize ItemSize = new CGSize (133, 185);
 		static CGRect FavoriteLabelFrame = new CGRect (7, 50, 180, 20);
 		static CGRect TopRatedLabelFrame = new CGRect (7, 205, 180, 20);
 		static CGRect NowPlayingLabelFrame = new CGRect (7, 400, 180, 20);
@@ -136,7 +133,7 @@ namespace FavoriteMovies
 			// Requests test ads on devices you specify. Your test device ID is printed to the console when
 			// an ad request is made. GADBannerView automatically returns test ads when running on a
 			// simulator. After you get your device ID, add it here
-			request.TestDevices = new [] { Request.SimulatorId.ToString (), "95ca7f0007da8e712049d4673c0627da" };
+			//request.TestDevices = new [] { Request.SimulatorId.ToString (), "95ca7f0007da8e712049d4673c0627da" };
 			return request;
 		}
 		public  override void  ViewDidAppear (bool animated)
@@ -656,13 +653,6 @@ namespace FavoriteMovies
 
 			//Set the search bar in the navigation bar
 			TabController.NavigationItem.TitleView = searchController.SearchBar;
-			//NavigationItem.SetRightBarButtonItem (
-			//		new UIBarButtonItem (UIImage.FromBundle ("threelines")
-			//			, UIBarButtonItemStyle.Plain
-			//			, (sender, args) => {
-			//				SidebarController.ToggleMenu ();
-
-			//			}), true);
 			NavigationController.NavigationBar.Translucent = false;
 			NavigationController.NavigationBar.Hidden = true;
 			TabController.NavigationController.NavigationBar.Hidden = false;
