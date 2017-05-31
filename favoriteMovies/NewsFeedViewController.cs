@@ -1,7 +1,8 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Threading.Tasks;
 using AlertView;
 using CoreGraphics;
 using FavoriteMoviesPCL;
@@ -21,22 +22,45 @@ namespace FavoriteMovies
 		NewsFeedTableSource tableSource;
 		public AzureTablesService postService= AzureTablesService.DefaultService;
         private bool needLogin = true;
-    
-		public override void ViewDidAppear (bool animated)
-		{
-			
-			base.ViewDidAppear (animated);
-			if (tableItems.Count > 0) { return; }
-			tableItems =  MovieNewsFeedService.GetMDCardItems ();
+
+        public override  void ViewDidAppear (bool animated)
+        {
+
+            base.ViewDidAppear (animated);
 			tableSource = new NewsFeedTableSource (tableItems, this);
-			(UIApplication.SharedApplication.Delegate as AppDelegate).rootViewController.TabController.TabBar.Items [0].BadgeValue = "";
 			table.Source = tableSource;
-           
+			NavigationItem.Title = "Movie Posts";
 			View.Add (table);
-           
+
+			
 		}
-		public override void ViewWillAppear(bool animated)
+
+         bool CheckForNewPosts ()
+        {
+            List<MDCard> items = new List<MDCard> ();
+            var ret = false;
+           
+
+            try {
+                items = MovieNewsFeedService.GetMDCardItems ();
+                if (items.Count > 0 && tableItems.Count > 0) {
+                    if (items [0].titleLabel == tableItems [0].titleLabel)
+                        ret = true; ;
+                }
+
+            } catch (Exception e) {
+                //first time in no favorites yet.
+                Debug.Write (e.Message);
+                ret = false;
+            }
+     
+
+            return ret;
+        }
+
+        public override void ViewWillAppear(bool animated)
 		{
+			base.ViewWillAppear (animated);
 			needLogin = ColorExtensions.CurrentUser.username == null;
 
 			if (needLogin) {
@@ -45,20 +69,18 @@ namespace FavoriteMovies
 
 				SideMenuController.ShowTipsController ();
 			}
-
-			if (tableItems.Count == 0) 
+            if (tableItems.Count == 0) 
             {
+                tableItems = MovieNewsFeedService.GetMDCardItems ();
                 MBHUDView.HudWithBody (
-                body: "Loading",
-                aType: MBAlertViewHUDType.ActivityIndicator,
-                delay: 4.0f,
-                showNow: true
-                );
+                   body: "Loading",
+                   aType: MBAlertViewHUDType.ActivityIndicator,
+                   delay: 5.0f,
+                   showNow: true
+                   );
+               
             }
-          
-			base.ViewWillAppear (animated);
-		    NavigationItem.Title = "Movie Posts";
-			
+
 		}
 
 

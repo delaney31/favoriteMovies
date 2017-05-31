@@ -111,8 +111,9 @@ namespace FavoriteMovies
 		}
 
 		public static string Method = "METHOD :";
+        internal static List<MDCard> NewsFeed;
 
-		public static byte [] ConvertImageToByteArray (UIImage image)
+        public static byte [] ConvertImageToByteArray (UIImage image)
 		{
 			byte [] byteArray;
 			using (NSData imageData = image.AsPNG ()) {

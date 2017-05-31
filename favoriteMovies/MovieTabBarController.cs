@@ -39,6 +39,7 @@ namespace FavoriteMovies
 		public override void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
+            NavigationItem.Title = "Movie Posts";
 			//adInterstitial = new FlurryAdInterstitial ("MAIN_SCREEN_INTERSTITIAL");
           
 			//#if DEBUG
@@ -61,7 +62,7 @@ namespace FavoriteMovies
 				{
 					MainViewController.NewCustomListToRefresh = 1;
                     NavigationController.NavigationBar.Hidden = false;
-
+					NavigationItem.Title = "Movies";
 					
                 } else if(TabBar.SelectedItem.Title == "Home")
                 {

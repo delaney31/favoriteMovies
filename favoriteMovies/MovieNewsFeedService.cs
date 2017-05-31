@@ -20,77 +20,13 @@ namespace FavoriteMovies
 	{
 		static string url = "http://movieweb.com/rss/movie-news/";
 
-		internal static List<FeedItem> GetFeedItems ()
-		{
-			List<FeedItem> feedItemsList = new List<FeedItem> ();
-
-			try {
-				WebRequest webRequest = WebRequest.Create (url);
-				WebResponse webResponse = webRequest.GetResponse ();
-				Stream stream = webResponse.GetResponseStream ();
-				XmlDocument xmlDocument = new XmlDocument ();
-				xmlDocument.Load (stream);
-				XmlNamespaceManager nsmgr = new XmlNamespaceManager (xmlDocument.NameTable);
-				nsmgr.AddNamespace ("dc", xmlDocument.DocumentElement.GetNamespaceOfPrefix ("dc"));
-				nsmgr.AddNamespace ("content", xmlDocument.DocumentElement.GetNamespaceOfPrefix ("content"));
-				XmlNodeList itemNodes = xmlDocument.SelectNodes ("rss/channel/item");
-
-			
-				DeleteAllFeedItems ();
-				for (int i = 0; i < itemNodes.Count; i++) 
-				{
-					FeedItem feedItem = new FeedItem ();
-
-					if (itemNodes [i].SelectSingleNode ("title") != null) {
-						feedItem.Title = itemNodes [i].SelectSingleNode ("title").InnerText;
-					}
-					if (itemNodes [i].SelectSingleNode ("link") != null) {
-						feedItem.Link = itemNodes [i].SelectSingleNode ("link").InnerText;
-						//feedItem.Link = itemNodes [i].SelectSingleNode ("enclosure").Attributes ["url"].Value;
-					}
-					if (itemNodes [i].SelectSingleNode ("link") != null) {
-						//feedItem.Link = itemNodes [i].SelectSingleNode ("link").InnerText;
-						feedItem.ImageLink = itemNodes [i].SelectSingleNode ("enclosure").Attributes ["url"].Value;
-					}
-					if (itemNodes [i].SelectSingleNode ("pubDate") != null) {
-						feedItem.PubDate =  itemNodes [i].SelectSingleNode ("pubDate").InnerText;
-					}
-					if (itemNodes [i].SelectSingleNode ("dc:creator", nsmgr) != null) {
-						feedItem.Creator = itemNodes [i].SelectSingleNode ("dc:creator", nsmgr).InnerText;
-					}
-					if (itemNodes [i].SelectSingleNode ("category") != null) {
-						feedItem.Category = itemNodes [i].SelectSingleNode ("category").InnerText;
-					}
-					if (itemNodes [i].SelectSingleNode ("description") != null) {
-						feedItem.Description = itemNodes [i].SelectSingleNode ("description").InnerText;
-					}
-					if (itemNodes [i].SelectSingleNode ("content:encoded", nsmgr) != null) {
-						feedItem.Content = itemNodes [i].SelectSingleNode ("content:encoded", nsmgr).InnerText;
-					} else {
-						feedItem.Content = feedItem.Description;
-					}
-					//feedItem.like = GetCloudLike (feedItem);
-
-					//var id = InsertNewsFeed (feedItem);
-
-					//feedItem.id = id;
-					feedItemsList.Add (feedItem);
-
-				}
-
-			} catch (Exception e) {
-				Console.WriteLine (@"Error{0}", e.Message);
-			}
-
-			return feedItemsList;
-		}
-
-		internal  static List<MDCard> GetMDCardItems ()
+		
+		internal static List<MDCard> GetMDCardItems ()
 		{
 			List<MDCard> feedItemsList = new List<MDCard> ();
 			AzureTablesService postService = AzureTablesService.DefaultService;
 			List<PostItem> result = new List<PostItem> ();
-			
+
 			Task.Run (async () => {
 				postService.InitializeStore ();
 			}).Wait ();
@@ -110,13 +46,13 @@ namespace FavoriteMovies
 
 				//HNKCacheFormat format = (HNKCacheFormat)HNKCache.SharedCache ().Formats ["thumbnail"];
 				//if (format == null) {
-				//	format = new HNKCacheFormat ("thumbnail") {
-				//		Size = new SizeF (320, 240),
-				//		ScaleMode = HNKScaleMode.AspectFill,
-				//		CompressionQuality = 0.5f,
-				//		DiskCapacity = 1 * 1024 * 1024,
-				//		PreloadPolicy = HNKPreloadPolicy.LastSession
-				//	};
+				//  format = new HNKCacheFormat ("thumbnail") {
+				//      Size = new SizeF (320, 240),
+				//      ScaleMode = HNKScaleMode.AspectFill,
+				//      CompressionQuality = 0.5f,
+				//      DiskCapacity = 1 * 1024 * 1024,
+				//      PreloadPolicy = HNKPreloadPolicy.LastSession
+				//  };
 				//}
 
 				//if (format == null) {
@@ -139,11 +75,11 @@ namespace FavoriteMovies
 						//feedItem.Link = itemNodes [i].SelectSingleNode ("link").InnerText;
 						//feedItem.profileImage.SetCacheFormat (new HNKCacheFormat ("thumbnail") 
 						//{
-						//	Size = new SizeF (320, 240),
-						//	ScaleMode = HNKScaleMode.AspectFill,
-						//	CompressionQuality = 0.5f,
-						//	DiskCapacity = 1 * 1024 * 1024,
-						//	PreloadPolicy = HNKPreloadPolicy.LastSession
+						//  Size = new SizeF (320, 240),
+						//  ScaleMode = HNKScaleMode.AspectFill,
+						//  CompressionQuality = 0.5f,
+						//  DiskCapacity = 1 * 1024 * 1024,
+						//  PreloadPolicy = HNKPreloadPolicy.LastSession
 						//});
 
 						feedItem.profileImage.SetImage (MovieCell.GetImageUrl (itemNodes [i].SelectSingleNode ("enclosure").Attributes ["url"].Value));
@@ -173,8 +109,7 @@ namespace FavoriteMovies
 						feed.Content = feedItem.Description;
 					}
 
-					Task.Run (async () => 
-					{
+					Task.Run (async () => {
 						result = await postService.GetCloudLike (feed.Title);
 					}).Wait ();
 
@@ -190,21 +125,19 @@ namespace FavoriteMovies
 
 				}
 
-			} catch (WebException e) 
-			{
+			} catch (WebException e) {
 				Console.WriteLine (@"Error{0}", e.Message + " No internet connection");
 				ShowAlert ("Limited Internet", "Your internet connection is down. Many items will not be available.", "Ok");
 				ColorExtensions.NoInternet = true;
 				//ColorExtensions.CurrentUser.suggestmovies = false;
-			} catch (Exception e) 
-			{
+			} catch (Exception e) {
 				Console.WriteLine (@"Error{0}", e.Message);
 			}
 
+            ColorExtensions.NewsFeed = feedItemsList;
 			return feedItemsList;
 
 		}
-
 
 		static void  ShowAlert (string title, string message, params string [] buttons)
 		{
@@ -229,7 +162,7 @@ namespace FavoriteMovies
 					using (var db = new SQLite.SQLiteConnection (MovieService.Database)) {
 						// there is a sqllite bug here https://forums.xamarin.com/discussion/52822/sqlite-error-deleting-a-record-no-primary-keydb.Delete<Movie> (movieDetail);
 
-						db.Query<Movie> ("DELETE FROM [FeedItem]");
+						db.Query<FeedItem> ("DELETE FROM [FeedItem]");
 
 					}
 				} catch (SQLite.SQLiteException e) {

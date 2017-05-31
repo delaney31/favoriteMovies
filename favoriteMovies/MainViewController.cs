@@ -612,6 +612,7 @@ namespace FavoriteMovies
 		{
 			base.ViewDidLoad ();
             CreateAndRequestInterstitial ();
+            this.Title = "Movies";
             this.TabBarItem.Title = "Movies";
 			// Creates an instance of a custom View Controller that holds the results
 			searchResultsController = new SearchResultsViewController ();

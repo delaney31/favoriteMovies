@@ -84,11 +84,7 @@ namespace FavoriteMovies
 		{
 			return UIInterfaceOrientationMask.Portrait;
 		}
-        public override void ViewDidAppear (bool animated)
-        {
-            base.ViewDidAppear (animated);
-			
-        }
+       
 		public override void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
@@ -127,7 +123,7 @@ namespace FavoriteMovies
 			var uinc1 = new UINavigationController (mainView);
 			uinc1.NavigationBar.BarTintColor = UIColor.Clear.FromHexString (ColorExtensions.NAV_BAR_COLOR, 1.0f);
 			uinc1.NavigationBar.TintColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
-			uinc1.NavigationBar.TopItem.Title = "Home";
+			uinc1.NavigationBar.TopItem.Title = "Movies";
 			//uinc2.NavigationBar.Translucent = true;
 			uinc1.NavigationBar.TitleTextAttributes = new UIStringAttributes () {
 				ForegroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f),
@@ -136,7 +132,6 @@ namespace FavoriteMovies
 
 			var tab2 = new NewsFeedViewController ();
 			tab2.Title = "Home";
-			tab2.View.BackgroundColor = UIColor.Clear.FromHexString (ColorExtensions.TAB_BACKGROUND_COLOR, 1.0f);
 			tab2.TabBarItem.SetFinishedImages (UIImage.FromBundle ("home-7.png"), UIImage.FromBundle ("home-7.png"));
 
 			var uinc2 = new UINavigationController (tab2);
