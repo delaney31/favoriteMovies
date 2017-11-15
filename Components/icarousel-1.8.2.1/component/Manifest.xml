@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<component format="1" id="icarousel">
+  <name>iCarousel</name>
+  <publisher>Xamarin Inc</publisher>
+  <publisher-url>https://xamarin.com</publisher-url>
+  <src-url>https://github.com/xamarin/XamarinComponents/tree/master/iOS/iCarousel</src-url>
+  <version>1.8.2.1</version>
+  <summary>iCarousel is designed to simplify the implementation of various types of carousel (paged, scrolling views) on iPhone and iPad.</summary>
+  <screenshots>
+    <img src="screenshots/screenshot1.png" title="screenshot1" />
+    <img src="screenshots/screenshot2.png" title="screenshot2" />
+  </screenshots>
+  <samples>
+    <sample id="iCarouselSamples">
+      <name>iOS Unified Sample</name>
+      <summary>iOS Unified Sample</summary>
+    </sample>
+    <sample id="iCarouselSamples-Classic">
+      <name>iOS Classic Sample</name>
+      <summary>iOS Classic Sample</summary>
+    </sample>
+  </samples>
+</component>
