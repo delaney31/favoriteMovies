@@ -29,6 +29,10 @@ namespace FavoriteMovies
 			set;
 		}
 
+        public void DidRefreshRegistrationToken (Messaging messaging, string fcmToken)
+        {
+            
+        }
 		//public override void RegisteredForRemoteNotifications (UIApplication application, NSData deviceToken)
 		//{
 		//	PushNotificationManager.PushManager.HandlePushRegistration (deviceToken);
@@ -46,7 +50,7 @@ namespace FavoriteMovies
         public override bool FinishedLaunching (UIApplication application, NSDictionary launchOptions)
         {
             
-            App.Configure ();
+           // App.Configure ();
 
 			// Get your Application Id here: https://apps.admob.com/#account/appmgmt:
 			MobileAds.Configure ("ca-app-pub-3328591715743369~6456302736");
@@ -249,7 +253,7 @@ namespace FavoriteMovies
 
 		}
 	}
-
+  
 
 }
 

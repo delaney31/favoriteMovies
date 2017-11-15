@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Xml;
@@ -100,9 +101,10 @@ namespace FavoriteMovies
 							postService.InitializeStore ();
                             var locator = CrossGeolocator.Current;
                             locator.DesiredAccuracy = 50;
-
+                            var tokenSource = new CancellationTokenSource ();
+                            var token = tokenSource.Token;
                             if (CLLocationManager.LocationServicesEnabled) {
-                                var position = await locator.GetPositionAsync (timeoutMilliseconds: 10000);
+                                var position = await locator.GetPositionAsync (new TimeSpan (10000),token);
 
                                 Console.WriteLine ("Position Status: {0}", position.Timestamp);
                                 Console.WriteLine ("Position Latitude: {0}", position.Latitude);
@@ -301,7 +303,7 @@ namespace FavoriteMovies
 
 		private void DelayInvoke (Action operation)
 		{
-			Timer timer = new Timer ();
+            System.Timers.Timer timer = new System.Timers.Timer ();
 			timer.AutoReset = false;
 			timer.Interval = 3000;
 			timer.Elapsed += (object sender, ElapsedEventArgs e) => {
